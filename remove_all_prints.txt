@@ -1,0 +1,9 @@
+Cmd + Shift + F
+
+sağdaki .* (regex seçeneğini aktif et)
+
+şunu ara: print\(.*\);
+
+replace kısmını boş bırak
+
+replace all a tıkla
