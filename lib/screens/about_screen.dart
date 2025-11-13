@@ -33,10 +33,11 @@ class AboutScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Icon(
-                    Icons.directions_car,
-                    size: 80,
-                    color: Colors.deepPurple,
+                  Image.asset(
+                    'assets/images/app_logo/cebinden_no_bg.png',
+                    height: 180,
+                    width: 180,
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 16),
                   const Text(

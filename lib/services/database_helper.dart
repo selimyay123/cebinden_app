@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/user_model.dart';
+import '../models/user_vehicle_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -9,6 +10,7 @@ class DatabaseHelper {
   // Box isimleri
   static const String usersBox = 'users';
   static const String currentUserBox = 'current_user';
+  static const String userVehiclesBox = 'user_vehicles'; // Kullanıcıların araçları
 
   // Initialize Hive
   static Future<void> init() async {
@@ -17,6 +19,7 @@ class DatabaseHelper {
     // Boxları aç
     final usersBoxInstance = await Hive.openBox<Map>(usersBox);
     final currentUserBoxInstance = await Hive.openBox<String>(currentUserBox);
+    final userVehiclesBoxInstance = await Hive.openBox<Map>(userVehiclesBox);
     
                 
     // Debug: Tüm kullanıcıları listele
@@ -166,7 +169,206 @@ class DatabaseHelper {
   Future<void> clearDatabase() async {
     await _usersBox.clear();
     await _currentUserBox.clear();
+    await _userVehiclesBox.clear();
     await _usersBox.flush();
     await _currentUserBox.flush();
+    await _userVehiclesBox.flush();
       }
+
+  // ============================================================================
+  // USER VEHICLES (Kullanıcıların Sahip Olduğu Araçlar)
+  // ============================================================================
+
+  // User vehicles box'ını al
+  Box<Map> get _userVehiclesBox => Hive.box<Map>(userVehiclesBox);
+
+  // Kullanıcının aracını ekle (satın alma)
+  Future<bool> addUserVehicle(UserVehicle vehicle) async {
+    try {
+      final vehicleMap = Map<dynamic, dynamic>.from(vehicle.toJson());
+      await _userVehiclesBox.put(vehicle.id, vehicleMap);
+      await _userVehiclesBox.flush();
+      print('✅ Vehicle added to user garage: ${vehicle.fullName} (ID: ${vehicle.id})');
+      return true;
+    } catch (e) {
+      print('❌ Error adding vehicle to user: $e');
+      return false;
+    }
+  }
+
+  // Kullanıcının tüm araçlarını getir
+  Future<List<UserVehicle>> getUserVehicles(String userId) async {
+    try {
+      final allVehicles = _userVehiclesBox.values;
+      final userVehicles = <UserVehicle>[];
+      
+      for (final vehicleMap in allVehicles) {
+        final vehicle = UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap));
+        if (vehicle.userId == userId) {
+          userVehicles.add(vehicle);
+        }
+      }
+      
+      // Satın alma tarihine göre sırala (en yeni en üstte)
+      userVehicles.sort((a, b) => b.purchaseDate.compareTo(a.purchaseDate));
+      
+      print('📊 User $userId has ${userVehicles.length} vehicles');
+      return userVehicles;
+    } catch (e) {
+      print('❌ Error getting user vehicles: $e');
+      return [];
+    }
+  }
+
+  // Kullanıcının satılmamış araçlarını getir
+  Future<List<UserVehicle>> getUserActiveVehicles(String userId) async {
+    try {
+      final allVehicles = await getUserVehicles(userId);
+      return allVehicles.where((v) => !v.isSold).toList();
+    } catch (e) {
+      print('❌ Error getting user active vehicles: $e');
+      return [];
+    }
+  }
+
+  // Kullanıcının satılmış araçlarını getir
+  Future<List<UserVehicle>> getUserSoldVehicles(String userId) async {
+    try {
+      final allVehicles = await getUserVehicles(userId);
+      return allVehicles.where((v) => v.isSold).toList();
+    } catch (e) {
+      print('❌ Error getting user sold vehicles: $e');
+      return [];
+    }
+  }
+
+  // Kullanıcının satışa çıkardığı araçları getir
+  Future<List<UserVehicle>> getUserListedVehicles(String userId) async {
+    try {
+      final allVehicles = await getUserVehicles(userId);
+      return allVehicles.where((v) => v.isListedForSale && !v.isSold).toList();
+    } catch (e) {
+      print('❌ Error getting user listed vehicles: $e');
+      return [];
+    }
+  }
+
+  // Kullanıcının araç sayısını getir
+  Future<int> getUserVehicleCount(String userId) async {
+    try {
+      final vehicles = await getUserActiveVehicles(userId);
+      return vehicles.length;
+    } catch (e) {
+      print('❌ Error getting user vehicle count: $e');
+      return 0;
+    }
+  }
+
+  // Belirli bir aracı getir
+  Future<UserVehicle?> getUserVehicleById(String vehicleId) async {
+    try {
+      final vehicleMap = _userVehiclesBox.get(vehicleId);
+      if (vehicleMap == null) return null;
+      return UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap));
+    } catch (e) {
+      print('❌ Error getting user vehicle by id: $e');
+      return null;
+    }
+  }
+
+  // Kullanıcının aracını güncelle
+  Future<bool> updateUserVehicle(String vehicleId, Map<String, dynamic> updates) async {
+    try {
+      final existingVehicle = await getUserVehicleById(vehicleId);
+      if (existingVehicle == null) {
+        print('❌ Vehicle not found: $vehicleId');
+        return false;
+      }
+
+      final updatedVehicleJson = existingVehicle.toJson();
+      updates.forEach((key, value) {
+        updatedVehicleJson[key] = value;
+      });
+
+      final vehicleMap = Map<dynamic, dynamic>.from(updatedVehicleJson);
+      await _userVehiclesBox.put(vehicleId, vehicleMap);
+      await _userVehiclesBox.flush();
+      print('✅ Vehicle updated: $vehicleId');
+      return true;
+    } catch (e) {
+      print('❌ Error updating vehicle: $e');
+      return false;
+    }
+  }
+
+  // Aracı satışa çıkar
+  Future<bool> listVehicleForSale({
+    required String vehicleId,
+    required double listingPrice,
+    required String listingDescription,
+  }) async {
+    try {
+      return await updateUserVehicle(vehicleId, {
+        'isListedForSale': true,
+        'listingPrice': listingPrice,
+        'listingDescription': listingDescription,
+        'listedDate': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      print('❌ Error listing vehicle for sale: $e');
+      return false;
+    }
+  }
+
+  // Kullanıcının aracını sat
+  Future<bool> sellUserVehicle(String vehicleId, double salePrice) async {
+    try {
+      return await updateUserVehicle(vehicleId, {
+        'isSold': true,
+        'salePrice': salePrice,
+        'saleDate': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      print('❌ Error selling vehicle: $e');
+      return false;
+    }
+  }
+
+  // Kullanıcının aracını sil (kalıcı)
+  Future<bool> deleteUserVehicle(String vehicleId) async {
+    try {
+      await _userVehiclesBox.delete(vehicleId);
+      await _userVehiclesBox.flush();
+      print('✅ Vehicle deleted: $vehicleId');
+      return true;
+    } catch (e) {
+      print('❌ Error deleting vehicle: $e');
+      return false;
+    }
+  }
+
+  // Kullanıcının toplam harcamasını hesapla
+  Future<double> getUserTotalSpent(String userId) async {
+    try {
+      final vehicles = await getUserVehicles(userId);
+      return vehicles.fold<double>(0.0, (double sum, vehicle) => sum + vehicle.purchasePrice);
+    } catch (e) {
+      print('❌ Error calculating total spent: $e');
+      return 0.0;
+    }
+  }
+
+  // Kullanıcının toplam kar/zararını hesapla
+  Future<double> getUserTotalProfitLoss(String userId) async {
+    try {
+      final vehicles = await getUserVehicles(userId);
+      return vehicles.fold<double>(0.0, (double sum, vehicle) {
+        final pl = vehicle.profitLoss ?? 0.0;
+        return sum + pl;
+      });
+    } catch (e) {
+      print('❌ Error calculating total profit/loss: $e');
+      return 0.0;
+    }
+  }
 }

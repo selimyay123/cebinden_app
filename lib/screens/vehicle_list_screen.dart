@@ -221,6 +221,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     // Fiyata göre sırala (ucuzdan pahalıya)
     generatedVehicles.sort((a, b) => a.price.compareTo(b.price));
     
+    
     return generatedVehicles;
   }
 
@@ -415,13 +416,19 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         ],
       ),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          // Araç detayına git ve satın alma sonucunu bekle
+          final purchased = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => VehicleDetailScreen(vehicle: vehicle),
             ),
           );
+          
+          // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
+          if (purchased == true && context.mounted) {
+            Navigator.pop(context, true);
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Row(

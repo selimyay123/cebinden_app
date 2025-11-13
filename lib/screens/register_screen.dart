@@ -176,10 +176,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Logo
-                Icon(
-                  Icons.directions_car,
-                  size: 80,
-                  color: Colors.deepPurple,
+                Image.asset(
+                  'assets/images/app_logo/cebinden_no_bg.png',
+                  height: 180,
+                  width: 180,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 20),
 

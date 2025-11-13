@@ -235,8 +235,8 @@ class BrandSelectionScreen extends StatelessWidget {
         elevation: 3,
         shadowColor: categoryColor.withOpacity(0.3),
         child: InkWell(
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            final purchased = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
@@ -246,6 +246,11 @@ class BrandSelectionScreen extends StatelessWidget {
                 ),
               ),
             );
+            
+            // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
+            if (purchased == true && context.mounted) {
+              Navigator.pop(context, true);
+            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
@@ -321,9 +326,9 @@ class BrandSelectionScreen extends StatelessWidget {
         elevation: 1,
         shadowColor: Colors.black.withOpacity(0.05),
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             // Seçilen markaya göre araç listesi sayfasına git
-            Navigator.push(
+            final purchased = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
@@ -333,6 +338,11 @@ class BrandSelectionScreen extends StatelessWidget {
                 ),
               ),
             );
+            
+            // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
+            if (purchased == true && context.mounted) {
+              Navigator.pop(context, true);
+            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(

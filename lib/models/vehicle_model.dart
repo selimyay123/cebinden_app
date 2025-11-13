@@ -20,6 +20,7 @@ class Vehicle {
   final bool hasWarranty; // Garanti var mı?
   final bool hasAccidentRecord; // Ağır hasar kaydı var mı?
   final String description; // İlan açıklaması
+  final int score; // İlan skoru (1-100) - Kullanıcıya gösterilmez, arka plan hesaplama
 
   Vehicle({
     required this.id,
@@ -41,6 +42,7 @@ class Vehicle {
     this.hasWarranty = false,
     this.hasAccidentRecord = false,
     required this.description,
+    required this.score,
   });
 
   // Yeni araç ilanı oluşturma factory
@@ -63,6 +65,19 @@ class Vehicle {
     bool hasAccidentRecord = false,
     required String description,
   }) {
+    // Skor hesapla (otomatik)
+    final calculatedScore = _calculateScore(
+      year: year,
+      mileage: mileage,
+      price: price,
+      fuelType: fuelType,
+      transmission: transmission,
+      hasWarranty: hasWarranty,
+      hasAccidentRecord: hasAccidentRecord,
+      engineSize: engineSize,
+      condition: condition,
+    );
+
     return Vehicle(
       id: const Uuid().v4(),
       brand: brand,
@@ -83,7 +98,173 @@ class Vehicle {
       hasWarranty: hasWarranty,
       hasAccidentRecord: hasAccidentRecord,
       description: description,
+      score: calculatedScore,
     );
+  }
+
+  // Skor hesaplama algoritması (1-100 arası)
+  // Kullanıcıya gösterilmez, arka planda çalışır
+  static int _calculateScore({
+    required int year,
+    required int mileage,
+    required double price,
+    required String fuelType,
+    required String transmission,
+    required bool hasWarranty,
+    required bool hasAccidentRecord,
+    required String engineSize,
+    required String condition,
+  }) {
+    double score = 50.0; // Base score
+
+    // 1. YIL PUANI (max ±15 puan)
+    final currentYear = DateTime.now().year;
+    final age = currentYear - year;
+    if (age <= 1) {
+      score += 15; // Neredeyse sıfır
+    } else if (age <= 3) {
+      score += 12;
+    } else if (age <= 5) {
+      score += 8;
+    } else if (age <= 7) {
+      score += 4;
+    } else if (age <= 10) {
+      score += 0; // Orta yaşlı
+    } else if (age <= 15) {
+      score -= 5;
+    } else {
+      score -= 10; // Çok eski
+    }
+
+    // 2. KİLOMETRE PUANI (max ±15 puan)
+    if (mileage < 10000) {
+      score += 15; // Çok az kullanılmış
+    } else if (mileage < 30000) {
+      score += 12;
+    } else if (mileage < 60000) {
+      score += 8;
+    } else if (mileage < 100000) {
+      score += 4;
+    } else if (mileage < 150000) {
+      score += 0; // Orta
+    } else if (mileage < 200000) {
+      score -= 5;
+    } else if (mileage < 300000) {
+      score -= 10;
+    } else {
+      score -= 15; // Çok yüksek km
+    }
+
+    // 3. FİYAT/DEĞER ORANI (max ±10 puan)
+    // Yıl ve km'ye göre beklenen fiyat
+    final expectedPrice = _calculateExpectedPrice(year, mileage);
+    final priceRatio = price / expectedPrice;
+    
+    if (priceRatio < 0.7) {
+      score += 10; // Çok ucuz (fırsat!)
+    } else if (priceRatio < 0.85) {
+      score += 7;
+    } else if (priceRatio < 1.0) {
+      score += 4;
+    } else if (priceRatio < 1.15) {
+      score += 0; // Normal fiyat
+    } else if (priceRatio < 1.3) {
+      score -= 5;
+    } else {
+      score -= 10; // Çok pahalı
+    }
+
+    // 4. YAKIT TİPİ PUANI (max ±8 puan)
+    switch (fuelType) {
+      case 'Elektrik':
+        score += 8; // En çevreci ve ekonomik
+        break;
+      case 'Hybrid':
+        score += 6;
+        break;
+      case 'Benzin':
+        score += 2;
+        break;
+      case 'Dizel':
+        score += 0; // Nötr
+        break;
+      default:
+        score += 0;
+    }
+
+    // 5. VİTES PUANI (max ±5 puan)
+    if (transmission == 'Otomatik') {
+      score += 5; // Konforlu
+    } else {
+      score += 2; // Manuel (bazıları tercih eder)
+    }
+
+    // 6. GARANTİ PUANI (max +7 puan)
+    if (hasWarranty) {
+      score += 7; // Garanti güven verir
+    }
+
+    // 7. KAZA KAYDI PUANI (max -12 puan)
+    if (hasAccidentRecord) {
+      score -= 12; // Ağır hasar kayıtlı araç risk
+    }
+
+    // 8. MOTOR HACMİ PUANI (max ±5 puan)
+    try {
+      final engineValue = double.parse(engineSize.replaceAll(RegExp(r'[^0-9.]'), ''));
+      if (engineValue >= 2.0 && engineValue <= 2.5) {
+        score += 5; // İdeal motor hacmi
+      } else if (engineValue >= 1.6 && engineValue < 2.0) {
+        score += 3;
+      } else if (engineValue >= 1.4 && engineValue < 1.6) {
+        score += 1;
+      } else if (engineValue >= 3.0) {
+        score -= 3; // Çok büyük motor (yakıt tüketimi)
+      } else if (engineValue < 1.2) {
+        score -= 2; // Çok küçük motor (güçsüz)
+      }
+    } catch (e) {
+      // Motor hacmi parse edilemezse 0 puan
+    }
+
+    // 9. DURUM PUANI (max ±10 puan)
+    switch (condition) {
+      case 'Sıfır':
+        score += 10; // Yepyeni araç
+        break;
+      case 'İkinci El':
+        score += 0; // Standart
+        break;
+      case 'Hasarlı':
+        score -= 10; // Hasarlı araç
+        break;
+      default:
+        score += 0;
+    }
+
+    // Skoru 1-100 arasına sınırla
+    score = score.clamp(1.0, 100.0);
+
+    return score.round();
+  }
+
+  // Beklenen fiyat hesaplama (basit model)
+  static double _calculateExpectedPrice(int year, int mileage) {
+    final currentYear = DateTime.now().year;
+    final age = currentYear - year;
+    
+    // Base fiyat (ortalama bir araç için)
+    double basePrice = 500000.0;
+    
+    // Yıl başına %10 değer kaybı
+    basePrice = basePrice * (1 - (age * 0.10));
+    
+    // Her 10,000 km için %2 değer kaybı
+    final kmFactor = (mileage / 10000) * 0.02;
+    basePrice = basePrice * (1 - kmFactor);
+    
+    // Minimum fiyat
+    return basePrice.clamp(50000.0, 2000000.0);
   }
 
   // Tam araç adı
@@ -94,6 +275,25 @@ class Vehicle {
 
   // JSON'dan Vehicle oluşturma
   factory Vehicle.fromJson(Map<String, dynamic> json) {
+    // Eğer score yoksa (eski kayıtlar), hesapla
+    final int score;
+    if (json['score'] != null) {
+      score = json['score'] as int;
+    } else {
+      // Eski kayıtlar için score hesapla
+      score = _calculateScore(
+        year: json['year'] as int,
+        mileage: json['mileage'] as int,
+        price: (json['price'] as num).toDouble(),
+        fuelType: json['fuelType'] as String,
+        transmission: json['transmission'] as String,
+        hasWarranty: json['hasWarranty'] as bool? ?? false,
+        hasAccidentRecord: json['hasAccidentRecord'] as bool? ?? false,
+        engineSize: json['engineSize'] as String? ?? '1.6',
+        condition: json['condition'] as String? ?? 'İkinci El',
+      );
+    }
+
     return Vehicle(
       id: json['id'] as String,
       brand: json['brand'] as String,
@@ -114,6 +314,7 @@ class Vehicle {
       hasWarranty: json['hasWarranty'] as bool? ?? false,
       hasAccidentRecord: json['hasAccidentRecord'] as bool? ?? false,
       description: json['description'] as String? ?? 'Açıklama yok',
+      score: score,
     );
   }
 
@@ -139,6 +340,7 @@ class Vehicle {
       'hasWarranty': hasWarranty,
       'hasAccidentRecord': hasAccidentRecord,
       'description': description,
+      'score': score, // İlan skoru (arka plan)
     };
   }
 

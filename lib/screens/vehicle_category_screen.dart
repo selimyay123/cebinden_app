@@ -87,10 +87,10 @@ class VehicleCategoryScreen extends StatelessWidget {
         elevation: 2,
         shadowColor: Colors.black.withOpacity(0.1),
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             // Otomobil kategorisi için marka seçimi, diğerleri için direkt liste
             if (title == 'Otomobil') {
-              Navigator.push(
+              final purchased = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => BrandSelectionScreen(
@@ -99,9 +99,14 @@ class VehicleCategoryScreen extends StatelessWidget {
                   ),
                 ),
               );
+              
+              // Eğer satın alma başarılıysa, home screen'e bildir
+              if (purchased == true && context.mounted) {
+                Navigator.pop(context, true);
+              }
             } else {
               // Diğer kategoriler için direkt araç listesi
-              Navigator.push(
+              final purchased = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => VehicleListScreen(
@@ -111,6 +116,11 @@ class VehicleCategoryScreen extends StatelessWidget {
                   ),
                 ),
               );
+              
+              // Eğer satın alma başarılıysa, home screen'e bildir
+              if (purchased == true && context.mounted) {
+                Navigator.pop(context, true);
+              }
             }
           },
           borderRadius: BorderRadius.circular(16),

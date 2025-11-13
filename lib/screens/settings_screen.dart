@@ -276,7 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onChanged: _toggleDarkMode,
               ),
               _buildListTile(
-                icon: Icons.attach_money,
+                icon: Icons.account_balance_wallet,
                 title: 'Para Birimi',
                 trailing: DropdownButton<String>(
                   value: _selectedCurrency,

@@ -19,7 +19,7 @@ class User {
     required this.gender,
     required this.birthDate,
     required this.registeredAt,
-    this.balance = 100000.0, // Varsayılan başlangıç parası: 100,000 TL
+    this.balance = 1000000.0, // Varsayılan başlangıç parası: 1,000,000 TL
     this.profitLossPercentage = 0.0, // Başlangıçta kar/zarar yok
     this.profileImageUrl,
     this.currency = 'TL', // Varsayılan para birimi
@@ -62,7 +62,7 @@ class User {
       gender: json['gender'] as String,
       birthDate: DateTime.parse(json['birthDate'] as String),
       registeredAt: DateTime.parse(json['registeredAt'] as String),
-      balance: (json['balance'] as num?)?.toDouble() ?? 100000.0,
+      balance: (json['balance'] as num?)?.toDouble() ?? 1000000.0,
       profitLossPercentage: (json['profitLossPercentage'] as num?)?.toDouble() ?? 0.0,
       profileImageUrl: json['profileImageUrl'] as String?,
       currency: json['currency'] as String? ?? 'TL',

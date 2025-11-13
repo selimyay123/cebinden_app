@@ -52,10 +52,11 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Logo veya uygulama ikonu
-            Icon(
-              Icons.directions_car,
-              size: 100,
-              color: Colors.white,
+            Image.asset(
+              'assets/images/app_logo/cebinden_no_bg.png',
+              height: 180,
+              width: 180,
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: 20),
             // Uygulama adı

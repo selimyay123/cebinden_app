@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
 import 'services/database_helper.dart';
 
@@ -35,6 +36,7 @@ class CebindenApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
         useMaterial3: true,
+        fontFamily: GoogleFonts.poppins().fontFamily,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           elevation: 0,
