@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -35,11 +36,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       initialDate: DateTime(2000, 1, 1),
       firstDate: DateTime(1940, 1, 1),
       lastDate: DateTime.now(),
-      locale: const Locale('tr', 'TR'),
-      helpText: 'Doğum Tarihinizi Seçin',
-      cancelText: 'İptal',
-      confirmText: 'Tamam',
-      fieldLabelText: 'Doğum Tarihi',
+      locale: Locale(LocalizationService().currentLanguage, LocalizationService().currentLanguage.toUpperCase()),
+      helpText: 'auth.selectBirthDate'.tr(),
+      cancelText: 'common.cancel'.tr(),
+      confirmText: 'common.ok'.tr(),
+      fieldLabelText: 'auth.birthDate'.tr(),
     );
 
     if (picked != null && picked != _selectedBirthDate) {
@@ -63,7 +64,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Boş kontrol
     if (username.isEmpty) {
       setState(() {
-        _errorMessage = 'Lütfen bir kullanıcı adı girin';
+        _errorMessage = 'auth.usernameRequired'.tr();
         _isLoading = false;
       });
       return;
@@ -72,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Minimum uzunluk kontrolü
     if (username.length < 3) {
       setState(() {
-        _errorMessage = 'Kullanıcı adı en az 3 karakter olmalıdır';
+        _errorMessage = 'Username must be at least 3 characters'.tr();
         _isLoading = false;
       });
       return;
@@ -81,7 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Maksimum uzunluk kontrolü
     if (username.length > 20) {
       setState(() {
-        _errorMessage = 'Kullanıcı adı en fazla 20 karakter olabilir';
+        _errorMessage = 'Username cannot exceed 20 characters'.tr();
         _isLoading = false;
       });
       return;
@@ -90,7 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Şifre kontrolleri
     if (password.isEmpty) {
       setState(() {
-        _errorMessage = 'Lütfen bir şifre belirleyin';
+        _errorMessage = 'auth.passwordRequired'.tr();
         _isLoading = false;
       });
       return;
@@ -98,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (password.length < 6) {
       setState(() {
-        _errorMessage = 'Şifre en az 6 karakter olmalıdır';
+        _errorMessage = 'Password must be at least 6 characters'.tr();
         _isLoading = false;
       });
       return;
@@ -106,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (password != passwordConfirm) {
       setState(() {
-        _errorMessage = 'Şifreler eşleşmiyor';
+        _errorMessage = 'auth.passwordMismatch'.tr();
         _isLoading = false;
       });
       return;
@@ -115,7 +116,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Cinsiyet kontrolü
     if (_selectedGender == null) {
       setState(() {
-        _errorMessage = 'Lütfen cinsiyetinizi seçin';
+        _errorMessage = 'auth.selectGender'.tr();
         _isLoading = false;
       });
       return;
@@ -124,7 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Doğum tarihi kontrolü
     if (_selectedBirthDate == null) {
       setState(() {
-        _errorMessage = 'Lütfen doğum tarihinizi seçin';
+        _errorMessage = 'auth.selectBirthDate'.tr();
         _isLoading = false;
       });
       return;
@@ -134,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final age = DateTime.now().year - _selectedBirthDate!.year;
     if (age < 13) {
       setState(() {
-        _errorMessage = 'En az 13 yaşında olmalısınız';
+        _errorMessage = 'You must be at least 13 years old'.tr();
         _isLoading = false;
       });
       return;
@@ -151,13 +152,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!mounted) return;
 
     if (success) {
-      // Başarılı kayıt - Ana sayfaya yönlendir
-      Navigator.of(context).pushReplacement(
+      // Başarılı kayıt - Tüm route geçmişini temizle ve ana sayfaya yönlendir
+      print('✅ Kayıt başarılı!');
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false, // Tüm önceki ekranları temizle
       );
     } else {
       setState(() {
-        _errorMessage = 'Bu kullanıcı adı zaten kullanılıyor';
+        _errorMessage = 'auth.usernameExists'.tr();
         _isLoading = false;
       });
     }
@@ -185,10 +188,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 20),
 
                 // Başlık
-                const Text(
-                  'Cebinden',
+                Text(
+                  'app.name'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: Colors.deepPurple,
@@ -196,10 +199,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Sanal Araba Ticareti',
+                Text(
+                  'app.subtitle'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
                   ),
@@ -207,20 +210,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 50),
 
                 // Alt başlık
-                const Text(
-                  'Hesap Oluştur',
+                Text(
+                  'auth.register'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Oyuna başlamak için bir kullanıcı adı seçin',
+                Text(
+                  'Choose a username to start the game'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -232,8 +235,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _usernameController,
                   enabled: !_isLoading,
                   decoration: InputDecoration(
-                    labelText: 'Kullanıcı Adı',
-                    hintText: 'Kullanıcı adınızı girin',
+                    labelText: 'auth.username'.tr(),
+                    hintText: 'auth.enterUsername'.tr(),
                     prefixIcon: const Icon(Icons.person),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -260,8 +263,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   enabled: !_isLoading,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    labelText: 'Şifre',
-                    hintText: 'Şifrenizi belirleyin',
+                    labelText: 'auth.password'.tr(),
+                    hintText: 'auth.enterPassword'.tr(),
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -300,8 +303,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   enabled: !_isLoading,
                   obscureText: _obscurePasswordConfirm,
                   decoration: InputDecoration(
-                    labelText: 'Şifre Tekrar',
-                    hintText: 'Şifrenizi tekrar girin',
+                    labelText: 'auth.confirmPassword'.tr(),
+                    hintText: 'auth.enterPasswordAgain'.tr(),
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -338,7 +341,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 DropdownButtonFormField<String>(
                   value: _selectedGender,
                   decoration: InputDecoration(
-                    labelText: 'Cinsiyet',
+                    labelText: 'auth.gender'.tr(),
                     prefixIcon: const Icon(Icons.people),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -355,14 +358,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: 'Erkek',
-                      child: Text('Erkek'),
+                      child: Text('auth.male'.tr()),
                     ),
                     DropdownMenuItem(
                       value: 'Kadın',
-                      child: Text('Kadın'),
+                      child: Text('auth.female'.tr()),
                     ),
                   ],
                   onChanged: _isLoading
@@ -381,7 +384,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onTap: _isLoading ? null : _selectBirthDate,
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      labelText: 'Doğum Tarihi',
+                      labelText: 'auth.birthDate'.tr(),
                       prefixIcon: const Icon(Icons.calendar_today),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -400,7 +403,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     child: Text(
                       _selectedBirthDate == null
-                          ? 'Doğum tarihinizi seçin'
+                          ? 'auth.selectBirthDate'.tr()
                           : '${_selectedBirthDate!.day.toString().padLeft(2, '0')}/${_selectedBirthDate!.month.toString().padLeft(2, '0')}/${_selectedBirthDate!.year}',
                       style: TextStyle(
                         color: _selectedBirthDate == null
@@ -465,9 +468,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text(
-                            'Kayıt Ol',
-                            style: TextStyle(
+                        : Text(
+                            'auth.register'.tr(),
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),

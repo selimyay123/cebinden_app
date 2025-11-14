@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
+import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 
 class ProfileInfoScreen extends StatelessWidget {
@@ -15,7 +16,7 @@ class ProfileInfoScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Profil Bilgileri'),
+        title: Text('profile.title'.tr()),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -74,7 +75,7 @@ class ProfileInfoScreen extends StatelessWidget {
 
             // Kişisel Bilgiler
             _buildInfoCard(
-              title: 'Kişisel Bilgiler',
+              title: 'profile.personalInfo'.tr(),
               icon: Icons.person_outline,
               children: [
                 _buildInfoRow('Kullanıcı Adı', user.username),
@@ -88,7 +89,7 @@ class ProfileInfoScreen extends StatelessWidget {
 
             // Hesap Bilgileri
             _buildInfoCard(
-              title: 'Hesap Bilgileri',
+              title: 'profile.accountInfo'.tr(),
               icon: Icons.account_balance_wallet_outlined,
               children: [
                 _buildInfoRow('Bakiye', '${_formatCurrency(user.balance)} ${user.currency}'),
@@ -105,7 +106,7 @@ class ProfileInfoScreen extends StatelessWidget {
 
             // Kayıt Bilgileri
             _buildInfoCard(
-              title: 'Kayıt Bilgileri',
+              title: 'profile.registrationInfo'.tr(),
               icon: Icons.calendar_today_outlined,
               children: [
                 _buildInfoRow('Kayıt Tarihi', _formatDate(user.registeredAt)),

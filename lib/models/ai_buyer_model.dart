@@ -1,0 +1,238 @@
+import 'dart:math';
+
+/// AI alıcı tipleri
+enum BuyerType {
+  bargainer, // Pazarlıkçı - Düşük teklif verir
+  realistic, // Gerçekçi - Adil fiyat civarı
+  urgent, // Acil - İlan fiyatına yakın
+  generous, // Cömert - İlan fiyatı veya üstü
+}
+
+/// AI Alıcı Modeli
+class AIBuyer {
+  final String buyerId;
+  final String buyerName;
+  final BuyerType buyerType;
+  final double budget; // Bütçe
+  final List<String> preferredBrands; // Tercih edilen markalar
+  final double maxPaymentRatio; // Adil fiyatın kaç katını ödeyebilir (0.8 - 1.2)
+  final String message; // Teklif mesajı
+
+  AIBuyer({
+    required this.buyerId,
+    required this.buyerName,
+    required this.buyerType,
+    required this.budget,
+    required this.preferredBrands,
+    required this.maxPaymentRatio,
+    required this.message,
+  });
+
+  /// Random AI alıcı oluştur
+  factory AIBuyer.generateRandom() {
+    final random = Random();
+    
+    // Tip seç (ağırlıklı random)
+    BuyerType type;
+    double typeRoll = random.nextDouble();
+    if (typeRoll < 0.50) {
+      type = BuyerType.bargainer; // %50
+    } else if (typeRoll < 0.80) {
+      type = BuyerType.realistic; // %30
+    } else if (typeRoll < 0.95) {
+      type = BuyerType.urgent; // %15
+    } else {
+      type = BuyerType.generous; // %5
+    }
+
+    // İsim oluştur
+    String name = _generateRandomName(random);
+    
+    // Bütçe belirle (500K - 5M arası)
+    double budget = 500000 + random.nextDouble() * 4500000;
+    
+    // Tercih edilen markalar (1-3 arası)
+    List<String> preferredBrands = _generatePreferredBrands(random);
+    
+    // Max ödeme oranı (tipe göre)
+    double maxPaymentRatio;
+    String message;
+    
+    switch (type) {
+      case BuyerType.bargainer:
+        maxPaymentRatio = 0.75 + random.nextDouble() * 0.15; // 0.75-0.90
+        message = _getBargainerMessage(random);
+        break;
+      case BuyerType.realistic:
+        maxPaymentRatio = 0.95 + random.nextDouble() * 0.10; // 0.95-1.05
+        message = _getRealisticMessage(random);
+        break;
+      case BuyerType.urgent:
+        maxPaymentRatio = 0.95 + random.nextDouble() * 0.10; // 0.95-1.05
+        message = _getUrgentMessage(random);
+        break;
+      case BuyerType.generous:
+        maxPaymentRatio = 1.00 + random.nextDouble() * 0.15; // 1.00-1.15
+        message = _getGenerousMessage(random);
+        break;
+    }
+    
+    return AIBuyer(
+      buyerId: 'ai_${DateTime.now().millisecondsSinceEpoch}_${random.nextInt(1000)}',
+      buyerName: name,
+      buyerType: type,
+      budget: budget,
+      preferredBrands: preferredBrands,
+      maxPaymentRatio: maxPaymentRatio,
+      message: message,
+    );
+  }
+
+  /// Teklif miktarı hesapla
+  double calculateOffer({
+    required double listingPrice,
+    required double fairPrice,
+  }) {
+    final random = Random();
+    double offerPrice;
+    
+    switch (buyerType) {
+      case BuyerType.bargainer:
+        // İlan fiyatının %75-90'ını teklif eder
+        offerPrice = listingPrice * (0.75 + random.nextDouble() * 0.15);
+        break;
+      case BuyerType.realistic:
+        // Adil fiyatın %95-105'ini teklif eder
+        offerPrice = fairPrice * (0.95 + random.nextDouble() * 0.10);
+        break;
+      case BuyerType.urgent:
+        // İlan fiyatının %95-100'ünü teklif eder
+        offerPrice = listingPrice * (0.95 + random.nextDouble() * 0.05);
+        break;
+      case BuyerType.generous:
+        // İlan fiyatının %100-110'unu teklif eder
+        offerPrice = listingPrice * (1.00 + random.nextDouble() * 0.10);
+        break;
+    }
+    
+    // Bütçeyi aşmamalı
+    if (offerPrice > budget) {
+      offerPrice = budget * 0.95; // Bütçenin %95'i
+    }
+    
+    // 1000'e yuvarla
+    return (offerPrice / 1000).round() * 1000.0;
+  }
+
+  /// Bu alıcı bu ilana ilgilenebilir mi?
+  bool isInterestedIn({
+    required String vehicleBrand,
+    required double listingPrice,
+    required double fairPrice,
+  }) {
+    // Bütçe kontrolü
+    if (listingPrice > budget * 1.1) return false; // Bütçenin %110'undan fazla olamaz
+    
+    // Marka tercihi kontrolü (ağırlıklı)
+    bool brandMatch = preferredBrands.contains(vehicleBrand);
+    
+    // Fiyat/değer oranı kontrolü
+    double priceRatio = listingPrice / fairPrice;
+    bool goodDeal = priceRatio <= maxPaymentRatio;
+    
+    // Karar ver
+    if (brandMatch && goodDeal) {
+      return true; // %100 ilgilenir
+    } else if (brandMatch) {
+      return Random().nextDouble() < 0.6; // Marka uygun ama pahalı, %60 şans
+    } else if (goodDeal && priceRatio < 0.80) {
+      return Random().nextDouble() < 0.7; // Marka değil ama çok ucuz, %70 şans (fırsatçı)
+    } else {
+      return false;
+    }
+  }
+
+  // === HELPER METHODS ===
+
+  static String _generateRandomName(Random random) {
+    final firstNames = [
+      'Ahmet', 'Mehmet', 'Zeynep', 'Ayşe', 'Can', 'Elif', 
+      'Burak', 'Selin', 'Emre', 'Deniz', 'Cem', 'Merve',
+      'Kaan', 'Esra', 'Murat', 'Burcu', 'Onur', 'Gizem',
+      'Serkan', 'Ebru', 'Tolga', 'Pınar', 'Barış', 'Seda',
+    ];
+    
+    final lastInitials = [
+      'A.', 'B.', 'C.', 'D.', 'E.', 'F.', 'G.', 'H.', 
+      'İ.', 'J.', 'K.', 'L.', 'M.', 'N.', 'Ö.', 'P.',
+      'R.', 'S.', 'T.', 'U.', 'Ü.', 'V.', 'Y.', 'Z.',
+    ];
+    
+    return '${firstNames[random.nextInt(firstNames.length)]} ${lastInitials[random.nextInt(lastInitials.length)]}';
+  }
+
+  static List<String> _generatePreferredBrands(Random random) {
+    final allBrands = [
+      'Bayern Motors', 'Falke', 'Veloce', 'Nippon',
+      'Spartana', 'Tudor', 'Cheonji', 'Gallia',
+    ];
+    
+    // 1-3 arası marka seç
+    int brandCount = 1 + random.nextInt(3);
+    List<String> selected = [];
+    
+    for (int i = 0; i < brandCount; i++) {
+      String brand = allBrands[random.nextInt(allBrands.length)];
+      if (!selected.contains(brand)) {
+        selected.add(brand);
+      }
+    }
+    
+    return selected;
+  }
+
+  static String _getBargainerMessage(Random random) {
+    final messages = [
+      'Bütçem biraz kısıtlı, bu fiyata anlaşabilir miyiz?',
+      'Finansal durumum şu an çok iyi değil ama aracı çok beğendim.',
+      'Son teklifim bu, daha fazlasını ödeyemem maalesef.',
+      'Elimdeki bu kadar, lütfen kabul edin.',
+      'Bu fiyat benim için en mantıklısı, değerlendirirseniz sevinirim.',
+    ];
+    return messages[random.nextInt(messages.length)];
+  }
+
+  static String _getRealisticMessage(Random random) {
+    final messages = [
+      'Piyasa değerine uygun bir teklif sunuyorum.',
+      'Araştırmalarım sonucu adil bir fiyat belirledim.',
+      'Hem sizin hem benim için uygun bir fiyat olduğunu düşünüyorum.',
+      'Benzer araçların fiyatlarına baktım, bu fiyat makul.',
+      'Gerçekçi bir teklif ile karşınızdayım.',
+    ];
+    return messages[random.nextInt(messages.length)];
+  }
+
+  static String _getUrgentMessage(Random random) {
+    final messages = [
+      'Acil ihtiyacım var, hemen anlaşabiliriz.',
+      'Bugün içinde işlemi kapatmam gerekiyor.',
+      'Çok acelem var, istediğiniz fiyatı veriyorum.',
+      'İşim düştü bu şehre, hemen bir araca ihtiyacım var.',
+      'Acil durumum var, lütfen kabul edin.',
+    ];
+    return messages[random.nextInt(messages.length)];
+  }
+
+  static String _getGenerousMessage(Random random) {
+    final messages = [
+      'Tam aradığım araç, istediğiniz fiyatı veriyorum.',
+      'Uzun süredir bu modeli arıyordum, fiyat sorun değil.',
+      'Çok beğendim, istediğiniz ücreti ödemeye hazırım.',
+      'Bu araç tam bana göre, paranız hazır.',
+      'Kesinlikle almak istiyorum, fiyat konusunda esnek değilim.',
+    ];
+    return messages[random.nextInt(messages.length)];
+  }
+}
+

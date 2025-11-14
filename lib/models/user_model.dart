@@ -85,6 +85,33 @@ class User {
     };
   }
 
+  // copyWith metodu
+  User copyWith({
+    String? id,
+    String? username,
+    String? password,
+    String? gender,
+    DateTime? birthDate,
+    DateTime? registeredAt,
+    double? balance,
+    double? profitLossPercentage,
+    String? profileImageUrl,
+    String? currency,
+  }) {
+    return User(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      password: password ?? this.password,
+      gender: gender ?? this.gender,
+      birthDate: birthDate ?? this.birthDate,
+      registeredAt: registeredAt ?? this.registeredAt,
+      balance: balance ?? this.balance,
+      profitLossPercentage: profitLossPercentage ?? this.profitLossPercentage,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      currency: currency ?? this.currency,
+    );
+  }
+
   @override
   String toString() {
     return 'User(id: $id, username: $username, gender: $gender, age: $age)';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/localization_service.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -8,7 +9,7 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Hakkında'),
+        title: Text('about.title'.tr()),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -65,7 +66,7 @@ class AboutScreen extends StatelessWidget {
             // Açıklama
             _buildInfoCard(
               icon: Icons.info_outline,
-              title: 'Uygulama Hakkında',
+              title: 'about.aboutApp'.tr(),
               content:
                   'Cebinden, eğlenceli ve interaktif bir araç alım-satım simülasyon oyunudur. '
                   'Sanal para ile araç alıp satabilir, kar elde edebilir ve garajınızı büyütebilirsiniz!\n\n'
@@ -78,7 +79,7 @@ class AboutScreen extends StatelessWidget {
             // Özellikler
             _buildInfoCard(
               icon: Icons.star_outline,
-              title: 'Özellikler',
+              title: 'about.features'.tr(),
               content:
                   '✓ Çeşitli marka ve modellerde araçlar\n'
                   '✓ Detaylı filtreleme sistemi\n'
@@ -94,7 +95,7 @@ class AboutScreen extends StatelessWidget {
             // İletişim
             _buildInfoCard(
               icon: Icons.contact_mail_outlined,
-              title: 'İletişim',
+              title: 'about.contactTitle'.tr(),
               content:
                   'Geri bildirim, öneri veya sorularınız için:\n\n'
                   '📧 E-posta: info@cebinden.com\n'
@@ -107,7 +108,7 @@ class AboutScreen extends StatelessWidget {
             // Geliştirici
             _buildInfoCard(
               icon: Icons.code,
-              title: 'Geliştirici',
+              title: 'about.developerTitle'.tr(),
               content:
                   'Bu uygulama Flutter ile geliştirilmiştir.\n\n'
                   '© 2024 Cebinden\n'

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 
 class MyListingsScreen extends StatefulWidget {
@@ -44,13 +45,16 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('İlanlarım'),
-        elevation: 0,
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-      ),
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('listings.title'.tr()),
+            elevation: 0,
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+          ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -66,6 +70,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       },
                     ),
             ),
+        );
+      },
     );
   }
 
@@ -83,7 +89,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Henüz satışa çıkardığınız araç yok!',
+              'listings.noListings'.tr(),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -93,7 +99,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Garajınızdaki araçları satışa çıkararak ilan oluşturabilirsiniz.',
+              'listings.noListingsDesc'.tr(),
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
@@ -169,7 +175,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'Satışta',
+                          'vehicles.onSale'.tr(),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -192,7 +198,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'İlan Fiyatı',
+                        'vehicles.listingPrice'.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -214,7 +220,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Alış Fiyatı',
+                      'vehicles.purchasePrice'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -252,7 +258,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Potansiyel ${_isProfit(vehicle) ? "Kar" : "Zarar"}: ${_formatCurrency(_getPotentialProfit(vehicle))} TL',
+                    '${'myListings.potential'.tr()} ${_isProfit(vehicle) ? 'myListings.profit'.tr() : 'myListings.loss'.tr()}: ${_formatCurrency(_getPotentialProfit(vehicle))} TL',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -268,7 +274,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             // İlan Açıklaması
             if (vehicle.listingDescription != null) ...[
               Text(
-                'İlan Açıklaması',
+                'myListings.description'.tr(),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -295,11 +301,11 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
               children: [
                 _buildInfoChip(
                   Icons.calendar_today,
-                  'İlan: ${_formatDate(vehicle.listedDate ?? DateTime.now())}',
+                  '${'myListings.listed'.tr()}: ${_formatDate(vehicle.listedDate ?? DateTime.now())}',
                 ),
                 _buildInfoChip(
                   Icons.access_time,
-                  '$daysListed gün önce',
+                  '$daysListed ${'misc.daysAgo'.tr()}',
                 ),
               ],
             ),
@@ -314,14 +320,14 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     onPressed: () {
                       // TODO: İlanı düzenle
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('İlan düzenleme özelliği yakında...'),
-                          duration: Duration(seconds: 2),
+                        SnackBar(
+                          content: Text('sell.editListingComingSoon'.tr()),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     },
                     icon: const Icon(Icons.edit),
-                    label: const Text('Düzenle'),
+                    label: Text('sell.editButton'.tr()),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.deepPurple,
                       side: const BorderSide(color: Colors.deepPurple),
@@ -339,7 +345,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       _showRemoveListingDialog(vehicle);
                     },
                     icon: const Icon(Icons.close),
-                    label: const Text('İlanı Kaldır'),
+                    label: Text('sell.removeListing'.tr()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
@@ -398,14 +404,14 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('İlanı Kaldır'),
+        title: Text('sell.removeListing'.tr()),
         content: Text(
-          '${vehicle.fullName} ilanını kaldırmak istediğinize emin misiniz?\n\nAraç garajınızda kalmaya devam edecek.',
+          '${vehicle.fullName} ${'myListings.removeConfirm'.tr()}\n\n${'myListings.willStayInGarage'.tr()}',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -420,8 +426,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
               
               if (success && mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('✅ İlan başarıyla kaldırıldı!'),
+                  SnackBar(
+                    content: Text('sell.listingRemoved'.tr()),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -432,7 +438,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Kaldır'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),

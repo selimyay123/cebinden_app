@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import '../services/localization_service.dart';
 import '../models/vehicle_model.dart';
 import 'vehicle_detail_screen.dart';
 
@@ -227,7 +228,11 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    // ValueListenableBuilder ile dil değişikliklerini dinle
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text(widget.categoryName),
@@ -344,7 +349,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${filteredVehicles.length} araç bulundu',
+                        '${filteredVehicles.length} ${'vehicles.foundVehicles'.tr()}',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[700],
@@ -372,7 +377,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Filtrelere uygun araç bulunamadı',
+                          'vehicles.noVehiclesFiltered'.tr(),
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -381,7 +386,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                         const SizedBox(height: 8),
                         TextButton(
                           onPressed: _clearFilters,
-                          child: const Text('Filtreleri Temizle'),
+                          child: Text('vehicles.clearFilters'.tr()),
                         ),
                       ],
                     ),
@@ -397,6 +402,8 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
           ),
         ],
       ),
+    );
+      },
     );
   }
 
@@ -869,7 +876,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   void _showFuelTypeFilter(BuildContext context) {
     _showDropdownFilter(
       context,
-      title: 'Yakıt Tipi',
+      title: 'vehicles.fuelType'.tr(),
       options: ['Benzin', 'Dizel', 'Hybrid', 'Elektrik'],
       selectedValues: selectedFuelTypes,
       onUpdate: () => setState(() => _applyFilters()),
@@ -929,7 +936,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   void _showYearFilter(BuildContext context) {
     _showSingleSelectFilter(
       context,
-      title: 'Model Yılı',
+      title: 'vehicles.modelYear'.tr(),
       options: {
         '2024': '2024',
         '2020-2023': '2020-2023',

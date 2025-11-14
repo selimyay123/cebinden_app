@@ -5,6 +5,7 @@ import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
+import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
@@ -53,10 +54,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          body: CustomScrollView(
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        return Stack(
+          children: [
+            Scaffold(
+              body: CustomScrollView(
         slivers: [
           // Resim ve AppBar
           SliverAppBar(
@@ -144,9 +148,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Fiyat',
-                              style: TextStyle(
+                            Text(
+                              'vehicles.price'.tr(),
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black54,
                                 fontWeight: FontWeight.w500,
@@ -178,9 +182,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     unselectedLabelColor: Colors.grey,
                     indicatorColor: Colors.deepPurple,
                     indicatorWeight: 3,
-                    tabs: const [
-                      Tab(text: 'İlan Bilgileri'),
-                      Tab(text: 'Açıklama'),
+                    tabs: [
+                      Tab(text: 'vehicles.listingInfo'.tr()),
+                      Tab(text: 'vehicles.description'.tr()),
                     ],
                   ),
                 ),
@@ -219,9 +223,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 child: OutlinedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Teklif Ver özelliği yakında eklenecek'),
-                        duration: Duration(seconds: 2),
+                      SnackBar(
+                        content: Text('purchase.makeOfferComingSoon'.tr()),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   },
@@ -232,9 +236,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Teklif Ver',
-                    style: TextStyle(
+                  child: Text(
+                    'purchase.makeOffer'.tr(),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.deepPurple,
@@ -256,9 +260,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Satın Al',
-                    style: TextStyle(
+                  child: Text(
+                    'purchase.title'.tr(),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -292,6 +296,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         ),
       ],
     );
+      },
+    );
   }
 
   Future<void> _showPurchaseDialog() async {
@@ -312,7 +318,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               color: canAfford ? Colors.deepPurple : Colors.orange,
             ),
             const SizedBox(width: 8),
-            const Text('Satın Alma Onayı'),
+            Text('purchase.confirm'.tr()),
           ],
         ),
         content: SingleChildScrollView(
@@ -321,27 +327,27 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Sayın ${_currentUser!.username},',
+                '${'common.dear'.tr()} ${_currentUser!.username},',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
               const SizedBox(height: 16),
-              _buildInfoRow('Araç', widget.vehicle.fullName),
+              _buildInfoRow('purchase.vehicle'.tr(), widget.vehicle.fullName),
               const Divider(),
               _buildInfoRow(
-                'Mevcut Bakiyeniz',
+                'purchase.currentBalance'.tr(),
                 '${_formatCurrency(currentBalance)} ${_currentUser!.currency}',
               ),
               _buildInfoRow(
-                'Araç Fiyatı',
+                'purchase.vehiclePrice'.tr(),
                 '${_formatCurrency(vehiclePrice)} TL',
                 valueColor: Colors.red,
               ),
               const Divider(thickness: 2),
               _buildInfoRow(
-                'Kalan Bakiye',
+                'purchase.remainingBalance'.tr(),
                 '${_formatCurrency(remainingBalance)} ${_currentUser!.currency}',
                 valueColor: canAfford ? Colors.green : Colors.red,
                 isBold: true,
@@ -361,7 +367,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Yetersiz bakiye! ${_formatCurrency(vehiclePrice - currentBalance)} ${_currentUser!.currency} eksik.',
+                          '${'purchase.insufficientBalance'.tr()} ${_formatCurrency(vehiclePrice - currentBalance)} ${_currentUser!.currency} ${'purchase.missing'.tr()}',
                           style: const TextStyle(
                             color: Colors.orange,
                             fontSize: 13,
@@ -373,9 +379,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ),
               ],
               const SizedBox(height: 16),
-              const Text(
-                'Bu işleme devam etmek istediğinizden emin misiniz?',
-                style: TextStyle(
+              Text(
+                'purchase.confirmMessage'.tr(),
+                style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                 ),
@@ -386,7 +392,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: canAfford
@@ -399,7 +405,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               backgroundColor: Colors.deepPurple,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Satın Al'),
+            child: Text('purchase.title'.tr()),
           ),
         ],
       ),
@@ -497,9 +503,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'TEBRİKLER! 🎉',
-                  style: TextStyle(
+                Text(
+                  'purchase.congratulations'.tr(),
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.deepPurple,
@@ -515,10 +521,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'başarıyla satın alındı!',
+                Text(
+                  'purchase.successfullyPurchased'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
                   ),
@@ -538,9 +544,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         size: 40,
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Artık bu araç sizin!',
-                        style: TextStyle(
+                      Text(
+                        'purchase.nowYours'.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.green,
@@ -548,7 +554,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Yeni bakiyeniz: ${_formatCurrency(newBalance)} TL',
+                        '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[700],
@@ -574,9 +580,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Harika!',
-                    style: TextStyle(
+                  child: Text(
+                    'purchase.great'.tr(),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -596,20 +602,20 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.error_outline, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Satın Alma Hatası'),
+              const Icon(Icons.error_outline, color: Colors.red),
+              const SizedBox(width: 8),
+              Text('purchase.purchaseError'.tr()),
             ],
           ),
           content: Text(
-            'Araç satın alınırken bir hata oluştu:\n\n$e\n\nLütfen tekrar deneyin.',
+            '${'purchase.errorMessage'.tr()}\n\n$e\n\n${'purchase.tryAgain'.tr()}',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Tamam'),
+              child: Text('common.ok'.tr()),
             ),
           ],
         ),
@@ -656,50 +662,50 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildInfoCard(
-            title: 'İlan Bilgileri',
+            title: 'vehicles.listingInfo'.tr(),
             icon: Icons.info_outline,
             children: [
-              _buildInfoRow('İlan No', '#${widget.vehicle.id.substring(0, 8).toUpperCase()}'),
-              _buildInfoRow('İlan Tarihi', _formatDate(widget.vehicle.listedAt)),
+              _buildInfoRow('vehicles.listingNo'.tr(), '#${widget.vehicle.id.substring(0, 8).toUpperCase()}'),
+              _buildInfoRow('vehicles.listingDate'.tr(), _formatDate(widget.vehicle.listedAt)),
             ],
           ),
           const SizedBox(height: 12),
           _buildInfoCard(
-            title: 'Araç Bilgileri',
+            title: 'vehicles.vehicleInfo'.tr(),
             icon: Icons.directions_car,
             children: [
-              _buildInfoRow('Marka', widget.vehicle.brand),
-              _buildInfoRow('Model', widget.vehicle.model),
-              _buildInfoRow('Yıl', widget.vehicle.year.toString()),
-              _buildInfoRow('Durum', widget.vehicle.condition),
+              _buildInfoRow('vehicles.brand'.tr(), widget.vehicle.brand),
+              _buildInfoRow('vehicles.model'.tr(), widget.vehicle.model),
+              _buildInfoRow('vehicles.year'.tr(), widget.vehicle.year.toString()),
+              _buildInfoRow('vehicles.condition'.tr(), widget.vehicle.condition),
             ],
           ),
           const SizedBox(height: 12),
           _buildInfoCard(
-            title: 'Teknik Özellikler',
+            title: 'vehicles.technicalSpecs'.tr(),
             icon: Icons.settings,
             children: [
-              _buildInfoRow('Motor Hacmi', '${widget.vehicle.engineSize} L'),
-              _buildInfoRow('Yakıt Tipi', widget.vehicle.fuelType),
-              _buildInfoRow('Vites', widget.vehicle.transmission),
-              _buildInfoRow('Çekiş', widget.vehicle.driveType),
-              _buildInfoRow('Kilometre', '${_formatNumber(widget.vehicle.mileage)} km'),
-              _buildInfoRow('Renk', widget.vehicle.color),
+              _buildInfoRow('vehicles.engineSize'.tr(), '${widget.vehicle.engineSize} L'),
+              _buildInfoRow('vehicles.fuelType'.tr(), widget.vehicle.fuelType),
+              _buildInfoRow('vehicles.transmission'.tr(), widget.vehicle.transmission),
+              _buildInfoRow('vehicles.driveType'.tr(), widget.vehicle.driveType),
+              _buildInfoRow('vehicles.mileage'.tr(), '${_formatNumber(widget.vehicle.mileage)} km'),
+              _buildInfoRow('vehicles.color'.tr(), widget.vehicle.color),
             ],
           ),
           const SizedBox(height: 12),
           _buildInfoCard(
-            title: 'Durum & Garanti',
+            title: 'vehicles.statusWarranty'.tr(),
             icon: Icons.verified_user,
             children: [
               _buildInfoRow(
-                'Garanti Durumu',
-                widget.vehicle.hasWarranty ? '✅ Var' : '❌ Yok',
+                'vehicles.warrantyStatus'.tr(),
+                widget.vehicle.hasWarranty ? '✅ ${'vehicles.available'.tr()}' : '❌ ${'vehicles.notAvailable'.tr()}',
                 valueColor: widget.vehicle.hasWarranty ? Colors.green : Colors.red,
               ),
               _buildInfoRow(
-                'Ağır Hasar Kaydı',
-                widget.vehicle.hasAccidentRecord ? '⚠️ Var' : '✅ Yok',
+                'vehicles.accidentRecord'.tr(),
+                widget.vehicle.hasAccidentRecord ? '⚠️ ${'vehicles.yes'.tr()}' : '✅ ${'vehicles.no'.tr()}',
                 valueColor: widget.vehicle.hasAccidentRecord ? Colors.red : Colors.green,
               ),
             ],
@@ -733,9 +739,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               children: [
                 Icon(Icons.description, color: Colors.deepPurple, size: 24),
                 const SizedBox(width: 12),
-                const Text(
-                  'Satıcının Notu',
-                  style: TextStyle(
+                Text(
+                  'vehicles.sellerNote'.tr(),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -766,7 +772,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Bu ilan açıklaması eğlence amaçlıdır. Gerçek araç bilgileri için İlan Bilgileri sekmesini kontrol edin! 😄',
+                      'vehicles.funDisclaimer'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[700],

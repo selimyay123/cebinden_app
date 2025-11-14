@@ -3,6 +3,7 @@ import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
+import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
@@ -44,14 +45,17 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('Araçlarım'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: Text('home.myVehicles'.tr()),
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _myVehicles.isEmpty
@@ -67,6 +71,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     },
                   ),
                 ),
+        );
+      },
     );
   }
 
@@ -84,7 +90,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Henüz aracınız yok',
+              'vehicles.noVehicles'.tr(),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -93,7 +99,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'İlk aracınızı satın alarak koleksiyonunuzu oluşturun!',
+              'myVehicles.buildCollection'.tr(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -104,7 +110,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
             ElevatedButton.icon(
               onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.shopping_cart),
-              label: const Text('Araç Satın Al'),
+              label: Text('misc.buyVehicleButton'.tr()),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
@@ -221,7 +227,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'Satışta',
+                                    'vehicles.onSale'.tr(),
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: Colors.orange[800],
@@ -288,7 +294,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Satın Alma Fiyatı',
+                        'vehicles.purchasePrice'.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -311,7 +317,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Satın Alma Tarihi',
+                        'vehicles.purchaseDate'.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -333,7 +339,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Sahiplik Süresi',
+                      'vehicles.daysOwned'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -350,7 +356,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${vehicle.daysOwned} gün',
+                        '${vehicle.daysOwned} ${'misc.days'.tr()}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -373,14 +379,14 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     onPressed: () {
                       // TODO: Araç detayına git
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Araç detay sayfası yakında...'),
-                          duration: Duration(seconds: 2),
+                        SnackBar(
+                          content: Text('misc.vehicleDetailComingSoon'.tr()),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     },
                     icon: const Icon(Icons.info_outline, size: 18),
-                    label: const Text('Detaylar'),
+                    label: Text('misc.vehicleDetails'.tr()),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.deepPurple,
                       side: const BorderSide(color: Colors.deepPurple),
@@ -397,14 +403,14 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     onPressed: () {
                       // TODO: Araç satış işlemi
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Araç satış özelliği yakında...'),
-                          duration: Duration(seconds: 2),
+                        SnackBar(
+                          content: Text('misc.sellFeatureComingSoon'.tr()),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     },
                     icon: const Icon(Icons.sell, size: 18),
-                    label: const Text('Sat'),
+                    label: Text('misc.sellVehicle'.tr()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,

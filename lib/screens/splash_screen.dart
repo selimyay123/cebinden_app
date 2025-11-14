@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 
@@ -20,26 +21,50 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthStatus() async {
-    // Kullanıcı kontrolü için kısa bir bekleme (splash ekranı gösterimi için)
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      // Kullanıcı kontrolü için kısa bir bekleme (splash ekranı gösterimi için)
+      await Future.delayed(const Duration(milliseconds: 1500));
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    // Aktif kullanıcı var mı kontrol et
-    final userExists = await _authService.checkUserExists();
+      // Aktif kullanıcı var mı kontrol et
+      print('🔍 Otomatik giriş kontrol ediliyor...');
+      final userExists = await _authService.checkUserExists();
+      
+      if (userExists) {
+        final currentUser = await _authService.getCurrentUser();
+        print('✅ Kullanıcı bulundu: ${currentUser?.username}');
+        print('🏠 Ana sayfaya yönlendiriliyor...');
+      } else {
+        print('❌ Aktif kullanıcı bulunamadı');
+        print('🔐 Giriş sayfasına yönlendiriliyor...');
+      }
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (userExists) {
-      // Aktif kullanıcı varsa ana sayfaya yönlendir
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else {
-      // Aktif kullanıcı yoksa giriş ekranına yönlendir
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+      if (userExists) {
+        // Aktif kullanıcı varsa ana sayfaya yönlendir (tüm geçmişi temizle)
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false, // Tüm önceki route'ları temizle
+        );
+      } else {
+        // Aktif kullanıcı yoksa giriş ekranına yönlendir
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false, // Tüm önceki route'ları temizle
+        );
+      }
+    } catch (e) {
+      print('❌ Splash screen hatası: $e');
+      
+      // Hata durumunda güvenli olarak login'e yönlendir
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -60,18 +85,18 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const SizedBox(height: 20),
             // Uygulama adı
-            const Text(
-              'Cebinden',
-              style: TextStyle(
+            Text(
+              'app.name'.tr(),
+              style: const TextStyle(
                 fontSize: 42,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Sanal Araba Ticareti',
-              style: TextStyle(
+            Text(
+              'app.subtitle'.tr(),
+              style: const TextStyle(
                 fontSize: 18,
                 color: Colors.white70,
               ),

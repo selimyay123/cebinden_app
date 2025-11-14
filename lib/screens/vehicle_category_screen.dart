@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
 import 'brand_selection_screen.dart';
 
@@ -7,68 +8,74 @@ class VehicleCategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Araç kategorileri
-    final categories = [
-      {
-        'title': 'Otomobil',
-        'icon': Icons.directions_car,
-        'color': Colors.blue,
-        'description': 'Sedan, hatchback ve coupe modeller',
-      },
-    //   {
-    //     'title': 'Arazi, SUV & Pickup',
-    //     'icon': Icons.terrain,
-    //     'color': Colors.green,
-    //     'description': 'Off-road ve çok amaçlı araçlar',
-    //   },
-      {
-        'title': 'Elektrikli Araçlar',
-        'icon': Icons.electric_car,
-        'color': Colors.teal,
-        'description': 'Çevre dostu elektrikli modeller',
-      },
-      {
-        'title': 'Ticari Araçlar',
-        'icon': Icons.local_shipping,
-        'color': Colors.orange,
-        'description': 'Kamyonet, minibüs ve hafif ticari',
-      },
-      {
-        'title': 'Hasarlı Araçlar',
-        'icon': Icons.build,
-        'color': Colors.red,
-        'description': 'Tamir gerektiren araçlar',
-      },
-      {
-        'title': 'Klasik Araçlar',
-        'icon': Icons.stars,
-        'color': Colors.purple,
-        'description': 'Koleksiyon değeri olan araçlar',
-      },
-    ];
+    // ValueListenableBuilder ile dil değişikliklerini dinle
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        // Araç kategorileri - dil değiştiğinde yeniden oluşturulur
+        final categories = [
+          {
+            'title': 'vehicles.categoryAuto'.tr(),
+            'icon': Icons.directions_car,
+            'color': Colors.blue,
+            'description': 'vehicles.categoryAutoDesc'.tr(),
+            'key': 'auto', // Dil bağımsız key
+          },
+          {
+            'title': 'vehicles.categoryElectric'.tr(),
+            'icon': Icons.electric_car,
+            'color': Colors.teal,
+            'description': 'vehicles.categoryElectricDesc'.tr(),
+            'key': 'electric',
+          },
+          {
+            'title': 'vehicles.categoryCommercial'.tr(),
+            'icon': Icons.local_shipping,
+            'color': Colors.orange,
+            'description': 'vehicles.categoryCommercialDesc'.tr(),
+            'key': 'commercial',
+          },
+          {
+            'title': 'vehicles.categoryDamaged'.tr(),
+            'icon': Icons.build,
+            'color': Colors.red,
+            'description': 'vehicles.categoryDamagedDesc'.tr(),
+            'key': 'damaged',
+          },
+          {
+            'title': 'vehicles.categoryClassic'.tr(),
+            'icon': Icons.stars,
+            'color': Colors.purple,
+            'description': 'vehicles.categoryClassicDesc'.tr(),
+            'key': 'classic',
+          },
+        ];
 
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('Araç Kategorisi Seçin'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          return _buildCategoryCard(
-            context,
-            title: category['title'] as String,
-            icon: category['icon'] as IconData,
-            color: category['color'] as Color,
-            description: category['description'] as String,
-          );
-        },
-      ),
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: Text('vehicles.selectCategory'.tr()),
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final category = categories[index];
+              return _buildCategoryCard(
+                context,
+                title: category['title'] as String,
+                icon: category['icon'] as IconData,
+                color: category['color'] as Color,
+                description: category['description'] as String,
+                categoryKey: category['key'] as String,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -78,6 +85,7 @@ class VehicleCategoryScreen extends StatelessWidget {
     required IconData icon,
     required Color color,
     required String description,
+    required String categoryKey,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -89,7 +97,7 @@ class VehicleCategoryScreen extends StatelessWidget {
         child: InkWell(
           onTap: () async {
             // Otomobil kategorisi için marka seçimi, diğerleri için direkt liste
-            if (title == 'Otomobil') {
+            if (categoryKey == 'auto') {
               final purchased = await Navigator.push(
                 context,
                 MaterialPageRoute(

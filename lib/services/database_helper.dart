@@ -1,6 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
+import '../models/offer_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -11,6 +12,7 @@ class DatabaseHelper {
   static const String usersBox = 'users';
   static const String currentUserBox = 'current_user';
   static const String userVehiclesBox = 'user_vehicles'; // Kullanıcıların araçları
+  static const String offersBox = 'offers'; // Teklifler
 
   // Initialize Hive
   static Future<void> init() async {
@@ -20,6 +22,7 @@ class DatabaseHelper {
     final usersBoxInstance = await Hive.openBox<Map>(usersBox);
     final currentUserBoxInstance = await Hive.openBox<String>(currentUserBox);
     final userVehiclesBoxInstance = await Hive.openBox<Map>(userVehiclesBox);
+    final offersBoxInstance = await Hive.openBox<Map>(offersBox);
     
                 
     // Debug: Tüm kullanıcıları listele
@@ -170,10 +173,12 @@ class DatabaseHelper {
     await _usersBox.clear();
     await _currentUserBox.clear();
     await _userVehiclesBox.clear();
+    await _offersBox.clear();
     await _usersBox.flush();
     await _currentUserBox.flush();
     await _userVehiclesBox.flush();
-      }
+    await _offersBox.flush();
+  }
 
   // ============================================================================
   // USER VEHICLES (Kullanıcıların Sahip Olduğu Araçlar)
@@ -238,6 +243,19 @@ class DatabaseHelper {
       return allVehicles.where((v) => v.isSold).toList();
     } catch (e) {
       print('❌ Error getting user sold vehicles: $e');
+      return [];
+    }
+  }
+
+  // Tüm kullanıcıların araçlarını getir (admin/sistem işlemleri için)
+  Future<List<UserVehicle>> getAllUserVehicles() async {
+    try {
+      final vehicles = _userVehiclesBox.values
+          .map((vehicleMap) => UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap)))
+          .toList();
+      return vehicles;
+    } catch (e) {
+      print('❌ Error getting all user vehicles: $e');
       return [];
     }
   }
@@ -369,6 +387,199 @@ class DatabaseHelper {
     } catch (e) {
       print('❌ Error calculating total profit/loss: $e');
       return 0.0;
+    }
+  }
+
+  // ============================================================================
+  // OFFERS (Teklifler)
+  // ============================================================================
+
+  // Offers box'ını al
+  Box<Map> get _offersBox => Hive.box<Map>(offersBox);
+
+  // Teklif ekle
+  Future<bool> addOffer(Offer offer) async {
+    try {
+      final offerMap = Map<dynamic, dynamic>.from(offer.toJson());
+      await _offersBox.put(offer.offerId, offerMap);
+      await _offersBox.flush();
+      print('✅ Offer added: ${offer.offerId}');
+      return true;
+    } catch (e) {
+      print('❌ Error adding offer: $e');
+      return false;
+    }
+  }
+
+  // Teklif ID'sine göre teklif getir
+  Future<Offer?> getOfferById(String offerId) async {
+    try {
+      final offerMap = _offersBox.get(offerId);
+      if (offerMap == null) return null;
+      return Offer.fromJson(Map<String, dynamic>.from(offerMap));
+    } catch (e) {
+      print('❌ Error getting offer: $e');
+      return null;
+    }
+  }
+
+  // Satıcıya gelen tüm teklifleri getir
+  Future<List<Offer>> getOffersBySellerId(String sellerId) async {
+    try {
+      final offers = _offersBox.values
+          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .where((offer) => offer.sellerId == sellerId)
+          .toList();
+      
+      // Tarihe göre sırala (en yeni en üstte)
+      offers.sort((a, b) => b.offerDate.compareTo(a.offerDate));
+      
+      return offers;
+    } catch (e) {
+      print('❌ Error getting offers by seller: $e');
+      return [];
+    }
+  }
+
+  // Belirli bir araca gelen teklifleri getir
+  Future<List<Offer>> getOffersByVehicleId(String vehicleId) async {
+    try {
+      final offers = _offersBox.values
+          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .where((offer) => offer.vehicleId == vehicleId)
+          .toList();
+      
+      // Tarihe göre sırala (en yeni en üstte)
+      offers.sort((a, b) => b.offerDate.compareTo(a.offerDate));
+      
+      return offers;
+    } catch (e) {
+      print('❌ Error getting offers by vehicle: $e');
+      return [];
+    }
+  }
+
+  // Satıcının bekleyen tekliflerini getir
+  Future<List<Offer>> getPendingOffersBySellerId(String sellerId) async {
+    try {
+      final offers = await getOffersBySellerId(sellerId);
+      return offers.where((offer) => offer.isPending).toList();
+    } catch (e) {
+      print('❌ Error getting pending offers: $e');
+      return [];
+    }
+  }
+
+  // Satıcının bekleyen teklif sayısını getir
+  Future<int> getPendingOffersCount(String sellerId) async {
+    try {
+      final offers = await getPendingOffersBySellerId(sellerId);
+      return offers.length;
+    } catch (e) {
+      print('❌ Error getting pending offers count: $e');
+      return 0;
+    }
+  }
+
+  // Teklifi güncelle
+  Future<bool> updateOffer(String offerId, Map<String, dynamic> updates) async {
+    try {
+      final offerMap = _offersBox.get(offerId);
+      if (offerMap == null) {
+        print('❌ Offer not found: $offerId');
+        return false;
+      }
+
+      final updatedMap = Map<dynamic, dynamic>.from(offerMap);
+      updates.forEach((key, value) {
+        updatedMap[key] = value;
+      });
+
+      await _offersBox.put(offerId, updatedMap);
+      await _offersBox.flush();
+      print('✅ Offer updated: $offerId');
+      return true;
+    } catch (e) {
+      print('❌ Error updating offer: $e');
+      return false;
+    }
+  }
+
+  // Teklif durumunu güncelle
+  Future<bool> updateOfferStatus(String offerId, OfferStatus status) async {
+    try {
+      return await updateOffer(offerId, {'status': status.index});
+    } catch (e) {
+      print('❌ Error updating offer status: $e');
+      return false;
+    }
+  }
+
+  // Teklifi sil
+  Future<bool> deleteOffer(String offerId) async {
+    try {
+      await _offersBox.delete(offerId);
+      await _offersBox.flush();
+      print('✅ Offer deleted: $offerId');
+      return true;
+    } catch (e) {
+      print('❌ Error deleting offer: $e');
+      return false;
+    }
+  }
+
+  // Belirli bir araç için diğer tüm teklifleri reddet
+  Future<bool> rejectOtherOffers(String vehicleId, String acceptedOfferId) async {
+    try {
+      final offers = await getOffersByVehicleId(vehicleId);
+      
+      for (var offer in offers) {
+        if (offer.offerId != acceptedOfferId && offer.status == OfferStatus.pending) {
+          await updateOfferStatus(offer.offerId, OfferStatus.rejected);
+        }
+      }
+      
+      print('✅ Other offers rejected for vehicle: $vehicleId');
+      return true;
+    } catch (e) {
+      print('❌ Error rejecting other offers: $e');
+      return false;
+    }
+  }
+
+  // Süresi dolan teklifleri güncelle
+  Future<void> expireOldOffers() async {
+    try {
+      final allOffers = _offersBox.values
+          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .toList();
+      
+      for (var offer in allOffers) {
+        if (offer.isExpired) {
+          await updateOfferStatus(offer.offerId, OfferStatus.expired);
+        }
+      }
+      
+      print('✅ Expired offers updated');
+    } catch (e) {
+      print('❌ Error expiring old offers: $e');
+    }
+  }
+
+  // Tüm teklifleri temizle (belirli bir araç için)
+  Future<bool> deleteOffersForVehicle(String vehicleId) async {
+    try {
+      final offers = await getOffersByVehicleId(vehicleId);
+      
+      for (var offer in offers) {
+        await deleteOffer(offer.offerId);
+      }
+      
+      print('✅ All offers deleted for vehicle: $vehicleId');
+      return true;
+    } catch (e) {
+      print('❌ Error deleting offers for vehicle: $e');
+      return false;
     }
   }
 }

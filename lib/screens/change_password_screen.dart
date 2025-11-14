@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   final String userId;
@@ -95,8 +96,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Şifreniz başarıyla değiştirildi'),
+        SnackBar(
+          content: Text('changePassword.passwordChanged'.tr()),
           backgroundColor: Colors.green,
         ),
       );
@@ -114,7 +115,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Şifre Değiştir'),
+        title: Text('changePassword.title'.tr()),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -58,9 +59,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (user != null) {
-      // Başarılı giriş
-      Navigator.of(context).pushReplacement(
+      // Başarılı giriş - Tüm route geçmişini temizle
+      print('✅ Giriş başarılı: ${user.username}');
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false, // Tüm önceki ekranları temizle
       );
     } else {
       setState(() {

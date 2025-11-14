@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
+import '../services/localization_service.dart';
 
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
@@ -61,17 +62,17 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       if (success) {
         // Başarı mesajı
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Aracınız başarıyla satışa çıkarıldı!'),
+          SnackBar(
+            content: Text('sell.listingSuccess'.tr()),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
         Navigator.pop(context, true); // Başarılı olduğunu bildir
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('❌ İlan oluşturulurken bir hata oluştu.'),
+          SnackBar(
+            content: Text('sell.listingError'.tr()),
             backgroundColor: Colors.red,
           ),
         );
@@ -80,7 +81,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('❌ Hata: $e'),
+          content: Text('${'sell.listingErrorWithMessage'.tr()}: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -97,7 +98,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('İlan Oluştur'),
+        title: Text('sell.title'.tr()),
         elevation: 0,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,

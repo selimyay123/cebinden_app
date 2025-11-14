@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
 
@@ -49,7 +50,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Araç Sat'),
+        title: Text('sell.title'.tr()),
         elevation: 0,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
@@ -236,7 +237,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                   }
                 },
                 icon: const Icon(Icons.sell),
-                label: const Text('Satışa Çıkar'),
+                label: Text('sell.listForSaleButton'.tr()),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,

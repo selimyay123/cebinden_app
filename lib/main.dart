@@ -3,12 +3,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
 import 'services/database_helper.dart';
+import 'services/localization_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Hive database'i initialize et
   await DatabaseHelper.init();
+  
+  // Localization'ı initialize et
+  await LocalizationService().initialize();
   
   runApp(const CebindenApp());
 }
@@ -18,31 +22,39 @@ class CebindenApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Cebinden',
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('tr', 'TR'),
-      ],
-      locale: const Locale('tr', 'TR'),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        fontFamily: GoogleFonts.poppins().fontFamily,
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          elevation: 0,
-        ),
-      ),
-      home: const SplashScreen(),
+    final localizationService = LocalizationService();
+    
+    // ValueListenableBuilder ile dil değişikliklerini dinle
+    return ValueListenableBuilder<String>(
+      valueListenable: localizationService.languageNotifier,
+      builder: (context, currentLanguage, child) {
+        print('🌍 App rebuilding with language: $currentLanguage');
+        
+        return MaterialApp(
+          title: 'Cebinden',
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: LocalizationService.supportedLocales,
+          locale: localizationService.currentLocale, // Dinamik locale
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.light,
+            ),
+            useMaterial3: true,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+            appBarTheme: const AppBarTheme(
+              centerTitle: true,
+              elevation: 0,
+            ),
+          ),
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }

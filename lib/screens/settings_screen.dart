@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/settings_helper.dart';
 import '../services/database_helper.dart';
+import '../services/offer_service.dart';
+import '../services/localization_service.dart';
 import '../models/user_model.dart';
 import 'profile_info_screen.dart';
 import 'change_password_screen.dart';
@@ -17,12 +19,15 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final AuthService _authService = AuthService();
+  final OfferService _offerService = OfferService();
+  final LocalizationService _localizationService = LocalizationService();
   late SettingsHelper _settingsHelper;
   User? _currentUser;
   bool _isLoading = true;
 
   // Settings states
   bool _darkMode = false;
+  String _selectedLanguage = 'tr'; // Varsayılan Türkçe
   String _selectedCurrency = 'TL';
   bool _notificationNewListings = true;
   bool _notificationPriceDrops = true;
@@ -54,6 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       setState(() {
         _darkMode = darkMode;
+        _selectedLanguage = _localizationService.currentLanguage; // Mevcut dili yükle
         _notificationNewListings = newListings;
         _notificationPriceDrops = priceDrops;
         _notificationOffers = offers;
@@ -69,13 +75,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Şimdilik sadece ayarı kaydet, theme değişimi yakında eklenecek
     setState(() => _darkMode = value);
     await _settingsHelper.setDarkMode(value);
+  }
+
+  Future<void> _changeLanguage(String? languageCode) async {
+    if (languageCode == null || languageCode == _selectedLanguage) return;
+
+    // Dili değiştir
+    bool success = await _localizationService.changeLanguage(languageCode);
+
+    if (success && mounted) {
+      setState(() {
+        _selectedLanguage = languageCode;
+      });
+
+      // Başarı mesajı
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('settings.languageChanged'.tr()),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      
+      // NOT: MaterialApp otomatik rebuild olacak, ekstra setState gerekmez!
+    }
     
     // Kullanıcıya bilgi ver
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Karanlık mod özelliği yakında aktif olacak'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text('settings.darkModeComingSoon'.tr()),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -93,7 +123,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() => _selectedCurrency = currency);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Para birimi güncellendi')),
+          SnackBar(content: Text('settings.currencyUpdated'.tr())),
         );
       }
     }
@@ -120,23 +150,85 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _generateTestOffers() async {
+    // Loading göster
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text(
+              'Teklifler oluşturuluyor...',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // AI tekliflerini oluştur
+      int offersCreated = await _offerService.generateDailyOffers();
+
+      if (mounted) {
+        Navigator.pop(context); // Loading'i kapat
+
+        // Sonuç göster
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('✅ ${'settings.success'.tr()}'),
+            content: Text('$offersCreated ${'settings.offersCreatedSuccess'.tr()}\n\n${'settings.checkOffersSection'.tr()}'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('settings.ok'.tr()),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Loading'i kapat
+
+        // Hata göster
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('❌ ${'settings.error'.tr()}'),
+            content: Text('${'settings.offersCreatedError'.tr()}:\n\n$e'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('settings.ok'.tr()),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _clearDatabase() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Veritabanını Temizle'),
-        content: const Text(
-          'Tüm kullanıcılar ve veriler silinecek. Bu işlem geri alınamaz. Emin misiniz?',
-        ),
+        title: Text('settings.clearDatabase'.tr()),
+        content: Text('settings.clearDatabaseConfirm'.tr()),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Temizle'),
+            child: Text('settings.clearDatabase'.tr()),
           ),
         ],
       ),
@@ -159,19 +251,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Hesabı Sil'),
-        content: const Text(
-          'Hesabınız kalıcı olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?',
-        ),
+        title: Text('settings.deleteAccount'.tr()),
+        content: Text('settings.deleteAccountConfirm'.tr()),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sil'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),
@@ -192,16 +282,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Çıkış Yap'),
-        content: const Text('Çıkış yapmak istediğinizden emin misiniz?'),
+        title: Text('auth.logout'.tr()),
+        content: Text('auth.logoutConfirm'.tr()),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Çıkış Yap'),
+            child: Text('auth.logout'.tr()),
           ),
         ],
       ),
@@ -220,26 +310,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    // ValueListenableBuilder ile dil değişikliklerini dinle
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        if (_isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ayarlar'),
-        elevation: 0,
-      ),
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('settings.title'.tr()),
+            elevation: 0,
+          ),
       body: ListView(
         children: [
           // Profil Bölümü
           _buildSection(
-            title: 'Profil',
+            title: 'settings.profile'.tr(),
             children: [
               _buildListTile(
                 icon: Icons.person_outline,
-                title: 'Profil Bilgileri',
+                title: 'settings.profileInfo'.tr(),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -251,7 +345,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               _buildListTile(
                 icon: Icons.lock_outline,
-                title: 'Şifre Değiştir',
+                title: 'settings.changePassword'.tr(),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -266,18 +360,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Görünüm Ayarları
           _buildSection(
-            title: 'Görünüm',
+            title: 'settings.appearance'.tr(),
             children: [
               _buildSwitchTile(
                 icon: Icons.dark_mode_outlined,
-                title: 'Karanlık Mod',
-                subtitle: 'Gece modunu aktifleştir',
+                title: 'settings.darkMode'.tr(),
+                subtitle: 'settings.darkModeDesc'.tr(),
                 value: _darkMode,
                 onChanged: _toggleDarkMode,
               ),
               _buildListTile(
+                icon: Icons.language,
+                title: 'settings.languageFull'.tr(),
+                trailing: DropdownButton<String>(
+                  value: _selectedLanguage,
+                  underline: const SizedBox(),
+                  items: const [
+                    DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
+                    DropdownMenuItem(value: 'en', child: Text('English')),
+                  ],
+                  onChanged: _changeLanguage,
+                ),
+              ),
+              _buildListTile(
                 icon: Icons.account_balance_wallet,
-                title: 'Para Birimi',
+                title: 'settings.currency'.tr(),
                 trailing: DropdownButton<String>(
                   value: _selectedCurrency,
                   underline: const SizedBox(),
@@ -294,29 +401,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Bildirim Ayarları
           _buildSection(
-            title: 'Bildirimler',
+            title: 'settings.notifications'.tr(),
             children: [
               _buildSwitchTile(
                 icon: Icons.new_releases_outlined,
-                title: 'Yeni İlan Bildirimleri',
+                title: 'settings.newListings'.tr(),
                 value: _notificationNewListings,
                 onChanged: (value) => _toggleNotification('newListings', value),
               ),
               _buildSwitchTile(
                 icon: Icons.trending_down,
-                title: 'Fiyat Düşüş Bildirimleri',
+                title: 'settings.priceDrops'.tr(),
                 value: _notificationPriceDrops,
                 onChanged: (value) => _toggleNotification('priceDrops', value),
               ),
               _buildSwitchTile(
                 icon: Icons.local_offer_outlined,
-                title: 'Teklif Bildirimleri',
+                title: 'settings.offers'.tr(),
                 value: _notificationOffers,
                 onChanged: (value) => _toggleNotification('offers', value),
               ),
               _buildSwitchTile(
                 icon: Icons.notifications_outlined,
-                title: 'Sistem Bildirimleri',
+                title: 'settings.system'.tr(),
                 value: _notificationSystem,
                 onChanged: (value) => _toggleNotification('system', value),
               ),
@@ -325,11 +432,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Uygulama Bilgisi
           _buildSection(
-            title: 'Uygulama',
+            title: 'settings.appInfo'.tr(),
             children: [
               _buildListTile(
                 icon: Icons.info_outline,
-                title: 'Hakkında',
+                title: 'settings.about'.tr(),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -342,12 +449,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Debug (Geliştirici Ayarları)
           _buildSection(
-            title: 'Geliştirici',
+            title: 'settings.developer'.tr(),
             children: [
               _buildListTile(
+                icon: Icons.auto_awesome,
+                title: 'settings.generateOffers'.tr(),
+                subtitle: 'settings.generateOffersDesc'.tr(),
+                textColor: Colors.blue,
+                onTap: _generateTestOffers,
+              ),
+              _buildListTile(
                 icon: Icons.delete_sweep,
-                title: 'Veritabanını Temizle',
-                subtitle: 'Tüm kullanıcılar ve veriler silinir',
+                title: 'settings.clearDatabase'.tr(),
+                subtitle: 'settings.clearDatabaseDesc'.tr(),
                 textColor: Colors.orange,
                 onTap: _clearDatabase,
               ),
@@ -356,18 +470,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // Hesap İşlemleri
           _buildSection(
-            title: 'Hesap',
+            title: 'settings.account'.tr(),
             children: [
               _buildListTile(
                 icon: Icons.delete_forever,
-                title: 'Hesabı Sil',
-                subtitle: 'Hesabınız kalıcı olarak silinir',
+                title: 'settings.deleteAccount'.tr(),
+                subtitle: 'settings.deleteAccountDesc'.tr(),
                 textColor: Colors.red,
                 onTap: _deleteAccount,
               ),
               _buildListTile(
                 icon: Icons.logout,
-                title: 'Çıkış Yap',
+                title: 'settings.logoutButton'.tr(),
                 textColor: Colors.red,
                 onTap: _logout,
               ),
@@ -377,6 +491,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 20),
         ],
       ),
+    );
+      },
     );
   }
 

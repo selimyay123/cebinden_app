@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
+import '../services/localization_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import 'login_screen.dart';
@@ -9,6 +10,7 @@ import 'settings_screen.dart';
 import 'my_vehicles_screen.dart';
 import 'sell_vehicle_screen.dart';
 import 'my_listings_screen.dart';
+import 'my_offers_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   User? _currentUser;
   bool _isLoading = true;
   int _vehicleCount = 0;
+  int _pendingOffersCount = 0; // Bekleyen teklif sayısı
   List<UserVehicle> _userVehicles = [];
   List<UserVehicle> _userListedVehicles = []; // Satışa çıkarılan araçlar
 
@@ -49,21 +52,25 @@ class _HomeScreenState extends State<HomeScreen> {
       // Kullanıcının satışa çıkardığı araçları yükle
       final listedVehicles = await _db.getUserListedVehicles(updatedUser.id);
       
+      // Bekleyen teklifleri yükle
+      final pendingOffers = await _db.getPendingOffersCount(updatedUser.id);
+      
       setState(() {
         _currentUser = updatedUser;
         _userVehicles = vehicles;
         _vehicleCount = vehicleCount;
         _userListedVehicles = listedVehicles;
+        _pendingOffersCount = pendingOffers;
         _isLoading = false;
       });
       
       // Kullanıcıya bilgi ver
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('🎉 Özel bonus! Bakiyeniz 5,000,000 TL\'ye yükseltildi!'),
+          SnackBar(
+            content: Text('home.bonusAwarded'.tr()),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
       }
@@ -76,11 +83,15 @@ class _HomeScreenState extends State<HomeScreen> {
         // Kullanıcının satışa çıkardığı araçları yükle
         final listedVehicles = await _db.getUserListedVehicles(user.id);
         
+        // Bekleyen teklifleri yükle
+        final pendingOffers = await _db.getPendingOffersCount(user.id);
+        
         setState(() {
           _currentUser = user;
           _userVehicles = vehicles;
           _vehicleCount = vehicleCount;
           _userListedVehicles = listedVehicles;
+          _pendingOffersCount = pendingOffers;
           _isLoading = false;
         });
       } else {
@@ -97,19 +108,19 @@ class _HomeScreenState extends State<HomeScreen> {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Çıkış Yap'),
-        content: const Text('Çıkış yapmak istediğinizden emin misiniz?'),
+        title: Text('auth.logout'.tr()),
+        content: Text('auth.logoutConfirm'.tr()),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,
             ),
-            child: const Text('Çıkış Yap'),
+            child: Text('auth.logout'.tr()),
           ),
         ],
       ),
@@ -131,83 +142,89 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            tooltip: 'Bildirimler',
-            onPressed: () {
-              // TODO: Bildirimler sayfası
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Çıkış Yap',
-            onPressed: _logout,
-          ),
-        ],
-      ),
-      drawer: _buildDrawer(context),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : RefreshIndicator(
-              onRefresh: _loadCurrentUser,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    // Profil ve Bakiye Kartı
-                    _buildProfileCard(),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Hızlı İşlemler
-                    _buildQuickActions(),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Galeri Satın Al
-                    _buildBuyGalleryButton(),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // İstatistikler
-                    _buildStatistics(),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // Araçlarım (YORUM: Garaj özelliği için ayrı sayfa yapıldı)
-                    // _buildMyVehicles(),
-                    // const SizedBox(height: 16),
-                    
-                    // İlanlarım (YORUM: Quick actions'a taşındı)
-                    // if (_userListedVehicles.isNotEmpty) ...[
-                    //   _buildMyListings(),
-                    //   const SizedBox(height: 16),
-                    // ],
-                    
-                    // Son İşlemler veya Bilgilendirme
-                    _buildRecentActivity(),
-                    
-                    const SizedBox(height: 24),
-                  ],
-                ),
+    // ValueListenableBuilder ile dil değişikliklerini dinle
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: Text('home.title'.tr()),
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            leading: Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
               ),
             ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                tooltip: 'home.notifications'.tr(),
+                onPressed: () {
+                  // TODO: Bildirimler sayfası
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.logout),
+                tooltip: 'auth.logout'.tr(),
+                onPressed: _logout,
+              ),
+            ],
+          ),
+          drawer: _buildDrawer(context),
+          body: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadCurrentUser,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        // Profil ve Bakiye Kartı
+                        _buildProfileCard(),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Hızlı İşlemler
+                        _buildQuickActions(),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Galeri Satın Al
+                        _buildBuyGalleryButton(),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // İstatistikler
+                        _buildStatistics(),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Araçlarım (YORUM: Garaj özelliği için ayrı sayfa yapıldı)
+                        // _buildMyVehicles(),
+                        // const SizedBox(height: 16),
+                        
+                        // İlanlarım (YORUM: Quick actions'a taşındı)
+                        // if (_userListedVehicles.isNotEmpty) ...[
+                        //   _buildMyListings(),
+                        //   const SizedBox(height: 16),
+                        // ],
+                        
+                        // Son İşlemler veya Bilgilendirme
+                        _buildRecentActivity(),
+                        
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ),
+        );
+      },
     );
   }
 
@@ -283,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 // Toplam Para
                 Text(
-                  'Toplam Bakiye',
+                  'home.balance'.tr(),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
                     fontSize: 12,
@@ -292,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${_formatCurrency(_currentUser!.balance)} TL',
+                  '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 28,
@@ -355,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final quickActions = [
       {
         'icon': Icons.shopping_cart,
-        'label': 'Araç Al',
+        'label': 'home.buyVehicle'.tr(),
         'color': Colors.blue,
         'onTap': () async {
           // Kategori seçim sayfasına git ve satın alma sonucunu bekle
@@ -374,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       {
         'icon': Icons.sell,
-        'label': 'Araç Sat',
+        'label': 'home.sellVehicle'.tr(),
         'color': Colors.orange,
         'onTap': () async {
           // Araç satış sayfasına git ve sonuç bekle
@@ -393,7 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       {
         'icon': Icons.garage,
-        'label': 'Araçlarım',
+        'label': 'home.myVehicles'.tr(),
         'color': Colors.green,
         'onTap': () {
           // Kullanıcının satın aldığı araçları göster
@@ -407,7 +424,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       {
         'icon': Icons.store,
-        'label': 'İlanlarım',
+        'label': 'home.myListings'.tr(),
         'color': Colors.purple,
         'onTap': () async {
           // İlanlar sayfasına git
@@ -418,6 +435,23 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
           // Sayfa kapanınca dashboard'u yenile (ilan kaldırılmış olabilir)
+          await _loadCurrentUser();
+        },
+      },
+      {
+        'icon': Icons.local_offer,
+        'label': 'home.myOffers'.tr(),
+        'color': Colors.teal,
+        'badge': _pendingOffersCount > 0 ? _pendingOffersCount : null, // Badge ekledik
+        'onTap': () async {
+          // Teklifler sayfasına git
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MyOffersScreen(),
+            ),
+          );
+          // Sayfa kapanınca dashboard'u yenile
           await _loadCurrentUser();
         },
       },
@@ -456,6 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: action['label'] as String,
             color: action['color'] as Color,
             onTap: action['onTap'] as VoidCallback,
+            badge: action['badge'] as int?,
           );
         },
       ),
@@ -467,6 +502,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    int? badge, // Badge parametresi ekledik
   }) {
     return InkWell(
       onTap: onTap,
@@ -486,13 +522,45 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 28),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color, size: 28),
+                ),
+                // Badge
+                if (badge != null && badge > 0)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
+                      child: Center(
+                        child: Text(
+                          badge > 99 ? '99+' : badge.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             Text(
@@ -529,7 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'İstatistikler',
+            'home.statistics'.tr(),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -539,20 +607,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              // YORUM: Galeri istatistiği - İleride farklı kurgu için ayrılmış
-              // Expanded(
-              //   child: _buildStatItem(
-              //     icon: Icons.garage,
-              //     label: 'Galerim',
-              //     value: _vehicleCount.toString(),
-              //     color: Colors.blue,
-              //   ),
-              // ),
-              // const SizedBox(width: 12),
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.directions_car,
-                  label: 'Toplam Araç',
+                  label: 'home.totalVehicles'.tr(),
                   value: _vehicleCount.toString(),
                   color: Colors.blue,
                 ),
@@ -560,8 +618,17 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildStatItem(
+                  icon: Icons.local_offer,
+                  label: 'home.pendingOffers'.tr(),
+                  value: _pendingOffersCount.toString(),
+                  color: Colors.orange,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildStatItem(
                   icon: Icons.show_chart,
-                  label: 'Toplam İşlem',
+                  label: 'home.totalTransactions'.tr(),
                   value: _vehicleCount.toString(),
                   color: Colors.green,
                 ),
@@ -662,7 +729,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
-                  child: const Text('Tümünü Gör'),
+                  child: Text('home.viewAll'.tr()),
                 ),
             ],
           ),
@@ -717,7 +784,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     },
                     icon: const Icon(Icons.shopping_cart),
-                    label: const Text('Araç Satın Al'),
+                    label: Text('misc.buyVehicleButton'.tr()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurple,
                       foregroundColor: Colors.white,
@@ -875,32 +942,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Galeri Satın Al',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                        child:                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'home.buyGallery'.tr(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Profesyonel İşletme',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white.withOpacity(0.9),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'home.professionalBusiness'.tr(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withOpacity(0.9),
+                              fontWeight: FontWeight.w500,
                             ),
-                          ],
-                        ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                       ),
                     ],
                   ),
@@ -1023,28 +1090,28 @@ class _HomeScreenState extends State<HomeScreen> {
               
               _buildAdvantageItem(
                 icon: Icons.car_rental,
-                title: 'Araç Kiralama Hizmeti',
+                title: 'home.rentalService'.tr(),
                 description: 'Garajınızdaki araçları kiralayarak pasif gelir elde edin.',
               ),
               const SizedBox(height: 12),
               
               _buildAdvantageItem(
                 icon: Icons.trending_down,
-                title: 'Fırsat Alımları',
+                title: 'home.opportunityPurchases'.tr(),
                 description: 'Acil nakit ihtiyacı olan müşterilerden piyasa değerinin altında araç satın alın.',
               ),
               const SizedBox(height: 12),
               
               _buildAdvantageItem(
                 icon: Icons.trending_up,
-                title: 'Yüksek Kar Marjı',
+                title: 'home.highProfitMargin'.tr(),
                 description: 'Profesyonel galeri olarak araçlarınızı daha yüksek fiyatlarla satın.',
               ),
               const SizedBox(height: 12),
               
               _buildAdvantageItem(
                 icon: Icons.workspace_premium,
-                title: 'Prestij & İtibar',
+                title: 'home.prestigeReputation'.tr(),
                 description: 'Galeri statüsü ile daha fazla müşteri ve güven kazanın.',
               ),
               
@@ -1109,10 +1176,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pop(context);
               // TODO: Galeri satın alma işlemi
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Galeri satın alma özelliği yakında aktif olacak!'),
+                SnackBar(
+                  content: Text('home.galleryComingSoon'.tr()),
                   backgroundColor: Colors.green,
-                  duration: Duration(seconds: 2),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
@@ -1212,7 +1279,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icon(Icons.info_outline, color: Colors.deepPurple),
               const SizedBox(width: 8),
               Text(
-                'Hoş Geldiniz!',
+                'home.welcome'.tr(),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -1223,7 +1290,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Araç alım satım platformumuza hoş geldiniz! Başlamak için yukarıdaki hızlı işlemler menüsünden bir seçim yapabilirsiniz.',
+            'home.welcomeMessage'.tr(),
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
@@ -1341,14 +1408,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   // TODO: Tüm ilanları göster
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Tüm ilanlarınızı görüntülemek için yakında...'),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      content: Text('home.viewAllListingsComingSoon'.tr()),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },
                 icon: const Icon(Icons.arrow_forward),
-                label: Text('Tüm İlanları Gör (${_userListedVehicles.length})'),
+                label: Text('${'home.viewAllListings'.tr()} (${_userListedVehicles.length})'),
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.deepPurple,
                 ),
@@ -1365,9 +1432,9 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         // TODO: İlan detay sayfasına git
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('İlan detay sayfası yakında...'),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text('home.listingDetailComingSoon'.tr()),
+            duration: const Duration(seconds: 2),
           ),
         );
       },
@@ -1560,14 +1627,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${_formatCurrency(_currentUser!.balance)} TL',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                Text(
+                  '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                   ],
                 ],
               ),
@@ -1580,7 +1647,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   _buildDrawerItem(
                     icon: Icons.dashboard,
-                    title: 'Dashboard',
+                    title: 'drawer.dashboard'.tr(),
                     onTap: () {
                       Navigator.pop(context); // Drawer'ı kapat
                       // Zaten dashboard'dayız, bir şey yapmaya gerek yok
@@ -1589,7 +1656,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildDrawerItem(
                     icon: Icons.shopping_cart,
-                    title: 'Araç Satın Al',
+                    title: 'drawer.buyVehicle'.tr(),
                     onTap: () async {
                       Navigator.pop(context); // Drawer'ı kapat
                       // Kategori seçim sayfasına git ve satın alma sonucunu bekle
@@ -1608,7 +1675,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildDrawerItem(
                     icon: Icons.sell,
-                    title: 'Araç Sat',
+                    title: 'drawer.sellVehicle'.tr(),
                     onTap: () async {
                       Navigator.pop(context); // Drawer'ı kapat
                       // Araç satış sayfasına git
@@ -1623,6 +1690,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (result == true) {
                         await _loadCurrentUser();
                       }
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.local_offer,
+                    title: 'drawer.myOffers'.tr(),
+                    badge: _pendingOffersCount > 0 ? _pendingOffersCount : null,
+                    onTap: () async {
+                      Navigator.pop(context); // Drawer'ı kapat
+                      // Teklifler sayfasına git
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MyOffersScreen(),
+                        ),
+                      );
+                      // Sayfa kapanınca dashboard'u yenile
+                      await _loadCurrentUser();
                     },
                   ),
                   // _buildDrawerItem(
@@ -1641,14 +1725,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   // ),
                   _buildDrawerItem(
                     icon: Icons.task_alt,
-                    title: 'Görevler',
+                    title: 'drawer.tasks'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       // TODO: Görevler sayfasına git
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Görevler sayfası yakında...'),
-                          duration: Duration(seconds: 2),
+                        SnackBar(
+                          content: Text('drawer.tasksComingSoon'.tr()),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     },
@@ -1670,7 +1754,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: _buildDrawerItem(
                 icon: Icons.settings,
-                title: 'Ayarlar',
+                title: 'drawer.settings'.tr(),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
@@ -1695,6 +1779,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String title,
     required VoidCallback onTap,
     bool isSelected = false,
+    int? badge, // Badge parametresi
   }) {
     return ListTile(
       leading: Icon(
@@ -1702,13 +1787,36 @@ class _HomeScreenState extends State<HomeScreen> {
         color: isSelected ? Colors.deepPurple : Colors.grey[700],
         size: 24,
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-          color: isSelected ? Colors.deepPurple : Colors.grey[800],
-        ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.deepPurple : Colors.grey[800],
+              ),
+            ),
+          ),
+          // Badge
+          if (badge != null && badge > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                badge > 99 ? '99+' : badge.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+        ],
       ),
       selected: isSelected,
       selectedTileColor: Colors.deepPurple.withOpacity(0.1),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
 
 class BrandSelectionScreen extends StatelessWidget {
@@ -13,8 +14,12 @@ class BrandSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Simülasyon araç markaları (telif riski olmayan isimler)
-    final brands = [
+    // ValueListenableBuilder ile dil değişikliklerini dinle
+    return ValueListenableBuilder<String>(
+      valueListenable: LocalizationService().languageNotifier,
+      builder: (context, currentLanguage, child) {
+        // Simülasyon araç markaları (telif riski olmayan isimler)
+        final brands = [
       {
         'name': 'Alfio',
         'originalHint': 'İtalyan spor karakteri',
@@ -163,7 +168,7 @@ class BrandSelectionScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Marka Seçin'),
+        title: Text('vehicles.selectBrand'.tr()),
         backgroundColor: categoryColor,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -185,7 +190,7 @@ class BrandSelectionScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '$categoryName kategorisinde hangi markayı tercih edersiniz?',
+                    '${'vehicles.categoryInfoAuto'.tr()} $categoryName',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[700],
@@ -224,6 +229,8 @@ class BrandSelectionScreen extends StatelessWidget {
         ],
       ),
     );
+      },
+    );
   }
 
   Widget _buildAllBrandsCard(BuildContext context) {
@@ -240,7 +247,7 @@ class BrandSelectionScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
-                  categoryName: '$categoryName - Tüm Modeller',
+                  categoryName: '$categoryName - ${'vehicles.allModels'.tr()}',
                   categoryColor: categoryColor,
                   brandName: null, // null = tüm markalar
                 ),
@@ -278,8 +285,8 @@ class BrandSelectionScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Tüm Modeller',
-                        style: TextStyle(
+                        'vehicles.allModels'.tr(),
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -287,7 +294,7 @@ class BrandSelectionScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Tüm markaların araçlarını görüntüle',
+                        'vehicles.allModelsDesc'.tr(),
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.white.withOpacity(0.9),
