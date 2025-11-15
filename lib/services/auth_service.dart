@@ -2,6 +2,7 @@ import 'package:crypto/crypto.dart';
 import 'dart:convert' as convert;
 import '../models/user_model.dart';
 import 'database_helper.dart';
+import 'firebase_auth_service.dart';
 
 class AuthService {
   // Singleton pattern
@@ -10,6 +11,7 @@ class AuthService {
   AuthService._internal();
 
   final DatabaseHelper _db = DatabaseHelper();
+  final FirebaseAuthService _firebaseAuth = FirebaseAuthService();
 
   // Şifreyi hashle
   String _hashPassword(String password) {
@@ -115,9 +117,30 @@ class AuthService {
     return true;
   }
 
+  // Google ile giriş yap
+  Future<User?> loginWithGoogle() async {
+    try {
+      // Firebase üzerinden Google Sign-In
+      final user = await _firebaseAuth.signInWithGoogle();
+      
+      if (user == null) {
+        return null; // Kullanıcı giriş iptal etti veya hata oluştu
+      }
+      
+      // Aktif kullanıcıyı ayarla
+      await _db.setCurrentUser(user.id);
+      
+      return user;
+    } catch (e) {
+      print('🔴 Google Login Error in AuthService: $e');
+      return null;
+    }
+  }
+
   // Çıkış yap
   Future<void> logout() async {
     await _db.clearCurrentUser();
+    await _firebaseAuth.signOut(); // Google'dan da çıkış yap
   }
 
   // Şifre değiştir

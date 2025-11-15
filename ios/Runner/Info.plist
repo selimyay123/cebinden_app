@@ -56,5 +56,17 @@
 			<string>cstr6suwn9.skadnetwork</string>
 		</dict>
 	</array>
+	<!-- Google Sign-In URL Scheme -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.585097479960-jd9clpbd09ttok1lgienfbaaedqofv9c</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

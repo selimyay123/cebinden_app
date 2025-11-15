@@ -65,6 +65,11 @@ dependencies:
   
   # Google AdMob - Reklamlar
   google_mobile_ads: ^5.1.0
+  
+  # Firebase - Google Sign In
+  firebase_core: ^3.3.0
+  firebase_auth: ^5.1.4
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_test:

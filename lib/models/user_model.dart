@@ -11,6 +11,9 @@ class User {
   final double profitLossPercentage; // Kar/Zarar yüzdesi
   final String? profileImageUrl; // Profil resmi URL'i (opsiyonel)
   final String currency; // Para birimi: 'TL', 'USD', 'EUR'
+  final String authProvider; // Giriş yöntemi: 'email' veya 'google'
+  final String? googleUserId; // Google kullanıcı ID'si (Google Sign-In için)
+  final String? email; // E-posta adresi (Google Sign-In için)
 
   User({
     required this.id,
@@ -23,6 +26,9 @@ class User {
     this.profitLossPercentage = 0.0, // Başlangıçta kar/zarar yok
     this.profileImageUrl,
     this.currency = 'TL', // Varsayılan para birimi
+    this.authProvider = 'email', // Varsayılan giriş yöntemi
+    this.googleUserId,
+    this.email,
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -66,6 +72,9 @@ class User {
       profitLossPercentage: (json['profitLossPercentage'] as num?)?.toDouble() ?? 0.0,
       profileImageUrl: json['profileImageUrl'] as String?,
       currency: json['currency'] as String? ?? 'TL',
+      authProvider: json['authProvider'] as String? ?? 'email',
+      googleUserId: json['googleUserId'] as String?,
+      email: json['email'] as String?,
     );
   }
 
@@ -82,6 +91,9 @@ class User {
       'profitLossPercentage': profitLossPercentage,
       'profileImageUrl': profileImageUrl,
       'currency': currency,
+      'authProvider': authProvider,
+      'googleUserId': googleUserId,
+      'email': email,
     };
   }
 
@@ -97,6 +109,9 @@ class User {
     double? profitLossPercentage,
     String? profileImageUrl,
     String? currency,
+    String? authProvider,
+    String? googleUserId,
+    String? email,
   }) {
     return User(
       id: id ?? this.id,
@@ -109,6 +124,9 @@ class User {
       profitLossPercentage: profitLossPercentage ?? this.profitLossPercentage,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       currency: currency ?? this.currency,
+      authProvider: authProvider ?? this.authProvider,
+      googleUserId: googleUserId ?? this.googleUserId,
+      email: email ?? this.email,
     );
   }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "585097479960",
+    "project_id": "cebinden-616e9",
+    "storage_bucket": "cebinden-616e9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:585097479960:android:afc569fb529577eaa1c06d",
+        "android_client_info": {
+          "package_name": "com.cebinden.cebinden_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJYz_NoHMbv8KLd-Xkc_YDxW49K9mXQ8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

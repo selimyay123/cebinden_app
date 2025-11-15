@@ -73,6 +73,39 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _loginWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final user = await _authService.loginWithGoogle();
+
+      if (!mounted) return;
+
+      if (user != null) {
+        // Başarılı Google girişi
+        print('✅ Google girişi başarılı: ${user.username}');
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
+        );
+      } else {
+        setState(() {
+          _errorMessage = 'login.googleLoginFailed'.tr();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = 'login.googleLoginError'.tr();
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,7 +291,64 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
+
+                // Ayraç - "veya"
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: Colors.grey[400])),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'login.or'.tr(),
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: Colors.grey[400])),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Google ile giriş butonu
+                SizedBox(
+                  height: 56,
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _loginWithGoogle,
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.grey[400]!),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: Colors.white,
+                    ),
+                    icon: Image.asset(
+                      'assets/images/google_logo.png',
+                      height: 24,
+                      width: 24,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Eğer Google logo bulunamazsa, varsayılan icon göster
+                        return const Icon(
+                          Icons.g_mobiledata,
+                          size: 32,
+                          color: Color(0xFF4285F4),
+                        );
+                      },
+                    ),
+                    label: Text(
+                      'login.googleSignIn'.tr(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
 
                 // Kayıt ol linki
                 Row(

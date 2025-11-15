@@ -453,5 +453,11 @@
     "rewardReceived": "Ödül Kazandınız!",
     "rewardMessage": "Teşekkürler! Ödül bakiyenize eklendi.",
     "notReady": "Reklam hazırlanıyor, lütfen biraz bekleyin..."
+  },
+  "login": {
+    "or": "veya",
+    "googleSignIn": "Google ile Giriş Yap",
+    "googleLoginFailed": "Google ile giriş başarısız oldu. Lütfen tekrar deneyin.",
+    "googleLoginError": "Google ile giriş yapılırken bir hata oluştu."
   }
 }
