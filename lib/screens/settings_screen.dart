@@ -177,20 +177,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         Navigator.pop(context); // Loading'i kapat
 
-        // Sonuç göster
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('✅ ${'settings.success'.tr()}'),
-            content: Text('$offersCreated ${'settings.offersCreatedSuccess'.tr()}\n\n${'settings.checkOffersSection'.tr()}'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('settings.ok'.tr()),
-              ),
-            ],
-          ),
-        );
+        if (offersCreated == 0) {
+          // Hiç teklif oluşturulmadıysa açıklayıcı mesaj göster
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('ℹ️ ${'common.info'.tr()}'),
+              content: Text('settings.noListingsForOffers'.tr()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('settings.ok'.tr()),
+                ),
+              ],
+            ),
+          );
+        } else {
+          // Sonuç göster
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('✅ ${'settings.success'.tr()}'),
+              content: Text('$offersCreated ${'settings.offersCreatedSuccess'.tr()}\n\n${'settings.checkOffersSection'.tr()}'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('settings.ok'.tr()),
+                ),
+              ],
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

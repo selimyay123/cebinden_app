@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
 import 'services/database_helper.dart';
 import 'services/localization_service.dart';
+import 'services/ad_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,9 @@ void main() async {
   
   // Localization'ı initialize et
   await LocalizationService().initialize();
+  
+  // AdMob'u initialize et (Test Mode)
+  await AdService.initialize();
   
   runApp(const CebindenApp());
 }

@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
+import '../models/notification_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -13,6 +14,7 @@ class DatabaseHelper {
   static const String currentUserBox = 'current_user';
   static const String userVehiclesBox = 'user_vehicles'; // Kullanıcıların araçları
   static const String offersBox = 'offers'; // Teklifler
+  static const String notificationsBox = 'notifications'; // Bildirimler
 
   // Initialize Hive
   static Future<void> init() async {
@@ -23,6 +25,7 @@ class DatabaseHelper {
     final currentUserBoxInstance = await Hive.openBox<String>(currentUserBox);
     final userVehiclesBoxInstance = await Hive.openBox<Map>(userVehiclesBox);
     final offersBoxInstance = await Hive.openBox<Map>(offersBox);
+    final notificationsBoxInstance = await Hive.openBox<Map>(notificationsBox);
     
                 
     // Debug: Tüm kullanıcıları listele
@@ -174,10 +177,12 @@ class DatabaseHelper {
     await _currentUserBox.clear();
     await _userVehiclesBox.clear();
     await _offersBox.clear();
+    await _notificationsBox.clear();
     await _usersBox.flush();
     await _currentUserBox.flush();
     await _userVehiclesBox.flush();
     await _offersBox.flush();
+    await _notificationsBox.flush();
   }
 
   // ============================================================================
@@ -579,6 +584,115 @@ class DatabaseHelper {
       return true;
     } catch (e) {
       print('❌ Error deleting offers for vehicle: $e');
+      return false;
+    }
+  }
+
+  // ============================================================================
+  // NOTIFICATIONS (Bildirimler)
+  // ============================================================================
+
+  // Notifications box'ını al
+  Box<Map> get _notificationsBox => Hive.box<Map>(notificationsBox);
+
+  // Bildirim ekle
+  Future<bool> addNotification(AppNotification notification) async {
+    try {
+      final notificationMap = Map<dynamic, dynamic>.from(notification.toJson());
+      await _notificationsBox.put(notification.id, notificationMap);
+      await _notificationsBox.flush();
+      print('✅ Notification added: ${notification.id}');
+      return true;
+    } catch (e) {
+      print('❌ Error adding notification: $e');
+      return false;
+    }
+  }
+
+  // Kullanıcının tüm bildirimlerini getir
+  Future<List<AppNotification>> getUserNotifications(String userId) async {
+    try {
+      final allNotifications = _notificationsBox.values;
+      final userNotifications = allNotifications
+          .where((n) => n['userId'] == userId)
+          .map((n) => AppNotification.fromJson(Map<String, dynamic>.from(n)))
+          .toList();
+      
+      // Tarihe göre sırala (en yeni üstte)
+      userNotifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      
+      return userNotifications;
+    } catch (e) {
+      print('❌ Error getting user notifications: $e');
+      return [];
+    }
+  }
+
+  // Okunmamış bildirim sayısı
+  Future<int> getUnreadNotificationCount(String userId) async {
+    try {
+      final notifications = await getUserNotifications(userId);
+      return notifications.where((n) => !n.isRead).length;
+    } catch (e) {
+      print('❌ Error getting unread count: $e');
+      return 0;
+    }
+  }
+
+  // Bildirimi okundu işaretle
+  Future<bool> markNotificationAsRead(String notificationId) async {
+    try {
+      final notification = _notificationsBox.get(notificationId);
+      if (notification != null) {
+        notification['isRead'] = true;
+        await _notificationsBox.put(notificationId, notification);
+        await _notificationsBox.flush();
+      }
+      return true;
+    } catch (e) {
+      print('❌ Error marking notification as read: $e');
+      return false;
+    }
+  }
+
+  // Tüm bildirimleri okundu işaretle
+  Future<bool> markAllNotificationsAsRead(String userId) async {
+    try {
+      final notifications = await getUserNotifications(userId);
+      for (var notification in notifications) {
+        if (!notification.isRead) {
+          await markNotificationAsRead(notification.id);
+        }
+      }
+      return true;
+    } catch (e) {
+      print('❌ Error marking all as read: $e');
+      return false;
+    }
+  }
+
+  // Bildirimi sil
+  Future<bool> deleteNotification(String notificationId) async {
+    try {
+      await _notificationsBox.delete(notificationId);
+      await _notificationsBox.flush();
+      return true;
+    } catch (e) {
+      print('❌ Error deleting notification: $e');
+      return false;
+    }
+  }
+
+  // Tüm bildirimleri sil
+  Future<bool> deleteAllNotifications(String userId) async {
+    try {
+      final notifications = await getUserNotifications(userId);
+      for (var notification in notifications) {
+        await deleteNotification(notification.id);
+      }
+      return true;
+    } catch (e) {
+      print('❌ Error deleting all notifications: $e');
       return false;
     }
   }

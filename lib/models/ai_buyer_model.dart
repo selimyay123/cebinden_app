@@ -130,8 +130,8 @@ class AIBuyer {
     required double listingPrice,
     required double fairPrice,
   }) {
-    // Bütçe kontrolü
-    if (listingPrice > budget * 1.1) return false; // Bütçenin %110'undan fazla olamaz
+    // Bütçe kontrolü (daha gevşek)
+    if (listingPrice > budget * 1.3) return false; // Bütçenin %130'undan fazla olamaz
     
     // Marka tercihi kontrolü (ağırlıklı)
     bool brandMatch = preferredBrands.contains(vehicleBrand);
@@ -140,15 +140,17 @@ class AIBuyer {
     double priceRatio = listingPrice / fairPrice;
     bool goodDeal = priceRatio <= maxPaymentRatio;
     
-    // Karar ver
+    // Karar ver (daha gevşek kriterler)
     if (brandMatch && goodDeal) {
       return true; // %100 ilgilenir
     } else if (brandMatch) {
-      return Random().nextDouble() < 0.6; // Marka uygun ama pahalı, %60 şans
-    } else if (goodDeal && priceRatio < 0.80) {
-      return Random().nextDouble() < 0.7; // Marka değil ama çok ucuz, %70 şans (fırsatçı)
+      return Random().nextDouble() < 0.75; // Marka uygun ama pahalı, %75 şans
+    } else if (goodDeal) {
+      return Random().nextDouble() < 0.80; // Fiyat uygun, %80 şans
+    } else if (priceRatio < 1.2) {
+      return Random().nextDouble() < 0.50; // Makul fiyat, %50 şans
     } else {
-      return false;
+      return Random().nextDouble() < 0.20; // Her durumda %20 şans (genel ilgi)
     }
   }
 
@@ -172,16 +174,19 @@ class AIBuyer {
   }
 
   static List<String> _generatePreferredBrands(Random random) {
+    // Gerçek marka isimleri (Vehicle kategorilerindeki markalarla eşleşmeli)
     final allBrands = [
-      'Bayern Motors', 'Falke', 'Veloce', 'Nippon',
-      'Spartana', 'Tudor', 'Cheonji', 'Gallia',
+      'BMW', 'Mercedes-Benz', 'Audi', 'Volkswagen', 'Ford',
+      'Renault', 'Peugeot', 'Fiat', 'Toyota', 'Honda',
+      'Hyundai', 'Kia', 'Nissan', 'Mazda', 'Opel',
+      'Skoda', 'Seat', 'Volvo', 'Chevrolet', 'Alfa Romeo',
     ];
     
-    // 1-3 arası marka seç
-    int brandCount = 1 + random.nextInt(3);
+    // 2-4 arası marka seç (daha geniş tercihler)
+    int brandCount = 2 + random.nextInt(3);
     List<String> selected = [];
     
-    for (int i = 0; i < brandCount; i++) {
+    for (int i = 0; i < brandCount && i < allBrands.length; i++) {
       String brand = allBrands[random.nextInt(allBrands.length)];
       if (!selected.contains(brand)) {
         selected.add(brand);

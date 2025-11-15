@@ -67,6 +67,7 @@
     "welcome": "Welcome",
     "balance": "Total Balance",
     "quickActions": "Quick Actions",
+    "watchAd": "Watch Ad",
     "statistics": "Statistics",
     "recentActivity": "Recent Activity",
     "totalVehicles": "Total Vehicles",
@@ -316,6 +317,7 @@
     "offersCreatedSuccess": "offers created",
     "checkOffersSection": "You can check them in My Offers section",
     "offersCreatedError": "An error occurred while generating offers",
+    "noListingsForOffers": "To generate offers, you need to buy a vehicle and list it for sale first.\n\n1️⃣ Dashboard → Buy Vehicle\n2️⃣ Dashboard → Sell Vehicle\n3️⃣ Try again",
     "clearDatabase": "Clear Database",
     "clearDatabaseDesc": "All users and data will be deleted",
     "clearDatabaseConfirm": "All users and data will be deleted. This action cannot be undone. Are you sure?",
@@ -425,5 +427,31 @@
     "sellVehicle": "Sell",
     "vehicleDetailComingSoon": "Vehicle detail page coming soon...",
     "sellFeatureComingSoon": "Sell vehicle feature coming soon..."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "No Notifications Yet",
+    "noNotificationsDesc": "New offers and updates will appear here",
+    "markAllRead": "Mark All Read",
+    "deleteAll": "Delete All",
+    "deleteAllConfirm": "All notifications will be deleted. Are you sure?",
+    "newOffer": {
+      "title": "New Offer! 💰",
+      "message": "{buyer} offered {price} for {vehicle}"
+    },
+    "offerAccepted": {
+      "title": "Offer Accepted! ✅",
+      "message": "Your offer of {price} for {vehicle} has been accepted"
+    },
+    "vehicleSold": {
+      "title": "Vehicle Sold! 🎉",
+      "message": "{vehicle} successfully sold for {price}"
+    }
+  },
+  "ads": {
+    "watchAd": "Watch Ad",
+    "rewardReceived": "Reward Earned!",
+    "rewardMessage": "Thank you! Reward added to your balance.",
+    "notReady": "Ad is loading, please wait a moment..."
   }
 }

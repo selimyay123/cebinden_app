@@ -67,6 +67,7 @@
     "welcome": "Hoş Geldiniz",
     "balance": "Toplam Bakiye",
     "quickActions": "Hızlı İşlemler",
+    "watchAd": "Reklam İzle",
     "statistics": "İstatistikler",
     "recentActivity": "Son İşlemler",
     "totalVehicles": "Toplam Araç",
@@ -316,6 +317,7 @@
     "offersCreatedSuccess": "adet teklif oluşturuldu",
     "checkOffersSection": "Tekliflerim bölümünden kontrol edebilirsiniz",
     "offersCreatedError": "Teklifler oluşturulurken bir hata oluştu",
+    "noListingsForOffers": "Teklif oluşturmak için önce bir araç satın alıp satışa çıkarmanız gerekiyor.\n\n1️⃣ Dashboard → Araç Al\n2️⃣ Dashboard → Araç Sat\n3️⃣ Tekrar deneyin",
     "clearDatabase": "Veritabanını Temizle",
     "clearDatabaseDesc": "Tüm kullanıcılar ve veriler silinir",
     "clearDatabaseConfirm": "Tüm kullanıcılar ve veriler silinecek. Bu işlem geri alınamaz. Emin misiniz?",
@@ -425,5 +427,31 @@
     "sellVehicle": "Sat",
     "vehicleDetailComingSoon": "Araç detay sayfası yakında...",
     "sellFeatureComingSoon": "Araç satış özelliği yakında..."
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "noNotifications": "Henüz Bildirim Yok",
+    "noNotificationsDesc": "Yeni teklifler ve güncellemeler burada görünecek",
+    "markAllRead": "Tümünü Okundu İşaretle",
+    "deleteAll": "Tümünü Sil",
+    "deleteAllConfirm": "Tüm bildirimler silinecek. Emin misiniz?",
+    "newOffer": {
+      "title": "Yeni Teklif! 💰",
+      "message": "{buyer}, {vehicle} için {price} TL teklif etti"
+    },
+    "offerAccepted": {
+      "title": "Teklif Kabul Edildi! ✅",
+      "message": "{vehicle} için verdiğiniz {price} TL teklif kabul edildi"
+    },
+    "vehicleSold": {
+      "title": "Araç Satıldı! 🎉",
+      "message": "{vehicle} başarıyla {price} TL'ye satıldı"
+    }
+  },
+  "ads": {
+    "watchAd": "Reklam İzle",
+    "rewardReceived": "Ödül Kazandınız!",
+    "rewardMessage": "Teşekkürler! Ödül bakiyenize eklendi.",
+    "notReady": "Reklam hazırlanıyor, lütfen biraz bekleyin..."
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../services/notification_service.dart';
+import '../services/ad_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import 'login_screen.dart';
@@ -11,6 +13,7 @@ import 'my_vehicles_screen.dart';
 import 'sell_vehicle_screen.dart';
 import 'my_listings_screen.dart';
 import 'my_offers_screen.dart';
+import 'notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
+  final AdService _adService = AdService();
   User? _currentUser;
   bool _isLoading = true;
   int _vehicleCount = 0;
@@ -33,6 +37,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadCurrentUser();
+    // İlk reklam yükleme
+    _adService.loadRewardedAd();
+  }
+
+  @override
+  void dispose() {
+    _adService.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -103,6 +115,85 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Ödüllü reklam izle
+  Future<void> _watchRewardedAd() async {
+    await _adService.showRewardedAd(
+      onRewarded: (double reward) async {
+        // Kullanıcıya ödülü ver
+        if (_currentUser != null) {
+          final newBalance = _currentUser!.balance + reward;
+          await _db.updateUser(_currentUser!.id, {'balance': newBalance});
+          
+          // UI'ı güncelle
+          await _loadCurrentUser();
+          
+          // Başarı mesajı göster
+          if (mounted) {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Row(
+                  children: [
+                    const Text('🎉 '),
+                    Expanded(child: Text('ads.rewardReceived'.tr())),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.monetization_on,
+                      size: 64,
+                      color: Colors.amber,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '+${reward.toStringAsFixed(0)} TL',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'ads.rewardMessage'.tr(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('common.ok'.tr()),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
+      },
+      onAdNotReady: () {
+        // Reklam hazır değil
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('ads.notReady'.tr()),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          // Yeni reklam yükle
+          _adService.loadRewardedAd();
+        }
+      },
+    );
+  }
+
   Future<void> _logout() async {
     // Onay dialogu göster
     final shouldLogout = await showDialog<bool>(
@@ -160,12 +251,56 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                tooltip: 'home.notifications'.tr(),
-                onPressed: () {
-                  // TODO: Bildirimler sayfası
-                },
+              // Bildirim butonu - Badge ile
+              Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    tooltip: 'home.notifications'.tr(),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const NotificationsScreen(),
+                        ),
+                      ).then((_) => setState(() {})); // Geri dönünce refresh et
+                    },
+                  ),
+                  // Badge - okunmamış sayısı
+                  if (_currentUser != null)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: FutureBuilder<int>(
+                        future: NotificationService().getUnreadCount(_currentUser!.id),
+                        builder: (context, snapshot) {
+                          final count = snapshot.data ?? 0;
+                          if (count == 0) return const SizedBox.shrink();
+                          
+                          return Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Text(
+                              count > 99 ? '99+' : count.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                ],
               ),
               IconButton(
                 icon: const Icon(Icons.logout),
@@ -455,6 +590,13 @@ class _HomeScreenState extends State<HomeScreen> {
           await _loadCurrentUser();
         },
       },
+      {
+        'icon': Icons.play_circle_filled,
+        'label': 'home.watchAd'.tr(),
+        'color': Colors.amber,
+        'reward': '1,000 TL', // Ödül gösterimi
+        'onTap': () => _watchRewardedAd(),
+      },
       // {
       //   'icon': Icons.car_rental,
       //   'label': 'Araç Kirala',
@@ -491,6 +633,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: action['color'] as Color,
             onTap: action['onTap'] as VoidCallback,
             badge: action['badge'] as int?,
+            reward: action['reward'] as String?,
           );
         },
       ),
@@ -503,6 +646,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
     int? badge, // Badge parametresi ekledik
+    String? reward, // Ödül gösterimi için
   }) {
     return InkWell(
       onTap: onTap,
@@ -571,6 +715,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.grey[800],
               ),
             ),
+            // Ödül gösterimi
+            if (reward != null) ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  reward,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

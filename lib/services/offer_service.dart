@@ -5,6 +5,7 @@ import '../models/user_vehicle_model.dart';
 import '../models/user_model.dart';
 import '../models/vehicle_model.dart';
 import 'database_helper.dart';
+import 'notification_service.dart';
 
 /// Teklif servisi - AI alıcılar ve teklif yönetimi
 class OfferService {
@@ -42,7 +43,7 @@ class OfferService {
           // Teklif oluştur
           Offer offer = Offer(
             offerId: 'offer_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}',
-            vehicleId: listing.vehicleId,
+            vehicleId: listing.id, // ✅ UserVehicle'ın ID'sini kullan (listing.vehicleId değil!)
             sellerId: listing.userId,
             buyerId: buyer.buyerId,
             buyerName: buyer.buyerName,
@@ -63,6 +64,12 @@ class OfferService {
           bool success = await _db.addOffer(offer);
           if (success) {
             offersCreated++;
+            
+            // 🔔 Bildirim gönder
+            await NotificationService().sendNewOfferNotification(
+              userId: listing.userId,
+              offer: offer,
+            );
           }
         }
       }
@@ -160,6 +167,13 @@ class OfferService {
       // 6. Diğer teklifleri reddet
       await _db.rejectOtherOffers(offer.vehicleId, offer.offerId);
       
+      // 7. 🔔 Satıcıya araç satıldı bildirimi gönder
+      await NotificationService().sendVehicleSoldNotification(
+        userId: offer.sellerId,
+        vehicleName: '${offer.vehicleBrand} ${offer.vehicleModel}',
+        salePrice: offer.offerPrice,
+      );
+      
       print('✅ Offer accepted successfully!');
       print('   Seller balance: +${offer.offerPrice} TL');
       print('   Vehicle sold: ${offer.vehicleBrand} ${offer.vehicleModel}');
@@ -208,18 +222,21 @@ class OfferService {
   int _calculateDailyBuyerCount(UserVehicle listing) {
     final random = Random();
     
-    // Base: 0-5 arası alıcı
-    int baseCount = random.nextInt(6);
+    // Base: 3-8 arası alıcı (daha fazla teklif için artırıldı)
+    int baseCount = 3 + random.nextInt(6);
     
     // İndirim varsa artır
     double fairPrice = _calculateFairPrice(listing);
     double priceRatio = listing.listingPrice! / fairPrice;
     
     if (priceRatio < 0.80) {
-      // %20+ indirim → +2-4 alıcı
-      baseCount += 2 + random.nextInt(3);
+      // %20+ indirim → +3-5 alıcı
+      baseCount += 3 + random.nextInt(3);
     } else if (priceRatio < 0.90) {
-      // %10-20 indirim → +1-2 alıcı
+      // %10-20 indirim → +2-3 alıcı
+      baseCount += 2 + random.nextInt(2);
+    } else if (priceRatio < 1.0) {
+      // Adil fiyat → +1-2 alıcı
       baseCount += 1 + random.nextInt(2);
     }
     
@@ -228,13 +245,13 @@ class OfferService {
       final daysSinceListed = DateTime.now().difference(listing.listedDate!).inDays;
       
       if (daysSinceListed > 30) {
-        baseCount = (baseCount * 0.5).round(); // %50 azalt
+        baseCount = (baseCount * 0.7).round(); // %30 azalt (daha az cezalandırıcı)
       } else if (daysSinceListed > 14) {
-        baseCount = (baseCount * 0.7).round(); // %30 azalt
+        baseCount = (baseCount * 0.85).round(); // %15 azalt
       }
     }
     
-    return baseCount.clamp(0, 10); // Max 10 alıcı/gün
+    return baseCount.clamp(2, 15); // Min 2, Max 15 alıcı/gün
   }
 
   /// Tüm aktif ilanları getir (tüm kullanıcılardan)

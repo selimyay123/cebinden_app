@@ -59,6 +59,12 @@ dependencies:
   
   # Kutlama animasyonu
   confetti: ^0.7.0
+  
+  # Zaman gösterimi (2 dakika önce, 1 saat önce)
+  timeago: ^3.6.1
+  
+  # Google AdMob - Reklamlar
+  google_mobile_ads: ^5.1.0
 
 dev_dependencies:
   flutter_test:
