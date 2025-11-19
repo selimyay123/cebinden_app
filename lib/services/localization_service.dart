@@ -40,7 +40,7 @@ class LocalizationService {
       final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
       final languageCode = systemLocale.languageCode.toLowerCase();
       
-      print('📱 Device language detected: $languageCode');
+      
       
       // Desteklenen diller arasında mı kontrol et
       if (supportedLanguages.contains(languageCode)) {
@@ -48,10 +48,10 @@ class LocalizationService {
       }
       
       // Desteklenmeyen diller için İngilizce döndür (evrensel)
-      print('⚠️ Language not supported, defaulting to English');
+      
       return 'en';
     } catch (e) {
-      print('❌ Error detecting device language: $e');
+      
       return 'en'; // Hata durumunda İngilizce
     }
   }
@@ -67,11 +67,11 @@ class LocalizationService {
       if (savedLanguage != null) {
         // Kullanıcı daha önce bir dil seçmiş, onu kullan
         _currentLanguage = savedLanguage;
-        print('✅ Using saved language: $_currentLanguage');
+        
       } else {
         // İlk kez açılıyor, sistem dilini kullan
         _currentLanguage = _getDeviceLanguage();
-        print('🌍 First launch, using device language: $_currentLanguage');
+        
         
         // Seçilen sistem dilini kaydet
         await prefs.setString(_languageKey, _currentLanguage);
@@ -79,9 +79,9 @@ class LocalizationService {
       
       languageNotifier.value = _currentLanguage; // Notifier'ı güncelle
       await _loadLanguageFile(_currentLanguage);
-      print('✅ Localization initialized: $_currentLanguage');
+      
     } catch (e) {
-      print('❌ Error initializing localization: $e');
+      
       _currentLanguage = 'en'; // Hata durumunda İngilizce
       languageNotifier.value = 'en';
       await _loadLanguageFile('en');
@@ -93,9 +93,9 @@ class LocalizationService {
     try {
       String jsonString = await rootBundle.loadString('assets/translations/$languageCode.json');
       _localizedStrings = json.decode(jsonString);
-      print('✅ Language file loaded: $languageCode');
+      
     } catch (e) {
-      print('❌ Error loading language file: $e');
+      
       _localizedStrings = {};
     }
   }
@@ -103,7 +103,7 @@ class LocalizationService {
   /// Dili değiştir
   Future<bool> changeLanguage(String languageCode) async {
     if (!supportedLanguages.contains(languageCode)) {
-      print('❌ Unsupported language: $languageCode');
+      
       return false;
     }
 
@@ -115,10 +115,10 @@ class LocalizationService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_languageKey, languageCode);
       
-      print('✅ Language changed to: $languageCode');
+      
       return true;
     } catch (e) {
-      print('❌ Error changing language: $e');
+      
       return false;
     }
   }
@@ -133,14 +133,14 @@ class LocalizationService {
         if (value is Map<String, dynamic> && value.containsKey(k)) {
           value = value[k];
         } else {
-          print('⚠️ Translation key not found: $key');
+          
           return key; // Key bulunamazsa key'in kendisini döndür
         }
       }
       
       return value.toString();
     } catch (e) {
-      print('❌ Translation error for key "$key": $e');
+      
       return key;
     }
   }

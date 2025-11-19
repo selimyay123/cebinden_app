@@ -153,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (success) {
       // Başarılı kayıt - Tüm route geçmişini temizle ve ana sayfaya yönlendir
-      print('✅ Kayıt başarılı!');
+      
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
         (route) => false, // Tüm önceki ekranları temizle

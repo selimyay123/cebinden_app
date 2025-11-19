@@ -111,29 +111,33 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     final transmissions = ['Manuel', 'Otomatik'];
     final engineSizes = ['1.0', '1.2', '1.4', '1.6', '1.8', '2.0', '2.2', '2.5', '3.0'];
     final driveTypes = ['Önden', 'Arkadan', '4x4'];
+    final bodyTypes = ['Sedan', 'Hatchback', 'SUV', 'Coupe', 'Station Wagon', 'MPV'];
+    final sellerTypes = ['Sahibinden', 'Galeriden'];
     
-    // Komik ilan açıklamaları
-    final funnyDescriptions = [
-      'Bu araba öyle hızlı ki, trafik cezalarım kendi bireysel emeklilik fonumu geçti. Artık onu sakinleştirecek birine ihtiyacım var. Sizin olabilir mi acaba? 🚗💨',
-      'Eşim "ya ben ya araba" dedi. Araba daha az yakıyor, o yüzden... Neyse, işte bu yüzden burada! Ailenize anlatacak harika bir hikaye de hediye! 😅',
-      'Şehir içi 50 litre, şehir dışı 100 litre yakıyor. Şaka şaka! Ama gerçekten ekonomik, benim param bitmediği için satıyorum. (Yalan bu arada, param bitti) 💰',
-      'Komşum her gün bu arabaya bakıp içini çekiyor. Artık acıyorum adama, alın gitsin rahatlasın. Psikolog parası vermesine gerek kalmaz! 👀',
-      'Arabanın tek sorunu şu: İnsanlar sürekli "Vay be, ne araba!" diye bağırıyor. Alışırsınız. Ben 3 yılda alıştım. Siz de alışırsınız... Sanırım. 🤷',
-      'Kayınvalidem bu arabayı çok seviyor. Bu yüzden satıyorum. Başka soru? 🙃',
-      'Araba o kadar temiz ki, zemin kat dairemden daha steril. Evinizi ihmal edip arabaya odaklanmak ister misiniz? İşte fırsat! 🧹✨',
-      'Bagajına 3 buzdolabı sığar. Denedim. Merak etmeyin, buzdolapları satıldı, kalıntı yok. Bonus: Bagaj hâlâ buzdolabı kokuyor! ❄️',
-      'GPS\'i bozuk, ama ben zaten yolu biliyorum, siz de öğrenirsiniz. Aslında bu hayat dersi sayılır, bedava veriyorum! 🧭',
-      'Lastikleri 2 yıl önce değiştirildi. Şimdi tekrar değiştirilmeleri gerekiyor. Ama hey, 2 yıl bedava kullandınız sayın! 🎁',
-      'Koltuklar çok rahat, 7 kere uyuyakaldım direksiyon başında. Endişelenmeyin, hiçbiri kazayla sonuçlanmadı! 😴',
-      'Klima yok ama camlar manuel açılıyor, doğal klima! Ayrıca fitness: Her gün kollarınız çalışır. Bedava spor salonu! 💪',
-      'Radyo sadece TEK istasyonu çalıyor. Hangi istasyon? Sürpriz olsun! Macera seviyorsunuz dimi? 📻',
-      'Far hizası biraz yamuk, ama gece sürüş zaten overrated. Gündüz kullanın, D vitamini alırsınız! ☀️',
-      'Vites kolu bazen 3. viteste takılıyor. Ama kim 4. vitese ihtiyaç duyar ki? Gereksiz lüks! ⚙️',
-      'Dikiz aynası düşük, ama arkadaki araba zaten hep korna çalıyor, ondan anlarsınız. Kim aynaya bakar? 🎺',
-      'Motor sesi biraz yüksek ama komşular erken kalkmasını öğrenir. Sosyal sorumluluk projesi gibi düşünün! ⏰',
-      'Boyası solmuş ama vintage diyoruz ona. Retro tarz sevmez misiniz? Hipsterlar bayılır! 🎨',
-      'Gösterge panelinde 3 ışık yanıyor. Dekoratif amaçlı, Noel ağacı gibi. Bayramlık havasında gitmek ister misiniz? 🎄',
-      'Park sensörü yok ama reflekslerinizi geliştirir. Ninja olma eğitimi veriyorum bedavaya! 🥷',
+    // İlan açıklamaları (profesyonel + nadiren komik)
+    final descriptions = [
+      // Profesyonel Açıklamalar
+      'Tek elden, bakımlı ve temiz kullanım. Tüm periyodik bakımları zamanında yapılmıştır. Orjinal boyasında, değişen-boyanan yok. Görüşmeye ve teklif yapmaya açığız.',
+      'Hasarsız, bakımlı ve sorunsuz bir araç. Tüm servis kayıtları elimizde mevcuttur. Muayenesi yeni alınmıştır. Takas ve kredi kartına taksit imkanı vardır.',
+      'Garaj arabası. Hep düzenli kullanılmış, her zaman bakımlı kalınmıştır. Detaylı bilgi ve görüntüler için arayabilirsiniz. Fiyat konusunda teklife açığız.',
+      'Aileden satılık araç. Yıllardır bu aracı kullandık, sorunsuz bir araçtır. Makul tekliflere açığız. Nakit veya krediye uygun şartlarla.',
+      'Sıfır km\'den beri tüm bakımları yetkili serviste yapılmıştır. Trafik sigortası ve kasko güncel. Araç her anlamda hazır ve eksiksizdir.',
+      'İkinci el ama sıfır gibi. Tramer kaydı temiz, hasar yok. Yakın zamanda lastikler değiştirildi. Motor ve şanzıman sorunsuz.',
+      'Ekonomik ve güvenilir araç. Şehir içi ve şehirlerarası rahat kullanım. Full bakımlı, her şey orjinal. Görüşmede detayları anlatırız.',
+      'Değişensiz, boyasız ve hasarsız araç. Ailenin ikinci aracı olarak kullanılmıştır. Az km\'de, temiz kullanım. Fiyat piyasa rayicindedir.',
+      'Yerli muayene ile hazır. Motor, şanzıman, klima, elektrik sorunsuz. Orjinal çıkma ve hatasız araç. Kredi ve takasa açığız.',
+      'Kullanılmış ancak çok bakımlı araç. Tüm özellikleri çalışır durumda. Hiçbir gizli kusur yok. İstediğiniz ustaya kontrol ettirebilirsiniz.',
+      'Orjinal km garantili. İlk alıcıdan satılık. Hiç hasar görmemiş, çarpma yok. Teklif edebilirsiniz, uygun görürsek anlaşırız.',
+      'Temiz, bakımlı ve sorunsuz araç. Şehir içi ve yol için idealdir. Her türlü kontrole açık. Ciddi alıcılara indirim yapılabilir.',
+      'Aile arabası. Sağlam, güvenilir ve ekonomik. Uzun yol deneyimliyiz bu araçla. Sorunu yok, her şey mükemmel çalışıyor.',
+      'Full paket, eksiksiz araç. Tüm konfor özellikleri mevcut. Bakım masrafı çok düşük. Piyasanın en ucuz ve en temiz ilanı.',
+      'Tramer raporu temiz. Pert kaydı yok. Aracı beğenmezseniz para iade. Kesinlikle kusursuz bir araç. Test sürüşü yapabilirsiniz.',
+      'Garantili araç. Satış sonrası 1 ay içinde herhangi bir mekanik arıza çıkarsa karşılarız. Güvenle alabilirsiniz.',
+      'Orjinal, boyasız, değişensiz araç. Kaportada çizik veya çarpma yok. Motor ve mekanik aksam yeni gibi. Uzman kontrolü yapılmıştır.',
+      'Düzenli servis geçmişi olan araç. Her türlü bakım zamanında yapılmıştır. Eksik yok, kusur yok. Sorunsuz kullanım garantisi veriyoruz.',
+      // Nadiren Komik
+      'Bu araç benim için bir aile dostu gibiydi. Şimdi ailesi değişsin, siz mutlu olun. Ben de yeni araba alacak kadar mutlu olayım! 😊',
+      'Komşularım bu arabayı o kadar çok beğeniyor ki, artık onların bakışlarından kaçmak için satıyorum. Şaka bir yana, çok iyi araç! 😄',
     ];
     
     // Markaya özel model isimleri
@@ -186,7 +190,10 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
               driveType: driveTypes[random.nextInt(driveTypes.length)],
               hasWarranty: random.nextBool(),
               hasAccidentRecord: random.nextInt(10) < 2, // %20 ihtimalle hasar kaydı
-              description: funnyDescriptions[random.nextInt(funnyDescriptions.length)],
+              description: descriptions[random.nextInt(descriptions.length)],
+              bodyType: bodyTypes[random.nextInt(bodyTypes.length)],
+              horsepower: 100 + random.nextInt(300), // 100-400 HP
+              sellerType: sellerTypes[random.nextInt(sellerTypes.length)],
             ),
           );
         }
@@ -213,7 +220,10 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
             driveType: driveTypes[random.nextInt(driveTypes.length)],
             hasWarranty: random.nextBool(),
             hasAccidentRecord: random.nextInt(10) < 2, // %20 ihtimalle hasar kaydı
-            description: funnyDescriptions[random.nextInt(funnyDescriptions.length)],
+            description: descriptions[random.nextInt(descriptions.length)],
+            bodyType: bodyTypes[random.nextInt(bodyTypes.length)],
+            horsepower: 100 + random.nextInt(300), // 100-400 HP
+            sellerType: sellerTypes[random.nextInt(sellerTypes.length)],
           ),
         );
       }

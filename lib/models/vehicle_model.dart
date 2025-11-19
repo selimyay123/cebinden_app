@@ -21,6 +21,10 @@ class Vehicle {
   final bool hasAccidentRecord; // Ağır hasar kaydı var mı?
   final String description; // İlan açıklaması
   final int score; // İlan skoru (1-100) - Kullanıcıya gösterilmez, arka plan hesaplama
+  final String bodyType; // Kasa tipi (Sedan, Hatchback, SUV, Coupe, vb.)
+  final int horsepower; // Motor gücü (HP)
+  final String sellerType; // Kimden (Sahibinden, Galeriden)
+  final Map<String, String> partConditions; // Parça durumları (orijinal, lokal_boyali, boyali, degisen)
 
   Vehicle({
     required this.id,
@@ -43,6 +47,10 @@ class Vehicle {
     this.hasAccidentRecord = false,
     required this.description,
     required this.score,
+    required this.bodyType,
+    required this.horsepower,
+    this.sellerType = 'Sahibinden',
+    this.partConditions = const {},
   });
 
   // Yeni araç ilanı oluşturma factory
@@ -64,6 +72,10 @@ class Vehicle {
     bool hasWarranty = false,
     bool hasAccidentRecord = false,
     required String description,
+    required String bodyType,
+    required int horsepower,
+    String sellerType = 'Sahibinden',
+    Map<String, String>? partConditions,
   }) {
     // Skor hesapla (otomatik)
     final calculatedScore = _calculateScore(
@@ -99,7 +111,33 @@ class Vehicle {
       hasAccidentRecord: hasAccidentRecord,
       description: description,
       score: calculatedScore,
+      bodyType: bodyType,
+      horsepower: horsepower,
+      sellerType: sellerType,
+      partConditions: partConditions ?? _generateRandomPartConditions(),
     );
+  }
+
+  // Rastgele parça durumları oluştur
+  static Map<String, String> _generateRandomPartConditions() {
+    final random = DateTime.now().millisecondsSinceEpoch % 100;
+    final parts = <String, String>{};
+    final conditions = ['orijinal', 'lokal_boyali', 'boyali', 'degisen'];
+    
+    // %70 oranında orijinal parçalar
+    parts['kaput'] = random < 70 ? 'orijinal' : conditions[random % 4];
+    parts['tavan'] = random < 85 ? 'orijinal' : conditions[random % 3];
+    parts['bagaj'] = random < 75 ? 'orijinal' : conditions[random % 4];
+    parts['sol_on_camurluk'] = random < 80 ? 'orijinal' : conditions[random % 4];
+    parts['sag_on_camurluk'] = random < 80 ? 'orijinal' : conditions[random % 4];
+    parts['sol_on_kapi'] = random < 85 ? 'orijinal' : conditions[random % 3];
+    parts['sag_on_kapi'] = random < 85 ? 'orijinal' : conditions[random % 3];
+    parts['sol_arka_kapi'] = random < 85 ? 'orijinal' : conditions[random % 3];
+    parts['sag_arka_kapi'] = random < 85 ? 'orijinal' : conditions[random % 3];
+    parts['sol_arka_camurluk'] = random < 80 ? 'orijinal' : conditions[random % 4];
+    parts['sag_arka_camurluk'] = random < 80 ? 'orijinal' : conditions[random % 4];
+    
+    return parts;
   }
 
   // Skor hesaplama algoritması (1-100 arası)
@@ -315,6 +353,12 @@ class Vehicle {
       hasAccidentRecord: json['hasAccidentRecord'] as bool? ?? false,
       description: json['description'] as String? ?? 'Açıklama yok',
       score: score,
+      bodyType: json['bodyType'] as String? ?? 'Sedan',
+      horsepower: json['horsepower'] as int? ?? 150,
+      sellerType: json['sellerType'] as String? ?? 'Sahibinden',
+      partConditions: json['partConditions'] != null 
+          ? Map<String, String>.from(json['partConditions'] as Map)
+          : _generateRandomPartConditions(),
     );
   }
 
@@ -341,6 +385,10 @@ class Vehicle {
       'hasAccidentRecord': hasAccidentRecord,
       'description': description,
       'score': score, // İlan skoru (arka plan)
+      'bodyType': bodyType,
+      'horsepower': horsepower,
+      'sellerType': sellerType,
+      'partConditions': partConditions,
     };
   }
 

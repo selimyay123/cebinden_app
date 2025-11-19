@@ -4,6 +4,7 @@ import '../models/ai_buyer_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../models/user_model.dart';
 import '../models/vehicle_model.dart';
+import '../models/seller_profile_model.dart';
 import 'database_helper.dart';
 import 'notification_service.dart';
 
@@ -74,10 +75,10 @@ class OfferService {
         }
       }
       
-      print('✅ $offersCreated offers created for ${listing.brand} ${listing.model}');
+      
       return offersCreated;
     } catch (e) {
-      print('❌ Error generating offers: $e');
+      
       return 0;
     }
   }
@@ -85,7 +86,7 @@ class OfferService {
   /// Tüm aktif ilanlar için teklif oluştur (günlük task)
   Future<int> generateDailyOffers() async {
     try {
-      print('🤖 Starting daily offer generation...');
+      
       
       // Süresi dolan teklifleri güncelle
       await _db.expireOldOffers();
@@ -103,10 +104,10 @@ class OfferService {
         await Future.delayed(Duration(milliseconds: Random().nextInt(500)));
       }
       
-      print('✅ Daily offer generation complete. Total offers: $totalOffersCreated');
+      
       return totalOffersCreated;
     } catch (e) {
-      print('❌ Error in daily offer generation: $e');
+      
       return 0;
     }
   }
@@ -114,26 +115,26 @@ class OfferService {
   /// Teklifi kabul et ve satışı gerçekleştir
   Future<bool> acceptOffer(Offer offer) async {
     try {
-      print('💰 Accepting offer: ${offer.offerId}');
+      
       
       // 1. Teklifi kabul edildi olarak işaretle
       bool offerUpdated = await _db.updateOfferStatus(offer.offerId, OfferStatus.accepted);
       if (!offerUpdated) {
-        print('❌ Failed to update offer status');
+        
         return false;
       }
       
       // 2. Aracı getir
       UserVehicle? vehicle = await _db.getUserVehicleById(offer.vehicleId);
       if (vehicle == null) {
-        print('❌ Vehicle not found: ${offer.vehicleId}');
+        
         return false;
       }
       
       // 3. Satıcıyı getir
       Map<String, dynamic>? sellerMap = await _db.getUserById(offer.sellerId);
       if (sellerMap == null) {
-        print('❌ Seller not found: ${offer.sellerId}');
+        
         return false;
       }
       User seller = User.fromJson(sellerMap);
@@ -142,7 +143,7 @@ class OfferService {
       seller = seller.copyWith(balance: seller.balance + offer.offerPrice);
       bool balanceUpdated = await _db.updateUser(seller.id, {'balance': seller.balance});
       if (!balanceUpdated) {
-        print('❌ Failed to update seller balance');
+        
         // Rollback teklif durumu
         await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
         return false;
@@ -157,7 +158,7 @@ class OfferService {
       });
       
       if (!vehicleUpdated) {
-        print('❌ Failed to update vehicle');
+        
         // Rollback
         await _db.updateUser(seller.id, {'balance': seller.balance - offer.offerPrice});
         await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
@@ -174,13 +175,13 @@ class OfferService {
         salePrice: offer.offerPrice,
       );
       
-      print('✅ Offer accepted successfully!');
-      print('   Seller balance: +${offer.offerPrice} TL');
-      print('   Vehicle sold: ${offer.vehicleBrand} ${offer.vehicleModel}');
+      
+      
+      
       
       return true;
     } catch (e) {
-      print('❌ Error accepting offer: $e');
+      
       return false;
     }
   }
@@ -188,17 +189,212 @@ class OfferService {
   /// Teklifi reddet
   Future<bool> rejectOffer(Offer offer) async {
     try {
-      print('❌ Rejecting offer: ${offer.offerId}');
+      
       
       bool success = await _db.updateOfferStatus(offer.offerId, OfferStatus.rejected);
       
       if (success) {
-        print('✅ Offer rejected successfully');
+        
       }
       
       return success;
     } catch (e) {
-      print('❌ Error rejecting offer: $e');
+      
+      return false;
+    }
+  }
+
+  /// Kullanıcı teklif gönderir ve AI satıcı değerlendirir
+  Future<Map<String, dynamic>> submitUserOffer({
+    required String userId,
+    required String userName,
+    required Vehicle vehicle,
+    required double offerPrice,
+    String? message,
+  }) async {
+    try {
+      // AI satıcı profili oluştur
+      final sellerProfile = SellerProfile.generateRandom();
+      
+      // Teklifi değerlendir
+      final evaluation = sellerProfile.evaluateOffer(
+        offerPrice: offerPrice,
+        listingPrice: vehicle.price,
+      );
+      
+      final decision = evaluation['decision'] as String;
+      
+      // Teklif objesi oluştur
+      OfferStatus status;
+      double? counterAmount;
+      String? sellerResponse;
+      
+      if (decision == 'accept') {
+        status = OfferStatus.accepted;
+        sellerResponse = evaluation['response'] as String;
+      } else if (decision == 'reject') {
+        status = OfferStatus.rejected;
+        sellerResponse = evaluation['response'] as String;
+      } else {
+        // counter
+        status = OfferStatus.pending;
+        counterAmount = evaluation['counterAmount'] as double?;
+        sellerResponse = evaluation['response'] as String;
+      }
+      
+      final offer = Offer(
+        offerId: 'user_offer_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}',
+        vehicleId: vehicle.id,
+        sellerId: vehicle.sellerId ?? 'ai_seller',
+        buyerId: userId,
+        buyerName: userName,
+        offerPrice: offerPrice,
+        offerDate: DateTime.now(),
+        status: status,
+        message: message,
+        listingPrice: vehicle.price,
+        fairPrice: vehicle.price * 0.95, // Basit adil fiyat hesabı
+        expirationDate: DateTime.now().add(const Duration(days: 7)),
+        isUserOffer: true,
+        counterOfferAmount: counterAmount,
+        sellerResponse: sellerResponse,
+        vehicleBrand: vehicle.brand,
+        vehicleModel: vehicle.model,
+        vehicleYear: vehicle.year,
+        vehicleImageUrl: vehicle.imageUrl ?? '',
+      );
+      
+      // Veritabanına kaydet
+      bool success = await _db.addOffer(offer);
+      
+      if (!success) {
+        return {'success': false, 'error': 'Veritabanı hatası'};
+      }
+      
+      // Eğer kabul edildiyse satın alma işlemini tamamla
+      if (status == OfferStatus.accepted) {
+        await _processUserOfferAcceptance(offer, userId);
+      }
+      
+      return {
+        'success': true,
+        'decision': decision,
+        'status': status,
+        'response': sellerResponse,
+        'counterOffer': counterAmount,
+        'offer': offer,
+      };
+    } catch (e) {
+      
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// Kullanıcı karşı teklife cevap verir
+  Future<Map<String, dynamic>> submitCounterOfferResponse({
+    required Offer offer,
+    required double newOfferAmount,
+  }) async {
+    try {
+      // Yeni bir AI satıcı profili oluştur
+      final sellerProfile = SellerProfile.generateRandom();
+      
+      // Orijinal ilan fiyatına göre değerlendir
+      final evaluation = sellerProfile.evaluateOffer(
+        offerPrice: newOfferAmount,
+        listingPrice: offer.listingPrice,
+      );
+      
+      final decision = evaluation['decision'] as String;
+      
+      // Teklif objesini güncelle
+      OfferStatus newStatus;
+      double? newCounterAmount;
+      String? newSellerResponse;
+      
+      if (decision == 'accept') {
+        newStatus = OfferStatus.accepted;
+        newSellerResponse = evaluation['response'] as String;
+        
+        // Satın alma işlemini tamamla
+        await _processUserOfferAcceptance(offer, offer.buyerId);
+      } else if (decision == 'reject') {
+        newStatus = OfferStatus.rejected;
+        newSellerResponse = evaluation['response'] as String;
+      } else {
+        // counter - yeni karşı teklif
+        newStatus = OfferStatus.pending;
+        newCounterAmount = evaluation['counterAmount'] as double?;
+        newSellerResponse = evaluation['response'] as String;
+      }
+      
+      // Offer'ı güncelle
+      final updatedOffer = {
+        'status': newStatus.index,
+        'offerPrice': newOfferAmount, // Kullanıcının son teklifi
+        'counterOfferAmount': newCounterAmount,
+        'sellerResponse': newSellerResponse,
+      };
+      
+      await _db.updateOffer(offer.offerId, updatedOffer);
+      
+      return {
+        'success': true,
+        'decision': decision,
+        'status': newStatus,
+        'response': newSellerResponse,
+        'counterOffer': newCounterAmount,
+      };
+    } catch (e) {
+      
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// Kullanıcı teklifinin kabulünü işle (araç satın alma)
+  Future<bool> _processUserOfferAcceptance(Offer offer, String userId) async {
+    try {
+      // Kullanıcıyı getir
+      final userMap = await _db.getUserById(userId);
+      if (userMap == null) return false;
+      
+      final user = User.fromJson(userMap);
+      
+      // Bakiye kontrolü
+      if (user.balance < offer.offerPrice) {
+        // Yetersiz bakiye - teklifi beklemede tut
+        await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
+        return false;
+      }
+      
+      // Bakiyeyi düş
+      await _db.updateUser(userId, {'balance': user.balance - offer.offerPrice});
+      
+      // Aracı kullanıcıya ekle
+      final userVehicle = UserVehicle.purchase(
+        userId: userId,
+        vehicleId: offer.vehicleId,
+        brand: offer.vehicleBrand,
+        model: offer.vehicleModel,
+        year: offer.vehicleYear,
+        mileage: 50000, // Varsayılan
+        purchasePrice: offer.offerPrice,
+        color: 'Bilinmiyor',
+        fuelType: 'Benzin',
+        transmission: 'Manuel',
+        engineSize: '1.6',
+        driveType: 'Önden',
+        hasWarranty: false,
+        hasAccidentRecord: false,
+        score: 75,
+        imageUrl: offer.vehicleImageUrl,
+      );
+      
+      await _db.addUserVehicle(userVehicle);
+      
+      return true;
+    } catch (e) {
+      
       return false;
     }
   }
@@ -260,7 +456,7 @@ class OfferService {
       final allVehicles = await _db.getAllUserVehicles();
       return allVehicles.where((v) => v.isListedForSale && !v.isSold).toList();
     } catch (e) {
-      print('❌ Error getting active listings: $e');
+      
       return [];
     }
   }

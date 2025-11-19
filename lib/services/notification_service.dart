@@ -25,7 +25,7 @@ class NotificationService {
       final isEnabled = await settings.getNotificationOffers();
       
       if (!isEnabled) {
-        print('⚠️ Offer notifications are disabled for user: $userId');
+        
         return;
       }
 
@@ -51,9 +51,9 @@ class NotificationService {
 
       // Veritabanına kaydet
       await _db.addNotification(notification);
-      print('✅ New offer notification sent to user: $userId');
+      
     } catch (e) {
-      print('❌ Error sending new offer notification: $e');
+      
     }
   }
 
@@ -85,9 +85,9 @@ class NotificationService {
       );
 
       await _db.addNotification(notification);
-      print('✅ Offer accepted notification sent to buyer: $buyerId');
+      
     } catch (e) {
-      print('❌ Error sending offer accepted notification: $e');
+      
     }
   }
 
@@ -116,9 +116,9 @@ class NotificationService {
       );
 
       await _db.addNotification(notification);
-      print('✅ Vehicle sold notification sent to user: $userId');
+      
     } catch (e) {
-      print('❌ Error sending vehicle sold notification: $e');
+      
     }
   }
 

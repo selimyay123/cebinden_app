@@ -1,31 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/offer_model.dart';
+import '../models/user_model.dart';
+import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../services/offer_service.dart';
 import '../services/localization_service.dart';
 
 class MyOffersScreen extends StatefulWidget {
-  const MyOffersScreen({Key? key}) : super(key: key);
+  final int initialTab;
+  
+  const MyOffersScreen({Key? key, this.initialTab = 0}) : super(key: key);
 
   @override
   State<MyOffersScreen> createState() => _MyOffersScreenState();
 }
 
-class _MyOffersScreenState extends State<MyOffersScreen> {
+class _MyOffersScreenState extends State<MyOffersScreen>
+    with SingleTickerProviderStateMixin {
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
 
-  List<Offer> _allOffers = [];
-  Map<String, List<Offer>> _offersByVehicle = {};
+  late TabController _tabController;
+
+  // Gelen teklifler (kullanıcının ilanlarına gelen)
+  List<Offer> _incomingOffers = [];
+  Map<String, List<Offer>> _incomingOffersByVehicle = {};
+
+  // Gönderilen teklifler (kullanıcının gönderdiği)
+  List<Offer> _sentOffers = [];
+
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTab,
+    );
     _loadOffers();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadOffers() async {
@@ -38,19 +61,22 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
         return;
       }
 
-      // Tüm teklifleri getir
-      _allOffers = await _db.getOffersBySellerId(currentUser.id);
+      // Gelen teklifleri getir (kullanıcının ilanlarına gelen)
+      _incomingOffers = await _db.getOffersBySellerId(currentUser.id);
 
       // Araca göre grupla
-      _offersByVehicle = {};
-      for (var offer in _allOffers) {
-        if (!_offersByVehicle.containsKey(offer.vehicleId)) {
-          _offersByVehicle[offer.vehicleId] = [];
+      _incomingOffersByVehicle = {};
+      for (var offer in _incomingOffers) {
+        if (!_incomingOffersByVehicle.containsKey(offer.vehicleId)) {
+          _incomingOffersByVehicle[offer.vehicleId] = [];
         }
-        _offersByVehicle[offer.vehicleId]!.add(offer);
+        _incomingOffersByVehicle[offer.vehicleId]!.add(offer);
       }
+
+      // Gönderilen teklifleri getir (kullanıcının gönderdiği)
+      _sentOffers = await _db.getOffersByBuyerId(currentUser.id);
     } catch (e) {
-      print('❌ Error loading offers: $e');
+      
     }
 
     setState(() => _isLoading = false);
@@ -65,39 +91,76 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
         elevation: 0,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          tabs: [
+            Tab(
+              icon: const Icon(Icons.inbox),
+              text: 'offers.incoming'.tr(),
+            ),
+            Tab(
+              icon: const Icon(Icons.send),
+              text: 'offers.sent'.tr(),
+            ),
+          ],
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _allOffers.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadOffers,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _offersByVehicle.length,
-                    itemBuilder: (context, index) {
-                      final vehicleId = _offersByVehicle.keys.elementAt(index);
-                      final offers = _offersByVehicle[vehicleId]!;
-                      return _buildVehicleCard(vehicleId, offers);
-                    },
-                  ),
-                ),
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                // Gelen Teklifler
+                _incomingOffers.isEmpty
+                    ? _buildEmptyState(isIncoming: true)
+                    : RefreshIndicator(
+                        onRefresh: _loadOffers,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: _incomingOffersByVehicle.length,
+                          itemBuilder: (context, index) {
+                            final vehicleId =
+                                _incomingOffersByVehicle.keys.elementAt(index);
+                            final offers = _incomingOffersByVehicle[vehicleId]!;
+                            return _buildVehicleCard(vehicleId, offers);
+                          },
+                        ),
+                      ),
+
+                // Gönderilen Teklifler
+                _sentOffers.isEmpty
+                    ? _buildEmptyState(isIncoming: false)
+                    : RefreshIndicator(
+                        onRefresh: _loadOffers,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: _sentOffers.length,
+                          itemBuilder: (context, index) {
+                            return _buildSentOfferCard(_sentOffers[index]);
+                          },
+                        ),
+                      ),
+              ],
+            ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState({required bool isIncoming}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.inbox_outlined,
+            isIncoming ? Icons.inbox_outlined : Icons.send_outlined,
             size: 120,
             color: Colors.grey[300],
           ),
           const SizedBox(height: 24),
           Text(
-            'offers.noOffers'.tr(),
+            isIncoming ? 'offers.noIncoming'.tr() : 'offers.noSent'.tr(),
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -106,7 +169,9 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'offers.noOffersDesc'.tr(),
+            isIncoming
+                ? 'offers.noIncomingDesc'.tr()
+                : 'offers.noSentDesc'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -535,6 +600,10 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
     );
   }
 
+  String _formatDate(DateTime date) {
+    return DateFormat('dd MMMM yyyy', 'tr_TR').format(date);
+  }
+
   Future<void> _handleAcceptOffer(Offer offer) async {
     // Onay dialogu göster
     final confirmed = await showDialog<bool>(
@@ -638,6 +707,308 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
     }
   }
 
+  /// Gönderilen teklif kartı oluştur
+  Widget _buildSentOfferCard(Offer offer) {
+    Color statusColor;
+    IconData statusIcon;
+    String statusText;
+
+    switch (offer.status) {
+      case OfferStatus.accepted:
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle;
+        statusText = 'offer.accepted'.tr();
+        break;
+      case OfferStatus.rejected:
+        statusColor = Colors.red;
+        statusIcon = Icons.cancel;
+        statusText = 'offer.rejected'.tr();
+        break;
+      case OfferStatus.pending:
+        if (offer.counterOfferAmount != null) {
+          statusColor = Colors.orange;
+          statusIcon = Icons.swap_horiz;
+          statusText = 'offer.counterOffer'.tr();
+        } else {
+          statusColor = Colors.blue;
+          statusIcon = Icons.schedule;
+          statusText = 'offer.pending'.tr();
+        }
+        break;
+      default:
+        statusColor = Colors.grey;
+        statusIcon = Icons.help_outline;
+        statusText = offer.status.toString();
+    }
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Araç bilgileri
+            Row(
+              children: [
+                if (offer.vehicleImageUrl.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      offer.vehicleImageUrl,
+                      width: 80,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 80,
+                        height: 60,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.directions_car),
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${offer.vehicleBrand} ${offer.vehicleModel}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${offer.vehicleYear}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Durum badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: statusColor, width: 1.5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(statusIcon, size: 16, color: statusColor),
+                      const SizedBox(width: 4),
+                      Text(
+                        statusText,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const Divider(height: 24),
+
+            // Fiyat bilgileri
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'offer.listingPrice'.tr(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${_formatCurrency(offer.listingPrice)} TL',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(Icons.arrow_forward, color: Colors.grey[400]),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'offer.yourOffer'.tr(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${_formatCurrency(offer.offerPrice)} TL',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            // Karşı teklif varsa göster
+            if (offer.counterOfferAmount != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.swap_horiz, color: Colors.orange[700]),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'offer.counterOfferAmount'.tr(),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.orange[900],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${_formatCurrency(offer.counterOfferAmount!)} TL',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange[900],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Karşı teklif için butonlar (pending durumunda)
+                    if (offer.status == OfferStatus.pending) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => _handleRejectCounterOffer(offer),
+                              icon: const Icon(Icons.close, size: 18),
+                              label: Text('offers.reject'.tr()),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                side: const BorderSide(color: Colors.red),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => _handleAcceptCounterOffer(offer),
+                              icon: const Icon(Icons.check, size: 18),
+                              label: Text('offers.accept'.tr()),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showCounterOfferDialog(offer),
+                          icon: const Icon(Icons.local_offer, size: 18),
+                          label: Text('offer.sendCounterOffer'.tr()),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.deepPurple,
+                            side: const BorderSide(color: Colors.deepPurple, width: 1.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+
+            // Satıcı cevabı varsa göster
+            if (offer.sellerResponse != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.message, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        offer.sellerResponse!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[800],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            // Tarih
+            const SizedBox(height: 12),
+            Text(
+              _formatDate(offer.offerDate),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _handleRejectOffer(Offer offer) async {
     // Onay dialogu göster
     final confirmed = await showDialog<bool>(
@@ -682,6 +1053,557 @@ class _MyOffersScreenState extends State<MyOffersScreen> {
           );
         }
       }
+    }
+  }
+
+  /// Karşı teklifi kabul et
+  Future<void> _handleAcceptCounterOffer(Offer offer) async {
+    // Onay dialogu göster
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.green),
+            const SizedBox(width: 8),
+            const Text('Karşı Teklifi Kabul Et'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${offer.vehicleBrand} ${offer.vehicleModel} için karşı teklifi kabul etmek istediğinize emin misiniz?',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Teklifiniz:', style: TextStyle(color: Colors.grey[600])),
+                      Text(
+                        '${_formatCurrency(offer.offerPrice)} TL',
+                        style: const TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Karşı Teklif:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${_formatCurrency(offer.counterOfferAmount!)} TL',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '• Araç garajınıza eklenecek',
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            ),
+            Text(
+              '• Bakiyenizden ${_formatCurrency(offer.counterOfferAmount!)} TL düşecek',
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Kabul Et'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      // Kullanıcı bilgilerini al
+      final currentUser = await _authService.getCurrentUser();
+      if (currentUser == null) return;
+
+      // Bakiye kontrolü
+      if (currentUser.balance < offer.counterOfferAmount!) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('purchase.insufficientBalance'.tr()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Teklifi kabul et ve satın alma işlemini gerçekleştir
+      bool success = await _acceptCounterOffer(offer, currentUser);
+
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Karşı teklif kabul edildi! Araç garajınıza eklendi.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Listeyi yenile
+          _loadOffers();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('offers.acceptError'.tr()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  /// Karşı teklifi reddet
+  Future<void> _handleRejectCounterOffer(Offer offer) async {
+    // Onay dialogu göster
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Karşı Teklifi Reddet'),
+        content: Text(
+          '${offer.vehicleBrand} ${offer.vehicleModel} için gelen karşı teklifi reddetmek istediğinize emin misiniz?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Reddet'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      bool success = await _offerService.rejectOffer(offer);
+
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Karşı teklif reddedildi.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+
+          // Listeyi yenile
+          _loadOffers();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('offers.rejectError'.tr()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  /// Karşı teklif gönderme dialogunu göster
+  void _showCounterOfferDialog(Offer offer) {
+    final TextEditingController counterOfferController = TextEditingController();
+    final minOffer = offer.offerPrice;
+    final maxOffer = offer.counterOfferAmount!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.local_offer, color: Colors.deepPurple),
+            const SizedBox(width: 8),
+            Text('offer.sendCounterOffer'.tr()),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${offer.vehicleBrand} ${offer.vehicleModel}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'offer.yourOffer'.tr(),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                        Text(
+                          '${_formatCurrency(minOffer)} TL',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'offer.sellerCounterOffer'.tr(),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                        Text(
+                          '${_formatCurrency(maxOffer)} TL',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: counterOfferController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'offer.yourCounterOffer'.tr(),
+                  hintText: '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} TL',
+                  suffixText: 'TL',
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.money),
+                  helperText: 'offer.counterOfferRange'.tr(),
+                  helperMaxLines: 2,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.blue[700], size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'offer.counterOfferInfo'.tr(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue[900],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final offerText = counterOfferController.text.trim();
+              if (offerText.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('offer.enterAmountError'.tr())),
+                );
+                return;
+              }
+
+              final newOffer = double.tryParse(offerText.replaceAll('.', ''));
+              if (newOffer == null || newOffer <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('offer.invalidAmountError'.tr())),
+                );
+                return;
+              }
+
+              // Aralık kontrolü
+              if (newOffer <= minOffer || newOffer >= maxOffer) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('offer.counterOfferRangeError'.tr()),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return;
+              }
+
+              Navigator.pop(context);
+              _submitCounterOffer(offer, newOffer);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('offer.sendOffer'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Karşı teklif gönder
+  Future<void> _submitCounterOffer(Offer originalOffer, double newOfferAmount) async {
+    // Loading göster
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      final currentUser = await _authService.getCurrentUser();
+      if (currentUser == null) {
+        if (mounted) Navigator.pop(context);
+        return;
+      }
+
+      final result = await _offerService.submitCounterOfferResponse(
+        offer: originalOffer,
+        newOfferAmount: newOfferAmount,
+      );
+
+      // Loading kapat
+      if (mounted) Navigator.pop(context);
+
+      if (!result['success']) {
+        throw Exception(result['error'] ?? 'Unknown error');
+      }
+
+      // Sonuç dialogunu göster
+      if (mounted) {
+        _showCounterOfferResultDialog(result, originalOffer);
+      }
+
+      // Listeyi yenile
+      _loadOffers();
+    } catch (e) {
+      // Loading kapat
+      if (mounted) Navigator.pop(context);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('offer.sendError'.tr()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Karşı teklif sonuç dialogunu göster
+  void _showCounterOfferResultDialog(Map<String, dynamic> result, Offer originalOffer) {
+    final decision = result['decision'] as String;
+    final response = result['response'] as String;
+    final newCounterOffer = result['counterOffer'] as double?;
+
+    IconData icon;
+    Color iconColor;
+    String title;
+
+    if (decision == 'accept') {
+      icon = Icons.check_circle;
+      iconColor = Colors.green;
+      title = 'offer.accepted'.tr();
+    } else if (decision == 'reject') {
+      icon = Icons.cancel;
+      iconColor = Colors.red;
+      title = 'offer.rejected'.tr();
+    } else {
+      icon = Icons.swap_horiz;
+      iconColor = Colors.orange;
+      title = 'offer.counterOffer'.tr();
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(icon, color: iconColor),
+            const SizedBox(width: 8),
+            Text(title),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              response,
+              style: const TextStyle(fontSize: 16),
+            ),
+            if (newCounterOffer != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade200),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('offer.newCounterOffer'.tr()),
+                    Text(
+                      '${_formatCurrency(newCounterOffer)} TL',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.deepOrange,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      decision == 'accept' 
+                          ? 'offer.purchaseCompleted'.tr()
+                          : 'offer.negotiationContinues'.tr(),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blue[900],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('common.ok'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Karşı teklifi kabul et ve satın alma işlemini yap
+  Future<bool> _acceptCounterOffer(Offer offer, User user) async {
+    try {
+      // 1. Bakiyeyi düş
+      final newBalance = user.balance - offer.counterOfferAmount!;
+      bool balanceUpdated = await _db.updateUser(user.id, {'balance': newBalance});
+      if (!balanceUpdated) return false;
+
+      // 2. Teklifi kabul edildi olarak işaretle
+      bool offerUpdated = await _db.updateOfferStatus(offer.offerId, OfferStatus.accepted);
+      if (!offerUpdated) {
+        // Rollback
+        await _db.updateUser(user.id, {'balance': user.balance});
+        return false;
+      }
+
+      // 3. Aracı kullanıcıya ekle
+      final userVehicle = UserVehicle.purchase(
+        userId: user.id,
+        vehicleId: offer.vehicleId,
+        brand: offer.vehicleBrand,
+        model: offer.vehicleModel,
+        year: offer.vehicleYear,
+        mileage: 50000, // Varsayılan
+        purchasePrice: offer.counterOfferAmount!,
+        color: 'Bilinmiyor',
+        fuelType: 'Benzin',
+        transmission: 'Manuel',
+        engineSize: '1.6',
+        driveType: 'Önden',
+        hasWarranty: false,
+        hasAccidentRecord: false,
+        score: 75,
+        imageUrl: offer.vehicleImageUrl,
+      );
+
+      bool vehicleAdded = await _db.addUserVehicle(userVehicle);
+      if (!vehicleAdded) {
+        // Rollback
+        await _db.updateUser(user.id, {'balance': user.balance});
+        await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      
+      return false;
     }
   }
 }

@@ -26,9 +26,9 @@ class AdService {
   static Future<void> initialize() async {
     try {
       await MobileAds.instance.initialize();
-      print('✅ AdMob initialized successfully');
+      
     } catch (e) {
-      print('❌ AdMob initialization error: $e');
+      
     }
   }
 
@@ -38,7 +38,7 @@ class AdService {
   /// Ödüllü reklam yükle
   Future<void> loadRewardedAd() async {
     if (_adLoadAttempts >= _maxAdLoadAttempts) {
-      print('⚠️ Max ad load attempts reached');
+      
       return;
     }
 
@@ -49,14 +49,14 @@ class AdService {
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (RewardedAd ad) {
-          print('✅ Rewarded ad loaded successfully');
+          
           _rewardedAd = ad;
           _isAdLoaded = true;
           _adLoadAttempts = 0;
           _setupAdCallbacks();
         },
         onAdFailedToLoad: (LoadAdError error) {
-          print('❌ Rewarded ad failed to load: $error');
+          
           _rewardedAd = null;
           _isAdLoaded = false;
           
@@ -74,10 +74,10 @@ class AdService {
   void _setupAdCallbacks() {
     _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
       onAdShowedFullScreenContent: (RewardedAd ad) {
-        print('📺 Ad showed full screen content');
+        
       },
       onAdDismissedFullScreenContent: (RewardedAd ad) {
-        print('👋 Ad dismissed full screen content');
+        
         ad.dispose();
         _rewardedAd = null;
         _isAdLoaded = false;
@@ -85,7 +85,7 @@ class AdService {
         loadRewardedAd();
       },
       onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-        print('❌ Ad failed to show: $error');
+        
         ad.dispose();
         _rewardedAd = null;
         _isAdLoaded = false;
@@ -100,7 +100,7 @@ class AdService {
     required Function() onAdNotReady,
   }) async {
     if (!isAdReady) {
-      print('⚠️ Rewarded ad is not ready');
+      
       onAdNotReady();
       return false;
     }
@@ -109,7 +109,7 @@ class AdService {
 
     _rewardedAd?.show(
       onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-        print('🎉 User earned reward: ${reward.amount} ${reward.type}');
+        
         rewardEarned = true;
         // Ödülü ver (1000 TL sabit)
         onRewarded(1000.0);

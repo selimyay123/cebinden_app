@@ -39,7 +39,7 @@ class CebindenApp extends StatelessWidget {
     return ValueListenableBuilder<String>(
       valueListenable: localizationService.languageNotifier,
       builder: (context, currentLanguage, child) {
-        print('🌍 App rebuilding with language: $currentLanguage');
+        
         
         return MaterialApp(
           title: 'Cebinden',

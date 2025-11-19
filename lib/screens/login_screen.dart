@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       // Başarılı giriş - Tüm route geçmişini temizle
-      print('✅ Giriş başarılı: ${user.username}');
+      
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
         (route) => false, // Tüm önceki ekranları temizle
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (user != null) {
         // Başarılı Google girişi
-        print('✅ Google girişi başarılı: ${user.username}');
+        
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
           (route) => false,

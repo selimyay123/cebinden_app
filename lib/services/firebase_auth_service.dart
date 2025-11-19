@@ -63,7 +63,7 @@ class FirebaseAuthService {
       }
       
     } catch (e) {
-      print('🔴 Google Sign-In Error: $e');
+      
       return null;
     }
   }
@@ -81,7 +81,7 @@ class FirebaseAuthService {
       
       return null;
     } catch (e) {
-      print('🔴 Find User Error: $e');
+      
       return null;
     }
   }
@@ -109,11 +109,11 @@ class FirebaseAuthService {
       // Local database'e kaydet
       await DatabaseHelper().insertUser(newUser.toJson());
       
-      print('✅ Google User Created: ${newUser.username}');
+      
       return newUser;
       
     } catch (e) {
-      print('🔴 Create Google User Error: $e');
+      
       rethrow;
     }
   }
@@ -123,9 +123,9 @@ class FirebaseAuthService {
     try {
       await _googleSignIn.signOut();
       await _firebaseAuth.signOut();
-      print('✅ Google Sign-Out Successful');
+      
     } catch (e) {
-      print('🔴 Google Sign-Out Error: $e');
+      
     }
   }
 

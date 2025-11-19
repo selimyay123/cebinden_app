@@ -40,7 +40,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         _notifications = await _notificationService.getUserNotifications(_currentUser!.id);
       }
     } catch (e) {
-      print('❌ Error loading notifications: $e');
+      
     }
     
     setState(() => _isLoading = false);

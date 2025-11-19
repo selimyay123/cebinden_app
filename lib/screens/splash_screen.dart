@@ -28,16 +28,16 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
 
       // Aktif kullanıcı var mı kontrol et
-      print('🔍 Otomatik giriş kontrol ediliyor...');
+      
       final userExists = await _authService.checkUserExists();
       
       if (userExists) {
         final currentUser = await _authService.getCurrentUser();
-        print('✅ Kullanıcı bulundu: ${currentUser?.username}');
-        print('🏠 Ana sayfaya yönlendiriliyor...');
+        
+        
       } else {
-        print('❌ Aktif kullanıcı bulunamadı');
-        print('🔐 Giriş sayfasına yönlendiriliyor...');
+        
+        
       }
 
       if (!mounted) return;
@@ -56,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     } catch (e) {
-      print('❌ Splash screen hatası: $e');
+      
       
       // Hata durumunda güvenli olarak login'e yönlendir
       if (mounted) {

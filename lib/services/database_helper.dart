@@ -127,7 +127,7 @@ class DatabaseHelper {
     try {
       final existingUser = await getUserById(userId);
       if (existingUser == null) {
-        print('❌ User not found: $userId');
+        
         return false;
       }
 
@@ -139,10 +139,10 @@ class DatabaseHelper {
 
       await _usersBox.put(userId, updatedUser);
       await _usersBox.flush();
-      print('✅ User updated: $userId');
+      
       return true;
     } catch (e) {
-      print('❌ Error updating user: $e');
+      
       return false;
     }
   }
@@ -163,10 +163,10 @@ class DatabaseHelper {
 
       await _usersBox.delete(userId);
       await _usersBox.flush();
-      print('✅ User deleted: $userId');
+      
       return true;
     } catch (e) {
-      print('❌ Error deleting user: $e');
+      
       return false;
     }
   }
@@ -198,10 +198,10 @@ class DatabaseHelper {
       final vehicleMap = Map<dynamic, dynamic>.from(vehicle.toJson());
       await _userVehiclesBox.put(vehicle.id, vehicleMap);
       await _userVehiclesBox.flush();
-      print('✅ Vehicle added to user garage: ${vehicle.fullName} (ID: ${vehicle.id})');
+      
       return true;
     } catch (e) {
-      print('❌ Error adding vehicle to user: $e');
+      
       return false;
     }
   }
@@ -222,10 +222,10 @@ class DatabaseHelper {
       // Satın alma tarihine göre sırala (en yeni en üstte)
       userVehicles.sort((a, b) => b.purchaseDate.compareTo(a.purchaseDate));
       
-      print('📊 User $userId has ${userVehicles.length} vehicles');
+      
       return userVehicles;
     } catch (e) {
-      print('❌ Error getting user vehicles: $e');
+      
       return [];
     }
   }
@@ -236,7 +236,7 @@ class DatabaseHelper {
       final allVehicles = await getUserVehicles(userId);
       return allVehicles.where((v) => !v.isSold).toList();
     } catch (e) {
-      print('❌ Error getting user active vehicles: $e');
+      
       return [];
     }
   }
@@ -247,7 +247,7 @@ class DatabaseHelper {
       final allVehicles = await getUserVehicles(userId);
       return allVehicles.where((v) => v.isSold).toList();
     } catch (e) {
-      print('❌ Error getting user sold vehicles: $e');
+      
       return [];
     }
   }
@@ -260,7 +260,7 @@ class DatabaseHelper {
           .toList();
       return vehicles;
     } catch (e) {
-      print('❌ Error getting all user vehicles: $e');
+      
       return [];
     }
   }
@@ -271,7 +271,7 @@ class DatabaseHelper {
       final allVehicles = await getUserVehicles(userId);
       return allVehicles.where((v) => v.isListedForSale && !v.isSold).toList();
     } catch (e) {
-      print('❌ Error getting user listed vehicles: $e');
+      
       return [];
     }
   }
@@ -282,7 +282,7 @@ class DatabaseHelper {
       final vehicles = await getUserActiveVehicles(userId);
       return vehicles.length;
     } catch (e) {
-      print('❌ Error getting user vehicle count: $e');
+      
       return 0;
     }
   }
@@ -294,7 +294,7 @@ class DatabaseHelper {
       if (vehicleMap == null) return null;
       return UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap));
     } catch (e) {
-      print('❌ Error getting user vehicle by id: $e');
+      
       return null;
     }
   }
@@ -304,7 +304,7 @@ class DatabaseHelper {
     try {
       final existingVehicle = await getUserVehicleById(vehicleId);
       if (existingVehicle == null) {
-        print('❌ Vehicle not found: $vehicleId');
+        
         return false;
       }
 
@@ -316,10 +316,10 @@ class DatabaseHelper {
       final vehicleMap = Map<dynamic, dynamic>.from(updatedVehicleJson);
       await _userVehiclesBox.put(vehicleId, vehicleMap);
       await _userVehiclesBox.flush();
-      print('✅ Vehicle updated: $vehicleId');
+      
       return true;
     } catch (e) {
-      print('❌ Error updating vehicle: $e');
+      
       return false;
     }
   }
@@ -338,7 +338,7 @@ class DatabaseHelper {
         'listedDate': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      print('❌ Error listing vehicle for sale: $e');
+      
       return false;
     }
   }
@@ -352,7 +352,7 @@ class DatabaseHelper {
         'saleDate': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      print('❌ Error selling vehicle: $e');
+      
       return false;
     }
   }
@@ -362,10 +362,10 @@ class DatabaseHelper {
     try {
       await _userVehiclesBox.delete(vehicleId);
       await _userVehiclesBox.flush();
-      print('✅ Vehicle deleted: $vehicleId');
+      
       return true;
     } catch (e) {
-      print('❌ Error deleting vehicle: $e');
+      
       return false;
     }
   }
@@ -376,7 +376,7 @@ class DatabaseHelper {
       final vehicles = await getUserVehicles(userId);
       return vehicles.fold<double>(0.0, (double sum, vehicle) => sum + vehicle.purchasePrice);
     } catch (e) {
-      print('❌ Error calculating total spent: $e');
+      
       return 0.0;
     }
   }
@@ -390,7 +390,7 @@ class DatabaseHelper {
         return sum + pl;
       });
     } catch (e) {
-      print('❌ Error calculating total profit/loss: $e');
+      
       return 0.0;
     }
   }
@@ -408,10 +408,10 @@ class DatabaseHelper {
       final offerMap = Map<dynamic, dynamic>.from(offer.toJson());
       await _offersBox.put(offer.offerId, offerMap);
       await _offersBox.flush();
-      print('✅ Offer added: ${offer.offerId}');
+      
       return true;
     } catch (e) {
-      print('❌ Error adding offer: $e');
+      
       return false;
     }
   }
@@ -423,7 +423,7 @@ class DatabaseHelper {
       if (offerMap == null) return null;
       return Offer.fromJson(Map<String, dynamic>.from(offerMap));
     } catch (e) {
-      print('❌ Error getting offer: $e');
+      
       return null;
     }
   }
@@ -441,7 +441,7 @@ class DatabaseHelper {
       
       return offers;
     } catch (e) {
-      print('❌ Error getting offers by seller: $e');
+      
       return [];
     }
   }
@@ -459,7 +459,7 @@ class DatabaseHelper {
       
       return offers;
     } catch (e) {
-      print('❌ Error getting offers by vehicle: $e');
+      
       return [];
     }
   }
@@ -470,7 +470,25 @@ class DatabaseHelper {
       final offers = await getOffersBySellerId(sellerId);
       return offers.where((offer) => offer.isPending).toList();
     } catch (e) {
-      print('❌ Error getting pending offers: $e');
+      
+      return [];
+    }
+  }
+
+  // Alıcının gönderdiği tüm teklifleri getir (kullanıcı teklifleri)
+  Future<List<Offer>> getOffersByBuyerId(String buyerId) async {
+    try {
+      final offers = _offersBox.values
+          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .where((offer) => offer.buyerId == buyerId && offer.isUserOffer)
+          .toList();
+      
+      // Tarihe göre sırala (en yeni en üstte)
+      offers.sort((a, b) => b.offerDate.compareTo(a.offerDate));
+      
+      return offers;
+    } catch (e) {
+      
       return [];
     }
   }
@@ -481,7 +499,7 @@ class DatabaseHelper {
       final offers = await getPendingOffersBySellerId(sellerId);
       return offers.length;
     } catch (e) {
-      print('❌ Error getting pending offers count: $e');
+      
       return 0;
     }
   }
@@ -491,7 +509,7 @@ class DatabaseHelper {
     try {
       final offerMap = _offersBox.get(offerId);
       if (offerMap == null) {
-        print('❌ Offer not found: $offerId');
+        
         return false;
       }
 
@@ -502,10 +520,10 @@ class DatabaseHelper {
 
       await _offersBox.put(offerId, updatedMap);
       await _offersBox.flush();
-      print('✅ Offer updated: $offerId');
+      
       return true;
     } catch (e) {
-      print('❌ Error updating offer: $e');
+      
       return false;
     }
   }
@@ -515,7 +533,7 @@ class DatabaseHelper {
     try {
       return await updateOffer(offerId, {'status': status.index});
     } catch (e) {
-      print('❌ Error updating offer status: $e');
+      
       return false;
     }
   }
@@ -525,10 +543,10 @@ class DatabaseHelper {
     try {
       await _offersBox.delete(offerId);
       await _offersBox.flush();
-      print('✅ Offer deleted: $offerId');
+      
       return true;
     } catch (e) {
-      print('❌ Error deleting offer: $e');
+      
       return false;
     }
   }
@@ -544,10 +562,10 @@ class DatabaseHelper {
         }
       }
       
-      print('✅ Other offers rejected for vehicle: $vehicleId');
+      
       return true;
     } catch (e) {
-      print('❌ Error rejecting other offers: $e');
+      
       return false;
     }
   }
@@ -565,9 +583,9 @@ class DatabaseHelper {
         }
       }
       
-      print('✅ Expired offers updated');
+      
     } catch (e) {
-      print('❌ Error expiring old offers: $e');
+      
     }
   }
 
@@ -580,10 +598,10 @@ class DatabaseHelper {
         await deleteOffer(offer.offerId);
       }
       
-      print('✅ All offers deleted for vehicle: $vehicleId');
+      
       return true;
     } catch (e) {
-      print('❌ Error deleting offers for vehicle: $e');
+      
       return false;
     }
   }
@@ -601,10 +619,10 @@ class DatabaseHelper {
       final notificationMap = Map<dynamic, dynamic>.from(notification.toJson());
       await _notificationsBox.put(notification.id, notificationMap);
       await _notificationsBox.flush();
-      print('✅ Notification added: ${notification.id}');
+      
       return true;
     } catch (e) {
-      print('❌ Error adding notification: $e');
+      
       return false;
     }
   }
@@ -623,7 +641,7 @@ class DatabaseHelper {
       
       return userNotifications;
     } catch (e) {
-      print('❌ Error getting user notifications: $e');
+      
       return [];
     }
   }
@@ -634,7 +652,7 @@ class DatabaseHelper {
       final notifications = await getUserNotifications(userId);
       return notifications.where((n) => !n.isRead).length;
     } catch (e) {
-      print('❌ Error getting unread count: $e');
+      
       return 0;
     }
   }
@@ -650,7 +668,7 @@ class DatabaseHelper {
       }
       return true;
     } catch (e) {
-      print('❌ Error marking notification as read: $e');
+      
       return false;
     }
   }
@@ -666,7 +684,7 @@ class DatabaseHelper {
       }
       return true;
     } catch (e) {
-      print('❌ Error marking all as read: $e');
+      
       return false;
     }
   }
@@ -678,7 +696,7 @@ class DatabaseHelper {
       await _notificationsBox.flush();
       return true;
     } catch (e) {
-      print('❌ Error deleting notification: $e');
+      
       return false;
     }
   }
@@ -692,7 +710,7 @@ class DatabaseHelper {
       }
       return true;
     } catch (e) {
-      print('❌ Error deleting all notifications: $e');
+      
       return false;
     }
   }

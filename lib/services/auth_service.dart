@@ -132,7 +132,7 @@ class AuthService {
       
       return user;
     } catch (e) {
-      print('🔴 Google Login Error in AuthService: $e');
+      
       return null;
     }
   }
@@ -167,7 +167,7 @@ class AuthService {
       final newPasswordHash = _hashPassword(newPassword);
       return await _db.updatePassword(userId, newPasswordHash);
     } catch (e) {
-      print('❌ Error changing password: $e');
+      
       return false;
     }
   }
@@ -185,7 +185,7 @@ class AuthService {
 
       return await _db.updateUser(userId, updates);
     } catch (e) {
-      print('❌ Error updating user info: $e');
+      
       return false;
     }
   }
@@ -195,7 +195,7 @@ class AuthService {
     try {
       return await _db.deleteUser(userId);
     } catch (e) {
-      print('❌ Error deleting account: $e');
+      
       return false;
     }
   }

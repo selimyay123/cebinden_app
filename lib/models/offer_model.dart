@@ -10,17 +10,22 @@ enum OfferStatus {
 /// Teklif modeli
 class Offer {
   final String offerId;
-  final String vehicleId; // UserVehicle ID'si
-  final String sellerId; // İlanı veren kullanıcı ID'si
-  final String buyerId; // AI alıcı ID'si
-  final String buyerName; // AI alıcı adı (örn: "Mehmet B.")
+  final String vehicleId; // UserVehicle ID'si (user offer için) veya Vehicle ID'si (listing offer için)
+  final String sellerId; // İlanı veren kullanıcı ID'si veya satıcı ID'si
+  final String buyerId; // AI alıcı ID'si veya kullanıcı ID'si
+  final String buyerName; // AI alıcı adı veya kullanıcı adı
   final double offerPrice; // Teklif edilen fiyat
   final DateTime offerDate; // Teklif tarihi
   OfferStatus status; // Teklif durumu
-  final String? message; // Alıcının mesajı
+  final String? message; // Alıcının/Kullanıcının mesajı
   final double listingPrice; // İlan fiyatı (karşılaştırma için)
   final double fairPrice; // Adil fiyat (karşılaştırma için)
   final DateTime expirationDate; // Teklifin son geçerlilik tarihi
+  
+  // Yeni alanlar
+  final bool isUserOffer; // Kullanıcı teklifi mi, AI teklifi mi?
+  final double? counterOfferAmount; // Karşı teklif tutarı (varsa)
+  final String? sellerResponse; // Satıcının/AI'nin cevabı
 
   // Araç bilgileri (UI'da göstermek için)
   final String vehicleBrand;
@@ -41,6 +46,9 @@ class Offer {
     required this.listingPrice,
     required this.fairPrice,
     required this.expirationDate,
+    this.isUserOffer = false,
+    this.counterOfferAmount,
+    this.sellerResponse,
     required this.vehicleBrand,
     required this.vehicleModel,
     required this.vehicleYear,
@@ -89,6 +97,9 @@ class Offer {
       listingPrice: json['listingPrice'].toDouble(),
       fairPrice: json['fairPrice'].toDouble(),
       expirationDate: DateTime.parse(json['expirationDate']),
+      isUserOffer: json['isUserOffer'] ?? false,
+      counterOfferAmount: json['counterOfferAmount']?.toDouble(),
+      sellerResponse: json['sellerResponse'],
       vehicleBrand: json['vehicleBrand'],
       vehicleModel: json['vehicleModel'],
       vehicleYear: json['vehicleYear'],
@@ -111,6 +122,9 @@ class Offer {
       'listingPrice': listingPrice,
       'fairPrice': fairPrice,
       'expirationDate': expirationDate.toIso8601String(),
+      'isUserOffer': isUserOffer,
+      'counterOfferAmount': counterOfferAmount,
+      'sellerResponse': sellerResponse,
       'vehicleBrand': vehicleBrand,
       'vehicleModel': vehicleModel,
       'vehicleYear': vehicleYear,
