@@ -292,15 +292,15 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             filled: true,
             fillColor: Colors.grey[100],
           ),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Açıklama girmelisiniz';
-            }
-            if (value.trim().length < 20) {
-              return 'Açıklama en az 20 karakter olmalı';
-            }
-            return null;
-          },
+          // validator: (value) {
+          //   if (value == null || value.trim().isEmpty) {
+          //     return 'Açıklama girmelisiniz';
+          //   }
+          //   if (value.trim().length < 20) {
+          //     return 'Açıklama en az 20 karakter olmalı';
+          //   }
+          //   return null;RR
+          // },
         ),
       ],
     );

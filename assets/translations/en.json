@@ -204,7 +204,12 @@
     "horsepower": "Horsepower",
     "sellerType": "Seller Type",
     "vehicleDiagram": "Vehicle Diagram",
-    "paintedOrReplacedParts": "Painted or Replaced Parts"
+    "paintedOrReplacedParts": "Painted or Replaced Parts",
+    "priceRequired": "Price field is required",
+    "validPrice": "Please enter a valid price",
+    "descriptionHint": "Provide detailed information about your vehicle...",
+    "descriptionRequired": "Description field is required",
+    "descriptionMinLength": "Description must be at least 20 characters"
   },
   "purchase": {
     "title": "Purchase",
@@ -249,7 +254,10 @@
     "listingRemoved": "✅ Listing successfully removed!",
     "listForSaleButton": "List For Sale",
     "editListingComingSoon": "Listing edit feature coming soon...",
-    "editButton": "Edit"
+    "editButton": "Edit",
+    "editListing": "Edit Listing",
+    "listingUpdated": "✅ Listing successfully updated!",
+    "listingUpdateFailed": "❌ An error occurred while updating the listing"
   },
   "offers": {
     "title": "My Offers",
@@ -441,7 +449,8 @@
     "rentComingSoon": "Vehicle rental page coming soon..."
   },
   "myVehicles": {
-    "buildCollection": "Build your collection by purchasing your first vehicle!"
+    "buildCollection": "Build your collection by purchasing your first vehicle!",
+    "alreadyListed": "This vehicle is already listed for sale!"
   },
   "myListings": {
     "potential": "Potential",
@@ -505,5 +514,40 @@
     "googleSignIn": "Sign in with Google",
     "googleLoginFailed": "Google sign-in failed. Please try again.",
     "googleLoginError": "An error occurred during Google sign-in."
+  },
+  "store": {
+    "title": "Store",
+    "buyGold": "Buy Gold",
+    "convertGold": "Convert Gold",
+    "yourGold": "Your Gold",
+    "gold": "Gold",
+    "bonus": "Bonus",
+    "gameCurrency": "Game Currency",
+    "realMoney": "Real Money",
+    "convertGoldTitle": "Convert Gold to Game Currency",
+    "convertGoldDesc": "Convert your gold to in-game currency",
+    "exchangeRate": "Exchange Rate",
+    "convertNow": "Convert Now",
+    "needGoldToConvert": "You need gold to convert",
+    "purchaseGold": "Purchase Gold",
+    "package": "Package",
+    "price": "Price",
+    "paymentComingSoon": "Payment system will be available soon",
+    "paymentSystemComingSoon": "Payment system is not integrated yet. Will be available soon!",
+    "buy": "Buy",
+    "selectAmount": "Select amount to convert",
+    "youWillGet": "You Will Get",
+    "remainingGold": "Remaining Gold",
+    "convert": "Convert",
+    "convertError": "An error occurred while converting gold",
+    "confirmConvert": "Confirm Transaction",
+    "confirmConvertMessage": "Are you sure you want to proceed with this transaction?",
+    "goldAmount": "Gold Amount",
+    "confirmButton": "Confirm",
+    "availableGold": "Available Gold",
+    "enterAmount": "Please enter an amount",
+    "invalidNumber": "Invalid number format",
+    "minAmount": "Minimum amount",
+    "maxAmount": "Maximum amount"
   }
 }

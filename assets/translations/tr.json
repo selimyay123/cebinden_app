@@ -204,7 +204,12 @@
     "horsepower": "Motor Gücü",
     "sellerType": "Kimden",
     "vehicleDiagram": "Araç Görseli",
-    "paintedOrReplacedParts": "Boyalı veya Değişen Parça"
+    "paintedOrReplacedParts": "Boyalı veya Değişen Parça",
+    "priceRequired": "Fiyat alanı zorunludur",
+    "validPrice": "Lütfen geçerli bir fiyat girin",
+    "descriptionHint": "Aracınız hakkında detaylı bilgi verin...",
+    "descriptionRequired": "Açıklama alanı zorunludur",
+    "descriptionMinLength": "Açıklama en az 20 karakter olmalıdır"
   },
   "purchase": {
     "title": "Satın Al",
@@ -249,7 +254,10 @@
     "listingRemoved": "✅ İlan başarıyla kaldırıldı!",
     "listForSaleButton": "Satışa Çıkar",
     "editListingComingSoon": "İlan düzenleme özelliği yakında...",
-    "editButton": "Düzenle"
+    "editButton": "Düzenle",
+    "editListing": "İlanı Düzenle",
+    "listingUpdated": "✅ İlan başarıyla güncellendi!",
+    "listingUpdateFailed": "❌ İlan güncellenirken bir hata oluştu"
   },
   "offers": {
     "title": "Tekliflerim",
@@ -441,7 +449,8 @@
     "rentComingSoon": "Araç kiralama sayfası yakında..."
   },
   "myVehicles": {
-    "buildCollection": "İlk aracınızı satın alarak koleksiyonunuzu oluşturun!"
+    "buildCollection": "İlk aracınızı satın alarak koleksiyonunuzu oluşturun!",
+    "alreadyListed": "Bu araç zaten satışta!"
   },
   "myListings": {
     "potential": "Potansiyel",
@@ -505,5 +514,40 @@
     "googleSignIn": "Google ile Giriş Yap",
     "googleLoginFailed": "Google ile giriş başarısız oldu. Lütfen tekrar deneyin.",
     "googleLoginError": "Google ile giriş yapılırken bir hata oluştu."
+  },
+  "store": {
+    "title": "Mağaza",
+    "buyGold": "Altın Satın Al",
+    "convertGold": "Altın Bozdur",
+    "yourGold": "Altınınız",
+    "gold": "Altın",
+    "bonus": "Bonus",
+    "gameCurrency": "Oyun Parası",
+    "realMoney": "Gerçek Para",
+    "convertGoldTitle": "Altını Oyun Parasına Çevir",
+    "convertGoldDesc": "Altınlarınızı oyun içi paraya dönüştürün",
+    "exchangeRate": "Dönüşüm Oranı",
+    "convertNow": "Şimdi Bozdur",
+    "needGoldToConvert": "Bozdurabilmek için altınınız olmalı",
+    "purchaseGold": "Altın Satın Al",
+    "package": "Paket",
+    "price": "Fiyat",
+    "paymentComingSoon": "Ödeme sistemi yakında aktif olacak",
+    "paymentSystemComingSoon": "Ödeme sistemi henüz entegre edilmedi. Yakında aktif olacak!",
+    "buy": "Satın Al",
+    "selectAmount": "Bozdurulacak miktarı seçin",
+    "youWillGet": "Alacağınız Para",
+    "remainingGold": "Kalan Altın",
+    "convert": "Bozdur",
+    "convertError": "Altın bozdurulurken bir hata oluştu",
+    "confirmConvert": "İşlemi Onayla",
+    "confirmConvertMessage": "Bu işleme devam etmek istediğinizden emin misiniz?",
+    "goldAmount": "Altın Miktarı",
+    "confirmButton": "Onayla",
+    "availableGold": "Mevcut Altın",
+    "enterAmount": "Lütfen bir miktar girin",
+    "invalidNumber": "Geçersiz sayı formatı",
+    "minAmount": "Minimum miktar",
+    "maxAmount": "Maksimum miktar"
   }
 }

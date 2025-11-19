@@ -8,6 +8,7 @@ class User {
   final DateTime birthDate;
   final DateTime registeredAt;
   final double balance; // Kullanıcının mevcut bakiyesi (TL)
+  final double gold; // Kullanıcının altın miktarı (1 Altın = 1,000,000 TL)
   final double profitLossPercentage; // Kar/Zarar yüzdesi
   final String? profileImageUrl; // Profil resmi URL'i (opsiyonel)
   final String currency; // Para birimi: 'TL', 'USD', 'EUR'
@@ -23,6 +24,7 @@ class User {
     required this.birthDate,
     required this.registeredAt,
     this.balance = 1000000.0, // Varsayılan başlangıç parası: 1,000,000 TL
+    this.gold = 0.0, // Varsayılan başlangıç altını: 0
     this.profitLossPercentage = 0.0, // Başlangıçta kar/zarar yok
     this.profileImageUrl,
     this.currency = 'TL', // Varsayılan para birimi
@@ -69,6 +71,7 @@ class User {
       birthDate: DateTime.parse(json['birthDate'] as String),
       registeredAt: DateTime.parse(json['registeredAt'] as String),
       balance: (json['balance'] as num?)?.toDouble() ?? 1000000.0,
+      gold: (json['gold'] as num?)?.toDouble() ?? 0.0,
       profitLossPercentage: (json['profitLossPercentage'] as num?)?.toDouble() ?? 0.0,
       profileImageUrl: json['profileImageUrl'] as String?,
       currency: json['currency'] as String? ?? 'TL',
@@ -88,6 +91,7 @@ class User {
       'birthDate': birthDate.toIso8601String(),
       'registeredAt': registeredAt.toIso8601String(),
       'balance': balance,
+      'gold': gold,
       'profitLossPercentage': profitLossPercentage,
       'profileImageUrl': profileImageUrl,
       'currency': currency,
@@ -106,6 +110,7 @@ class User {
     DateTime? birthDate,
     DateTime? registeredAt,
     double? balance,
+    double? gold,
     double? profitLossPercentage,
     String? profileImageUrl,
     String? currency,
@@ -121,6 +126,7 @@ class User {
       birthDate: birthDate ?? this.birthDate,
       registeredAt: registeredAt ?? this.registeredAt,
       balance: balance ?? this.balance,
+      gold: gold ?? this.gold,
       profitLossPercentage: profitLossPercentage ?? this.profitLossPercentage,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       currency: currency ?? this.currency,

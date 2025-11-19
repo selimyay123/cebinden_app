@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
+import 'create_listing_screen.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
   const MyVehiclesScreen({super.key});
@@ -377,13 +378,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      // TODO: Araç detayına git
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('misc.vehicleDetailComingSoon'.tr()),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
+                      _showVehicleDetailsDialog(vehicle);
                     },
                     icon: const Icon(Icons.info_outline, size: 18),
                     label: Text('misc.vehicleDetails'.tr()),
@@ -400,14 +395,31 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Araç satış işlemi
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('misc.sellFeatureComingSoon'.tr()),
-                          duration: const Duration(seconds: 2),
+                    onPressed: () async {
+                      // Eğer araç zaten satışta ise uyarı ver
+                      if (vehicle.isListedForSale) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('myVehicles.alreadyListed'.tr()),
+                            backgroundColor: Colors.orange,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      }
+                      
+                      // Satışa çıkarma ekranına git
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CreateListingScreen(vehicle: vehicle),
                         ),
                       );
+                      
+                      // Eğer satışa çıkarma başarılıysa listeyi yenile
+                      if (result == true) {
+                        await _loadMyVehicles();
+                      }
                     },
                     icon: const Icon(Icons.sell, size: 18),
                     label: Text('misc.sellVehicle'.tr()),
@@ -445,6 +457,333 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
 
   String _formatDate(DateTime date) {
     return DateFormat('dd MMM yyyy', 'tr_TR').format(date);
+  }
+
+  void _showVehicleDetailsDialog(UserVehicle vehicle) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 700),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.deepPurple, Colors.deepPurple.shade700],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.directions_car,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            vehicle.fullName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Satın Alma Bilgileri
+                      _buildSectionTitle('vehicles.purchaseDate'.tr()),
+                      const SizedBox(height: 12),
+                      _buildInfoCard([
+                        _buildDetailRow(
+                          Icons.shopping_cart,
+                          'vehicles.purchasePrice'.tr(),
+                          '${_formatCurrency(vehicle.purchasePrice)} TL',
+                          Colors.deepPurple,
+                        ),
+                        _buildDetailRow(
+                          Icons.calendar_today,
+                          'vehicles.purchaseDate'.tr(),
+                          _formatDate(vehicle.purchaseDate),
+                          Colors.blue,
+                        ),
+                        _buildDetailRow(
+                          Icons.access_time,
+                          'vehicles.daysOwned'.tr(),
+                          '${vehicle.daysOwned} ${'misc.days'.tr()}',
+                          Colors.green,
+                        ),
+                      ]),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Teknik Özellikler
+                      _buildSectionTitle('vehicles.technicalSpecs'.tr()),
+                      const SizedBox(height: 12),
+                      _buildInfoCard([
+                        _buildDetailRow(
+                          Icons.color_lens,
+                          'vehicles.color'.tr(),
+                          vehicle.color,
+                          Colors.pink,
+                        ),
+                        _buildDetailRow(
+                          Icons.local_gas_station,
+                          'vehicles.fuelType'.tr(),
+                          vehicle.fuelType,
+                          Colors.orange,
+                        ),
+                        _buildDetailRow(
+                          Icons.settings,
+                          'vehicles.transmission'.tr(),
+                          vehicle.transmission,
+                          Colors.teal,
+                        ),
+                        _buildDetailRow(
+                          Icons.speed,
+                          'vehicles.engineSize'.tr(),
+                          vehicle.engineSize,
+                          Colors.red,
+                        ),
+                        _buildDetailRow(
+                          Icons.compare_arrows,
+                          'vehicles.driveType'.tr(),
+                          vehicle.driveType,
+                          Colors.indigo,
+                        ),
+                      ]),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Durum & Garanti
+                      _buildSectionTitle('vehicles.statusWarranty'.tr()),
+                      const SizedBox(height: 12),
+                      _buildInfoCard([
+                        _buildDetailRow(
+                          Icons.verified_user,
+                          'vehicles.warrantyStatus'.tr(),
+                          vehicle.hasWarranty ? 'vehicles.yes'.tr() : 'vehicles.no'.tr(),
+                          vehicle.hasWarranty ? Colors.green : Colors.grey,
+                        ),
+                        _buildDetailRow(
+                          Icons.car_crash,
+                          'vehicles.accidentRecord'.tr(),
+                          vehicle.hasAccidentRecord ? 'vehicles.yes'.tr() : 'vehicles.no'.tr(),
+                          vehicle.hasAccidentRecord ? Colors.red : Colors.green,
+                        ),
+                        _buildDetailRow(
+                          Icons.star,
+                          'İlan Skoru',
+                          '${vehicle.score}/100',
+                          Colors.amber,
+                        ),
+                      ]),
+                      
+                      // Satış Durumu (eğer satışta ise)
+                      if (vehicle.isListedForSale) ...[
+                        const SizedBox(height: 20),
+                        _buildSectionTitle('vehicles.listingInfo'.tr()),
+                        const SizedBox(height: 12),
+                        _buildInfoCard([
+                          _buildDetailRow(
+                            Icons.local_offer,
+                            'vehicles.listingPrice'.tr(),
+                            '${_formatCurrency(vehicle.listingPrice ?? 0)} TL',
+                            Colors.green,
+                          ),
+                          if (vehicle.listedDate != null)
+                            _buildDetailRow(
+                              Icons.calendar_today,
+                              'vehicles.listingDate'.tr(),
+                              _formatDate(vehicle.listedDate!),
+                              Colors.blue,
+                            ),
+                          _buildDetailRow(
+                            Icons.trending_up,
+                            'Potansiyel Kar/Zarar',
+                            '${_formatCurrency((vehicle.listingPrice ?? 0) - vehicle.purchasePrice)} TL',
+                            (vehicle.listingPrice ?? 0) >= vehicle.purchasePrice
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ]),
+                        if (vehicle.listingDescription != null &&
+                            vehicle.listingDescription!.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.description, 
+                                      size: 16, 
+                                      color: Colors.grey[700],
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'vehicles.description'.tr(),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  vehicle.listingDescription!,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[800],
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 20,
+          decoration: BoxDecoration(
+            color: Colors.deepPurple,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoCard(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.grey[100]!),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 20, color: color),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

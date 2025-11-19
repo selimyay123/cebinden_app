@@ -344,6 +344,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
       body: ListView(
         children: [
+          // TEST BUTONU - GEÇİCİ
+          Container(
+            margin: const EdgeInsets.all(16),
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                if (_currentUser != null) {
+                  final db = DatabaseHelper();
+                  await db.updateUser(_currentUser!.id, {
+                    'gold': _currentUser!.gold + 100.0,
+                  });
+                  
+                  // Kullanıcıyı yeniden yükle
+                  await _loadSettings();
+                  
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('✅ Test: 100 Altın eklendi!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(Icons.stars),
+              label: const Text('TEST: 100 Altın Ekle'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+          ),
+          
           // Profil Bölümü
           _buildSection(
             title: 'settings.profile'.tr(),

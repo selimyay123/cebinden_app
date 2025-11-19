@@ -28,138 +28,138 @@ class BrandSelectionScreen extends StatelessWidget {
         'imagePath': 'assets/images/car_brands/alfio.jpeg',
       },
       {
-        'name': 'Audix',
+        'name': 'Audira', // Audi
         'originalHint': 'Alman lüks performansı',
         'color': Colors.grey[800]!,
         'icon': 'A',
         'imagePath': 'assets/images/car_brands/audix.jpeg',
       },
       {
-        'name': 'BMV',
+        'name': 'Bavora', // BMW
         'originalHint': 'Bavyera motoru',
         'color': Colors.blue[700]!,
         'icon': 'B',
         'imagePath': 'assets/images/car_brands/bmv.jpeg',
       },
+      // {
+      //   'name': 'Chevro',
+      //   'originalHint': 'Amerikan gücü',
+      //   'color': Colors.amber[700]!,
+      //   'icon': 'C',
+      //   'imagePath': 'assets/images/car_brands/chevro.jpeg',
+      // },
       {
-        'name': 'Chevro',
-        'originalHint': 'Amerikan gücü',
-        'color': Colors.amber[700]!,
-        'icon': 'C',
-        'imagePath': 'assets/images/car_brands/chevro.jpeg',
-      },
-      {
-        'name': 'Fait Motors',
-        'originalHint': 'İtalyan şıklığı',
+        'name': 'Fialto', // Fiat
+        'originalHint': 'test',
         'color': Colors.red[600]!,
         'icon': 'F',
         'imagePath': 'assets/images/car_brands/fait.jpeg',
-      },
+      }, 
       {
-        'name': 'Forde',
+        'name': 'Fortran', // Ford
         'originalHint': 'Amerikan klasiği',
         'color': Colors.blue[900]!,
         'icon': 'F',
         'imagePath': 'assets/images/car_brands/forde.jpeg',
       },
       {
-        'name': 'Hyunday',
+        'name': 'Hyundaro', // Hyundai
         'originalHint': 'Kore teknolojisi',
         'color': Colors.grey[700]!,
         'icon': 'H',
         'imagePath': 'assets/images/car_brands/hyunday.jpeg',
       },
       {
-        'name': 'Hondia',
+        'name': 'Hondaro',
         'originalHint': 'Japon güvenilirliği',
         'color': Colors.red[700]!,
         'icon': 'H',
         'imagePath': 'assets/images/car_brands/hondia.jpeg',
       },
+      // {
+      //   'name': 'Kio',
+      //   'originalHint': 'Kore tasarımı',
+      //   'color': Colors.red[800]!,
+      //   'icon': 'K',
+      //   'imagePath': 'assets/images/car_brands/kio.jpeg',
+      // },
       {
-        'name': 'Kio',
-        'originalHint': 'Kore tasarımı',
-        'color': Colors.red[800]!,
-        'icon': 'K',
-        'imagePath': 'assets/images/car_brands/kio.jpeg',
-      },
-      {
-        'name': 'Mercedez',
+        'name': 'Mercurion', // Mercedes
         'originalHint': 'Alman lüksü',
         'color': Colors.grey[600]!,
         'icon': 'M',
         'imagePath': 'assets/images/car_brands/mercedez.jpeg',
       },
+      // {
+      //   'name': 'Mazdo',
+      //   'originalHint': 'Japon dinamizmi',
+      //   'color': Colors.red[900]!,
+      //   'icon': 'M',
+      //   'imagePath': 'assets/images/car_brands/mazdo.jpeg',
+      // },
+      // {
+      //   'name': 'Nissano',
+      //   'originalHint': 'Japon inovasyonu',
+      //   'color': Colors.grey[800]!,
+      //   'icon': 'N',
+      //   'imagePath': 'assets/images/car_brands/nissano.jpeg',
+      // },
       {
-        'name': 'Mazdo',
-        'originalHint': 'Japon dinamizmi',
-        'color': Colors.red[900]!,
-        'icon': 'M',
-        'imagePath': 'assets/images/car_brands/mazdo.jpeg',
-      },
-      {
-        'name': 'Nissano',
-        'originalHint': 'Japon inovasyonu',
-        'color': Colors.grey[800]!,
-        'icon': 'N',
-        'imagePath': 'assets/images/car_brands/nissano.jpeg',
-      },
-      {
-        'name': 'Opex',
+        'name': 'Opexel', // Opel
         'originalHint': 'Alman pratikliği',
         'color': Colors.yellow[700]!,
         'icon': 'O',
         'imagePath': 'assets/images/car_brands/opex.jpeg',
       },
       {
-        'name': 'Pejo',
+        'name': 'Peugot', // Peugeot
         'originalHint': 'Fransız zarafeti',
         'color': Colors.blue[800]!,
         'icon': 'P',
         'imagePath': 'assets/images/car_brands/pejo.jpeg',
       },
       {
-        'name': 'Renol',
+        'name': 'Renauva', // Renault
         'originalHint': 'Fransız inovasyonu',
         'color': Colors.yellow[800]!,
         'icon': 'R',
         'imagePath': 'assets/images/car_brands/renol.jpeg',
       },
+      // {
+      //   'name': 'Seato',
+      //   'originalHint': 'İspanyol tutkusu',
+      //   'color': Colors.red[700]!,
+      //   'icon': 'S',
+      //   'imagePath': 'assets/images/car_brands/seato.jpeg',
+      // },
       {
-        'name': 'Seato',
-        'originalHint': 'İspanyol tutkusu',
-        'color': Colors.red[700]!,
-        'icon': 'S',
-        'imagePath': 'assets/images/car_brands/seato.jpeg',
-      },
-      {
-        'name': 'Škodai',
+        'name': 'Skodra', // Škoda
         'originalHint': 'Çek değeri',
         'color': Colors.green[700]!,
         'icon': 'Š',
         'imagePath': 'assets/images/car_brands/skodai.jpeg',
       },
       {
-        'name': 'Toyoto',
+        'name': 'Toyoto', // Toyota
         'originalHint': 'Japon mükemmelliği',
         'color': Colors.red[600]!,
         'icon': 'T',
         'imagePath': 'assets/images/car_brands/toyoto.jpeg',
       },
       {
-        'name': 'Volksvan',
+        'name': 'Voltswagen', // Volkswagen
         'originalHint': 'Halkın arabası',
         'color': Colors.blue[700]!,
         'icon': 'V',
         'imagePath': 'assets/images/car_brands/volksvan.jpeg',
       },
-      {
-        'name': 'Volvy',
-        'originalHint': 'İsveç güvenliği',
-        'color': Colors.blue[900]!,
-        'icon': 'V',
-        'imagePath': 'assets/images/car_brands/volvy.jpeg',
-      },
+      // {
+      //   'name': 'Volvy',
+      //   'originalHint': 'İsveç güvenliği',
+      //   'color': Colors.blue[900]!,
+      //   'icon': 'V',
+      //   'imagePath': 'assets/images/car_brands/volvy.jpeg',
+      // },
     ];
 
     // Alfabetik sırala

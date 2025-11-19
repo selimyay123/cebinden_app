@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
@@ -318,13 +319,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      // TODO: İlanı düzenle
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('sell.editListingComingSoon'.tr()),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
+                      _showEditListingDialog(vehicle);
                     },
                     icon: const Icon(Icons.edit),
                     label: Text('sell.editButton'.tr()),
@@ -398,6 +393,194 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
 
   IconData _getProfitIcon(UserVehicle vehicle) {
     return _isProfit(vehicle) ? Icons.trending_up : Icons.trending_down;
+  }
+
+  void _showEditListingDialog(UserVehicle vehicle) {
+    final priceController = TextEditingController(
+      text: (vehicle.listingPrice ?? 0).toStringAsFixed(0),
+    );
+    final descriptionController = TextEditingController(
+      text: vehicle.listingDescription ?? '',
+    );
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.edit, color: Colors.deepPurple),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text('sell.editListing'.tr()),
+            ),
+          ],
+        ),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Araç Bilgisi
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        vehicle.fullName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Fiyat Girişi
+                Text(
+                  'vehicles.listingPrice'.tr(),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: priceController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  decoration: InputDecoration(
+                    prefixText: '₺ ',
+                    suffixText: 'TL',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'vehicles.priceRequired'.tr();
+                    }
+                    final price = double.tryParse(value);
+                    if (price == null || price <= 0) {
+                      return 'vehicles.validPrice'.tr();
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                // Açıklama Girişi
+                Text(
+                  'myListings.description'.tr(),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: descriptionController,
+                  maxLines: 4,
+                  maxLength: 500,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    hintText: 'vehicles.descriptionHint'.tr(),
+                  ),
+                  // validator: (value) {
+                  //   if (value == null || value.trim().isEmpty) {
+                  //     return 'vehicles.descriptionRequired'.tr();
+                  //   }
+                  //   if (value.trim().length < 20) {
+                  //     return 'vehicles.descriptionMinLength'.tr();
+                  //   }
+                  //   return null;
+                  // },
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              priceController.dispose();
+              descriptionController.dispose();
+              Navigator.pop(context);
+            },
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(context);
+                
+                // İlanı güncelle
+                final newPrice = double.parse(priceController.text);
+                final newDescription = descriptionController.text.trim();
+                
+                final success = await _db.updateUserVehicle(vehicle.id, {
+                  'listingPrice': newPrice,
+                  'listingDescription': newDescription,
+                });
+                
+                priceController.dispose();
+                descriptionController.dispose();
+                
+                if (success && mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('sell.listingUpdated'.tr()),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  _loadUserListedVehicles(); // Listeyi yenile
+                } else if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('sell.listingUpdateFailed'.tr()),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('common.save'.tr()),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showRemoveListingDialog(UserVehicle vehicle) {

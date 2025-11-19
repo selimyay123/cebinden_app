@@ -7,13 +7,15 @@ import '../services/ad_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import 'login_screen.dart';
-import 'vehicle_category_screen.dart';
+// import 'vehicle_category_screen.dart'; // YORUM: Kategori seçimi şimdilik devre dışı, doğrudan otomobil kategorisi
+import 'brand_selection_screen.dart'; // Doğrudan marka seçimi için
 import 'settings_screen.dart';
 import 'my_vehicles_screen.dart';
 import 'sell_vehicle_screen.dart';
 import 'my_listings_screen.dart';
 import 'my_offers_screen.dart';
 import 'notifications_screen.dart';
+import 'store_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -119,10 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _watchRewardedAd() async {
     await _adService.showRewardedAd(
       onRewarded: (double reward) async {
-        // Kullanıcıya ödülü ver
+        // Kullanıcıya ödülü ver (0.01 Altın)
         if (_currentUser != null) {
-          final newBalance = _currentUser!.balance + reward;
-          await _db.updateUser(_currentUser!.id, {'balance': newBalance});
+          final goldReward = 0.01;
+          final newGold = _currentUser!.gold + goldReward;
+          await _db.updateUser(_currentUser!.id, {'gold': newGold});
           
           // UI'ı güncelle
           await _loadCurrentUser();
@@ -142,17 +145,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      Icons.monetization_on,
+                      Icons.stars,
                       size: 64,
                       color: Colors.amber,
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '+${reward.toStringAsFixed(0)} TL',
+                      '+${goldReward.toStringAsFixed(2)} ${'store.gold'.tr()}',
                       style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        color: Colors.amber,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -455,43 +458,130 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 const SizedBox(height: 12),
                 
-                // Kar/Zarar
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isProfit 
-                        ? Colors.green.withOpacity(0.2)
-                        : Colors.red.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isProfit ? Colors.green : Colors.red,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isProfit 
-                            ? Icons.trending_up 
-                            : Icons.trending_down,
-                        color: isProfit ? Colors.green : Colors.red,
-                        size: 18,
+                // Altın ve Kar/Zarar
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    // Altın
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${isProfit ? '+' : ''}${_currentUser!.profitLossPercentage.toStringAsFixed(2)}%',
-                        style: TextStyle(
-                          color: isProfit ? Colors.green : Colors.red,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.amber,
+                          width: 1.5,
                         ),
                       ),
-                    ],
-                  ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.stars,
+                            color: Colors.amber,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${_currentUser!.gold.toStringAsFixed(2)} ${'store.gold'.tr()}',
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Altın Al Butonu
+                    InkWell(
+                      onTap: () async {
+                        // Mağaza sayfasına git
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const StoreScreen(),
+                          ),
+                        );
+                        // Sayfa kapanınca dashboard'u yenile (altın satın alınmış olabilir)
+                        await _loadCurrentUser();
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.amber,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'store.buyGold'.tr(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // const SizedBox(width: 8),
+                    // Kar/Zarar
+                    // Container(
+                    //   padding: const EdgeInsets.symmetric(
+                    //     horizontal: 12,
+                    //     vertical: 6,
+                    //   ),
+                    //   decoration: BoxDecoration(
+                    //     color: isProfit 
+                    //         ? Colors.green.withOpacity(0.2)
+                    //         : Colors.red.withOpacity(0.2),
+                    //     borderRadius: BorderRadius.circular(20),
+                    //     border: Border.all(
+                    //       color: isProfit ? Colors.green : Colors.red,
+                    //       width: 1.5,
+                    //     ),
+                    //   ),
+                    //   child: Row(
+                    //     mainAxisSize: MainAxisSize.min,
+                    //     children: [
+                    //       Icon(
+                    //         isProfit 
+                    //             ? Icons.trending_up 
+                    //             : Icons.trending_down,
+                    //         color: isProfit ? Colors.green : Colors.red,
+                    //         size: 18,
+                    //       ),
+                    //       const SizedBox(width: 6),
+                    //       Text(
+                    //         '${isProfit ? '+' : ''}${_currentUser!.profitLossPercentage.toStringAsFixed(2)}%',
+                    //         style: TextStyle(
+                    //           color: isProfit ? Colors.green : Colors.red,
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.bold,
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                  ],
                 ),
               ],
             ),
@@ -510,11 +600,22 @@ class _HomeScreenState extends State<HomeScreen> {
         'label': 'home.buyVehicle'.tr(),
         'color': Colors.blue,
         'onTap': () async {
-          // Kategori seçim sayfasına git ve satın alma sonucunu bekle
+          // YORUM: Kategori seçim sayfası devre dışı, doğrudan otomobil kategorisi
+          // final purchased = await Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => const VehicleCategoryScreen(),
+          //   ),
+          // );
+          
+          // Doğrudan marka seçim sayfasına git (Otomobil kategorisi)
           final purchased = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const VehicleCategoryScreen(),
+              builder: (context) => BrandSelectionScreen(
+                categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
+                categoryColor: Colors.blue,
+              ),
             ),
           );
           
@@ -547,6 +648,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.garage,
         'label': 'home.myVehicles'.tr(),
         'color': Colors.green,
+        'badge': _vehicleCount > 0 ? _vehicleCount : null, // Araç sayısı badge'i
         'onTap': () {
           // Kullanıcının satın aldığı araçları göster
           Navigator.push(
@@ -561,6 +663,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.store,
         'label': 'home.myListings'.tr(),
         'color': Colors.purple,
+        'badge': _userListedVehicles.length > 0 ? _userListedVehicles.length : null, // İlan sayısı badge'i
         'onTap': () async {
           // İlanlar sayfasına git
           await Navigator.push(
@@ -594,8 +697,24 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.play_circle_filled,
         'label': 'home.watchAd'.tr(),
         'color': Colors.amber,
-        'reward': '1,000 TL', // Ödül gösterimi
+        'reward': '0.01 ${'store.gold'.tr()}', // Ödül gösterimi
         'onTap': () => _watchRewardedAd(),
+      },
+      {
+        'icon': Icons.store,
+        'label': 'store.title'.tr(),
+        'color': Colors.deepOrange,
+        'onTap': () async {
+          // Mağaza sayfasına git
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const StoreScreen(),
+            ),
+          );
+          // Sayfa kapanınca dashboard'u yenile (altın bozdurulmuş olabilir)
+          await _loadCurrentUser();
+        },
       },
       // {
       //   'icon': Icons.car_rental,
@@ -936,10 +1055,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () async {
+                      // YORUM: Kategori seçim sayfası devre dışı, doğrudan otomobil kategorisi
+                      // final purchased = await Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const VehicleCategoryScreen(),
+                      //   ),
+                      // );
+                      
+                      // Doğrudan marka seçim sayfasına git (Otomobil kategorisi)
                       final purchased = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VehicleCategoryScreen(),
+                          builder: (context) => BrandSelectionScreen(
+                            categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
+                            categoryColor: Colors.blue,
+                          ),
                         ),
                       );
                       if (purchased == true) {
@@ -1822,11 +1953,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'drawer.buyVehicle'.tr(),
                     onTap: () async {
                       Navigator.pop(context); // Drawer'ı kapat
-                      // Kategori seçim sayfasına git ve satın alma sonucunu bekle
+                      
+                      // YORUM: Kategori seçim sayfası devre dışı, doğrudan otomobil kategorisi
+                      // final purchased = await Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const VehicleCategoryScreen(),
+                      //   ),
+                      // );
+                      
+                      // Doğrudan marka seçim sayfasına git (Otomobil kategorisi)
                       final purchased = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VehicleCategoryScreen(),
+                          builder: (context) => BrandSelectionScreen(
+                            categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
+                            categoryColor: Colors.blue,
+                          ),
                         ),
                       );
                       
