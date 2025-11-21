@@ -966,7 +966,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               TextField(
                 controller: offerController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  _ThousandsSeparatorInputFormatter(),
+                ],
                 decoration: InputDecoration(
                   labelText: 'offer.yourOffer'.tr(),
                   hintText: 'offer.enterAmount'.tr(),
@@ -993,7 +996,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 return;
               }
 
-              final offerAmount = double.tryParse(offerText);
+              // Noktaları kaldır (1.000.000 -> 1000000)
+              final cleanedText = offerText.replaceAll('.', '');
+              final offerAmount = double.tryParse(cleanedText);
               if (offerAmount == null || offerAmount <= 0) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('offer.invalidAmountError'.tr())),
@@ -1306,6 +1311,38 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Binlik ayracı ekleyen TextInputFormatter
+class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  final NumberFormat _formatter = NumberFormat('#,###', 'tr_TR');
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Sadece sayıları al
+    final numericValue = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    
+    if (numericValue.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    // Sayıyı formatla
+    final number = int.parse(numericValue);
+    final formattedText = _formatter.format(number);
+
+    // Cursor pozisyonunu ayarla
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
 }

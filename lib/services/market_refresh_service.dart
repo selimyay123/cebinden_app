@@ -100,6 +100,40 @@ class MarketRefreshService {
   final List<String> _driveTypes = ['Önden', 'Arkadan', '4x4'];
   final List<String> _bodyTypes = ['Sedan', 'Hatchback', 'SUV', 'Coupe', 'Station Wagon', 'MPV'];
   final List<String> _sellerTypes = ['Sahibinden', 'Galeriden'];
+  
+  // 2025 model yılı tavan fiyatları (brand -> model -> fiyat)
+  final Map<String, Map<String, double>> _basePrices2025 = {
+    'Renauva': {
+      'Slim': 1500000.0,
+      // Diğer modeller eklenecek
+    },
+    // Diğer markalar eklenecek
+  };
+  
+  // Model-spesifik teknik özellik kuralları
+  final Map<String, Map<String, dynamic>> _modelSpecs = {
+    'Renauva_Slim': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2018], 'types': ['Sedan', 'Hatchback']},
+          {'years': [2019, 2025], 'types': ['Hatchback']},
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG']},
+          {'years': [2010, 2020], 'types': ['Dizel']},
+          {'years': [2020, 2025], 'types': ['Hybrid']},
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 2010-2025 hepsi
+      'driveType': 'Önden', // Sabit
+      'engineSize': {'min': 0.9, 'max': 1.6}, // 898cc - 1598cc
+      'horsepower': {'min': 65, 'max': 145},
+    },
+  };
 
   /// Servisi başlat
   Future<void> initialize() async {
@@ -265,8 +299,49 @@ class MarketRefreshService {
     // Gerçekçi kilometre dağılımı
     final mileage = _generateRealisticMileage();
     
-    // Fiyat oluştur
-    final price = _generateRealisticPrice(year, mileage);
+    // Model-spesifik teknik özellikler al (varsa)
+    final specKey = '${brand}_$model';
+    final specs = _modelSpecs[specKey];
+    
+    // Diğer özellikler (model-spesifik veya genel)
+    final fuelType = specs != null 
+      ? _getSpecificFuelType(specs, year) 
+      : _fuelTypes[_random.nextInt(_fuelTypes.length)];
+      
+    final transmission = specs != null
+      ? _getSpecificTransmission(specs, year)
+      : _transmissions[_random.nextInt(_transmissions.length)];
+      
+    final bodyType = specs != null
+      ? _getSpecificBodyType(specs, year)
+      : _bodyTypes[_random.nextInt(_bodyTypes.length)];
+      
+    final driveType = specs != null && specs['driveType'] != null
+      ? specs['driveType'] as String
+      : _driveTypes[_random.nextInt(_driveTypes.length)];
+      
+    final engineSize = specs != null && specs['engineSize'] != null
+      ? _getSpecificEngineSize(specs)
+      : _engineSizes[_random.nextInt(_engineSizes.length)];
+      
+    final horsepower = specs != null && specs['horsepower'] != null
+      ? _getSpecificHorsepower(specs)
+      : 100 + _random.nextInt(300);
+    
+    final hasAccidentRecord = _random.nextInt(10) < 2; // %20
+    final sellerType = _sellerTypes[_random.nextInt(_sellerTypes.length)];
+    
+    // Fiyat oluştur (yeni sistem)
+    final price = _generateRealisticPrice(
+      brand: brand,
+      model: model,
+      year: year,
+      mileage: mileage,
+      fuelType: fuelType,
+      transmission: transmission,
+      hasAccidentRecord: hasAccidentRecord,
+      sellerType: sellerType,
+    );
     
     // Araç objesi oluştur
     final vehicle = Vehicle.create(
@@ -277,17 +352,17 @@ class MarketRefreshService {
       price: price,
       location: _cities[_random.nextInt(_cities.length)],
       color: _colors[_random.nextInt(_colors.length)],
-      fuelType: _fuelTypes[_random.nextInt(_fuelTypes.length)],
-      transmission: _transmissions[_random.nextInt(_transmissions.length)],
+      fuelType: fuelType,
+      transmission: transmission,
       condition: 'İkinci El',
-      engineSize: _engineSizes[_random.nextInt(_engineSizes.length)],
-      driveType: _driveTypes[_random.nextInt(_driveTypes.length)],
+      engineSize: engineSize,
+      driveType: driveType,
       hasWarranty: _random.nextBool(),
-      hasAccidentRecord: _random.nextInt(10) < 2, // %20
+      hasAccidentRecord: hasAccidentRecord,
       description: _generateDescription(),
-      bodyType: _bodyTypes[_random.nextInt(_bodyTypes.length)],
-      horsepower: 100 + _random.nextInt(300),
-      sellerType: _sellerTypes[_random.nextInt(_sellerTypes.length)],
+      bodyType: bodyType,
+      horsepower: horsepower,
+      sellerType: sellerType,
     );
     
     // Yaşam süresi hesapla (skora göre)
@@ -298,6 +373,81 @@ class MarketRefreshService {
       createdDay: _gameTime.getCurrentDay(),
       expiryDay: _gameTime.getCurrentDay() + lifespan,
     );
+  }
+
+  /// Model-spesifik yakıt tipi seç
+  String _getSpecificFuelType(Map<String, dynamic> specs, int year) {
+    final fuelData = specs['fuelTypes'];
+    if (fuelData == null) return _fuelTypes[_random.nextInt(_fuelTypes.length)];
+    
+    final List<dynamic> ranges = fuelData['ranges'] as List;
+    List<String> availableTypes = [];
+    
+    for (var range in ranges) {
+      final years = range['years'] as List;
+      if (year >= years[0] && year <= years[1]) {
+        availableTypes.addAll((range['types'] as List).cast<String>());
+      }
+    }
+    
+    if (availableTypes.isEmpty) return 'Benzin';
+    return availableTypes[_random.nextInt(availableTypes.length)];
+  }
+  
+  /// Model-spesifik vites tipi seç
+  String _getSpecificTransmission(Map<String, dynamic> specs, int year) {
+    final transList = specs['transmissions'];
+    if (transList == null) return _transmissions[_random.nextInt(_transmissions.length)];
+    
+    final List<String> types = (transList as List).cast<String>();
+    return types[_random.nextInt(types.length)];
+  }
+  
+  /// Model-spesifik kasa tipi seç
+  String _getSpecificBodyType(Map<String, dynamic> specs, int year) {
+    final bodyData = specs['bodyTypes'];
+    if (bodyData == null) return _bodyTypes[_random.nextInt(_bodyTypes.length)];
+    
+    final List<dynamic> ranges = bodyData['ranges'] as List;
+    List<String> availableTypes = [];
+    
+    for (var range in ranges) {
+      final years = range['years'] as List;
+      if (year >= years[0] && year <= years[1]) {
+        availableTypes.addAll((range['types'] as List).cast<String>());
+      }
+    }
+    
+    if (availableTypes.isEmpty) return 'Sedan';
+    return availableTypes[_random.nextInt(availableTypes.length)];
+  }
+  
+  /// Model-spesifik motor hacmi seç
+  String _getSpecificEngineSize(Map<String, dynamic> specs) {
+    final engineData = specs['engineSize'] as Map?;
+    if (engineData == null) return _engineSizes[_random.nextInt(_engineSizes.length)];
+    
+    final double min = (engineData['min'] as num).toDouble();
+    final double max = (engineData['max'] as num).toDouble();
+    
+    // 0.9 - 1.6 arasında rastgele seç (yaygın motor hacimleri)
+    final List<double> commonSizes = [0.9, 1.0, 1.2, 1.3, 1.4, 1.5, 1.6];
+    final validSizes = commonSizes.where((s) => s >= min && s <= max).toList();
+    
+    if (validSizes.isEmpty) return min.toStringAsFixed(1);
+    
+    return validSizes[_random.nextInt(validSizes.length)].toStringAsFixed(1);
+  }
+  
+  /// Model-spesifik beygir gücü seç
+  int _getSpecificHorsepower(Map<String, dynamic> specs) {
+    final hpData = specs['horsepower'] as Map?;
+    if (hpData == null) return 100 + _random.nextInt(300);
+    
+    final int min = hpData['min'] as int;
+    final int max = hpData['max'] as int;
+    
+    return min + _random.nextInt(max - min + 1);
   }
 
   /// İlan yaşam süresini hesapla (oyun günü cinsinden)
@@ -350,25 +500,82 @@ class MarketRefreshService {
   }
 
   /// Gerçekçi fiyat oluştur
-  double _generateRealisticPrice(int year, int mileage) {
-    final currentYear = DateTime.now().year;
-    final age = currentYear - year;
+  double _generateRealisticPrice({
+    required String brand,
+    required String model,
+    required int year,
+    required int mileage,
+    required String fuelType,
+    required String transmission,
+    required bool hasAccidentRecord,
+    required String sellerType,
+  }) {
+    // Base price al (2025 tavan fiyatı)
+    double basePrice = _basePrices2025[brand]?[model] ?? 500000.0;
     
-    // Base fiyat
-    double basePrice = 500000.0;
+    // YIL FAKTÖRÜ (2025'den geriye gidildikçe değer düşer)
+    final age = 2025 - year;
+    double yearFactor = 1.0;
+    if (age == 0) {
+      yearFactor = 1.0; // 2025 model
+    } else if (age <= 2) {
+      yearFactor = 0.90 - (age * 0.05); // 2023-2024: %90-85
+    } else if (age <= 5) {
+      yearFactor = 0.80 - ((age - 2) * 0.08); // 2020-2022: %80-56
+    } else if (age <= 10) {
+      yearFactor = 0.56 - ((age - 5) * 0.06); // 2015-2019: %56-26
+    } else {
+      yearFactor = 0.26 - ((age - 10) * 0.03); // 2014 ve öncesi
+    }
+    yearFactor = yearFactor.clamp(0.10, 1.0);
     
-    // Yıl başına %10 değer kaybı
-    basePrice = basePrice * (1 - (age * 0.10));
+    // KİLOMETRE FAKTÖRÜ
+    double kmFactor = 1.0;
+    if (mileage <= 20000) {
+      kmFactor = 1.0; // Sıfır gibi
+    } else if (mileage <= 50000) {
+      kmFactor = 0.95;
+    } else if (mileage <= 100000) {
+      kmFactor = 0.85;
+    } else if (mileage <= 150000) {
+      kmFactor = 0.75;
+    } else if (mileage <= 200000) {
+      kmFactor = 0.65;
+    } else if (mileage <= 250000) {
+      kmFactor = 0.55;
+    } else {
+      kmFactor = 0.45;
+    }
     
-    // Her 10,000 km için %2 değer kaybı
-    final kmFactor = (mileage / 10000) * 0.02;
-    basePrice = basePrice * (1 - kmFactor);
+    // YAKIT TİPİ FAKTÖRÜ
+    double fuelFactor = 1.0;
+    if (fuelType == 'Dizel') {
+      fuelFactor = 1.10; // Dizel %10 daha değerli
+    } else if (fuelType == 'Hybrid') {
+      fuelFactor = 1.15; // Hybrid %15 daha değerli
+    } else if (fuelType == 'Elektrik') {
+      fuelFactor = 1.20; // Elektrik %20 daha değerli
+    } else {
+      fuelFactor = 1.0; // Benzin
+    }
     
-    // Rastgele varyasyon ±15%
-    final variation = ((_random.nextDouble() * 0.30) - 0.15);
-    basePrice = basePrice * (1 + variation);
+    // VİTES FAKTÖRÜ
+    double transFactor = transmission == 'Otomatik' ? 1.08 : 1.0; // Otomatik %8 daha değerli
     
-    return basePrice.clamp(100000.0, 2000000.0);
+    // HASAR FAKTÖRÜ
+    double accidentFactor = hasAccidentRecord ? 0.85 : 1.0; // Hasarlı %15 düşük
+    
+    // SATICI TİPİ FAKTÖRÜ (Galeriden biraz daha pahalı)
+    double sellerFactor = sellerType == 'Galeriden' ? 1.05 : 1.0; // Galeri %5 daha pahalı
+    
+    // GENEL HESAPLAMa
+    double finalPrice = basePrice * yearFactor * kmFactor * fuelFactor * transFactor * accidentFactor * sellerFactor;
+    
+    // Rastgele varyasyon ±8% (pazar dinamikleri)
+    final variation = ((_random.nextDouble() * 0.16) - 0.08);
+    finalPrice = finalPrice * (1 + variation);
+    
+    return finalPrice.clamp(50000.0, basePrice * 1.1);
   }
 
   /// Açıklama oluştur

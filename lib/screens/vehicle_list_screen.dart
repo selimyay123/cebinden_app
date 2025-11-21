@@ -400,8 +400,6 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                         _buildCompactFeature(Icons.speed, '${_formatNumber(vehicle.mileage)} km'),
                         const SizedBox(width: 12),
                         _buildCompactFeature(Icons.local_gas_station, vehicle.fuelType),
-                        const SizedBox(width: 12),
-                        _buildCompactFeature(Icons.settings, vehicle.transmission),
                       ],
                     ),
                     
