@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import '../models/offer_model.dart';
 import '../models/ai_buyer_model.dart';
 import '../models/user_vehicle_model.dart';
@@ -7,10 +8,47 @@ import '../models/vehicle_model.dart';
 import '../models/seller_profile_model.dart';
 import 'database_helper.dart';
 import 'notification_service.dart';
+import 'game_time_service.dart';
 
 /// Teklif servisi - AI alıcılar ve teklif yönetimi
 class OfferService {
+  static final OfferService _instance = OfferService._internal();
+  factory OfferService() => _instance;
+  OfferService._internal();
+
   final DatabaseHelper _db = DatabaseHelper();
+  final GameTimeService _gameTime = GameTimeService();
+
+  /// Servisi başlat ve günlük teklif sistemini aktifleştir
+  Future<void> initialize() async {
+    debugPrint('💼 OfferService initializing...');
+    
+    // Gün değişim listener'ı ekle
+    _gameTime.addDayChangeListener(_onDayChange);
+    
+    debugPrint('✅ OfferService initialized - Daily offer generation active');
+  }
+
+  /// Gün değişiminde otomatik çağrılır
+  void _onDayChange(int oldDay, int newDay) {
+    debugPrint('💰 Daily offer generation triggered (Day $oldDay → $newDay)');
+    _generateDailyOffersAsync();
+  }
+
+  /// Günlük teklifleri oluştur (async olarak)
+  Future<void> _generateDailyOffersAsync() async {
+    try {
+      final offersCreated = await generateDailyOffers();
+      debugPrint('✅ Daily offers generated: $offersCreated new offers');
+    } catch (e) {
+      debugPrint('❌ Error generating daily offers: $e');
+    }
+  }
+
+  /// Servisi temizle
+  void dispose() {
+    _gameTime.removeDayChangeListener(_onDayChange);
+  }
 
   /// Belirli bir ilan için AI teklifleri oluştur
   Future<int> generateOffersForListing(UserVehicle listing) async {
@@ -296,6 +334,9 @@ class OfferService {
     required double newOfferAmount,
   }) async {
     try {
+      // Satıcının önceki karşı teklifi
+      final previousCounterOffer = offer.counterOfferAmount;
+      
       // Yeni bir AI satıcı profili oluştur
       final sellerProfile = SellerProfile.generateRandom();
       
@@ -325,7 +366,42 @@ class OfferService {
         // counter - yeni karşı teklif
         newStatus = OfferStatus.pending;
         newCounterAmount = evaluation['counterAmount'] as double?;
-        newSellerResponse = evaluation['response'] as String;
+        
+        // ✅ BUGFIX: Satıcının karşı teklifi öncekinden yüksek olamaz
+        if (previousCounterOffer != null && newCounterAmount != null) {
+          if (newCounterAmount >= previousCounterOffer) {
+            // Eğer yeni karşı teklif daha yüksekse, iki seçenek var:
+            // 1. Önceki tekliften biraz daha düşük bir teklif ver
+            // 2. Reddet
+            
+            final random = Random();
+            final lowerAmount = previousCounterOffer - (previousCounterOffer * (0.02 + random.nextDouble() * 0.03)); // %2-5 daha düşük
+            
+            // Eğer kullanıcının teklifi satıcının düşebileceği minimum seviyeye yakınsa, kabul et veya reddet
+            if (newOfferAmount >= lowerAmount * 0.95) {
+              // Kabul et
+              newStatus = OfferStatus.accepted;
+              newSellerResponse = _generateAcceptanceResponse();
+              newCounterAmount = null;
+              
+              // Satın alma işlemini tamamla
+              await _processUserOfferAcceptance(offer, offer.buyerId);
+            } else if (lowerAmount > newOfferAmount * 1.1) {
+              // Fark hala çok büyük, reddet
+              newStatus = OfferStatus.rejected;
+              newSellerResponse = _generateRejectionResponse();
+              newCounterAmount = null;
+            } else {
+              // Daha düşük bir karşı teklif ver
+              newCounterAmount = lowerAmount;
+              newSellerResponse = _generateCounterOfferResponse(lowerAmount);
+            }
+          }
+        }
+        
+        if (newStatus == OfferStatus.pending && newCounterAmount != null) {
+          newSellerResponse = evaluation['response'] as String;
+        }
       }
       
       // Offer'ı güncelle

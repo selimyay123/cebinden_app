@@ -21,6 +21,10 @@ class SettingsHelper {
   static const String _keyNotificationPriceDrops = 'notification_price_drops';
   static const String _keyNotificationOffers = 'notification_offers';
   static const String _keyNotificationSystem = 'notification_system';
+  static const String _keyGameStartTime = 'game_start_time';
+  static const String _keyGameDayDuration = 'game_day_duration';
+  static const String _keyLastMarketRefresh = 'last_market_refresh';
+  static const String _keyTotalPlayedMinutes = 'total_played_minutes';
 
   // Dark Mode
   Future<bool> getDarkMode() async {
@@ -62,6 +66,53 @@ class SettingsHelper {
 
   Future<void> setNotificationSystem(bool value) async {
     await _prefs?.setBool(_keyNotificationSystem, value);
+  }
+
+  // Game Time Settings
+  static Future<DateTime?> getGameStartTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = prefs.getInt(_keyGameStartTime);
+    if (timestamp == null) return null;
+    return DateTime.fromMillisecondsSinceEpoch(timestamp);
+  }
+
+  static Future<void> setGameStartTime(DateTime time) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyGameStartTime, time.millisecondsSinceEpoch);
+  }
+
+  static Future<int> getGameDayDuration() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyGameDayDuration) ?? 10; // Default: 10 dakika
+  }
+
+  static Future<void> setGameDayDuration(int minutes) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyGameDayDuration, minutes);
+  }
+
+  // Market Refresh
+  static Future<DateTime?> getLastMarketRefresh() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = prefs.getInt(_keyLastMarketRefresh);
+    if (timestamp == null) return null;
+    return DateTime.fromMillisecondsSinceEpoch(timestamp);
+  }
+
+  static Future<void> setLastMarketRefresh(DateTime time) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyLastMarketRefresh, time.millisecondsSinceEpoch);
+  }
+
+  // Total Played Minutes (Aktif oyun süresi)
+  static Future<int> getTotalPlayedMinutes() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyTotalPlayedMinutes) ?? 0;
+  }
+
+  static Future<void> setTotalPlayedMinutes(int minutes) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyTotalPlayedMinutes, minutes);
   }
 
   // Clear all settings

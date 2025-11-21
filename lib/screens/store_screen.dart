@@ -553,85 +553,17 @@ class _StoreScreenState extends State<StoreScreen> {
 
   void _showConvertGoldDialog() {
     final maxGold = _currentUser!.gold; // Tüm altınları bozdurabilir (double)
-    double selectedGold = 0.01; // Minimum 0.01 altın
+    double selectedGold = 0.1; // 0.1'den başlasın
     
-    final TextEditingController controller = TextEditingController(text: '0.01');
+    final TextEditingController controller = TextEditingController(text: '0.1');
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     String? validationError;
-    String previousValue = '0.01';
-
-    // Controller değişikliklerini dinle
-    controller.addListener(() {
-      final text = controller.text;
-      final cursorPosition = controller.selection.baseOffset;
-      
-      // Boş ise "0.0" yap (silme işlemi engellendi)
-      if (text.isEmpty) {
-        controller.value = const TextEditingValue(
-          text: '0.0',
-          selection: TextSelection.collapsed(offset: 1),
-        );
-        previousValue = '0.0';
-        return;
-      }
-      
-      // Silme işlemi yapıldıysa (text boyutu küçülmüşse) önceki değere dön
-      if (text.length < previousValue.length) {
-        // Silme işlemi engellendi, önceki değere geri dön
-        final oldCursorPos = cursorPosition > 0 ? cursorPosition : 1;
-        controller.value = TextEditingValue(
-          text: previousValue,
-          selection: TextSelection.collapsed(offset: oldCursorPos),
-        );
-        return;
-      }
-      
-      // Birden fazla nokta varsa önceki değere dön
-      if ('.'.allMatches(text).length > 1) {
-        controller.value = TextEditingValue(
-          text: previousValue,
-          selection: TextSelection.collapsed(offset: cursorPosition > 0 ? cursorPosition - 1 : 0),
-        );
-        return;
-      }
-      
-      // Geçerli bir sayı formatı olup olmadığını kontrol et
-      final parsed = double.tryParse(text);
-      if (parsed == null) {
-        // Geçersiz format, önceki değere dön
-        controller.value = TextEditingValue(
-          text: previousValue,
-          selection: TextSelection.collapsed(offset: cursorPosition > 0 ? cursorPosition - 1 : 0),
-        );
-        return;
-      }
-      
-      // Format geçerliyse maksimum 2 ondalık basamak kontrolü
-      if (text.contains('.')) {
-        final parts = text.split('.');
-        if (parts.length == 2 && parts[1].length > 2) {
-          // 2 ondalık basamaktan fazla girildi, önceki değere dön
-          controller.value = TextEditingValue(
-            text: previousValue,
-            selection: TextSelection.collapsed(offset: cursorPosition > 0 ? cursorPosition - 1 : 0),
-          );
-          return;
-        }
-      }
-      
-      previousValue = text;
-    });
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
-          return WillPopScope(
-            onWillPop: () async {
-              controller.dispose();
-              return true;
-            },
-            child: AlertDialog(
+          return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -663,106 +595,149 @@ class _StoreScreenState extends State<StoreScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  // Input alanı + ve - butonları ile
                   Row(
                     children: [
+                      // Azalt butonu (-)
                       IconButton(
-                        onPressed: selectedGold > 0.01
-                            ? () => setDialogState(() {
-                                  selectedGold = (selectedGold - 0.01).clamp(0.01, maxGold);
-                                  selectedGold = double.parse(selectedGold.toStringAsFixed(2));
-                                  controller.text = selectedGold.toStringAsFixed(2);
-                                  validationError = null;
-                                })
+                        onPressed: selectedGold > 0.1
+                            ? () {
+                                setDialogState(() {
+                                  selectedGold = (selectedGold - 0.1).clamp(0.1, maxGold);
+                                  selectedGold = double.parse(selectedGold.toStringAsFixed(1));
+                                  controller.text = selectedGold.toStringAsFixed(1);
+                                  validationError = _validateGoldAmount(controller.text, maxGold);
+                                });
+                              }
                             : null,
-                        icon: const Icon(Icons.remove_circle_outline),
+                        icon: const Icon(Icons.remove_circle_outline, size: 36),
                         color: Colors.deepPurple,
+                        iconSize: 36,
                       ),
+                      // Input (readonly)
                       Expanded(
                         child: TextFormField(
                           controller: controller,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          readOnly: true, // Kullanıcı yazamasın
+                          enableInteractiveSelection: false, // Context menu'yu kapat
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 24,
+                            fontSize: 32,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
                           ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                          ],
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.grey[100],
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
                                 color: validationError != null ? Colors.red : Colors.grey[300]!,
-                                width: 1,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(
-                                color: Colors.deepPurple,
-                                width: 2,
-                              ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
-                                width: 1,
-                              ),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(
-                                color: Colors.red,
                                 width: 2,
                               ),
                             ),
                             suffix: Text(
                               'store.gold'.tr(),
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.grey[600],
                               ),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
+                              horizontal: 20,
+                              vertical: 16,
                             ),
                             errorText: validationError,
                             errorMaxLines: 2,
                           ),
-                          onChanged: (value) {
-                            setDialogState(() {
-                              validationError = _validateGoldAmount(value, maxGold);
-                              if (validationError == null && value.isNotEmpty) {
-                                final parsed = double.tryParse(value);
-                                if (parsed != null) {
-                                  selectedGold = parsed;
-                                }
-                              }
-                            });
-                          },
                           validator: (value) => _validateGoldAmount(value, maxGold),
                         ),
                       ),
+                      // Arttır butonu (+)
                       IconButton(
-                        onPressed: selectedGold < maxGold
-                            ? () => setDialogState(() {
-                                  selectedGold = (selectedGold + 0.01).clamp(0.01, maxGold);
-                                  selectedGold = double.parse(selectedGold.toStringAsFixed(2));
-                                  controller.text = selectedGold.toStringAsFixed(2);
-                                  validationError = null;
-                                })
-                            : null,
-                        icon: const Icon(Icons.add_circle_outline),
+                        onPressed: () {
+                          setDialogState(() {
+                            selectedGold = (selectedGold + 0.1).clamp(0.1, maxGold);
+                            selectedGold = double.parse(selectedGold.toStringAsFixed(1));
+                            controller.text = selectedGold.toStringAsFixed(1);
+                            validationError = _validateGoldAmount(controller.text, maxGold);
+                          });
+                        },
+                        icon: const Icon(Icons.add_circle_outline, size: 36),
                         color: Colors.deepPurple,
+                        iconSize: 36,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Hızlı seçim butonları
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildQuickSelectButton(
+                        context,
+                        '1',
+                        1.0,
+                        maxGold,
+                        () {
+                          setDialogState(() {
+                            if (1.0 <= maxGold) {
+                              selectedGold = 1.0;
+                              controller.text = '1.0';
+                              validationError = _validateGoldAmount(controller.text, maxGold);
+                            }
+                          });
+                        },
+                      ),
+                      _buildQuickSelectButton(
+                        context,
+                        '5',
+                        5.0,
+                        maxGold,
+                        () {
+                          setDialogState(() {
+                            if (5.0 <= maxGold) {
+                              selectedGold = 5.0;
+                              controller.text = '5.0';
+                              validationError = _validateGoldAmount(controller.text, maxGold);
+                            }
+                          });
+                        },
+                      ),
+                      _buildQuickSelectButton(
+                        context,
+                        '10',
+                        10.0,
+                        maxGold,
+                        () {
+                          setDialogState(() {
+                            if (10.0 <= maxGold) {
+                              selectedGold = 10.0;
+                              controller.text = '10.0';
+                              validationError = _validateGoldAmount(controller.text, maxGold);
+                            }
+                          });
+                        },
+                      ),
+                      _buildQuickSelectButton(
+                        context,
+                        '25',
+                        25.0,
+                        maxGold,
+                        () {
+                          setDialogState(() {
+                            if (25.0 <= maxGold) {
+                              selectedGold = 25.0;
+                              controller.text = '25.0';
+                              validationError = _validateGoldAmount(controller.text, maxGold);
+                            }
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -827,7 +802,6 @@ class _StoreScreenState extends State<StoreScreen> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    controller.dispose();
                     Navigator.pop(context);
                   },
                   child: Text('common.cancel'.tr()),
@@ -835,7 +809,6 @@ class _StoreScreenState extends State<StoreScreen> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
-                      controller.dispose();
                       Navigator.pop(context);
                       await _showConvertConfirmDialog(selectedGold);
                     }
@@ -848,9 +821,44 @@ class _StoreScreenState extends State<StoreScreen> {
                   ),
                 ),
               ],
-            ),
-          );
+            );
         },
+      ),
+    );
+  }
+
+  // Hızlı seçim butonu widget'ı
+  Widget _buildQuickSelectButton(
+    BuildContext context,
+    String label,
+    double value,
+    double maxGold,
+    VoidCallback onTap,
+  ) {
+    final isDisabled = value > maxGold;
+    
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: ElevatedButton(
+          onPressed: isDisabled ? null : onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isDisabled ? Colors.grey[300] : Colors.amber[600],
+            foregroundColor: isDisabled ? Colors.grey[600] : Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: isDisabled ? 0 : 2,
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -865,12 +873,12 @@ class _StoreScreenState extends State<StoreScreen> {
       return 'store.invalidNumber'.tr();
     }
 
-    if (parsed < 0.01) {
-      return 'store.minAmount'.tr() + ': 0.01 ${'store.gold'.tr()}';
+    if (parsed < 0.1) {
+      return 'En az 0.1 altın girmelisiniz';
     }
 
     if (parsed > maxGold) {
-      return 'store.maxAmount'.tr() + ': ${maxGold.toStringAsFixed(2)} ${'store.gold'.tr()}';
+      return 'Yetersiz altın! Mevcut: ${maxGold.toStringAsFixed(1)} altın';
     }
 
     return null;

@@ -7,6 +7,9 @@ import 'screens/splash_screen.dart';
 import 'services/database_helper.dart';
 import 'services/localization_service.dart';
 import 'services/ad_service.dart';
+import 'services/game_time_service.dart';
+import 'services/market_refresh_service.dart';
+import 'services/offer_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +27,15 @@ void main() async {
   
   // AdMob'u initialize et (Test Mode)
   await AdService.initialize();
+  
+  // Oyun zamanı sistemini başlat
+  await GameTimeService().initialize();
+  
+  // Pazar yenileme sistemini başlat
+  await MarketRefreshService().initialize();
+  
+  // Günlük teklif sistemini başlat
+  await OfferService().initialize();
   
   runApp(const CebindenApp());
 }

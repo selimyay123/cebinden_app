@@ -7,11 +7,19 @@ import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../services/offer_service.dart';
 import '../services/localization_service.dart';
+import '../utils/brand_colors.dart';
 
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
+  final String? selectedBrand; // null = marka listesi göster, brand = o markanın tekliflerini göster
+  final bool isIncoming; // true = gelen teklifler, false = gönderilen teklifler
   
-  const MyOffersScreen({Key? key, this.initialTab = 0}) : super(key: key);
+  const MyOffersScreen({
+    Key? key,
+    this.initialTab = 0,
+    this.selectedBrand,
+    this.isIncoming = true,
+  }) : super(key: key);
 
   @override
   State<MyOffersScreen> createState() => _MyOffersScreenState();
@@ -23,31 +31,36 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
 
-  late TabController _tabController;
+  late TabController? _tabController;
 
   // Gelen teklifler (kullanıcının ilanlarına gelen)
   List<Offer> _incomingOffers = [];
   Map<String, List<Offer>> _incomingOffersByVehicle = {};
+  Map<String, List<Offer>> _incomingOffersByBrand = {}; // Markaya göre grupla
 
   // Gönderilen teklifler (kullanıcının gönderdiği)
   List<Offer> _sentOffers = [];
+  Map<String, List<Offer>> _sentOffersByBrand = {}; // Markaya göre grupla
 
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-      initialIndex: widget.initialTab,
-    );
+    // Sadece marka seçilmemişse TabController oluştur
+    if (widget.selectedBrand == null) {
+      _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: widget.initialTab,
+      );
+    }
     _loadOffers();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -73,8 +86,26 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         _incomingOffersByVehicle[offer.vehicleId]!.add(offer);
       }
 
+      // Markaya göre grupla (gelen teklifler)
+      _incomingOffersByBrand = {};
+      for (var offer in _incomingOffers) {
+        if (!_incomingOffersByBrand.containsKey(offer.vehicleBrand)) {
+          _incomingOffersByBrand[offer.vehicleBrand] = [];
+        }
+        _incomingOffersByBrand[offer.vehicleBrand]!.add(offer);
+      }
+
       // Gönderilen teklifleri getir (kullanıcının gönderdiği)
       _sentOffers = await _db.getOffersByBuyerId(currentUser.id);
+      
+      // Markaya göre grupla (gönderilen teklifler)
+      _sentOffersByBrand = {};
+      for (var offer in _sentOffers) {
+        if (!_sentOffersByBrand.containsKey(offer.vehicleBrand)) {
+          _sentOffersByBrand[offer.vehicleBrand] = [];
+        }
+        _sentOffersByBrand[offer.vehicleBrand]!.add(offer);
+      }
     } catch (e) {
       
     }
@@ -84,6 +115,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Eğer seçili bir marka varsa, o markanın tekliflerini göster
+    if (widget.selectedBrand != null) {
+      return _buildBrandOffersScreen();
+    }
+    
+    // Aksi takdirde, tab view ile marka listelerini göster
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -92,7 +129,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         foregroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
-          controller: _tabController,
+          controller: _tabController!,
           indicatorColor: Colors.white,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
@@ -111,40 +148,204 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : TabBarView(
-              controller: _tabController,
+              controller: _tabController!,
               children: [
-                // Gelen Teklifler
+                // Gelen Teklifler - Marka Listesi
                 _incomingOffers.isEmpty
                     ? _buildEmptyState(isIncoming: true)
-                    : RefreshIndicator(
-                        onRefresh: _loadOffers,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _incomingOffersByVehicle.length,
-                          itemBuilder: (context, index) {
-                            final vehicleId =
-                                _incomingOffersByVehicle.keys.elementAt(index);
-                            final offers = _incomingOffersByVehicle[vehicleId]!;
-                            return _buildVehicleCard(vehicleId, offers);
-                          },
-                        ),
-                      ),
+                    : _buildBrandList(isIncoming: true),
 
-                // Gönderilen Teklifler
+                // Gönderilen Teklifler - Marka Listesi
                 _sentOffers.isEmpty
                     ? _buildEmptyState(isIncoming: false)
-                    : RefreshIndicator(
-                        onRefresh: _loadOffers,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _sentOffers.length,
-                          itemBuilder: (context, index) {
-                            return _buildSentOfferCard(_sentOffers[index]);
-                          },
-                        ),
-                      ),
+                    : _buildBrandList(isIncoming: false),
               ],
             ),
+    );
+  }
+
+  // Marka listesi (Grid view)
+  Widget _buildBrandList({required bool isIncoming}) {
+    final brandMap = isIncoming ? _incomingOffersByBrand : _sentOffersByBrand;
+    
+    return RefreshIndicator(
+      onRefresh: _loadOffers,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1.2,
+        ),
+        itemCount: brandMap.length,
+        itemBuilder: (context, index) {
+          final brand = brandMap.keys.elementAt(index);
+          final offers = brandMap[brand]!;
+          return _buildBrandCard(brand, offers.length, isIncoming);
+        },
+      ),
+    );
+  }
+
+  // Marka kartı widget'ı
+  Widget _buildBrandCard(String brand, int offerCount, bool isIncoming) {
+    final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepOrange);
+    
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyOffersScreen(
+              selectedBrand: brand,
+              isIncoming: isIncoming,
+              initialTab: isIncoming ? 0 : 1,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Arkaplan dekoratif eleman
+            Positioned(
+              right: -20,
+              bottom: -20,
+              child: Icon(
+                isIncoming ? Icons.inbox : Icons.send,
+                size: 100,
+                color: brandColor.withOpacity(0.1),
+              ),
+            ),
+            
+            // İçerik
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Badge (Teklif Sayısı)
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: brandColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: brandColor.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        '$offerCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Marka İsmi
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        brand,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: brandColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        offerCount == 1 
+                          ? '1 teklif' 
+                          : '$offerCount teklif',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Seçili markanın tekliflerini gösteren ekran
+  Widget _buildBrandOffersScreen() {
+    final isIncoming = widget.isIncoming;
+    final brandOffers = isIncoming 
+        ? _incomingOffersByBrand[widget.selectedBrand] ?? []
+        : _sentOffersByBrand[widget.selectedBrand] ?? [];
+    
+    // Gelen teklifler için araca göre grupla
+    Map<String, List<Offer>> offersByVehicle = {};
+    if (isIncoming) {
+      for (var offer in brandOffers) {
+        if (!offersByVehicle.containsKey(offer.vehicleId)) {
+          offersByVehicle[offer.vehicleId] = [];
+        }
+        offersByVehicle[offer.vehicleId]!.add(offer);
+      }
+    }
+    
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: Text(widget.selectedBrand!),
+        backgroundColor: Colors.deepOrange,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : brandOffers.isEmpty
+              ? _buildEmptyState(isIncoming: isIncoming)
+              : RefreshIndicator(
+                  onRefresh: _loadOffers,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: isIncoming ? offersByVehicle.length : brandOffers.length,
+                    itemBuilder: (context, index) {
+                      if (isIncoming) {
+                        final vehicleId = offersByVehicle.keys.elementAt(index);
+                        final offers = offersByVehicle[vehicleId]!;
+                        return _buildVehicleCard(vehicleId, offers);
+                      } else {
+                        return _buildSentOfferCard(brandOffers[index]);
+                      }
+                    },
+                  ),
+                ),
     );
   }
 
@@ -361,6 +562,25 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final percentDiff = offer.offerPercentage;
     final isGoodOffer = percentDiff >= -10; // -%10'dan az düşük ise iyi teklif
 
+    return FutureBuilder<UserVehicle?>(
+      future: _db.getUserVehicleById(offer.vehicleId),
+      builder: (context, snapshot) {
+        final vehicle = snapshot.data;
+        return _buildOfferTileContent(offer, vehicle, percentDiff, isGoodOffer, compact);
+      },
+    );
+  }
+
+  Widget _buildOfferTileContent(Offer offer, UserVehicle? vehicle, double percentDiff, bool isGoodOffer, bool compact) {
+    // Kar/Zarar hesaplama
+    double? profitLoss;
+    double? profitLossPercentage;
+    
+    if (vehicle != null) {
+      profitLoss = offer.offerPrice - vehicle.purchasePrice;
+      profitLossPercentage = (profitLoss / vehicle.purchasePrice) * 100;
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -455,6 +675,99 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
             ],
           ),
+
+          // Kar/Zarar Analizi
+          if (profitLoss != null && !compact) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: profitLoss >= 0 ? Colors.green.shade50 : Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: profitLoss >= 0 ? Colors.green.shade300 : Colors.red.shade300,
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            profitLoss >= 0 ? Icons.trending_up : Icons.trending_down,
+                            color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            profitLoss >= 0 ? 'Kar' : 'Zarar',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '${profitLoss >= 0 ? '+' : ''}${_formatCurrency(profitLoss)} ₺',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Kar/Zarar Oranı:',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      Text(
+                        '${profitLossPercentage! >= 0 ? '+' : ''}${profitLossPercentage.toStringAsFixed(1)}%',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Satın Alma Fiyatı:',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      Text(
+                        '${_formatCurrency(vehicle!.purchasePrice)} ₺',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           // Mesaj
           if (offer.message != null && !compact) ...[

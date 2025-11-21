@@ -4,6 +4,7 @@ import '../services/settings_helper.dart';
 import '../services/database_helper.dart';
 import '../services/offer_service.dart';
 import '../services/localization_service.dart';
+import '../services/game_time_service.dart';
 import '../models/user_model.dart';
 import 'profile_info_screen.dart';
 import 'change_password_screen.dart';
@@ -21,6 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
   final LocalizationService _localizationService = LocalizationService();
+  final GameTimeService _gameTimeService = GameTimeService();
   late SettingsHelper _settingsHelper;
   User? _currentUser;
   bool _isLoading = true;
@@ -33,6 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationPriceDrops = true;
   bool _notificationOffers = true;
   bool _notificationSystem = true;
+  int _gameDayDuration = 10; // Dakika cinsinden
 
   @override
   void initState() {
@@ -56,6 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final priceDrops = await _settingsHelper.getNotificationPriceDrops();
       final offers = await _settingsHelper.getNotificationOffers();
       final system = await _settingsHelper.getNotificationSystem();
+      final gameDayDuration = await SettingsHelper.getGameDayDuration();
 
       setState(() {
         _darkMode = darkMode;
@@ -64,6 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _notificationPriceDrops = priceDrops;
         _notificationOffers = offers;
         _notificationSystem = system;
+        _gameDayDuration = gameDayDuration;
         _isLoading = false;
       });
     } catch (e) {
@@ -75,6 +80,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Şimdilik sadece ayarı kaydet, theme değişimi yakında eklenecek
     setState(() => _darkMode = value);
     await _settingsHelper.setDarkMode(value);
+  }
+  
+  Future<void> _changeGameDayDuration(int? minutes) async {
+    if (minutes == null || minutes == _gameDayDuration) return;
+    
+    setState(() => _gameDayDuration = minutes);
+    await _gameTimeService.setGameDayDuration(minutes);
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Oyun günü süresi $minutes dakika olarak ayarlandı'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
   Future<void> _changeLanguage(String? languageCode) async {
@@ -446,6 +467,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                   onChanged: _updateCurrency,
                 ),
+              ),
+            ],
+          ),
+
+          // Oyun Ayarları
+          _buildSection(
+            title: 'Oyun Ayarları',
+            children: [
+              _buildListTile(
+                icon: Icons.access_time,
+                title: 'Oyun Günü Süresi',
+                subtitle: '1 oyun günü = $_gameDayDuration dakika (gerçek zaman)',
+                trailing: DropdownButton<int>(
+                  value: _gameDayDuration,
+                  underline: const SizedBox(),
+                  items: const [
+                    DropdownMenuItem(value: 5, child: Text('5 dk')),
+                    DropdownMenuItem(value: 10, child: Text('10 dk')),
+                    DropdownMenuItem(value: 15, child: Text('15 dk')),
+                    DropdownMenuItem(value: 20, child: Text('20 dk')),
+                    DropdownMenuItem(value: 30, child: Text('30 dk')),
+                  ],
+                  onChanged: _changeGameDayDuration,
+                ),
+              ),
+              _buildListTile(
+                icon: Icons.calendar_today,
+                title: 'Mevcut Oyun Zamanı',
+                subtitle: _gameTimeService.getFormattedGameTime(),
+                trailing: const Icon(Icons.info_outline, size: 20),
               ),
             ],
           ),

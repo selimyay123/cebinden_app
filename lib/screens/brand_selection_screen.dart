@@ -21,13 +21,6 @@ class BrandSelectionScreen extends StatelessWidget {
         // Simülasyon araç markaları (telif riski olmayan isimler)
         final brands = [
       {
-        'name': 'Alfio',
-        'originalHint': 'İtalyan spor karakteri',
-        'color': Colors.red,
-        'icon': 'A',
-        'imagePath': 'assets/images/car_brands/alfio.jpeg',
-      },
-      {
         'name': 'Audira', // Audi
         'originalHint': 'Alman lüks performansı',
         'color': Colors.grey[800]!,
@@ -41,16 +34,16 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'B',
         'imagePath': 'assets/images/car_brands/bmv.jpeg',
       },
-      // {
-      //   'name': 'Chevro',
-      //   'originalHint': 'Amerikan gücü',
-      //   'color': Colors.amber[700]!,
-      //   'icon': 'C',
-      //   'imagePath': 'assets/images/car_brands/chevro.jpeg',
-      // },
+      {
+        'name': 'Citronix', // Citroen
+        'originalHint': 'Fransız konforu',
+        'color': Colors.red[400]!,
+        'icon': 'C',
+        'imagePath': 'assets/images/car_brands/alfio.jpeg',
+      },
       {
         'name': 'Fialto', // Fiat
-        'originalHint': 'test',
+        'originalHint': 'İtalyan pratikliği',
         'color': Colors.red[600]!,
         'icon': 'F',
         'imagePath': 'assets/images/car_brands/fait.jpeg',
@@ -76,13 +69,6 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'H',
         'imagePath': 'assets/images/car_brands/hondia.jpeg',
       },
-      // {
-      //   'name': 'Kio',
-      //   'originalHint': 'Kore tasarımı',
-      //   'color': Colors.red[800]!,
-      //   'icon': 'K',
-      //   'imagePath': 'assets/images/car_brands/kio.jpeg',
-      // },
       {
         'name': 'Mercurion', // Mercedes
         'originalHint': 'Alman lüksü',
@@ -90,20 +76,6 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'M',
         'imagePath': 'assets/images/car_brands/mercedez.jpeg',
       },
-      // {
-      //   'name': 'Mazdo',
-      //   'originalHint': 'Japon dinamizmi',
-      //   'color': Colors.red[900]!,
-      //   'icon': 'M',
-      //   'imagePath': 'assets/images/car_brands/mazdo.jpeg',
-      // },
-      // {
-      //   'name': 'Nissano',
-      //   'originalHint': 'Japon inovasyonu',
-      //   'color': Colors.grey[800]!,
-      //   'icon': 'N',
-      //   'imagePath': 'assets/images/car_brands/nissano.jpeg',
-      // },
       {
         'name': 'Opexel', // Opel
         'originalHint': 'Alman pratikliği',
@@ -125,13 +97,6 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'R',
         'imagePath': 'assets/images/car_brands/renol.jpeg',
       },
-      // {
-      //   'name': 'Seato',
-      //   'originalHint': 'İspanyol tutkusu',
-      //   'color': Colors.red[700]!,
-      //   'icon': 'S',
-      //   'imagePath': 'assets/images/car_brands/seato.jpeg',
-      // },
       {
         'name': 'Skodra', // Škoda
         'originalHint': 'Çek değeri',
@@ -153,13 +118,6 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'V',
         'imagePath': 'assets/images/car_brands/volksvan.jpeg',
       },
-      // {
-      //   'name': 'Volvy',
-      //   'originalHint': 'İsveç güvenliği',
-      //   'color': Colors.blue[900]!,
-      //   'icon': 'V',
-      //   'imagePath': 'assets/images/car_brands/volvy.jpeg',
-      // },
     ];
 
     // Alfabetik sırala

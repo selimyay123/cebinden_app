@@ -4,11 +4,17 @@ import '../models/user_vehicle_model.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../utils/brand_colors.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
-  const MyVehiclesScreen({super.key});
+  final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
+
+  const MyVehiclesScreen({
+    super.key,
+    this.selectedBrand,
+  });
 
   @override
   State<MyVehiclesScreen> createState() => _MyVehiclesScreenState();
@@ -21,6 +27,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
   User? _currentUser;
   List<UserVehicle> _myVehicles = [];
   bool _isLoading = true;
+  
+  // Marka bazında gruplandırılmış araçlar
+  Map<String, List<UserVehicle>> _vehiclesByBrand = {};
 
   @override
   void initState() {
@@ -34,9 +43,20 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     final user = await _authService.getCurrentUser();
     if (user != null) {
       final vehicles = await _db.getUserActiveVehicles(user.id);
+      
+      // Araçları markaya göre gruplandır
+      final Map<String, List<UserVehicle>> grouped = {};
+      for (var vehicle in vehicles) {
+        if (!grouped.containsKey(vehicle.brand)) {
+          grouped[vehicle.brand] = [];
+        }
+        grouped[vehicle.brand]!.add(vehicle);
+      }
+      
       setState(() {
         _currentUser = user;
         _myVehicles = vehicles;
+        _vehiclesByBrand = grouped;
         _isLoading = false;
       });
     } else {
@@ -52,28 +72,169 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
         return Scaffold(
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
-            title: Text('home.myVehicles'.tr()),
+            title: Text(widget.selectedBrand != null 
+              ? widget.selectedBrand! 
+              : 'home.myVehicles'.tr()),
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
             elevation: 0,
           ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _myVehicles.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadMyVehicles,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _myVehicles.length,
-                    itemBuilder: (context, index) {
-                      final vehicle = _myVehicles[index];
-                      return _buildVehicleCard(vehicle);
-                    },
-                  ),
-                ),
+          body: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _myVehicles.isEmpty
+                  ? _buildEmptyState()
+                  : widget.selectedBrand != null
+                      ? _buildVehicleList()
+                      : _buildBrandList(),
         );
       },
+    );
+  }
+  
+  // Marka listesi (1. seviye)
+  Widget _buildBrandList() {
+    return RefreshIndicator(
+      onRefresh: _loadMyVehicles,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1.2,
+        ),
+        itemCount: _vehiclesByBrand.length,
+        itemBuilder: (context, index) {
+          final brand = _vehiclesByBrand.keys.elementAt(index);
+          final vehicles = _vehiclesByBrand[brand]!;
+          return _buildBrandCard(brand, vehicles.length);
+        },
+      ),
+    );
+  }
+  
+  // Belirli bir markanın araç listesi (2. seviye)
+  Widget _buildVehicleList() {
+    final brandVehicles = _vehiclesByBrand[widget.selectedBrand] ?? [];
+    
+    return RefreshIndicator(
+      onRefresh: _loadMyVehicles,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: brandVehicles.length,
+        itemBuilder: (context, index) {
+          final vehicle = brandVehicles[index];
+          return _buildVehicleCard(vehicle);
+        },
+      ),
+    );
+  }
+
+  // Marka kartı widget'ı
+  Widget _buildBrandCard(String brand, int vehicleCount) {
+    final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepPurple);
+    
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyVehiclesScreen(selectedBrand: brand),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Arkaplan dekoratif eleman
+            Positioned(
+              right: -20,
+              bottom: -20,
+              child: Icon(
+                Icons.directions_car,
+                size: 100,
+                color: brandColor.withOpacity(0.1),
+              ),
+            ),
+            
+            // İçerik
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Badge (Araç Sayısı)
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: brandColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: brandColor.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        '$vehicleCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Marka İsmi
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        brand,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: brandColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        vehicleCount == 1 
+                          ? '1 araç' 
+                          : '$vehicleCount araç',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

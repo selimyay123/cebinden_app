@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import '../services/localization_service.dart';
+import '../services/market_refresh_service.dart';
 import '../models/vehicle_model.dart';
 import 'vehicle_detail_screen.dart';
 
@@ -21,6 +21,8 @@ class VehicleListScreen extends StatefulWidget {
 }
 
 class _VehicleListScreenState extends State<VehicleListScreen> {
+  final MarketRefreshService _marketService = MarketRefreshService();
+  
   List<Vehicle> allVehicles = []; // Tüm araçlar
   List<Vehicle> filteredVehicles = []; // Filtrelenmiş araçlar
   
@@ -34,8 +36,15 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   @override
   void initState() {
     super.initState();
-    allVehicles = _generateMockVehicles();
-    filteredVehicles = List.from(allVehicles);
+    _loadVehicles();
+  }
+  
+  // Araçları market servisinden yükle
+  void _loadVehicles() {
+    setState(() {
+      allVehicles = _marketService.getActiveListings(brand: widget.brandName);
+      filteredVehicles = List.from(allVehicles);
+    });
   }
   
   // Filtreleri uygula
@@ -91,149 +100,6 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       selectedYearRange = null;
       filteredVehicles = allVehicles;
     });
-  }
-
-  // Mock araç verileri oluştur
-  List<Vehicle> _generateMockVehicles() {
-    final random = Random();
-    
-    final cities = [
-      'İstanbul', 'Ankara', 'İzmir', 'Antalya', 'Bursa',
-      'Adana', 'Gaziantep', 'Konya', 'Mersin', 'Kayseri'
-    ];
-    
-    final colors = [
-      'Beyaz', 'Siyah', 'Gri', 'Kırmızı', 'Mavi',
-      'Gümüş', 'Kahverengi', 'Yeşil'
-    ];
-    
-    final fuelTypes = ['Benzin', 'Dizel', 'Hybrid', 'Elektrik'];
-    final transmissions = ['Manuel', 'Otomatik'];
-    final engineSizes = ['1.0', '1.2', '1.4', '1.6', '1.8', '2.0', '2.2', '2.5', '3.0'];
-    final driveTypes = ['Önden', 'Arkadan', '4x4'];
-    final bodyTypes = ['Sedan', 'Hatchback', 'SUV', 'Coupe', 'Station Wagon', 'MPV'];
-    final sellerTypes = ['Sahibinden', 'Galeriden'];
-    
-    // İlan açıklamaları (profesyonel + nadiren komik)
-    final descriptions = [
-      // Profesyonel Açıklamalar
-      'Tek elden, bakımlı ve temiz kullanım. Tüm periyodik bakımları zamanında yapılmıştır. Orjinal boyasında, değişen-boyanan yok. Görüşmeye ve teklif yapmaya açığız.',
-      'Hasarsız, bakımlı ve sorunsuz bir araç. Tüm servis kayıtları elimizde mevcuttur. Muayenesi yeni alınmıştır. Takas ve kredi kartına taksit imkanı vardır.',
-      'Garaj arabası. Hep düzenli kullanılmış, her zaman bakımlı kalınmıştır. Detaylı bilgi ve görüntüler için arayabilirsiniz. Fiyat konusunda teklife açığız.',
-      'Aileden satılık araç. Yıllardır bu aracı kullandık, sorunsuz bir araçtır. Makul tekliflere açığız. Nakit veya krediye uygun şartlarla.',
-      'Sıfır km\'den beri tüm bakımları yetkili serviste yapılmıştır. Trafik sigortası ve kasko güncel. Araç her anlamda hazır ve eksiksizdir.',
-      'İkinci el ama sıfır gibi. Tramer kaydı temiz, hasar yok. Yakın zamanda lastikler değiştirildi. Motor ve şanzıman sorunsuz.',
-      'Ekonomik ve güvenilir araç. Şehir içi ve şehirlerarası rahat kullanım. Full bakımlı, her şey orjinal. Görüşmede detayları anlatırız.',
-      'Değişensiz, boyasız ve hasarsız araç. Ailenin ikinci aracı olarak kullanılmıştır. Az km\'de, temiz kullanım. Fiyat piyasa rayicindedir.',
-      'Yerli muayene ile hazır. Motor, şanzıman, klima, elektrik sorunsuz. Orjinal çıkma ve hatasız araç. Kredi ve takasa açığız.',
-      'Kullanılmış ancak çok bakımlı araç. Tüm özellikleri çalışır durumda. Hiçbir gizli kusur yok. İstediğiniz ustaya kontrol ettirebilirsiniz.',
-      'Orjinal km garantili. İlk alıcıdan satılık. Hiç hasar görmemiş, çarpma yok. Teklif edebilirsiniz, uygun görürsek anlaşırız.',
-      'Temiz, bakımlı ve sorunsuz araç. Şehir içi ve yol için idealdir. Her türlü kontrole açık. Ciddi alıcılara indirim yapılabilir.',
-      'Aile arabası. Sağlam, güvenilir ve ekonomik. Uzun yol deneyimliyiz bu araçla. Sorunu yok, her şey mükemmel çalışıyor.',
-      'Full paket, eksiksiz araç. Tüm konfor özellikleri mevcut. Bakım masrafı çok düşük. Piyasanın en ucuz ve en temiz ilanı.',
-      'Tramer raporu temiz. Pert kaydı yok. Aracı beğenmezseniz para iade. Kesinlikle kusursuz bir araç. Test sürüşü yapabilirsiniz.',
-      'Garantili araç. Satış sonrası 1 ay içinde herhangi bir mekanik arıza çıkarsa karşılarız. Güvenle alabilirsiniz.',
-      'Orjinal, boyasız, değişensiz araç. Kaportada çizik veya çarpma yok. Motor ve mekanik aksam yeni gibi. Uzman kontrolü yapılmıştır.',
-      'Düzenli servis geçmişi olan araç. Her türlü bakım zamanında yapılmıştır. Eksik yok, kusur yok. Sorunsuz kullanım garantisi veriyoruz.',
-      // Nadiren Komik
-      'Bu araç benim için bir aile dostu gibiydi. Şimdi ailesi değişsin, siz mutlu olun. Ben de yeni araba alacak kadar mutlu olayım! 😊',
-      'Komşularım bu arabayı o kadar çok beğeniyor ki, artık onların bakışlarından kaçmak için satıyorum. Şaka bir yana, çok iyi araç! 😄',
-    ];
-    
-    // Markaya özel model isimleri
-    final modelsByBrand = {
-      'BMV': ['316i', '318i', '320i', '520d', 'X3', 'X5'],
-      'Mercedez': ['C180', 'C200', 'E200', 'E220d', 'GLE', 'GLA'],
-      'Audix': ['A3', 'A4', 'A6', 'Q3', 'Q5', 'Q7'],
-      'Toyoto': ['Corolla', 'Camry', 'RAV4', 'C-HR', 'Yaris'],
-      'Volksvan': ['Golf', 'Polo', 'Passat', 'Tiguan', 'T-Roc'],
-      'Forde': ['Focus', 'Fiesta', 'Mondeo', 'Kuga', 'Puma'],
-      'Renauva': ['Megira', 'Fluencio', 'Symbra', 'Taliora', 'Talismar', 'Latidora', 'Zoré', 'Scenara', 'Lagura'],
-      'Pejo': ['208', '308', '3008', '5008', '2008'],
-      'Hondia': ['Civic', 'Accord', 'CR-V', 'Jazz', 'HR-V'],
-      'Hyunday': ['i20', 'i30', 'Tucson', 'Kona', 'Elantra'],
-      'Kio': ['Sportage', 'Ceed', 'Picanto', 'Stonic', 'XCeed'],
-      'Nissano': ['Micra', 'Qashqai', 'Juke', 'X-Trail', 'Leaf'],
-      'Mazdo': ['2', '3', '6', 'CX-3', 'CX-5'],
-      'Seato': ['Ibiza', 'Leon', 'Arona', 'Ateca', 'Tarraco'],
-      'Škodai': ['Fabia', 'Octavia', 'Superb', 'Karoq', 'Kodiaq'],
-      'Volvy': ['S60', 'V60', 'XC40', 'XC60', 'XC90'],
-      'Alfio': ['Giulia', 'Stelvio', 'Giulietta', 'Tonale'],
-      'Chevro': ['Cruze', 'Aveo', 'Captiva', 'Trax'],
-      'Fait Motors': ['Egea', '500', 'Tipo', 'Panda', 'Doblo'],
-      'Opex': ['Corsa', 'Astra', 'Insignia', 'Crossland', 'Grandland'],
-    };
-    
-    final List<Vehicle> generatedVehicles = [];
-    
-    // Eğer brandName null ise, tüm markalardan araç üret
-    if (widget.brandName == null) {
-      // Her markadan 3-5 araç üret
-      for (var brand in modelsByBrand.keys) {
-        final models = modelsByBrand[brand]!;
-        final vehicleCount = 3 + random.nextInt(3); // 3-5 araç
-        
-        for (int i = 0; i < vehicleCount; i++) {
-          generatedVehicles.add(
-            Vehicle.create(
-              brand: brand,
-              model: models[random.nextInt(models.length)],
-              year: 2015 + random.nextInt(10), // 2015-2024
-              mileage: random.nextInt(200000) + 10000, // 10k-210k km
-              price: (random.nextInt(50) + 20) * 10000.0, // 200k-700k TL
-              location: cities[random.nextInt(cities.length)],
-              color: colors[random.nextInt(colors.length)],
-              fuelType: fuelTypes[random.nextInt(fuelTypes.length)],
-              transmission: transmissions[random.nextInt(transmissions.length)],
-              condition: 'İkinci El',
-              engineSize: engineSizes[random.nextInt(engineSizes.length)],
-              driveType: driveTypes[random.nextInt(driveTypes.length)],
-              hasWarranty: random.nextBool(),
-              hasAccidentRecord: random.nextInt(10) < 2, // %20 ihtimalle hasar kaydı
-              description: descriptions[random.nextInt(descriptions.length)],
-              bodyType: bodyTypes[random.nextInt(bodyTypes.length)],
-              horsepower: 100 + random.nextInt(300), // 100-400 HP
-              sellerType: sellerTypes[random.nextInt(sellerTypes.length)],
-            ),
-          );
-        }
-      }
-    } else {
-      // Sadece seçilen markadan araç üret
-      final models = modelsByBrand[widget.brandName] ?? ['Sedan', 'Hatchback', 'SUV', 'Coupe'];
-      final vehicleCount = 10 + random.nextInt(6); // 10-15 araç
-      
-      for (int i = 0; i < vehicleCount; i++) {
-        generatedVehicles.add(
-          Vehicle.create(
-            brand: widget.brandName!,
-            model: models[random.nextInt(models.length)],
-            year: 2015 + random.nextInt(10), // 2015-2024
-            mileage: random.nextInt(200000) + 10000, // 10k-210k km
-            price: (random.nextInt(50) + 20) * 10000.0, // 200k-700k TL
-            location: cities[random.nextInt(cities.length)],
-            color: colors[random.nextInt(colors.length)],
-            fuelType: fuelTypes[random.nextInt(fuelTypes.length)],
-            transmission: transmissions[random.nextInt(transmissions.length)],
-            condition: 'İkinci El',
-            engineSize: engineSizes[random.nextInt(engineSizes.length)],
-            driveType: driveTypes[random.nextInt(driveTypes.length)],
-            hasWarranty: random.nextBool(),
-            hasAccidentRecord: random.nextInt(10) < 2, // %20 ihtimalle hasar kaydı
-            description: descriptions[random.nextInt(descriptions.length)],
-            bodyType: bodyTypes[random.nextInt(bodyTypes.length)],
-            horsepower: 100 + random.nextInt(300), // 100-400 HP
-            sellerType: sellerTypes[random.nextInt(sellerTypes.length)],
-          ),
-        );
-      }
-    }
-    
-    // Fiyata göre sırala (ucuzdan pahalıya)
-    generatedVehicles.sort((a, b) => a.price.compareTo(b.price));
-    
-    
-    return generatedVehicles;
   }
 
   @override
@@ -684,7 +550,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
           enabled: false,
           child: StatefulBuilder(
             builder: (context, setMenuState) {
-              return Container(
+              return SizedBox(
                 width: 250,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -737,7 +603,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                               ),
                             ),
                             if (selectedValues.contains(option))
-                              Icon(Icons.check, color: Colors.green, size: 20),
+                              const Icon(Icons.check, color: Colors.green, size: 20),
                           ],
                         ),
                       ),
@@ -799,7 +665,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
           enabled: false,
           child: StatefulBuilder(
             builder: (context, setMenuState) {
-              return Container(
+              return SizedBox(
                 width: 250,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -848,7 +714,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                               ),
                             ),
                             if (selectedValue == entry.key)
-                              Icon(Icons.check, color: Colors.green, size: 20),
+                              const Icon(Icons.check, color: Colors.green, size: 20),
                           ],
                         ),
                       ),

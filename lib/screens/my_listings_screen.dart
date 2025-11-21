@@ -4,10 +4,16 @@ import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
+import '../utils/brand_colors.dart';
 import 'package:intl/intl.dart';
 
 class MyListingsScreen extends StatefulWidget {
-  const MyListingsScreen({super.key});
+  final String? selectedBrand; // null = marka listesi göster, brand = o markanın ilanlarını göster
+
+  const MyListingsScreen({
+    super.key,
+    this.selectedBrand,
+  });
 
   @override
   State<MyListingsScreen> createState() => _MyListingsScreenState();
@@ -18,6 +24,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
   final AuthService _authService = AuthService();
   List<UserVehicle> _userListedVehicles = [];
   bool _isLoading = true;
+  
+  // Marka bazında gruplandırılmış ilanlar
+  Map<String, List<UserVehicle>> _listingsByBrand = {};
 
   @override
   void initState() {
@@ -32,13 +41,25 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     final currentUser = await _authService.getCurrentUser();
     if (currentUser != null) {
       final listedVehicles = await _db.getUserListedVehicles(currentUser.id);
+      
+      // İlanları markaya göre gruplandır
+      final Map<String, List<UserVehicle>> grouped = {};
+      for (var vehicle in listedVehicles) {
+        if (!grouped.containsKey(vehicle.brand)) {
+          grouped[vehicle.brand] = [];
+        }
+        grouped[vehicle.brand]!.add(vehicle);
+      }
+      
       setState(() {
         _userListedVehicles = listedVehicles;
+        _listingsByBrand = grouped;
         _isLoading = false;
       });
     } else {
       setState(() {
         _userListedVehicles = [];
+        _listingsByBrand = {};
         _isLoading = false;
       });
     }
@@ -50,29 +71,171 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
         return Scaffold(
+          backgroundColor: Colors.grey[100],
           appBar: AppBar(
-            title: Text('listings.title'.tr()),
+            title: Text(widget.selectedBrand != null 
+              ? widget.selectedBrand! 
+              : 'listings.title'.tr()),
             elevation: 0,
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
           ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadUserListedVehicles,
-              child: _userListedVehicles.isEmpty
+          body: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _userListedVehicles.isEmpty
                   ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _userListedVehicles.length,
-                      itemBuilder: (context, index) {
-                        final vehicle = _userListedVehicles[index];
-                        return _buildListingCard(vehicle);
-                      },
-                    ),
-            ),
+                  : widget.selectedBrand != null
+                      ? _buildListingList()
+                      : _buildBrandList(),
         );
       },
+    );
+  }
+  
+  // Marka listesi (1. seviye)
+  Widget _buildBrandList() {
+    return RefreshIndicator(
+      onRefresh: _loadUserListedVehicles,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 1.2,
+        ),
+        itemCount: _listingsByBrand.length,
+        itemBuilder: (context, index) {
+          final brand = _listingsByBrand.keys.elementAt(index);
+          final listings = _listingsByBrand[brand]!;
+          return _buildBrandCard(brand, listings.length);
+        },
+      ),
+    );
+  }
+  
+  // Belirli bir markanın ilan listesi (2. seviye)
+  Widget _buildListingList() {
+    final brandListings = _listingsByBrand[widget.selectedBrand] ?? [];
+    
+    return RefreshIndicator(
+      onRefresh: _loadUserListedVehicles,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: brandListings.length,
+        itemBuilder: (context, index) {
+          final vehicle = brandListings[index];
+          return _buildListingCard(vehicle);
+        },
+      ),
+    );
+  }
+
+  // Marka kartı widget'ı
+  Widget _buildBrandCard(String brand, int listingCount) {
+    final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepPurple);
+    
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyListingsScreen(selectedBrand: brand),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Arkaplan dekoratif eleman
+            Positioned(
+              right: -20,
+              bottom: -20,
+              child: Icon(
+                Icons.store,
+                size: 100,
+                color: brandColor.withOpacity(0.1),
+              ),
+            ),
+            
+            // İçerik
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Badge (İlan Sayısı)
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: brandColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: brandColor.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        '$listingCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Marka İsmi
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        brand,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: brandColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        listingCount == 1 
+                          ? '1 ilan' 
+                          : '$listingCount ilan',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
