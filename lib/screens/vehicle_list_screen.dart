@@ -148,7 +148,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       'Toyoto': ['Corolla', 'Camry', 'RAV4', 'C-HR', 'Yaris'],
       'Volksvan': ['Golf', 'Polo', 'Passat', 'Tiguan', 'T-Roc'],
       'Forde': ['Focus', 'Fiesta', 'Mondeo', 'Kuga', 'Puma'],
-      'Renol': ['Clio', 'Megane', 'Taliant', 'Kadjar', 'Captur'],
+      'Renauva': ['Megira', 'Fluencio', 'Symbra', 'Taliora', 'Talismar', 'Latidora', 'Zoré', 'Scenara', 'Lagura'],
       'Pejo': ['208', '308', '3008', '5008', '2008'],
       'Hondia': ['Civic', 'Accord', 'CR-V', 'Jazz', 'HR-V'],
       'Hyunday': ['i20', 'i30', 'Tucson', 'Kona', 'Elantra'],

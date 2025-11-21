@@ -25,7 +25,7 @@
     "sort": "Sırala",
     "refresh": "Yenile",
     "share": "Paylaş",
-    "currency": "TL",
+    "currency": "₺",
     "continue": "Devam Et",
     "active": "Aktif",
     "dear": "Sayın"
@@ -279,6 +279,7 @@
     "message": "Mesaj",
     "accept": "Kabul Et",
     "reject": "Reddet",
+    "sendCounterOffer": "Karşı Teklif Ver",
     "acceptConfirm": "Teklifi Kabul Et",
     "acceptConfirmMessage": "kullanıcısının teklifini kabul etmek istediğinizden emin misiniz?",
     "acceptSuccess": "✅ Teklif kabul edildi! Satış başarıyla tamamlandı.",
@@ -293,6 +294,16 @@
     "otherOffersRejected": "• Diğer teklifler otomatik reddedilecek",
     "offerAccepted": "KABUL EDİLDİ",
     "offerRejected": "REDDEDİLDİ",
+    "counterOfferDialogTitle": "Karşı Teklif Ver",
+    "counterOfferDialogDesc": "Alıcının teklifine karşılık vereceğiniz fiyatı belirleyin",
+    "buyerOffer": "Alıcının Teklifi",
+    "yourCounterOffer": "Karşı Teklifiniz",
+    "counterOfferHint": "Karşı teklif tutarını girin",
+    "counterOfferInfo": "İyi bir karşı teklif pazarlığı hızlandırır ve anlaşma şansını artırır.",
+    "counterOfferRangeError": "Karşı teklifiniz, alıcının teklifi ile ilan fiyatı arasında olmalıdır",
+    "counterOfferSuccess": "✅ Karşı teklif gönderildi!",
+    "counterOfferError": "❌ Karşı teklif gönderilirken bir hata oluştu",
+    "buyerResponse": "Alıcının Yanıtı",
     "timeAgo": {
       "now": "Şimdi",
       "minutesAgo": "dakika önce",
@@ -492,15 +503,15 @@
     "deleteAllConfirm": "Tüm bildirimler silinecek. Emin misiniz?",
     "newOffer": {
       "title": "Yeni Teklif! 💰",
-      "message": "{buyer}, {vehicle} için {price} TL teklif etti"
+      "message": "{buyer}, {vehicle} için {price} ₺ teklif etti"
     },
     "offerAccepted": {
       "title": "Teklif Kabul Edildi! ✅",
-      "message": "{vehicle} için verdiğiniz {price} TL teklif kabul edildi"
+      "message": "{vehicle} için verdiğiniz {price} ₺ teklif kabul edildi"
     },
     "vehicleSold": {
       "title": "Araç Satıldı! 🎉",
-      "message": "{vehicle} başarıyla {price} TL'ye satıldı"
+      "message": "{vehicle} başarıyla {price} ₺'ye satıldı"
     }
   },
   "ads": {

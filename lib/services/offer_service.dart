@@ -351,6 +351,241 @@ class OfferService {
     }
   }
 
+  /// Satıcı gelen teklife karşı teklif gönderir (AI alıcı değerlendirir)
+  Future<Map<String, dynamic>> sendCounterOfferToIncomingOffer({
+    required Offer originalOffer,
+    required double counterOfferAmount,
+    String? sellerMessage,
+  }) async {
+    try {
+      // AI alıcıyı getir/yeniden oluştur
+      final aiBuyer = AIBuyer.generateRandom();
+      
+      // AI alıcının karşı teklifi değerlendirmesi
+      final decision = _evaluateCounterOfferByBuyer(
+        aiBuyer: aiBuyer,
+        originalOfferPrice: originalOffer.offerPrice,
+        counterOfferAmount: counterOfferAmount,
+        listingPrice: originalOffer.listingPrice,
+      );
+      
+      // Karar tipine göre işle
+      OfferStatus newStatus;
+      double? newCounterOffer;
+      String response;
+      
+      if (decision['decision'] == 'accept') {
+        // AI alıcı karşı teklifi kabul etti - satışı tamamla
+        newStatus = OfferStatus.accepted;
+        response = decision['response'] as String;
+        
+        // Satış işlemini gerçekleştir
+        await _processIncomingOfferAcceptance(originalOffer, counterOfferAmount);
+      } else if (decision['decision'] == 'reject') {
+        // AI alıcı reddetti
+        newStatus = OfferStatus.rejected;
+        response = decision['response'] as String;
+      } else {
+        // AI alıcı yeni karşı teklif verdi
+        newStatus = OfferStatus.pending;
+        newCounterOffer = decision['counterAmount'] as double?;
+        response = decision['response'] as String;
+      }
+      
+      // Teklifi güncelle
+      final updatedOffer = {
+        'status': newStatus.index,
+        'counterOfferAmount': newCounterOffer ?? counterOfferAmount,
+        'sellerResponse': sellerMessage ?? response,
+      };
+      
+      await _db.updateOffer(originalOffer.offerId, updatedOffer);
+      
+      return {
+        'success': true,
+        'decision': decision['decision'],
+        'status': newStatus,
+        'response': response,
+        'counterOffer': newCounterOffer,
+      };
+    } catch (e) {
+      
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// AI alıcının karşı teklifi değerlendirmesi
+  Map<String, dynamic> _evaluateCounterOfferByBuyer({
+    required AIBuyer aiBuyer,
+    required double originalOfferPrice,
+    required double counterOfferAmount,
+    required double listingPrice,
+  }) {
+    final random = Random();
+    
+    // Karşı teklifin orijinal teklife göre artış yüzdesi
+    final increasePercent = ((counterOfferAmount - originalOfferPrice) / originalOfferPrice) * 100;
+    
+    // Karşı teklifin ilan fiyatına göre oranı
+    final priceRatio = counterOfferAmount / listingPrice;
+    
+    // Alıcının tipine göre agresiflik seviyesi
+    final aggressiveness = _getAggressivenessFromBuyerType(aiBuyer.buyerType);
+    
+    // Karar verme mantığı
+    if (priceRatio >= 0.95) {
+      // Karşı teklif çok yüksek (%95+ ilan fiyatı) - çoğunlukla reddet
+      if (random.nextDouble() < 0.7) {
+        return {
+          'decision': 'reject',
+          'response': _generateRejectionResponse(),
+        };
+      } else {
+        // Kabul et
+        return {
+          'decision': 'accept',
+          'response': _generateAcceptanceResponse(),
+        };
+      }
+    } else if (priceRatio >= 0.85) {
+      // İyi bir karşı teklif (%85-95 arası) - çoğunlukla kabul et
+      if (random.nextDouble() < 0.6 + (aggressiveness * 0.2)) {
+        return {
+          'decision': 'accept',
+          'response': _generateAcceptanceResponse(),
+        };
+      } else {
+        // Tekrar karşı teklif ver
+        final newCounter = (counterOfferAmount + listingPrice) / 2;
+        return {
+          'decision': 'counter',
+          'counterAmount': newCounter,
+          'response': _generateCounterOfferResponse(newCounter),
+        };
+      }
+    } else if (priceRatio >= 0.70) {
+      // Orta seviye karşı teklif (%70-85 arası) - pazarlık devam eder
+      if (random.nextDouble() < 0.4) {
+        return {
+          'decision': 'accept',
+          'response': _generateAcceptanceResponse(),
+        };
+      } else if (random.nextDouble() < 0.7) {
+        // Tekrar karşı teklif ver
+        final newCounter = counterOfferAmount + ((listingPrice - counterOfferAmount) * (0.3 + random.nextDouble() * 0.3));
+        return {
+          'decision': 'counter',
+          'counterAmount': newCounter,
+          'response': _generateCounterOfferResponse(newCounter),
+        };
+      } else {
+        return {
+          'decision': 'reject',
+          'response': _generateRejectionResponse(),
+        };
+      }
+    } else {
+      // Düşük karşı teklif (%70'in altı) - çoğunlukla reddet
+      if (random.nextDouble() < 0.8) {
+        return {
+          'decision': 'reject',
+          'response': _generateRejectionResponse(),
+        };
+      } else {
+        // Son bir deneme karşı teklifi
+        final newCounter = counterOfferAmount * 1.15;
+        return {
+          'decision': 'counter',
+          'counterAmount': newCounter,
+          'response': _generateCounterOfferResponse(newCounter),
+        };
+      }
+    }
+  }
+
+  /// Gelen teklifin kabulünü işle (satıcı bakiyesini artır, aracı sat)
+  Future<bool> _processIncomingOfferAcceptance(Offer offer, double finalPrice) async {
+    try {
+      // Satıcıyı getir
+      final sellerMap = await _db.getUserById(offer.sellerId);
+      if (sellerMap == null) return false;
+      
+      final seller = User.fromJson(sellerMap);
+      
+      // Satıcının bakiyesini artır
+      await _db.updateUser(seller.id, {'balance': seller.balance + finalPrice});
+      
+      // Aracı satıldı olarak işaretle
+      await _db.updateUserVehicle(offer.vehicleId, {
+        'isSold': true,
+        'isListedForSale': false,
+        'salePrice': finalPrice,
+        'saleDate': DateTime.now().toIso8601String(),
+      });
+      
+      // Diğer teklifleri reddet
+      await _db.rejectOtherOffers(offer.vehicleId, offer.offerId);
+      
+      // 🔔 Satıcıya araç satıldı bildirimi gönder
+      await NotificationService().sendVehicleSoldNotification(
+        userId: offer.sellerId,
+        vehicleName: '${offer.vehicleBrand} ${offer.vehicleModel}',
+        salePrice: finalPrice,
+      );
+      
+      return true;
+    } catch (e) {
+      
+      return false;
+    }
+  }
+
+  /// Kabul yanıtı üret
+  String _generateAcceptanceResponse() {
+    final responses = [
+      'Harika! Anlaştık. Bu fiyata razıyım.',
+      'Tamam, kabul ediyorum. Anlaşalım.',
+      'Olur, bu fiyata tamam.',
+      'İyi bir anlaşma. Kabul ediyorum.',
+      'Peki, bu fiyata razıyım.',
+      'Anlaştık! Kabul.',
+    ];
+    return responses[Random().nextInt(responses.length)];
+  }
+
+  /// Red yanıtı üret
+  String _generateRejectionResponse() {
+    final responses = [
+      'Maalesef bu fiyata razı olamam. Teşekkürler.',
+      'Düşündüm ama bu fiyat benim için uygun değil.',
+      'Üzgünüm, bu teklife hayır diyorum.',
+      'Bu fiyata anlaşamayız sanırım. Teşekkürler.',
+      'Maalesef kabul edemem. Başka bir fiyat düşünebilir misiniz?',
+      'Bu fiyat beklediğimden düşük. Teşekkürler ama olmaz.',
+    ];
+    return responses[Random().nextInt(responses.length)];
+  }
+
+  /// Karşı teklif yanıtı üret
+  String _generateCounterOfferResponse(double counterAmount) {
+    final responses = [
+      'Hmm, biraz düşündüm. ${_formatCurrency(counterAmount)} TL yapsak?',
+      'Bu fiyata zor. ${_formatCurrency(counterAmount)} TL olursa anlaşabiliriz.',
+      '${_formatCurrency(counterAmount)} TL\'ye ne dersiniz? Orta bir yol bulalım.',
+      'Peki, ${_formatCurrency(counterAmount)} TL son teklifim.',
+      'Bir adım atalım. ${_formatCurrency(counterAmount)} TL olsa?',
+    ];
+    return responses[Random().nextInt(responses.length)];
+  }
+
+  /// Para formatı
+  String _formatCurrency(double value) {
+    return value.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
   /// Kullanıcı teklifinin kabulünü işle (araç satın alma)
   Future<bool> _processUserOfferAcceptance(Offer offer, String userId) async {
     try {
@@ -402,6 +637,20 @@ class OfferService {
   // ============================================================================
   // HELPER METHODS
   // ============================================================================
+
+  /// Alıcı tipinden agresiflik seviyesi çıkar
+  double _getAggressivenessFromBuyerType(BuyerType type) {
+    switch (type) {
+      case BuyerType.bargainer:
+        return 0.8; // Yüksek agresiflik - pazarlığa devam etmeye eğilimli
+      case BuyerType.realistic:
+        return 0.5; // Orta agresiflik - dengeli yaklaşım
+      case BuyerType.urgent:
+        return 0.2; // Düşük agresiflik - hızlı kabul etme eğilimi
+      case BuyerType.generous:
+        return 0.1; // Çok düşük agresiflik - kolayca kabul eder
+    }
+  }
 
   /// Adil fiyatı hesapla (skordan)
   double _calculateFairPrice(UserVehicle vehicle) {

@@ -1434,7 +1434,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      '${_formatCurrency(10000000.0)} TL',
+                      '${_formatCurrency(10000000.0)} ₺',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -1776,7 +1776,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${_formatCurrency(vehicle.listingPrice ?? 0)} TL',
+                    '${_formatCurrency(vehicle.listingPrice ?? 0)} ₺',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
