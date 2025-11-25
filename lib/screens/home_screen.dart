@@ -2029,20 +2029,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   //     );
                   //   },
                   // ),
-                  _buildDrawerItem(
-                    icon: Icons.task_alt,
-                    title: 'drawer.tasks'.tr(),
-                    onTap: () {
-                      Navigator.pop(context);
-                      // TODO: Görevler sayfasına git
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('drawer.tasksComingSoon'.tr()),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                  ),
+                  // GÖREVLER - Geçici olarak devre dışı
+                  // _buildDrawerItem(
+                  //   icon: Icons.task_alt,
+                  //   title: 'drawer.tasks'.tr(),
+                  //   onTap: () {
+                  //     Navigator.pop(context);
+                  //     // TODO: Görevler sayfasına git
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       SnackBar(
+                  //         content: Text('drawer.tasksComingSoon'.tr()),
+                  //         duration: const Duration(seconds: 2),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   const Divider(height: 1),
                 ],
               ),

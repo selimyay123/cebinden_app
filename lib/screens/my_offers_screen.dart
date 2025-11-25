@@ -31,7 +31,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
 
-  late TabController? _tabController;
+  TabController? _tabController;
 
   // Gelen teklifler (kullanıcının ilanlarına gelen)
   List<Offer> _incomingOffers = [];

@@ -59,14 +59,6 @@ class ProfileInfoScreen extends StatelessWidget {
                       color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Kullanıcı ID: ${user.id.substring(0, 8)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -87,23 +79,6 @@ class ProfileInfoScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // Hesap Bilgileri
-            _buildInfoCard(
-              title: 'profile.accountInfo'.tr(),
-              icon: Icons.account_balance_wallet_outlined,
-              children: [
-                _buildInfoRow('Bakiye', '${_formatCurrency(user.balance)} ${user.currency}'),
-                _buildInfoRow(
-                  'Kar/Zarar',
-                  '${user.profitLossPercentage >= 0 ? '+' : ''}${user.profitLossPercentage.toStringAsFixed(2)}%',
-                  valueColor: user.profitLossPercentage >= 0 ? Colors.green : Colors.red,
-                ),
-                _buildInfoRow('Para Birimi', user.currency),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
             // Kayıt Bilgileri
             _buildInfoCard(
               title: 'profile.registrationInfo'.tr(),
@@ -112,33 +87,6 @@ class ProfileInfoScreen extends StatelessWidget {
                 _buildInfoRow('Kayıt Tarihi', _formatDate(user.registeredAt)),
                 _buildInfoRow('Üyelik Süresi', _getMembershipDuration()),
               ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Bilgilendirme
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.blue[700], size: 24),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Profil düzenleme özelliği yakında eklenecek!',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue[900],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ],
         ),

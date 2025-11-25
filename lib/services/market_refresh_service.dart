@@ -104,7 +104,9 @@ class MarketRefreshService {
   // 2025 model yılı tavan fiyatları (brand -> model -> fiyat)
   final Map<String, Map<String, double>> _basePrices2025 = {
     'Renauva': {
-      'Slim': 1500000.0,
+      'Slim': 1500000.0,    // Clio - 1.0 TCe tavan
+      'Magna': 1650000.0,   // Megane - 1.3 TCe tavan (en pahalı)
+      'Flow': 1200000.0,    // Fluence - Sedan tavan
       // Diğer modeller eklenecek
     },
     // Diğer markalar eklenecek
@@ -132,6 +134,52 @@ class MarketRefreshService {
       'driveType': 'Önden', // Sabit
       'engineSize': {'min': 0.9, 'max': 1.6}, // 898cc - 1598cc
       'horsepower': {'min': 65, 'max': 145},
+    },
+    'Renauva_Magna': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          // Eski kasa (çeşitlilik fazla)
+          {'years': [2010, 2015], 'types': ['Sedan', 'Hatchback', 'Coupe', 'Station Wagon']},
+          // Yeni kasa (daha modern, sınırlı çeşit)
+          {'years': [2016, 2025], 'types': ['Sedan', 'Hatchback', 'Station Wagon']},
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          // Eski jenerasyon (1.6 16V benzin yaygın)
+          {'years': [2010, 2015], 'types': ['Benzin', 'Benzin+LPG', 'Dizel']},
+          // Yeni jenerasyon (1.3 TCe ve 1.5 dCi)
+          {'years': [2016, 2025], 'types': ['Benzin', 'Dizel']},
+          // Hybrid sadece 2020 sonrası
+          {'years': [2020, 2025], 'types': ['Hybrid']},
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5-6 ileri) + EDC Otomatik
+      'driveType': 'Önden', // Sabit - tüm Megane'ler önden çeker
+      'engineSize': {'min': 1.3, 'max': 1.6}, // 1330cc (1.3 TCe), 1461cc (1.5 dCi), 1598cc (1.6)
+      'horsepower': {'min': 85, 'max': 160}, // 85-160 HP aralığı
+    },
+    'Renauva_Flow': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          // Fluence sadece Sedan
+          {'years': [2010, 2025], 'types': ['Sedan']},
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          // Tüm yıllar için benzin ve dizel
+          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG', 'Dizel']},
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5-6 ileri) + EDC Otomatik
+      'driveType': 'Önden', // Sabit - tüm Fluence'ler önden çeker
+      'engineSize': {'min': 1.3, 'max': 1.6}, // 1330cc (1.3 TCe), 1461cc (1.5 dCi), 1598cc (1.6)
+      'horsepower': {'min': 85, 'max': 160}, // 85-160 HP aralığı
     },
   };
 

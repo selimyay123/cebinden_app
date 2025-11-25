@@ -366,38 +366,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         children: [
           // TEST BUTONU - GEÇİCİ
-          Container(
-            margin: const EdgeInsets.all(16),
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                if (_currentUser != null) {
-                  final db = DatabaseHelper();
-                  await db.updateUser(_currentUser!.id, {
-                    'gold': _currentUser!.gold + 100.0,
-                  });
+          // Container(
+          //   margin: const EdgeInsets.all(16),
+          //   child: ElevatedButton.icon(
+          //     onPressed: () async {
+          //       if (_currentUser != null) {
+          //         final db = DatabaseHelper();
+          //         await db.updateUser(_currentUser!.id, {
+          //           'gold': _currentUser!.gold + 100.0,
+          //         });
                   
-                  // Kullanıcıyı yeniden yükle
-                  await _loadSettings();
+          //         // Kullanıcıyı yeniden yükle
+          //         await _loadSettings();
                   
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('✅ Test: 100 Altın eklendi!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
-                }
-              },
-              icon: const Icon(Icons.stars),
-              label: const Text('TEST: 100 Altın Ekle'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
-          ),
+          //         if (mounted) {
+          //           ScaffoldMessenger.of(context).showSnackBar(
+          //             const SnackBar(
+          //               content: Text('✅ Test: 100 Altın eklendi!'),
+          //               backgroundColor: Colors.green,
+          //             ),
+          //           );
+          //         }
+          //       }
+          //     },
+          //     icon: const Icon(Icons.stars),
+          //     label: const Text('TEST: 100 Altın Ekle'),
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: Colors.amber,
+          //       foregroundColor: Colors.white,
+          //       padding: const EdgeInsets.symmetric(vertical: 16),
+          //     ),
+          //   ),
+          // ),
           
           // Profil Bölümü
           _buildSection(
@@ -434,13 +434,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _buildSection(
             title: 'settings.appearance'.tr(),
             children: [
-              _buildSwitchTile(
-                icon: Icons.dark_mode_outlined,
-                title: 'settings.darkMode'.tr(),
-                subtitle: 'settings.darkModeDesc'.tr(),
-                value: _darkMode,
-                onChanged: _toggleDarkMode,
-              ),
+              // KARANKLIK MOD - Geçici olarak devre dışı
+              // _buildSwitchTile(
+              //   icon: Icons.dark_mode_outlined,
+              //   title: 'settings.darkMode'.tr(),
+              //   subtitle: 'settings.darkModeDesc'.tr(),
+              //   value: _darkMode,
+              //   onChanged: _toggleDarkMode,
+              // ),
               _buildListTile(
                 icon: Icons.language,
                 title: 'settings.languageFull'.tr(),
@@ -454,31 +455,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: _changeLanguage,
                 ),
               ),
-              _buildListTile(
-                icon: Icons.account_balance_wallet,
-                title: 'settings.currency'.tr(),
-                trailing: DropdownButton<String>(
-                  value: _selectedCurrency,
-                  underline: const SizedBox(),
-                  items: const [
-                    DropdownMenuItem(value: 'TL', child: Text('TL')),
-                    DropdownMenuItem(value: 'USD', child: Text('USD')),
-                    DropdownMenuItem(value: 'EUR', child: Text('EUR')),
-                  ],
-                  onChanged: _updateCurrency,
-                ),
-              ),
+              // PARA BİRİMİ - Geçici olarak devre dışı (sadece TL)
+              // _buildListTile(
+              //   icon: Icons.account_balance_wallet,
+              //   title: 'settings.currency'.tr(),
+              //   trailing: DropdownButton<String>(
+              //     value: _selectedCurrency,
+              //     underline: const SizedBox(),
+              //     items: const [
+              //       DropdownMenuItem(value: 'TL', child: Text('TL')),
+              //       DropdownMenuItem(value: 'USD', child: Text('USD')),
+              //       DropdownMenuItem(value: 'EUR', child: Text('EUR')),
+              //     ],
+              //     onChanged: _updateCurrency,
+              //   ),
+              // ),
             ],
           ),
 
-          // Oyun Ayarları
+          // OYUN AYARLARI - Geçici olarak devre dışı
           _buildSection(
             title: 'Oyun Ayarları',
             children: [
               _buildListTile(
                 icon: Icons.access_time,
                 title: 'Oyun Günü Süresi',
-                subtitle: '1 oyun günü = $_gameDayDuration dakika (gerçek zaman)',
                 trailing: DropdownButton<int>(
                   value: _gameDayDuration,
                   underline: const SizedBox(),
@@ -492,45 +493,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: _changeGameDayDuration,
                 ),
               ),
-              _buildListTile(
-                icon: Icons.calendar_today,
-                title: 'Mevcut Oyun Zamanı',
-                subtitle: _gameTimeService.getFormattedGameTime(),
-                trailing: const Icon(Icons.info_outline, size: 20),
-              ),
+              // _buildListTile(
+              //   icon: Icons.calendar_today,
+              //   title: 'Mevcut Oyun Zamanı',
+              //   subtitle: _gameTimeService.getFormattedGameTime(),
+              //   trailing: const Icon(Icons.info_outline, size: 20),
+              // ),
             ],
           ),
 
-          // Bildirim Ayarları
-          _buildSection(
-            title: 'settings.notifications'.tr(),
-            children: [
-              _buildSwitchTile(
-                icon: Icons.new_releases_outlined,
-                title: 'settings.newListings'.tr(),
-                value: _notificationNewListings,
-                onChanged: (value) => _toggleNotification('newListings', value),
-              ),
-              _buildSwitchTile(
-                icon: Icons.trending_down,
-                title: 'settings.priceDrops'.tr(),
-                value: _notificationPriceDrops,
-                onChanged: (value) => _toggleNotification('priceDrops', value),
-              ),
-              _buildSwitchTile(
-                icon: Icons.local_offer_outlined,
-                title: 'settings.offers'.tr(),
-                value: _notificationOffers,
-                onChanged: (value) => _toggleNotification('offers', value),
-              ),
-              _buildSwitchTile(
-                icon: Icons.notifications_outlined,
-                title: 'settings.system'.tr(),
-                value: _notificationSystem,
-                onChanged: (value) => _toggleNotification('system', value),
-              ),
-            ],
-          ),
+          // BİLDİRİM AYARLARI - Geçici olarak devre dışı
+          // _buildSection(
+          //   title: 'settings.notifications'.tr(),
+          //   children: [
+          //     _buildSwitchTile(
+          //       icon: Icons.new_releases_outlined,
+          //       title: 'settings.newListings'.tr(),
+          //       value: _notificationNewListings,
+          //       onChanged: (value) => _toggleNotification('newListings', value),
+          //     ),
+          //     _buildSwitchTile(
+          //       icon: Icons.trending_down,
+          //       title: 'settings.priceDrops'.tr(),
+          //       value: _notificationPriceDrops,
+          //       onChanged: (value) => _toggleNotification('priceDrops', value),
+          //     ),
+          //     _buildSwitchTile(
+          //       icon: Icons.local_offer_outlined,
+          //       title: 'settings.offers'.tr(),
+          //       value: _notificationOffers,
+          //       onChanged: (value) => _toggleNotification('offers', value),
+          //     ),
+          //     _buildSwitchTile(
+          //       icon: Icons.notifications_outlined,
+          //       title: 'settings.system'.tr(),
+          //       value: _notificationSystem,
+          //       onChanged: (value) => _toggleNotification('system', value),
+          //     ),
+          //   ],
+          // ),
 
           // Uygulama Bilgisi
           _buildSection(
@@ -549,26 +550,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
 
-          // Debug (Geliştirici Ayarları)
-          _buildSection(
-            title: 'settings.developer'.tr(),
-            children: [
-              _buildListTile(
-                icon: Icons.auto_awesome,
-                title: 'settings.generateOffers'.tr(),
-                subtitle: 'settings.generateOffersDesc'.tr(),
-                textColor: Colors.blue,
-                onTap: _generateTestOffers,
-              ),
-              _buildListTile(
-                icon: Icons.delete_sweep,
-                title: 'settings.clearDatabase'.tr(),
-                subtitle: 'settings.clearDatabaseDesc'.tr(),
-                textColor: Colors.orange,
-                onTap: _clearDatabase,
-              ),
-            ],
-          ),
+          // DEBUG (GELİŞTİRİCİ AYARLARI) - Geçici olarak devre dışı
+          // _buildSection(
+          //   title: 'settings.developer'.tr(),
+          //   children: [
+          //     _buildListTile(
+          //       icon: Icons.auto_awesome,
+          //       title: 'settings.generateOffers'.tr(),
+          //       subtitle: 'settings.generateOffersDesc'.tr(),
+          //       textColor: Colors.blue,
+          //       onTap: _generateTestOffers,
+          //     ),
+          //     _buildListTile(
+          //       icon: Icons.delete_sweep,
+          //       title: 'settings.clearDatabase'.tr(),
+          //       subtitle: 'settings.clearDatabaseDesc'.tr(),
+          //       textColor: Colors.orange,
+          //       onTap: _clearDatabase,
+          //     ),
+          //   ],
+          // ),
 
           // Hesap İşlemleri
           _buildSection(

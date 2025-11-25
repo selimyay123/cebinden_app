@@ -26,12 +26,26 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   List<Vehicle> allVehicles = []; // Tüm araçlar
   List<Vehicle> filteredVehicles = []; // Filtrelenmiş araçlar
   
-  // Filtre durumları
+  // Filtre durumları (Backend değerlerini saklayacağız)
   Set<String> selectedFuelTypes = {};
   Set<String> selectedTransmissions = {};
   String? selectedMileageRange;
   String? selectedPriceRange;
   String? selectedYearRange;
+  
+  // Yakıt tipi mapping (backend değerleri)
+  final Map<String, String> _fuelTypeMapping = {
+    'Benzin': 'vehicles.fuelGasoline',
+    'Dizel': 'vehicles.fuelDiesel',
+    'Hybrid': 'vehicles.fuelHybrid',
+    'Elektrik': 'vehicles.fuelElectric',
+  };
+  
+  // Vites tipi mapping (backend değerleri)
+  final Map<String, String> _transmissionMapping = {
+    'Manuel': 'vehicles.transmissionManual',
+    'Otomatik': 'vehicles.transmissionAutomatic',
+  };
 
   @override
   void initState() {
@@ -131,7 +145,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                     children: [
                       // Yakıt Tipi
                       _buildCategoryFilter(
-                        'Yakıt Tipi',
+                        'vehicles.filterFuelType'.tr(),
                         selectedFuelTypes.isNotEmpty,
                         selectedFuelTypes.length,
                         () => _showFuelTypeFilter(context),
@@ -140,7 +154,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       
                       // Vites
                       _buildCategoryFilter(
-                        'Vites',
+                        'vehicles.filterTransmission'.tr(),
                         selectedTransmissions.isNotEmpty,
                         selectedTransmissions.length,
                         () => _showTransmissionFilter(context),
@@ -149,7 +163,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       
                       // Kilometre
                       _buildCategoryFilter(
-                        'Kilometre',
+                        'vehicles.filterMileage'.tr(),
                         selectedMileageRange != null,
                         selectedMileageRange != null ? 1 : 0,
                         () => _showMileageFilter(context),
@@ -158,7 +172,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       
                       // Fiyat
                       _buildCategoryFilter(
-                        'Fiyat',
+                        'vehicles.filterPrice'.tr(),
                         selectedPriceRange != null,
                         selectedPriceRange != null ? 1 : 0,
                         () => _showPriceFilter(context),
@@ -167,7 +181,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       
                       // Yıl
                       _buildCategoryFilter(
-                        'Yıl',
+                        'vehicles.filterYear'.tr(),
                         selectedYearRange != null,
                         selectedYearRange != null ? 1 : 0,
                         () => _showYearFilter(context),
@@ -195,7 +209,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                                 Icon(Icons.clear, size: 16, color: Colors.red[700]),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Temizle',
+                                  'vehicles.clearFilters'.tr(),
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Colors.red[700],
@@ -520,6 +534,236 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     );
   }
   
+  // Mapping ile Dropdown Filter (Multi-select)
+  void _showDropdownFilterWithMapping(
+    BuildContext context, {
+    required String title,
+    required List<String> displayOptions,
+    required List<String> backendValues,
+    required Set<String> selectedDisplayValues,
+    required Function(Set<String>) onUpdate,
+  }) {
+    final Set<String> tempSelectedValues = Set.from(selectedDisplayValues);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Başlık
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: widget.categoryColor.withOpacity(0.1),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.filter_alt,
+                                color: widget.categoryColor,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                title,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (tempSelectedValues.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: widget.categoryColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${tempSelectedValues.length}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Seçenekler
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: displayOptions.length,
+                        itemBuilder: (context, index) {
+                          final displayOption = displayOptions[index];
+                          final isSelected = tempSelectedValues.contains(displayOption);
+                          
+                          return InkWell(
+                            onTap: () {
+                              setDialogState(() {
+                                if (isSelected) {
+                                  tempSelectedValues.remove(displayOption);
+                                } else {
+                                  tempSelectedValues.add(displayOption);
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? widget.categoryColor.withOpacity(0.1)
+                                    : Colors.transparent,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    displayOption,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: isSelected
+                                          ? widget.categoryColor
+                                          : Colors.grey[700],
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? widget.categoryColor
+                                          : Colors.transparent,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? widget.categoryColor
+                                            : Colors.grey[400]!,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: isSelected
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 16,
+                                          )
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    
+                    // Alt Butonlar
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          if (tempSelectedValues.isNotEmpty)
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  setDialogState(() => tempSelectedValues.clear());
+                                  onUpdate({});
+                                  Navigator.pop(dialogContext);
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: Text(
+                                  'vehicles.clearFilters'.tr(),
+                                  style: TextStyle(
+                                    color: Colors.red[700],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (tempSelectedValues.isNotEmpty)
+                            const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                onUpdate(tempSelectedValues);
+                                Navigator.pop(dialogContext);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: widget.categoryColor,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                'vehicles.apply'.tr(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  
   // Genel Dropdown Filter (Multi-select)
   void _showDropdownFilter(
     BuildContext context, {
@@ -528,110 +772,221 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     required Set<String> selectedValues,
     required VoidCallback onUpdate,
   }) {
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-
-    showMenu<String>(
+    showDialog(
       context: context,
-      position: position,
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      items: [
-        PopupMenuItem<String>(
-          enabled: false,
-          child: StatefulBuilder(
-            builder: (context, setMenuState) {
-              return SizedBox(
-                width: 250,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Başlık ve Temizle Butonu
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                        if (selectedValues.isNotEmpty)
-                          InkWell(
-                            onTap: () {
-                              setMenuState(() => selectedValues.clear());
-                              onUpdate();
-                            },
-                            child: Icon(Icons.clear, size: 20, color: Colors.red[700]),
-                          ),
-                      ],
-                    ),
-                    const Divider(height: 20),
-                    // Seçenekler
-                    ...options.map((option) => InkWell(
-                      onTap: () {
-                        setMenuState(() {
-                          if (selectedValues.contains(option)) {
-                            selectedValues.remove(option);
-                          } else {
-                            selectedValues.add(option);
-                          }
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              option,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            if (selectedValues.contains(option))
-                              const Icon(Icons.check, color: Colors.green, size: 20),
-                          ],
+                    // Başlık
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: widget.categoryColor.withOpacity(0.1),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
                         ),
                       ),
-                    )).toList(),
-                    const SizedBox(height: 12),
-                    // Uygula Butonu
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          onUpdate();
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.categoryColor,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.filter_alt,
+                                color: widget.categoryColor,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                title,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                            ],
                           ),
+                          if (selectedValues.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: widget.categoryColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${selectedValues.length}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Seçenekler
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: options.length,
+                        itemBuilder: (context, index) {
+                          final option = options[index];
+                          final isSelected = selectedValues.contains(option);
+                          
+                          return InkWell(
+                            onTap: () {
+                              setDialogState(() {
+                                if (isSelected) {
+                                  selectedValues.remove(option);
+                                } else {
+                                  selectedValues.add(option);
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? widget.categoryColor.withOpacity(0.1)
+                                    : Colors.transparent,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    option,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: isSelected
+                                          ? widget.categoryColor
+                                          : Colors.grey[700],
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? widget.categoryColor
+                                          : Colors.transparent,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? widget.categoryColor
+                                            : Colors.grey[400]!,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: isSelected
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 16,
+                                          )
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    
+                    // Alt Butonlar
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
                         ),
-                        child: const Text('Uygula', style: TextStyle(color: Colors.white)),
+                      ),
+                      child: Row(
+                        children: [
+                          if (selectedValues.isNotEmpty)
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  setDialogState(() => selectedValues.clear());
+                                  setState(() => _applyFilters());
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: Text(
+                                  'vehicles.clearFilters'.tr(),
+                                  style: TextStyle(
+                                    color: Colors.red[700],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (selectedValues.isNotEmpty)
+                            const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                onUpdate();
+                                Navigator.pop(dialogContext);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: widget.categoryColor,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                'vehicles.apply'.tr(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              );
-            },
-          ),
-        ),
-      ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -643,128 +998,288 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     required String? selectedValue,
     required Function(String?) onUpdate,
   }) {
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-
-    showMenu<String>(
+    String? tempSelectedValue = selectedValue;
+    
+    showDialog(
       context: context,
-      position: position,
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      items: [
-        PopupMenuItem<String>(
-          enabled: false,
-          child: StatefulBuilder(
-            builder: (context, setMenuState) {
-              return SizedBox(
-                width: 250,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Başlık ve Temizle Butonu
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                        if (selectedValue != null)
-                          InkWell(
-                            onTap: () {
-                              setMenuState(() => selectedValue = null);
-                              onUpdate(null);
-                            },
-                            child: Icon(Icons.clear, size: 20, color: Colors.red[700]),
-                          ),
-                      ],
-                    ),
-                    const Divider(height: 20),
-                    // Seçenekler
-                    ...options.entries.map((entry) => InkWell(
-                      onTap: () {
-                        setMenuState(() {
-                          selectedValue = selectedValue == entry.key ? null : entry.key;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              entry.value,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            if (selectedValue == entry.key)
-                              const Icon(Icons.check, color: Colors.green, size: 20),
-                          ],
+                    // Başlık
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: widget.categoryColor.withOpacity(0.1),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
                         ),
                       ),
-                    )).toList(),
-                    const SizedBox(height: 12),
-                    // Uygula Butonu
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          onUpdate(selectedValue);
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.categoryColor,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.filter_alt,
+                                color: widget.categoryColor,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                title,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                            ],
                           ),
+                          if (tempSelectedValue != null)
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: widget.categoryColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Seçenekler
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: options.length,
+                        itemBuilder: (context, index) {
+                          final entry = options.entries.elementAt(index);
+                          final isSelected = tempSelectedValue == entry.key;
+                          
+                          return InkWell(
+                            onTap: () {
+                              setDialogState(() {
+                                tempSelectedValue = isSelected ? null : entry.key;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? widget.categoryColor.withOpacity(0.1)
+                                    : Colors.transparent,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    entry.value,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: isSelected
+                                          ? widget.categoryColor
+                                          : Colors.grey[700],
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? widget.categoryColor
+                                          : Colors.transparent,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? widget.categoryColor
+                                            : Colors.grey[400]!,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: isSelected
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 16,
+                                          )
+                                        : null,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    
+                    // Alt Butonlar
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
                         ),
-                        child: const Text('Uygula', style: TextStyle(color: Colors.white)),
+                      ),
+                      child: Row(
+                        children: [
+                          if (tempSelectedValue != null)
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  setDialogState(() => tempSelectedValue = null);
+                                  onUpdate(null);
+                                  Navigator.pop(dialogContext);
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: Text(
+                                  'vehicles.clearFilters'.tr(),
+                                  style: TextStyle(
+                                    color: Colors.red[700],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (tempSelectedValue != null)
+                            const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                onUpdate(tempSelectedValue);
+                                Navigator.pop(dialogContext);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: widget.categoryColor,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                'vehicles.apply'.tr(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              );
-            },
-          ),
-        ),
-      ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   // Yakıt Tipi Filtresi
   void _showFuelTypeFilter(BuildContext context) {
-    _showDropdownFilter(
+    // Backend değerlerinden çevrilmiş değerlere map
+    final displayOptions = _fuelTypeMapping.keys.map((key) => _fuelTypeMapping[key]!.tr()).toList();
+    final backendValues = _fuelTypeMapping.keys.toList();
+    
+    // Seçili backend değerlerini çevrilmiş değerlere dönüştür
+    final displaySelected = selectedFuelTypes.map((backendValue) {
+      final translationKey = _fuelTypeMapping[backendValue];
+      return translationKey != null ? translationKey.tr() : backendValue;
+    }).toSet();
+    
+    _showDropdownFilterWithMapping(
       context,
-      title: 'vehicles.fuelType'.tr(),
-      options: ['Benzin', 'Dizel', 'Hybrid', 'Elektrik'],
-      selectedValues: selectedFuelTypes,
-      onUpdate: () => setState(() => _applyFilters()),
+      title: 'vehicles.filterFuelType'.tr(),
+      displayOptions: displayOptions,
+      backendValues: backendValues,
+      selectedDisplayValues: displaySelected,
+      onUpdate: (newDisplayValues) {
+        // Çevrilmiş değerlerden backend değerlerine dönüştür
+        selectedFuelTypes.clear();
+        for (final displayValue in newDisplayValues) {
+          final backendValue = _fuelTypeMapping.entries
+              .firstWhere(
+                (entry) => entry.value.tr() == displayValue,
+                orElse: () => const MapEntry('', ''),
+              )
+              .key;
+          if (backendValue.isNotEmpty) {
+            selectedFuelTypes.add(backendValue);
+          }
+        }
+        setState(() => _applyFilters());
+      },
     );
   }
 
   // Vites Filtresi
   void _showTransmissionFilter(BuildContext context) {
-    _showDropdownFilter(
+    // Backend değerlerinden çevrilmiş değerlere map
+    final displayOptions = _transmissionMapping.keys.map((key) => _transmissionMapping[key]!.tr()).toList();
+    final backendValues = _transmissionMapping.keys.toList();
+    
+    // Seçili backend değerlerini çevrilmiş değerlere dönüştür
+    final displaySelected = selectedTransmissions.map((backendValue) {
+      final translationKey = _transmissionMapping[backendValue];
+      return translationKey != null ? translationKey.tr() : backendValue;
+    }).toSet();
+    
+    _showDropdownFilterWithMapping(
       context,
-      title: 'Vites',
-      options: ['Manuel', 'Otomatik'],
-      selectedValues: selectedTransmissions,
-      onUpdate: () => setState(() => _applyFilters()),
+      title: 'vehicles.filterTransmission'.tr(),
+      displayOptions: displayOptions,
+      backendValues: backendValues,
+      selectedDisplayValues: displaySelected,
+      onUpdate: (newDisplayValues) {
+        // Çevrilmiş değerlerden backend değerlerine dönüştür
+        selectedTransmissions.clear();
+        for (final displayValue in newDisplayValues) {
+          final backendValue = _transmissionMapping.entries
+              .firstWhere(
+                (entry) => entry.value.tr() == displayValue,
+                orElse: () => const MapEntry('', ''),
+              )
+              .key;
+          if (backendValue.isNotEmpty) {
+            selectedTransmissions.add(backendValue);
+          }
+        }
+        setState(() => _applyFilters());
+      },
     );
   }
   
@@ -772,12 +1287,12 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   void _showMileageFilter(BuildContext context) {
     _showSingleSelectFilter(
       context,
-      title: 'Kilometre',
+      title: 'vehicles.filterMileage'.tr(),
       options: {
-        '0-50k': '0-50k km',
-        '50k-100k': '50k-100k km',
-        '100k-150k': '100k-150k km',
-        '150k+': '150k+ km',
+        '0-50k': 'vehicles.mileageRange1'.tr(),
+        '50k-100k': 'vehicles.mileageRange2'.tr(),
+        '100k-150k': 'vehicles.mileageRange3'.tr(),
+        '150k+': 'vehicles.mileageRange4'.tr(),
       },
       selectedValue: selectedMileageRange,
       onUpdate: (value) => setState(() {
@@ -791,12 +1306,12 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   void _showPriceFilter(BuildContext context) {
     _showSingleSelectFilter(
       context,
-      title: 'Fiyat',
+      title: 'vehicles.filterPrice'.tr(),
       options: {
-        '0-300k': '0-300k TL',
-        '300k-500k': '300k-500k TL',
-        '500k-700k': '500k-700k TL',
-        '700k+': '700k+ TL',
+        '0-300k': 'vehicles.priceRange1'.tr(),
+        '300k-500k': 'vehicles.priceRange2'.tr(),
+        '500k-700k': 'vehicles.priceRange3'.tr(),
+        '700k+': 'vehicles.priceRange4'.tr(),
       },
       selectedValue: selectedPriceRange,
       onUpdate: (value) => setState(() {
@@ -810,12 +1325,12 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   void _showYearFilter(BuildContext context) {
     _showSingleSelectFilter(
       context,
-      title: 'vehicles.modelYear'.tr(),
+      title: 'vehicles.filterYear'.tr(),
       options: {
-        '2024': '2024',
-        '2020-2023': '2020-2023',
-        '2015-2019': '2015-2019',
-        '2015 öncesi': '2015 öncesi',
+        '2024': 'vehicles.yearRange1'.tr(),
+        '2020-2023': 'vehicles.yearRange2'.tr(),
+        '2015-2019': 'vehicles.yearRange3'.tr(),
+        '2015 öncesi': 'vehicles.yearRange4'.tr(),
       },
       selectedValue: selectedYearRange,
       onUpdate: (value) => setState(() {
