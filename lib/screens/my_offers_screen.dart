@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // 🆕 Input formatters için
 import 'package:intl/intl.dart';
 import '../models/offer_model.dart';
 import '../models/user_model.dart';
@@ -103,13 +104,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       // Gönderilen teklifleri getir (kullanıcının gönderdiği)
       _sentOffers = await _db.getOffersByBuyerId(currentUser.id);
       
-      // Markaya göre grupla (gönderilen teklifler)
+      // Markaya göre grupla (gönderilen teklifler) - SADECE BEKLEYENLERİ AL
       _sentOffersByBrand = {};
       for (var offer in _sentOffers) {
-        if (!_sentOffersByBrand.containsKey(offer.vehicleBrand)) {
-          _sentOffersByBrand[offer.vehicleBrand] = [];
+        // Sadece bekleyen (pending) teklifleri ekle
+        // Kabul edilmiş veya reddedilmiş teklifler listede görünmemeli
+        if (offer.isPending) {
+          if (!_sentOffersByBrand.containsKey(offer.vehicleBrand)) {
+            _sentOffersByBrand[offer.vehicleBrand] = [];
+          }
+          _sentOffersByBrand[offer.vehicleBrand]!.add(offer);
         }
-        _sentOffersByBrand[offer.vehicleBrand]!.add(offer);
       }
     } catch (e) {
       
@@ -1983,6 +1988,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               TextField(
                 controller: counterOfferController,
                 keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Sadece rakam
+                  _ThousandsSeparatorInputFormatter(), // Binlik ayırıcı
+                ],
                 decoration: InputDecoration(
                   labelText: 'offer.yourCounterOffer'.tr(),
                   hintText: '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} TL',
@@ -2306,6 +2315,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               TextField(
                 controller: counterOfferController,
                 keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Sadece rakam
+                  _ThousandsSeparatorInputFormatter(), // Binlik ayırıcı
+                ],
                 decoration: InputDecoration(
                   labelText: 'offers.yourCounterOffer'.tr(),
                   hintText: '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} ₺',
@@ -2604,6 +2617,38 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       
       return false;
     }
+  }
+}
+
+/// Binlik ayırıcı input formatter (Teklif Ver gibi)
+class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  final NumberFormat _formatter = NumberFormat('#,###', 'tr_TR');
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Sadece sayıları al
+    final numericValue = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
+    
+    if (numericValue.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    // Sayıyı formatla
+    final number = int.parse(numericValue);
+    final formattedText = _formatter.format(number);
+
+    // Cursor pozisyonunu ayarla
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
   }
 }
 

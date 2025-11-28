@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
@@ -35,6 +37,16 @@ class _HomeScreenState extends State<HomeScreen> {
   int _pendingOffersCount = 0; // Bekleyen teklif sayısı
   List<UserVehicle> _userVehicles = [];
   List<UserVehicle> _userListedVehicles = []; // Satışa çıkarılan araçlar
+  
+  // Tutorial için GlobalKey'ler
+  final GlobalKey _marketButtonKey = GlobalKey();
+  final GlobalKey _myVehiclesButtonKey = GlobalKey();
+  final GlobalKey _sellVehicleButtonKey = GlobalKey();
+  final GlobalKey _offersButtonKey = GlobalKey();
+  final GlobalKey _balanceKey = GlobalKey();
+  
+  // Tutorial aktif mi? (scroll'u engellemek için)
+  bool _isTutorialActive = false;
 
   @override
   void initState() {
@@ -74,6 +86,11 @@ class _HomeScreenState extends State<HomeScreen> {
         _userListedVehicles = listedVehicles;
         _pendingOffersCount = pendingOffers;
         _isLoading = false;
+      });
+      
+      // Kullanıcı yüklendikten sonra tutorial'ı kontrol et
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkAndShowTutorial();
       });
     } else {
       setState(() {
@@ -286,7 +303,9 @@ class _HomeScreenState extends State<HomeScreen> {
               : RefreshIndicator(
                   onRefresh: _loadCurrentUser,
                   child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+                    physics: _isTutorialActive 
+                        ? const NeverScrollableScrollPhysics() // Tutorial sırasında scroll kapalı
+                        : const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       children: [
                         // Profil ve Bakiye Kartı
@@ -413,6 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
+                  key: _balanceKey, // Tutorial için key
                   '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
                   style: const TextStyle(
                     color: Colors.white,
@@ -426,14 +446,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 // Altın ve Kar/Zarar
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 4,
+                  runSpacing: 4,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     // Altın
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
+                        horizontal: 8,
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
@@ -454,7 +474,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '${_currentUser!.gold.toStringAsFixed(2)} ${'store.gold'.tr()}',
+                            // ${'store.gold'.tr()}
+                            '${_currentUser!.gold.toStringAsFixed(2)}',
                             style: const TextStyle(
                               color: Colors.amber,
                               fontSize: 14,
@@ -480,7 +501,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
+                          horizontal: 8,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
@@ -494,16 +515,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               'store.buyGold'.tr(),
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 12,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(
-                              Icons.add,
-                              color: Colors.white,
-                              size: 14,
-                            ),
+                            // const Icon(
+                            //   Icons.add,
+                            //   color: Colors.white,
+                            //   size: 14,
+                            // ),
                           ],
                         ),
                       ),
@@ -712,7 +733,21 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: quickActions.length,
         itemBuilder: (context, index) {
           final action = quickActions[index];
+          
+          // Tutorial için key'leri atıyoruz
+          Key? buttonKey;
+          if (index == 0) {
+            buttonKey = _marketButtonKey; // Market butonu
+          } else if (index == 1) {
+            buttonKey = _sellVehicleButtonKey; // Araç Sat butonu
+          } else if (index == 2) {
+            buttonKey = _myVehiclesButtonKey; // Garajım butonu
+          } else if (index == 4) {
+            buttonKey = _offersButtonKey; // Teklifler butonu
+          }
+          
           return _buildActionButton(
+            key: buttonKey,
             icon: action['icon'] as IconData,
             label: action['label'] as String,
             color: action['color'] as Color,
@@ -726,6 +761,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildActionButton({
+    Key? key, // Tutorial için key parametresi
     required IconData icon,
     required String label,
     required Color color,
@@ -734,6 +770,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String? reward, // Ödül gösterimi için
   }) {
     return InkWell(
+      key: key, // Key'i burada kullanıyoruz
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
@@ -760,7 +797,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: color.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: color, size: 28),
+                  child: Icon(icon, color: color, size: 30),
                 ),
                 // Badge
                 if (badge != null && badge > 0)
@@ -782,7 +819,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           badge > 99 ? '99+' : badge.toString(),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -2099,6 +2136,372 @@ class _HomeScreenState extends State<HomeScreen> {
         vertical: 4,
       ),
     );
+  }
+
+  // ========== TUTORIAL SİSTEMİ ==========
+
+  /// İlk açılış kontrolü ve tutorial gösterimi
+  Future<void> _checkAndShowTutorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    final tutorialCompleted = prefs.getBool('tutorial_completed') ?? false;
+    
+    // Tutorial daha önce gösterilmediyse ve kullanıcı giriş yapmışsa göster
+    if (!tutorialCompleted && _currentUser != null && mounted) {
+      await Future.delayed(const Duration(milliseconds: 800));
+      _showTutorial();
+    }
+  }
+
+  /// Tutorial'ı tamamlandı olarak işaretle
+  Future<void> _setTutorialCompleted() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('tutorial_completed', true);
+  }
+
+  /// Tutorial'ı göster
+  void _showTutorial() {
+    final targets = _createTutorialTargets();
+    
+    // Scroll'u engelle
+    setState(() {
+      _isTutorialActive = true;
+    });
+    
+    TutorialCoachMark(
+      targets: targets,
+      colorShadow: Colors.black,
+      paddingFocus: 10,
+      opacityShadow: 0.8,
+      hideSkip: false,
+      textSkip: 'tutorial.skip'.tr(),
+      textStyleSkip: const TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
+      // Overlay'e (karanlık alana) tıklanmasını engelle
+      onClickOverlay: (target) {
+        // Hiçbir şey yapma, tıklama engellendi
+      },
+      onFinish: () {
+        _setTutorialCompleted();
+        // Scroll'u tekrar aktif et
+        setState(() {
+          _isTutorialActive = false;
+        });
+      },
+      onSkip: () {
+        _setTutorialCompleted();
+        // Scroll'u tekrar aktif et
+        setState(() {
+          _isTutorialActive = false;
+        });
+        return true;
+      },
+    ).show(context: context);
+  }
+
+  /// Tutorial adımlarını oluştur
+  List<TargetFocus> _createTutorialTargets() {
+    return [
+      // ADIM 1: Market Butonu (İlanlar)
+      TargetFocus(
+        identify: "market_button",
+        keyTarget: _marketButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step1_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step1_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '1/5',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_downward,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      
+      // ADIM 2: Garajım Butonu
+      TargetFocus(
+        identify: "my_vehicles_button",
+        keyTarget: _myVehiclesButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step2_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step2_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '2/5',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_downward,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      
+      // ADIM 3: Araç Sat Butonu
+      TargetFocus(
+        identify: "sell_vehicle_button",
+        keyTarget: _sellVehicleButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step3_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step3_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '3/5',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_downward,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      
+      // ADIM 4: Teklifler Butonu
+      TargetFocus(
+        identify: "offers_button",
+        keyTarget: _offersButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top, // Yukarıda göster (ekranın altında olduğu için)
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step4_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step4_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '4/5',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_upward, // Ok yukarı göstermeli
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      
+      // ADIM 5: Bakiye
+      TargetFocus(
+        identify: "balance",
+        keyTarget: _balanceKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step5_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step5_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '5/5',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'tutorial.finish'.tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ];
   }
 }
 

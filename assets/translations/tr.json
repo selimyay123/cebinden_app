@@ -595,5 +595,19 @@
     "invalidNumber": "Geçersiz sayı formatı",
     "minAmount": "Minimum miktar",
     "maxAmount": "Maksimum miktar"
+  },
+  "tutorial": {
+    "skip": "Atla",
+    "finish": "Tamamla",
+    "step1_title": "İlanlar 🚗",
+    "step1_desc": "Buradan araç ilanlarını inceleyebilir ve satın alabilirsiniz.",
+    "step2_title": "Garajım 🏠",
+    "step2_desc": "Satın aldığınız araçlar garajınızda görünür.",
+    "step3_title": "Araç Sat 💰",
+    "step3_desc": "Garajınızdaki araçları satışa çıkararak para kazanın.",
+    "step4_title": "Teklifler 📩",
+    "step4_desc": "Gelen ve gönderdiğiniz teklifleri buradan yönetin.",
+    "step5_title": "Bakiye 💵",
+    "step5_desc": "Paranızı al-sat yaparak artırın. Bol şans!"
   }
 }

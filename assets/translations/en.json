@@ -595,5 +595,19 @@
     "invalidNumber": "Invalid number format",
     "minAmount": "Minimum amount",
     "maxAmount": "Maximum amount"
+  },
+  "tutorial": {
+    "skip": "Skip",
+    "finish": "Finish",
+    "step1_title": "Market 🚗",
+    "step1_desc": "Browse and purchase vehicle listings here.",
+    "step2_title": "My Garage 🏠",
+    "step2_desc": "Your purchased vehicles appear in your garage.",
+    "step3_title": "Sell Vehicle 💰",
+    "step3_desc": "List your garage vehicles for sale and earn money.",
+    "step4_title": "Offers 📩",
+    "step4_desc": "Manage incoming and sent offers here.",
+    "step5_title": "Balance 💵",
+    "step5_desc": "Grow your money by trading. Good luck!"
   }
 }

@@ -64,60 +64,60 @@ class SellerProfile {
 
     switch (type) {
       case SellerType.strict:
-        // Sert (Tok Satıcı/Binici): En az %95-100 kabul eder
-        minRatio = 0.95 + random.nextDouble() * 0.05;
-        counterThreshold = 0.85; // %85 altı için karşı teklif
-        counterIncrease = 0.10 + random.nextDouble() * 0.05; // %10-15 artır
+        // Sert (Tok Satıcı/Binici): En az %98-100 kabul eder (YÜKSEK!)
+        minRatio = 0.98 + random.nextDouble() * 0.02;
+        counterThreshold = 0.88; // %88 altı için direkt red
+        counterIncrease = 0.15 + random.nextDouble() * 0.08; // %15-23 artır (AGRESIF)
         // 🆕 Zone System
-        insultZone = 0.75; // %75 altı hakaret
-        negotiationZone = 0.92; // %92 altı müzakere
-        fuzzyVariance = 0.02; // %2 sapma
+        insultZone = 0.82; // %82 altı hakaret (YÜKSEK!)
+        negotiationZone = 0.97; // %97 altı müzakere (ÇOK YÜKSEK!)
+        fuzzyVariance = 0.015; // %1.5 sapma (daha az random, daha katı)
         // 🆕 Patience
         patience = 2 + random.nextInt(2); // 2-3 tur (çabuk sıkılır)
         // 🆕 Reserve Price
-        reserveRatio = 0.90 + random.nextDouble() * 0.05; // %90-95 (çok az iner)
+        reserveRatio = 0.95 + random.nextDouble() * 0.04; // %95-99 (neredeyse inmez!)
         break;
       case SellerType.moderate:
-        // Ilımlı (Galerici): En az %85-95 kabul eder
-        minRatio = 0.85 + random.nextDouble() * 0.10;
-        counterThreshold = 0.75; // %75 altı için karşı teklif
-        counterIncrease = 0.07 + random.nextDouble() * 0.05; // %7-12 artır
+        // Ilımlı (Galerici): En az %94-98 kabul eder (YÜKSEK!)
+        minRatio = 0.94 + random.nextDouble() * 0.04;
+        counterThreshold = 0.82; // %82 altı için direkt red
+        counterIncrease = 0.12 + random.nextDouble() * 0.06; // %12-18 artır
         // 🆕 Zone System
-        insultZone = 0.70; // %70 altı hakaret
-        negotiationZone = 0.88; // %88 altı müzakere
-        fuzzyVariance = 0.025; // %2.5 sapma
+        insultZone = 0.75; // %75 altı hakaret
+        negotiationZone = 0.93; // %93 altı müzakere (YÜKSEK!)
+        fuzzyVariance = 0.02; // %2 sapma
         // 🆕 Patience
         patience = 3 + random.nextInt(2); // 3-4 tur (dengeli sabır)
         // 🆕 Reserve Price
-        reserveRatio = 0.85 + random.nextDouble() * 0.08; // %85-93 (dengeli)
+        reserveRatio = 0.90 + random.nextDouble() * 0.06; // %90-96 (daha katı)
         break;
       case SellerType.flexible:
-        // Esnek: En az %75-85 kabul eder
-        minRatio = 0.75 + random.nextDouble() * 0.10;
-        counterThreshold = 0.65; // %65 altı için karşı teklif
-        counterIncrease = 0.05 + random.nextDouble() * 0.05; // %5-10 artır
+        // Esnek: En az %88-94 kabul eder (ORTA-YÜKSEK!)
+        minRatio = 0.88 + random.nextDouble() * 0.06;
+        counterThreshold = 0.75; // %75 altı için direkt red
+        counterIncrease = 0.08 + random.nextDouble() * 0.05; // %8-13 artır
         // 🆕 Zone System
-        insultZone = 0.65; // %65 altı hakaret
-        negotiationZone = 0.82; // %82 altı müzakere
-        fuzzyVariance = 0.03; // %3 sapma
+        insultZone = 0.68; // %68 altı hakaret
+        negotiationZone = 0.87; // %87 altı müzakere
+        fuzzyVariance = 0.025; // %2.5 sapma
         // 🆕 Patience
         patience = 4 + random.nextInt(2); // 4-5 tur (sabırlı)
         // 🆕 Reserve Price
-        reserveRatio = 0.80 + random.nextDouble() * 0.08; // %80-88 (esnek)
+        reserveRatio = 0.85 + random.nextDouble() * 0.07; // %85-92 (esnek ama yine yüksek)
         break;
       case SellerType.desperate:
-        // Aceleci (Acil Satıcı): En az %65-75 kabul eder
-        minRatio = 0.65 + random.nextDouble() * 0.10;
-        counterThreshold = 0.50; // %50 altı için karşı teklif
-        counterIncrease = 0.03 + random.nextDouble() * 0.05; // %3-8 artır
+        // Aceleci (Acil Satıcı): En az %82-88 kabul eder (ORTA)
+        minRatio = 0.82 + random.nextDouble() * 0.06;
+        counterThreshold = 0.68; // %68 altı için direkt red
+        counterIncrease = 0.06 + random.nextDouble() * 0.05; // %6-11 artır
         // 🆕 Zone System
-        insultZone = 0.55; // %55 altı hakaret
-        negotiationZone = 0.75; // %75 altı müzakere
-        fuzzyVariance = 0.035; // %3.5 sapma (daha tahmin edilemez)
+        insultZone = 0.60; // %60 altı hakaret
+        negotiationZone = 0.82; // %82 altı müzakere
+        fuzzyVariance = 0.03; // %3 sapma
         // 🆕 Patience
         patience = 5 + random.nextInt(2); // 5-6 tur (çok sabırlı)
         // 🆕 Reserve Price
-        reserveRatio = 0.70 + random.nextDouble() * 0.12; // %70-82 (çok esnek, acil)
+        reserveRatio = 0.78 + random.nextDouble() * 0.08; // %78-86 (esnek ama yine de yüksek)
         break;
     }
 
@@ -149,6 +149,7 @@ class SellerProfile {
     // 🆕 PRICE BAND ADJUSTMENT: Araç fiyatına göre eşikleri ayarla
     // Yüksek fiyatlı araçlarda daha katı ol
     final priceBandMultiplier = _calculatePriceBandMultiplier(listingPrice);
+    final priceBandBonus = _calculatePriceBandBonus(listingPrice); // 🆕 Yüksek fiyat = yüksek eşik
     
     // 🆕 FUZZY LOGIC: Küçük bir rastgele sapma ekle (%2-3)
     // Bu, aynı teklifin her seferinde farklı sonuç verebilmesini sağlar
@@ -162,13 +163,18 @@ class SellerProfile {
     final adjustedInsultZone = insultZoneThreshold * priceBandMultiplier;
     final adjustedNegotiationZone = negotiationZoneThreshold + (1.0 - priceBandMultiplier) * 0.05;
     
+    // 🆕 KRİTİK: Kabul eşiğini fiyat bandına göre YÜKSELT!
+    // Pahalı araçlarda daha yüksek oran gerekli
+    final adjustedMinAcceptable = minAcceptableRatio + priceBandBonus;
+    
     // 🆕 PATIENCE CHECK: Sabır tükendi mi?
     final isPatienceExhausted = currentRounds >= maxPatience;
     
     if (isPatienceExhausted) {
       // Sabır tükendi! Artık karşı teklif yok, nihai karar zamanı
       // Eğer teklif minimum kabul edilebilir oranın üstündeyse kabul et, değilse reddet
-      if (adjustedRatio >= minAcceptableRatio * 0.90) {
+      // 🆕 Fiyat bandına göre ayarlanmış eşiği kullan
+      if (adjustedRatio >= adjustedMinAcceptable * 0.90) {
         // Son bir şans: %90'dan fazlası ise kabul et
         return {
           'decision': 'accept',
@@ -221,23 +227,42 @@ class SellerProfile {
     // 🟢 BÖLGE 3: KABUL BÖLGESÖ (Acceptance Zone)
     // Yüksek teklif - Kabul edilebilir veya son nazlanma
     else {
-      // Fuzzy logic: Bazen yüksek teklifi bile nazlanarak kabul et
-      if (adjustedRatio >= 0.95 && random.nextDouble() < 0.15) {
-        // %15 ihtimalle "biraz daha artsanız?" diye nazlan
-        final finalOffer = offerPrice * 1.02; // %2 daha fazla iste
+      // 🆕 Fiyat bandına göre ayarlanmış kabul eşiğini kontrol et
+      if (adjustedRatio >= adjustedMinAcceptable) {
+        // Fuzzy logic: Bazen yüksek teklifi bile nazlanarak kabul et
+        if (adjustedRatio >= 0.95 && adjustedRatio < 0.98 && random.nextDouble() < 0.15) {
+          // %15 ihtimalle "biraz daha artsanız?" diye nazlan
+          final finalOffer = offerPrice * 1.02; // %2 daha fazla iste
+          return {
+            'decision': 'counter',
+            'counterAmount': finalOffer,
+            'response': _getFinalBargainMessage(finalOffer),
+            'zone': 'final_bargain',
+          };
+        }
+        
+        return {
+          'decision': 'accept',
+          'response': _getAcceptMessage(),
+          'zone': 'accept',
+        };
+      } else {
+        // 🆕 Kabul bölgesinde ama eşik altında - karşı teklif ver
+        final counterOffer = _calculateSmartCounterOffer(
+          offerPrice: offerPrice,
+          listingPrice: listingPrice,
+          reservePrice: reservePrice,
+          sellerBias: counterOfferIncrease,
+          random: random,
+        );
+        
         return {
           'decision': 'counter',
-          'counterAmount': finalOffer,
-          'response': _getFinalBargainMessage(finalOffer),
-          'zone': 'final_bargain', // Debug için
+          'counterAmount': counterOffer,
+          'response': _getCounterOfferMessage(counterOffer),
+          'zone': 'acceptance_counter',
         };
       }
-      
-      return {
-        'decision': 'accept',
-        'response': _getAcceptMessage(),
-        'zone': 'accept', // Debug için
-      };
     }
   }
 
@@ -334,7 +359,7 @@ class SellerProfile {
   }
   
   // 🆕 PRICE BAND MULTIPLIER: Araç fiyatına göre eşik çarpanı
-  // Yüksek fiyatlı araçlarda daha katı eşikler
+  // Yüksek fiyatlı araçlarda daha katı eşikler (zone thresholds için)
   double _calculatePriceBandMultiplier(double listingPrice) {
     if (listingPrice < 500000) {
       return 1.0; // 0-500K: Normal eşikler (esnek)
@@ -347,44 +372,62 @@ class SellerProfile {
     }
   }
   
+  // 🆕 PRICE BAND BONUS: Araç fiyatı arttıkça kabul eşiğini YÜKSELTir
+  // Pahalı araçlarda daha yüksek teklif oranı gerekli
+  double _calculatePriceBandBonus(double listingPrice) {
+    if (listingPrice < 500000) {
+      return 0.0; // 0-500K: Normal kabul eşiği
+    } else if (listingPrice < 1000000) {
+      return 0.01; // 500K-1M: +%1 daha yüksek eşik
+    } else if (listingPrice < 2000000) {
+      return 0.02; // 1M-2M: +%2 daha yüksek
+    } else if (listingPrice < 3000000) {
+      return 0.03; // 2M-3M: +%3 daha yüksek
+    } else if (listingPrice < 5000000) {
+      return 0.04; // 3M-5M: +%4 daha yüksek
+    } else {
+      return 0.05; // 5M+: +%5 daha yüksek (ÇOK KATİ!)
+    }
+  }
+  
   // 🆕 SMART COUNTER OFFER: Mantıklı karşı teklif hesapla
-  // Orta yolu bul ama satıcı lehine hafif kayma
-  // 🆕 RESERVE PRICE ile çalışır (gerçek hedef fiyat)
+  // 🔥 KRİTİK: Karşı teklifler İLAN FİYATINA YAKIN olmalı, orta nokta değil!
+  // Gerçek hayatta galericiler çok az iner
   double _calculateSmartCounterOffer({
     required double offerPrice,
     required double listingPrice,
-    required double reservePrice, // 🆕 Satıcının gerçek hedefi
-    required double sellerBias, // 0.03-0.15 arası (satıcının ısrarı)
+    required double reservePrice, // Satıcının gerçek hedefi
+    required double sellerBias, // 0.06-0.23 arası (satıcının ısrarı)
     required Random random,
   }) {
-    // 1. Orta noktayı bul (teklif ile reserve arasında)
-    // Artık listed price'ı orta nokta için kullanmıyoruz!
-    final targetMidPoint = (offerPrice + reservePrice) / 2;
+    // 1. 🔥 YENİ MANTIK: İlan fiyatından başla, satıcı bias'ına göre az iner
+    // Eski: Orta noktayı bul → ÇOK YUMUŞAK ❌
+    // Yeni: İlan fiyatından küçük bir indirim yap → GERÇEKÇÖ ✅
     
-    // 2. Ancak listed price'dan çok uzaklaşmamalı (gerçekçilik için)
-    final maxCounter = listingPrice * 0.98; // İlan fiyatının %98'i max
-    final minCounter = reservePrice * 0.95; // Reserve'in %95'i min
+    // 2. Kullanıcı teklifini dikkate al (çok düşükse biraz daha iner)
+    // Ama yine de ilan fiyatına yakın kalır
+    final userOfferRatio = offerPrice / listingPrice;
     
-    // 3. Orta nokta bu aralıkta olmalı
-    final midPoint = targetMidPoint.clamp(minCounter, maxCounter);
+    double adjustedCounter;
+    if (userOfferRatio < 0.85) {
+      // Çok düşük teklif, biraz daha aşağı in ama yine de yüksek kal
+      adjustedCounter = listingPrice * (0.93 + random.nextDouble() * 0.04); // %93-97
+    } else if (userOfferRatio < 0.92) {
+      // Orta teklif, ilan fiyatına yakın dur
+      adjustedCounter = listingPrice * (0.95 + random.nextDouble() * 0.03); // %95-98
+    } else {
+      // İyi teklif, çok az in
+      adjustedCounter = listingPrice * (0.97 + random.nextDouble() * 0.02); // %97-99
+    }
     
-    // 4. Satıcı lehine kayma (bias'a göre)
-    // sellerBias yüksekse (strict) daha fazla ısrar eder
-    final biasAmount = (reservePrice - offerPrice) * sellerBias * 0.5;
+    // 4. Reserve price'ın altına inme (mantık kontrolü)
+    adjustedCounter = adjustedCounter.clamp(reservePrice * 1.02, listingPrice * 0.99);
     
-    // 5. Karşı teklif = Orta nokta + Bias + Küçük random
-    final baseCounterOffer = midPoint + biasAmount;
+    // 5. Kullanıcı teklifinden mutlaka yüksek ol
+    adjustedCounter = adjustedCounter.clamp(offerPrice * 1.05, listingPrice * 0.99);
     
-    // 6. Küçük bir randomness ekle (%1-2 arası)
-    final randomAdjustment = baseCounterOffer * (random.nextDouble() * 0.02 - 0.01);
-    
-    final counterOffer = baseCounterOffer + randomAdjustment;
-    
-    // 7. Mantık kontrolü: Karşı teklif mantıklı aralıkta olmalı
-    final clampedCounter = counterOffer.clamp(offerPrice * 1.03, listingPrice * 0.98);
-    
-    // 8. 1000'e yuvarla (daha gerçekçi görünsün)
-    return (clampedCounter / 1000).round() * 1000.0;
+    // 6. 1000'e yuvarla (daha gerçekçi görünsün)
+    return (adjustedCounter / 1000).round() * 1000.0;
   }
 }
 
