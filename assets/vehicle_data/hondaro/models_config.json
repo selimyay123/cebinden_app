@@ -1,0 +1,270 @@
+{
+  "brand": "Hondaro",
+  "spawnRate": 0.087,
+  "description": "Güvenilirlik + performans şampiyonu, CVT mükemmelliği, ECO (LPG) avantajı, ikinci el kralı, değer koruması maksimum",
+  "models": [
+    {
+      "code": "Vice",
+      "realName": "Civic",
+      "spawnRate": 0.8046,
+      "description": "İkinci el kralı, CVT güvenilirlik, ECO avantajı",
+      "segment": "C",
+      "basePriceTL": 1850000,
+      "priceRange": "1500000-1850000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin (VTEC)", "Benzin+LPG (ECO)"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik (CVT)"],
+        "notes": "CVT (ÇOK GÜVENİLİR!) + eski tork konv."
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.5-1.6",
+      "horsepowerRange": "125-182",
+      "notes": [
+        "İKİNCİ EL KRALI - Corolla ile birlikte EN AZ değer kaybı!",
+        "MAKSIMUM DEĞER KORUMASI (+%9) - uzun süre tutulsa bile zarar düşük",
+        "CVT GÜVENİLİRLİĞİ (+%15) - DSG/Powershift/DCT risklerinden TAM UZAK!",
+        "Focus Powershift/Tenis DSG riskine karşı en güvenli alım",
+        "RİSKSİZ YATIRIM - garantili kar",
+        "ECO (FABRİKA ÇIKIŞLI LPG) - Honda'nın özel avantajı (+%11 değer!)",
+        "Düşük yakıt maliyeti - geniş alıcı kitlesi - yüksek talep",
+        "ECO versiyonlar standart benzinliye göre ekstra prim",
+        "RS/TURBO PERFORMANS NİŞİ - 1.5 VTEC Turbo 182 HP (+%7 ekstra)",
+        "Performans arayan genç alıcılar - yüksek performans primi",
+        "RS donanım sportif - hızlı satış",
+        "1.6 VTEC: En yaygın motor - LPG uyumu yüksek",
+        "125 HP: Temel güç - güvenilir",
+        "Sedan: Türkiye'de en yaygın - hızlı satış",
+        "Hatchback: 10. nesilde popüler - genç alıcı",
+        "Yüksek kilometrede bile sorunsuz - Honda kalitesi",
+        "Executive/Elegance: En dolu donanım - maksimum fiyat",
+        "Corolla ile rekabet - benzer güvenilirlik",
+        "EN KÂRLI VE İSTİKRARLI ticaret araçlarından",
+        "Yüksek güvenilirlik primi - istikrarlı sat"
+      ]
+    },
+    {
+      "code": "VHL",
+      "realName": "CR-V",
+      "spawnRate": 0.1034,
+      "description": "SUV konforu, hibrit teknoloji, CVT güvenilirlik",
+      "segment": "C-SUV",
+      "basePriceTL": 2700000,
+      "priceRange": "2000000-2700000",
+      "bodyTypes": {
+        "2010-2025": ["SUV"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin (VTEC Turbo)", "Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Otomatik (CVT)"],
+        "notes": "CVT (ÇOK GÜVENİLİR!) - Manuel nadir"
+      },
+      "driveType": "Önden (FWD) / AWD (4x4)",
+      "engineSizeRange": "1.5-2.0",
+      "horsepowerRange": "155-193",
+      "notes": [
+        "MAKSİMUM ŞANZIMAN GÜVENİLİRLİĞİ - CVT (+%16)",
+        "Kuga/Tiguan/Kascon DCT/DSG risklerine karşı EN RİSKSİZ otomatik",
+        "CR-V ticareti güvenli ve garantili kar",
+        "İKİNCİ EL DEĞER KORUMASI - SUV'larda EN AZ kayıp (+%7)",
+        "Yüksek kilometreli bile diğer rakiplere göre az zarar",
+        "HİBRİT PRİMİ - 2.0 Hibrit premium SUV (+%26 değer!)",
+        "Yakıt ekonomisi üstün - en hızlı ve kârlı satan",
+        "AWD (4x4) PRİMİ - dört çekiş (+%14 ekstra!)",
+        "AWD + CVT kombinasyonu - prestij + güvenlik",
+        "FWD standart - en yaygın",
+        "KONFOR ODAKLI SATIŞ - aileler ve uzun yol",
+        "Kuga/Kascon'dan daha konforlu - geniş iç mekan",
+        "Premium SUV segmentinde güvenilir oyuncu",
+        "1.5 VTEC Turbo: Yeni nesil - güçlü ve verimli",
+        "2.0: Eski nesil + Hibrit ana motor",
+        "155-170 HP: Yaygın motor güçleri",
+        "190+ HP: Hibrit/Turbo tavan",
+        "Executive: En dolu donanım - maksimum fiyat",
+        "6. nesil en yeni - en pahalı",
+        "Dizel artık yok - benzin + hibrit odaklanma"
+      ]
+    },
+    {
+      "code": "Kent",
+      "realName": "City",
+      "spawnRate": 0.0575,
+      "description": "Ekonomik sedan, yüksek güç, CVT güvenilir",
+      "segment": "B-Sedan",
+      "basePriceTL": 1100000,
+      "priceRange": "950000-1100000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin (i-VTEC)", "Benzin+LPG"]
+      },
+      "transmissions": {
+        "types": ["Otomatik (CVT)"],
+        "notes": "CVT (GÜVENİLİR!) - Manuel yok"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.5",
+      "horsepowerRange": "121",
+      "notes": [
+        "CVT GÜVENİLİRLİĞİ - Rekabet avantajı (+%12)",
+        "Tallion/Agna tam otomatiklerine benzer güvenilirlik",
+        "Honda markasıyla daha yüksek satış hızı",
+        "YÜKSEK GÜÇ/DÜŞÜK RİSK PRİMİ (+%5)",
+        "121 HP - Agna (95-100 HP) ve Tallion'dan (90 HP) YÜKSEK",
+        "Performans farkıyla pazarla - küçük performans primi",
+        "HONDA GÜVENİLİRLİĞİ (+%5 değer koruması)",
+        "Değer kaybı az - prestijli Japon markası",
+        "Agna/Tallion'a göre daha prestijli algı",
+        "Tek motor: 1.5 i-VTEC 121 HP - sabit güç",
+        "LPG uyumu yüksek",
+        "TEK DONANIM RİSKİ - kâr marjı sınırlı",
+        "Donanım farkından kar yaratma yok",
+        "Ticaret kilometre düşüklüğü ve hasarsızlık üzerine",
+        "Geniş iç mekan - konforlu",
+        "Ekonomik sedan segmentinde güvenilirlik + konfor",
+        "Tek kasa: Sedan 4 kapı",
+        "Executive: En dolu donanım",
+        "Nispeten yeni model",
+        "Dizel/Hibrit seçeneği yok"
+      ]
+    },
+    {
+      "code": "Caz",
+      "realName": "Jazz",
+      "spawnRate": 0.0345,
+      "description": "Sihirli koltuk, hibrit teknoloji, kompakt pratik",
+      "segment": "B-Hatchback",
+      "basePriceTL": 1450000,
+      "priceRange": "1200000-1450000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin (VTEC)", "Hybrid (e:HEV)", "Benzin+LPG"]
+      },
+      "transmissions": {
+        "types": ["Manuel (eski)", "Otomatik (CVT)"],
+        "notes": "CVT (ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.3-1.5",
+      "horsepowerRange": "90-122",
+      "notes": [
+        "SİHİRLİ KOLTUK PRİMİ (+%6 ekstra!) - en büyük ayırt edici özellik",
+        "Arka koltuklar zemine yatay katlanır - ekstra pratiklik",
+        "Yüksek taşıma kapasitesi - niş alıcılara hitap",
+        "Yüksek tavan - geniş iç mekan algısı",
+        "HİBRİT VE CVT GÜVENİLİRLİĞİ (+%13)",
+        "Yeni nesil 1.5 e:HEV Hibrit (+%23 değer!)",
+        "En risksiz alım - en yüksek kar marjı",
+        "Garantili kar - CVT + Hibrit kombinasyonu",
+        "YÜKSEK FİYAT/NİŞ PAZAR - Vista/A10'dan pahalı",
+        "Daha az alıcı AMA daha yüksek kar marjı",
+        "Alıcı kitlesi: Pratiklik + güvenilirlik + yüksek tavan",
+        "Genellikle yaşlı veya aile kitlesi",
+        "ESKİ NESİL YÜKSEK TAVAN - değer korunur (+%6)",
+        "Düşük km + temiz: İkinci elde yüksek değer",
+        "Yüksek oturma pozisyonu arayanlar",
+        "1.3 litre: Eski nesil en yaygın",
+        "1.5 litre: Yeni Hibrit ana motor",
+        "90-100 HP: Eski nesil motorlar",
+        "122 HP: Yeni Hibrit tavan",
+        "LPG uyumu (eski): Ekonomik (+%8 değer)",
+        "Tek kasa: Hatchback 5 kapı",
+        "Executive/Style: En dolu donanım",
+        "Yeni nesil SADECE Hibrit - en pahalı",
+        "Karma Hibrit ile rekabet - benzer segment"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "Vice": "İkinci el kralı - maksimum değer koruması (+%9) - CVT güvenilir (+%15) - ECO (LPG) avantajı (+%11) - RS/Turbo performans (+%7) - risksiz yatırım",
+      "VHL": "SUV güvenilirliği - CVT maksimum (+%16) - Hibrit primi (+%26) - AWD prestij (+%14) - konfor odaklı - değer koruması (+%7)",
+      "Kent": "CVT güvenilirlik (+%12) - yüksek güç avantajı (+%5) - Honda prestiji (+%5) - tek donanım kısıtı - km ve hasarsızlık odaklı",
+      "Caz": "Sihirli koltuk primi (+%6) - Hibrit + CVT güvenilir (+%13) - yüksek fiyat/niş pazar - pratiklik + yüksek tavan - değer koruması (+%6)"
+    },
+    "cvtReliabilitySystem": {
+      "Vice": "+%15 değer - DSG/Powershift/DCT risklerinden TAM UZAK - garantili kar",
+      "VHL": "+%16 değer - SUV segmentinde maksimum güvenilirlik - Kuga/Tiguan/Kascon DCT/DSG'ye karşı avantaj",
+      "Kent": "+%12 değer - Tallion CVT/Agna otomatik seviyesi - Honda markasıyla daha hızlı satış",
+      "Caz": "+%13 değer - CVT + Hibrit kombinasyonu - garantili yüksek kar"
+    },
+    "valueRetention": {
+      "Vice_Maksimum": "+%9 - Corolla ile birlikte EN AZ değer kaybı - ikinci el kralı - uzun süre tutulsa bile zarar düşük",
+      "VHL_Yüksek": "+%7 - SUV segmentinde en az kayıp - yüksek km bile az zarar",
+      "Kent_İyi": "+%5 - Honda prestiji - Agna/Tallion'dan daha prestijli - değer korunur",
+      "Caz_İyi": "+%6 - sihirli koltuk + yüksek tavan - düşük km temiz örnekler değerli"
+    },
+    "ecoLpgAdvantage": {
+      "Vice_ECO": "Fabrika çıkışlı LPG - +%11 değer - düşük yakıt maliyeti - geniş alıcı kitlesi - yüksek talep - standart benzinliye ekstra prim",
+      "Kent_LPG": "LPG uyumu yüksek - +%9 değer - ekonomik seçenek",
+      "Caz_LPG_Eski": "Eski nesil LPG uyumu - +%8 değer - ekonomik"
+    },
+    "hybridPremium": {
+      "VHL_2.0_Hibrit": "+%26 değer - premium SUV hibrit - yakıt ekonomisi üstün - en hızlı ve kârlı satan",
+      "Caz_1.5_eHEV": "+%23 değer - yeni nesil sadece hibrit - çok verimli - en risksiz alım - garantili kar"
+    },
+    "awdPremium": {
+      "VHL_AWD": "+%14 ekstra - dört çekiş prestij + güvenlik - AWD + CVT kombinasyonu - FWD standart"
+    },
+    "performanceNiche": {
+      "Vice_RS_Turbo": "1.5 VTEC Turbo 182 HP - +%7 ekstra - performans arayan genç alıcılar - sportif sürüş - hızlı satış"
+    },
+    "magicSeatsPremium": {
+      "Caz_Sihirli_Koltuk": "+%6 ekstra - arka koltuklar zemine yatay katlanır - yüksek taşıma kapasitesi - yüksek tavan - pratiklik - niş alıcı"
+    },
+    "highPowerAdvantage": {
+      "Kent_121_HP": "+%5 - Agna (95-100 HP) ve Tallion (90 HP)'dan yüksek - performans farkıyla pazarla"
+    },
+    "bodyTypeDynamics": {
+      "Vice_Sedan": "Türkiye'de en yaygın - hızlı satış",
+      "Vice_Hatchback": "10. nesilde popüler - genç alıcı",
+      "VHL_SUV": "Tek kasa - 5 kapı",
+      "Kent_Sedan": "Tek kasa - 4 kapı",
+      "Caz_Hatchback": "Tek kasa - 5 kapı - yüksek tavan"
+    },
+    "singleTrimRisk": {
+      "Kent": "Tek veya az donanım - donanım farkından kar marjı yok - ticaret kilometre düşüklüğü ve hasarsızlık üzerine"
+    },
+    "nichMarket": {
+      "Caz": "Yüksek fiyat - Vista/A10'dan pahalı - daha az alıcı AMA daha yüksek kar - pratiklik + güvenilirlik + yüksek tavan - yaşlı/aile kitlesi"
+    },
+    "profitStrategy": {
+      "Vice": "ECO (LPG) ARA! (+%11) - CVT güvenilirlik vurgusu (+%15) - RS/Turbo performans niş (+%7) - değer koruması maksimum (+%9) - risksiz yatırım - uzun tutulsa bile zarar düşük",
+      "VHL": "HİBRİT ARA! (+%26) - AWD dört çekiş değerli (+%14) - CVT maksimum güvenilirlik (+%16) - konfor odaklı sat (aile/uzun yol) - değer koruması (+%7) - garantili kar",
+      "Kent": "CVT güvenilirlik vurgusu (+%12) - yüksek güç avantajı sat (+%5) - Honda prestiji vurgusu (+%5) - LPG uyumu (+%9) - kilometre düşüklüğü odaklan - Agna/Tallion'a karşı prestij avantajı",
+      "Caz": "HİBRİT ARA! (+%23) - sihirli koltuk pratikliği sat (+%6) - CVT güvenilir (+%13) - yüksek tavan/geniş iç mekan - pratiklik arayan niş alıcı (yaşlı/aile) - sabır gerek ama yüksek kar"
+    },
+    "competitivePositioning": {
+      "Vice_vs_Airoko": "Benzer güvenilirlik ve değer koruması - CVT benzer güvenilir - ECO (LPG) Honda avantajı - RS/Turbo performans niş",
+      "Vice_vs_Odak_Tenis": "Çok daha güvenilir - CVT vs Powershift/DSG riski - değer koruması çok daha iyi",
+      "VHL_vs_Kuga_Kascon": "CVT maksimum güvenilir - DCT/DSG riskine karşı - konfor daha üstün - değer koruması en iyi",
+      "Kent_vs_Agna_Tallion": "Yüksek güç (+%5) - Honda prestiji (+%5) - CVT güvenilir - değer korunur - prestijli Japon markası",
+      "Caz_vs_Vista_Karma": "Daha pahalı - sihirli koltuk özel - Hibrit güçlü - niş pazar - yüksek kar"
+    },
+    "criticalFactors": [
+      "İKİNCİ EL KRALI (Vice) = Corolla ile birlikte EN AZ değer kaybı (+%9) - maksimum değer koruması",
+      "CVT GÜVENİLİRLİĞİ = TÜM MODELLERDE - DSG/Powershift/DCT risklerinden TAM UZAK - Vice +%15, VHL +%16, Kent +%12, Caz +%13",
+      "ECO (LPG) AVANTAJI (Vice) = Fabrika çıkışlı LPG - +%11 değer - Honda'nın özel avantajı - geniş alıcı",
+      "HİBRİT PRİMİ = VHL 2.0 (+%26), Caz 1.5 e:HEV (+%23) - en hızlı ve kârlı satan",
+      "AWD PRİMİ (VHL) = +%14 ekstra - dört çekiş prestij + güvenlik",
+      "RS/TURBO PERFORMANS (Vice) = 1.5 VTEC Turbo 182 HP - +%7 ekstra - genç alıcılar",
+      "SİHİRLİ KOLTUK (Caz) = +%6 ekstra - en büyük ayırt edici özellik - yüksek taşıma - niş alıcı",
+      "YÜKSEK GÜÇ (Kent) = 121 HP +%5 - Agna/Tallion'dan yüksek - performans farkı",
+      "DEĞER KORUMASI = Vice +%9 (maksimum), VHL +%7 (SUV en iyi), Kent +%5 (prestij), Caz +%6 (pratiklik)",
+      "RİSKSİZ YATIRIM = Tüm modellerde CVT güvenilirlik - garantili kar - uzun tutulsa bile zarar düşük",
+      "KONFOR ODAKLI (VHL) = Kuga/Kascon'dan daha konforlu - geniş iç mekan - aile/uzun yol",
+      "NİŞ PAZAR (Caz) = Yüksek fiyat - az alıcı AMA yüksek kar - pratiklik/yaşlı/aile kitlesi",
+      "TEK DONANIM (Kent) = Donanım farkı yok - km düşüklüğü ve hasarsızlık odaklı ticaret"
+    ]
+  }
+}
+

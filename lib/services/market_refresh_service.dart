@@ -49,16 +49,68 @@ class MarketRefreshService {
       'Signa': 0.1150,     // Symbol - %11.50
       'Tallion': 0.0273,   // Taliant - %2.73
     },
+    'Voltswagen': {
+      'Paso': 0.40,        //  - %40
+      'Tenis': 0.25,       // Golf - %25
+      'Colo': 0.22,        // Polo - %22
+      'Jago': 0.13,        // Jetta - %13
+    },
+    'Fialto': {
+      'Agna': 0.7145,      // Egea - %71.45 (HACIM KRALI!)
+      'Lagua': 0.2280,     // Linea - %22.80
+      'Zorno': 0.0572,     // Punto - %5.72
+    },
+    'Opexel': {
+      'Tasra': 0.55,       // Astra - %55
+      'Lorisa': 0.323,     // Corsa - %32.3
+      'Mornitia': 0.127,   // Insignia - %12.7
+    },
+    'Bavora': {
+      'C Serisi': 0.40,    // 3 Serisi - %40
+      'E Serisi': 0.25,    // 5 Serisi - %25
+      'A Serisi': 0.22,    // 1 Serisi - %22
+      'D Serisi': 0.13,    // 4 Serisi - %13
+    },
+    'Fortran': {
+      'Odak': 0.5908,      // Focus - %59.08
+      'Vista': 0.2169,     // Fiesta - %21.69
+      'Avger': 0.1032,     // Ranger - %10.32
+      'Tupa': 0.0891,      // Kuga - %8.91
+    },
+    'Mercurion': {
+      '3 Serisi': 0.4218,  // C-Class - %42.18
+      '5 Serisi': 0.2840,  // E-Class - %28.40
+      '1 Serisi': 0.1019,  // A-Class - %10.19
+      'GJE': 0.0998,       // CLA - %9.98
+      '8 Serisi': 0.0926,  // G-Class - %9.26
+    },
+    'Hyundaro': {
+      'A10': 0.5215,       // i20 - %52.15
+      'Tecent Red': 0.1925, // Accent Blue - %19.25
+      'Tecent White': 0.1095, // Accent Era - %10.95
+      'A20': 0.0995,       // i30 - %9.95
+      'Kascon': 0.0769,    // Tucson - %7.69
+    },
+    'Toyoto': {
+      'Airoko': 0.8193,    // Corolla - %81.93
+      'Lotus': 0.1165,     // Auris - %11.65
+      'Karma': 0.0643,     // Yaris - %6.43
+    },
+    'Audira': {
+      'B3': 0.4505,        // A3 - %45.05
+      'B4': 0.2375,        // A4 - %23.75
+      'B6': 0.2087,        // A6 - %20.87
+      'B5': 0.1033,        // A5 - %10.33
+    },
+    'Hondaro': {
+      'Vice': 0.8046,      // Civic - %80.46
+      'VHL': 0.1034,       // CR-V - %10.34
+      'Kent': 0.0575,      // City - %5.75
+      'Caz': 0.0345,       // Jazz - %3.45
+    },
     // Diğer markalar için varsayılan olarak eşit dağılım kullanılacak
-    'Bavora': {},
-    'Mercurion': {},
-    'Audira': {},
-    'Toyoto': {},
-    'Voltswagen': {},
-    'Fortran': {},
     'Peugot': {},
     'Hondaro': {},
-    'Hyundaro': {},
     'Skodra': {},
     'Citronix': {},
     'Fialto': {},
@@ -68,19 +120,20 @@ class MarketRefreshService {
   // Marka-model eşleşmeleri (geriye dönük uyumluluk için)
   final Map<String, List<String>> _modelsByBrand = {
     'Renauva': ['Slim', 'Magna', 'Flow', 'Signa', 'Tallion'],
-    'Bavora': ['316i', '318i', '320i', '520d', 'X3', 'X5'],
-    'Mercurion': ['C180', 'C200', 'E200', 'E220d', 'GLE', 'GLA'],
-    'Audira': ['A3', 'A4', 'A6', 'Q3', 'Q5', 'Q7'],
-    'Toyoto': ['Corolla', 'Camry', 'RAV4', 'C-HR', 'Yaris'],
-    'Voltswagen': ['Golf', 'Polo', 'Passat', 'Tiguan', 'T-Roc'],
-    'Fortran': ['Focus', 'Fiesta', 'Mondeo', 'Kuga', 'Puma'],
+    'Voltswagen': ['Paso', 'Tenis', 'Colo', 'Jago'],
+    'Fialto': ['Agna', 'Lagua', 'Zorno'],
+    'Opexel': ['Tasra', 'Lorisa', 'Mornitia'],
+    'Bavora': ['C Serisi', 'E Serisi', 'A Serisi', 'D Serisi'],
+    'Fortran': ['Odak', 'Vista', 'Avger', 'Tupa'],
+    'Mercurion': ['3 Serisi', '5 Serisi', '1 Serisi', 'GJE', '8 Serisi'],
+    'Hyundaro': ['A10', 'Tecent Red', 'Tecent White', 'A20', 'Kascon'],
+    'Toyoto': ['Airoko', 'Lotus', 'Karma'],
+    'Audira': ['B3', 'B4', 'B6', 'B5'],
+    'Hondaro': ['Vice', 'VHL', 'Kent', 'Caz'],
     'Peugot': ['208', '308', '3008', '5008', '2008'],
     'Hondaro': ['Civic', 'Accord', 'CR-V', 'Jazz', 'HR-V'],
-    'Hyundaro': ['i20', 'i30', 'Tucson', 'Kona', 'Elantra'],
     'Skodra': ['Fabia', 'Octavia', 'Superb', 'Karoq', 'Kodiaq'],
     'Citronix': ['C3', 'C4', 'C5 Aircross', 'Berlingo', 'C-Elysée'],
-    'Fialto': ['Egea', '500', 'Tipo', 'Panda', 'Doblo'],
-    'Opexel': ['Corsa', 'Astra', 'Insignia', 'Crossland', 'Grandland'],
   };
 
   // Sabit veriler
@@ -94,7 +147,7 @@ class MarketRefreshService {
     'Gümüş', 'Kahverengi', 'Yeşil'
   ];
   
-  final List<String> _fuelTypes = ['Benzin', 'Dizel', 'Hybrid', 'Elektrik'];
+  final List<String> _fuelTypes = ['Benzin', 'Dizel', 'Hybrid', /* 'Elektrik' */];
   final List<String> _transmissions = ['Manuel', 'Otomatik'];
   final List<String> _engineSizes = ['1.0', '1.2', '1.4', '1.6', '1.8', '2.0', '2.2', '2.5', '3.0'];
   final List<String> _driveTypes = ['Önden', 'Arkadan', '4x4'];
@@ -104,82 +157,966 @@ class MarketRefreshService {
   // 2025 model yılı tavan fiyatları (brand -> model -> fiyat)
   final Map<String, Map<String, double>> _basePrices2025 = {
     'Renauva': {
-      'Slim': 1500000.0,    // Clio - 1.0 TCe tavan
-      'Magna': 1650000.0,   // Megane - 1.3 TCe tavan (en pahalı)
-      'Flow': 1200000.0,    // Fluence - Sedan tavan
-      // Diğer modeller eklenecek
+      'Slim': 1450000.0,    // Clio V (Icon, Touch, Esprit Alpine) - ₺1.200.000-₺1.450.000 tavan
+      'Magna': 1850000.0,   // Megane IV Sedan/HB (Icon, GT-Line) - ₺1.500.000-₺1.850.000 tavan
+      'Flow': 825000.0,     // Fluence (Üretim durdu, 2014-2016 en üst) - ₺700.000-₺825.000 tavan
+      'Signa': 875000.0,    // Symbol (2016-2020 Joy/Touch Plus) - ₺750.000-₺875.000 tavan
+      'Tallion': 1050000.0, // Taliant (2024-2025 Touch Plus) - ₺900.000-₺1.050.000 tavan
+    },
+    'Voltswagen': {
+      'Paso': 2200000.0,    // Passat B8/B8.5 (Highline, R-Line) - ₺1.800.000-₺2.200.000 tavan
+      'Tenis': 1800000.0,   // Golf VIII (R-Line, Highline) - ₺1.400.000-₺1.800.000 tavan
+      'Colo': 1300000.0,    // Polo (Comfortline/Highline) - ₺1.050.000-₺1.300.000 tavan
+      'Jago': 1150000.0,    // Jetta (Üretim durdu, 2016-2018 Highline) - ₺950.000-₺1.150.000 tavan
+    },
+    'Fialto': {
+      'Agna': 1250000.0,    // Egea (Lounge, Limited, Hibrit) - ₺1.050.000-₺1.250.000 tavan
+      'Lagua': 650000.0,    // Linea (Üretim durdu, 2014-2015 Emotion Plus) - ₺500.000-₺650.000 tavan
+      'Zorno': 580000.0,    // Punto (Üretim durdu, 2014-2015 Lounge) - ₺450.000-₺580.000 tavan
+    },
+    'Opexel': {
+      'Tasra': 1700000.0,   // Astra L (Ultimate, Elegance) - ₺1.350.000-₺1.700.000 tavan
+      'Lorisa': 1200000.0,  // Corsa F (Ultimate, Elegance) - ₺950.000-₺1.200.000 tavan
+      'Mornitia': 2000000.0, // Insignia B (Ultimate, Excellence) - ₺1.600.000-₺2.000.000 tavan
+    },
+    'Bavora': {
+      'C Serisi': 3500000.0,  // 3 Serisi G20 (M Sport, Luxury Line) - ₺2.500.000-₺3.500.000 tavan
+      'E Serisi': 5000000.0,  // 5 Serisi G30/G60 (M Sport, Executive) - ₺3.500.000-₺5.000.000 tavan
+      'A Serisi': 1850000.0,  // 1 Serisi F40 (M Sport) - ₺1.500.000-₺1.850.000 tavan
+      'D Serisi': 4000000.0,  // 4 Serisi G22/G26 (M Sport, Cabrio) - ₺2.800.000-₺4.000.000 tavan
+    },
+    'Fortran': {
+      'Odak': 1500000.0,      // Focus IV (Titanium, ST-Line) - ₺1.200.000-₺1.500.000 tavan
+      'Vista': 1150000.0,     // Fiesta VIII (ST-Line, Titanium) - ₺900.000-₺1.150.000 tavan
+      'Avger': 4500000.0,     // Ranger (Wildtrak, Bi-Turbo) - ₺2.500.000-₺4.500.000 tavan (Raptor daha yüksek!)
+      'Tupa': 2000000.0,      // Kuga III (Vignale, Hibrit) - ₺1.500.000-₺2.000.000 tavan
+    },
+    'Mercurion': {
+      '3 Serisi': 4000000.0,  // C-Class W206 (AMG Line, Exclusive, Hibrit) - ₺2.800.000-₺4.000.000 tavan
+      '5 Serisi': 5500000.0,  // E-Class W213 (AMG Line, Designo) - ₺3.800.000-₺5.500.000 tavan
+      '1 Serisi': 2200000.0,  // A-Class W177 (AMG Line, MBUX) - ₺1.700.000-₺2.200.000 tavan
+      'GJE': 3000000.0,       // CLA C118 (AMG Line, 4 Kapı Coupe) - ₺2.400.000-₺3.000.000 tavan
+      '8 Serisi': 25000000.0, // G-Class (G 63 AMG) - ₺15.000.000-₺25.000.000+ tavan - OYUNUN EN PAHALI ARACI!
+    },
+    'Hyundaro': {
+      'A10': 1100000.0,        // i20 III (Style Plus, Elite) - ₺900.000-₺1.100.000 tavan
+      'Tecent Red': 700000.0,  // Accent Blue (Mode Plus, Dizel Oto) - ₺550.000-₺700.000 tavan
+      'Tecent White': 520000.0, // Accent Era (Team, Dizel Oto) - ₺400.000-₺520.000 tavan
+      'A20': 1600000.0,        // i30 III (Elite, N-Line) - ₺1.250.000-₺1.600.000 tavan
+      'Kascon': 2500000.0,     // Tucson NX4 (Elite Plus, Hibrit) - ₺1.800.000-₺2.500.000 tavan
+    },
+    'Toyoto': {
+      'Airoko': 2000000.0,     // Corolla E210 (Passion, Flame X-Pack, Hibrit) - ₺1.550.000-₺2.000.000 tavan
+      'Lotus': 950000.0,       // Auris (Premium, Elegant, Hibrit) - ₺750.000-₺950.000 tavan
+      'Karma': 1300000.0,      // Yaris XP210 (Passion, Hibrit) - ₺1.000.000-₺1.300.000 tavan
+    },
+    'Audira': {
+      'B3': 2400000.0,         // A3 8Y (S Line, Edition One) 2023-2025 sıfıra yakın - ₺1.800.000-₺2.400.000 tavan
+      'B4': 3600000.0,         // A4 B9/B10 (S Line, Design, Quattro) 2023-2025 - ₺2.600.000-₺3.600.000 tavan
+      'B6': 5200000.0,         // A6 C8 (S Line, Exclusive, Quattro 3.0 V6) 2023-2025 - ₺4.000.000-₺5.200.000 tavan
+      'B5': 4000000.0,         // A5 B9 (S Line, Sportback, Quattro) 2023-2025 - ₺3.000.000-₺4.000.000 tavan
+    },
+    'Hondaro': {
+      'Vice': 1850000.0,       // Civic FL (Executive, RS, Turbo) - ₺1.500.000-₺1.850.000 tavan
+      'VHL': 2700000.0,        // CR-V 6. nesil (Executive, Hibrit, AWD) - ₺2.000.000-₺2.700.000 tavan
+      'Kent': 1100000.0,       // City (Executive, CVT) - ₺950.000-₺1.100.000 tavan
+      'Caz': 1450000.0,        // Jazz 4. nesil (Executive, Hibrit) - ₺1.200.000-₺1.450.000 tavan
     },
     // Diğer markalar eklenecek
   };
   
   // Model-spesifik teknik özellik kuralları
   final Map<String, Map<String, dynamic>> _modelSpecs = {
+    // RENAUVA SLIM (Clio) - %37.82 spawn
     'Renauva_Slim': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
-          {'years': [2010, 2018], 'types': ['Sedan', 'Hatchback']},
-          {'years': [2019, 2025], 'types': ['Hatchback']},
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // Clio V nesil (2010 sonrası) sadece 5 kapı
         ],
       },
       'fuelTypes': {
         'rule': 'year_based',
         'ranges': [
           {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG']},
-          {'years': [2010, 2020], 'types': ['Dizel']},
-          {'years': [2020, 2025], 'types': ['Hybrid']},
+          {'years': [2010, 2020], 'types': ['Dizel']}, // 1.5 dCi (Eski nesillerde)
+          {'years': [2020, 2025], 'types': ['Hybrid']}, // E-Tech Hibrit (Clio V)
         ],
       },
-      'transmissions': ['Manuel', 'Otomatik'], // 2010-2025 hepsi
-      'driveType': 'Önden', // Sabit
-      'engineSize': {'min': 0.9, 'max': 1.6}, // 898cc - 1598cc
-      'horsepower': {'min': 65, 'max': 145},
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5-6 ileri) + EDC/X-Tronic CVT
+      'driveType': 'Önden', // FWD - Tek ve standart
+      'engineSize': {'min': 0.9, 'max': 1.5}, // 0.9 TCe (eski), 1.0 SCe/TCe, 1.5 dCi
+      'horsepower': {'min': 65, 'max': 140}, // 65-140 HP (140 HP: E-Tech Hibrit)
     },
+    
+    // RENAUVA MAGNA (Megane) - %34.43 spawn
     'Renauva_Magna': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
           // Eski kasa (çeşitlilik fazla)
           {'years': [2010, 2015], 'types': ['Sedan', 'Hatchback', 'Coupe', 'Station Wagon']},
-          // Yeni kasa (daha modern, sınırlı çeşit)
+          // Yeni kasa (Megane IV - daha modern)
           {'years': [2016, 2025], 'types': ['Sedan', 'Hatchback', 'Station Wagon']},
         ],
       },
       'fuelTypes': {
         'rule': 'year_based',
         'ranges': [
-          // Eski jenerasyon (1.6 16V benzin yaygın)
+          // Eski jenerasyon
           {'years': [2010, 2015], 'types': ['Benzin', 'Benzin+LPG', 'Dizel']},
           // Yeni jenerasyon (1.3 TCe ve 1.5 dCi)
           {'years': [2016, 2025], 'types': ['Benzin', 'Dizel']},
-          // Hybrid sadece 2020 sonrası
-          {'years': [2020, 2025], 'types': ['Hybrid']},
         ],
       },
-      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5-6 ileri) + EDC Otomatik
-      'driveType': 'Önden', // Sabit - tüm Megane'ler önden çeker
-      'engineSize': {'min': 1.3, 'max': 1.6}, // 1330cc (1.3 TCe), 1461cc (1.5 dCi), 1598cc (1.6)
-      'horsepower': {'min': 85, 'max': 160}, // 85-160 HP aralığı
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (6 ileri) + EDC Otomatik (Çift Kavrama)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.3, 'max': 1.6}, // 1.3 TCe, 1.5 dCi, 1.6
+      'horsepower': {'min': 95, 'max': 140}, // 95-140 HP (130-140 HP: TCe üst versiyon)
     },
+    
+    // RENAUVA FLOW (Fluence) - %13.49 spawn
     'Renauva_Flow': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
-          // Fluence sadece Sedan
-          {'years': [2010, 2025], 'types': ['Sedan']},
+          {'years': [2010, 2025], 'types': ['Sedan']}, // Fluence sadece Sedan (4 Kapı)
         ],
       },
       'fuelTypes': {
         'rule': 'year_based',
         'ranges': [
-          // Tüm yıllar için benzin ve dizel
-          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG', 'Dizel']},
+          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG', 'Dizel']}, // 1.5 dCi çok popüler
         ],
       },
       'transmissions': ['Manuel', 'Otomatik'], // Manuel (5-6 ileri) + EDC Otomatik
-      'driveType': 'Önden', // Sabit - tüm Fluence'ler önden çeker
-      'engineSize': {'min': 1.3, 'max': 1.6}, // 1330cc (1.3 TCe), 1461cc (1.5 dCi), 1598cc (1.6)
-      'horsepower': {'min': 85, 'max': 160}, // 85-160 HP aralığı
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.5, 'max': 1.6}, // 1.5 dCi (1461cc), 1.6 Benzin (1598cc)
+      'horsepower': {'min': 90, 'max': 110}, // 90-110 HP (Konfor odaklı)
+    },
+    
+    // RENAUVA SIGNA (Symbol) - %11.50 spawn
+    'Renauva_Signa': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan']}, // Symbol sadece Sedan (4 Kapı)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG', 'Dizel']}, // 1.5 dCi en yaygın
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5 ileri) + Easy-R (Yarı Otomatik - problemli)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.2, 'max': 1.5}, // 1.2, 1.4, 1.5 dCi
+      'horsepower': {'min': 65, 'max': 95}, // 65-95 HP (Ekonomik yapı)
+    },
+    
+    // RENAUVA TALLION (Taliant) - %2.73 spawn
+    'Renauva_Tallion': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2021, 2025], 'types': ['Sedan']}, // Taliant sadece Sedan (4 Kapı), 2021 sonrası
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2021, 2025], 'types': ['Benzin', 'Benzin+LPG']}, // DİZEL YOK! Sadece Benzin/LPG
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5 ileri) + X-Tronic CVT (Modern, sorunsuz)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.0}, // Sadece 1.0 SCe/TCe (1.0 litre)
+      'horsepower': {'min': 65, 'max': 90}, // 65-90 HP (Ekonomik B segment)
+    },
+    
+    // VOLTSWAGEN PASO (Passat) - %40 spawn
+    'Voltswagen_Paso': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Station Wagon']}, // Station Wagon (Variant) nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // TSI (Benzin) ve TDI (Dizel)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (6-7 ileri) + DSG (Çift Kavrama - RİSKLİ!)
+      'driveType': 'Önden', // FWD - Standart (4Motion nadir)
+      'engineSize': {'min': 1.4, 'max': 2.0}, // 1.4/1.5 TSI, 1.6 TDI, 2.0 TDI
+      'horsepower': {'min': 120, 'max': 240}, // 120-240 HP (Premium segment)
+    },
+    
+    // VOLTSWAGEN TENIS (Golf) - %25 spawn
+    'Voltswagen_Tenis': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // 5 kapı standart
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // TSI ve TDI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (6-7 ileri) + DSG (RİSKLİ!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.6}, // 1.0 TSI, 1.2 TSI, 1.4/1.5 TSI, 1.6 TDI
+      'horsepower': {'min': 90, 'max': 150}, // 90-150 HP (GTI/R versiyonları hariç)
+    },
+    
+    // VOLTSWAGEN COLO (Polo) - %22 spawn
+    'Voltswagen_Colo': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // 5 kapı standart
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // TSI ve TDI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5 ileri) + DSG (Küçük motor, daha düşük risk)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.6}, // 1.0 TSI, 1.2 TSI, 1.4/1.6 TDI
+      'horsepower': {'min': 75, 'max': 115}, // 75-115 HP (Premium küçük segment)
+    },
+    
+    // VOLTSWAGEN JAGO (Jetta) - %13 spawn
+    'Voltswagen_Jago': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan']}, // Sadece Sedan (4 kapı)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // TSI ve TDI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (6-7 ileri) + DSG (ESKİ NESIL - YÜKSEK RİSK!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.2, 'max': 1.6}, // 1.2 TSI, 1.4 TSI, 1.6 TDI
+      'horsepower': {'min': 105, 'max': 150}, // 105-150 HP
+    },
+    
+    // FIALTO AGNA (Egea) - %71.45 spawn (HACIM KRALI!)
+    'Fialto_Agna': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2015, 2025], 'types': ['Sedan', 'Hatchback', 'Cross', 'Station Wagon']}, // Çok çeşitli
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2015, 2025], 'types': ['Benzin', 'Dizel']}, // Fire, T-Jet, Multijet
+          {'years': [2020, 2025], 'types': ['Hybrid']}, // Yeni nesil hibrit
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5-6 ileri) + DCT/Tork Konvertörlü
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.6}, // 1.0 T-Jet, 1.3 Multijet, 1.4 Fire, 1.6 Multijet
+      'horsepower': {'min': 95, 'max': 130}, // 95-130 HP
+    },
+    
+    // FIALTO LAGUA (Linea) - %22.80 spawn
+    'Fialto_Lagua': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan']}, // Sadece Sedan (üretim 2016'da durdu)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // Fire, Multijet
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5 ileri) + Dualogic (YARI OTOMATİK - RİSKLİ!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.3, 'max': 1.6}, // 1.3 Multijet, 1.4 Fire, 1.6 Multijet
+      'horsepower': {'min': 77, 'max': 105}, // 77-105 HP (Ekonomik yapı)
+    },
+    
+    // FIALTO ZORNO (Punto) - %5.72 spawn
+    'Fialto_Zorno': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // 3 ve 5 kapı (üretim durdu)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // Fire, Multijet
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5 ileri) + Dualogic (YARI OTOMATİK - RİSKLİ!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.2, 'max': 1.4}, // 1.2/1.4 Fire, 1.3 Multijet
+      'horsepower': {'min': 77, 'max': 95}, // 77-95 HP (En küçük segment)
+    },
+    
+    // OPEXEL TASRA (Astra) - %55 spawn
+    'Opexel_Tasra': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2018], 'types': ['Hatchback', 'Sedan']}, // Astra J - Sedan yaygın
+          {'years': [2019, 2025], 'types': ['Hatchback']}, // Astra K/L - Modern hatchback
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // ECOTEC, CDTI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (6 ileri) + Tork Konvertörlü (GÜVENİLİR!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.2, 'max': 1.6}, // 1.2 Turbo, 1.4 Turbo, 1.5 Dizel, 1.6 CDTI/Benzin
+      'horsepower': {'min': 110, 'max': 160}, // 110-160 HP
+    },
+    
+    // OPEXEL LORISA (Corsa) - %32.3 spawn
+    'Opexel_Lorisa': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2019], 'types': ['Hatchback']}, // Corsa D/E - 3 ve 5 kapı
+          {'years': [2020, 2025], 'types': ['Hatchback']}, // Corsa F - Modern 5 kapı
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // ECOTEC, CDTI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (5-6 ileri) + Easytronic (ESKİ - RİSKLİ!) / Tork (YENİ - GÜVENİLİR)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.2, 'max': 1.5}, // 1.2 Turbo, 1.4, 1.3/1.5 CDTI
+      'horsepower': {'min': 75, 'max': 130}, // 75-130 HP
+    },
+    
+    // OPEXEL MORNITIA (Insignia) - %12.7 spawn
+    'Opexel_Mornitia': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Station Wagon']}, // Grand Sport / Sports Tourer nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // ECOTEC/SIDI, CDTI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Manuel (6 ileri) + Tork Konvertörlü (GÜVENİLİR - PASSAT ALTERNATİFİ!)
+      'driveType': 'Önden', // FWD - Standart (nadir 4x4)
+      'engineSize': {'min': 1.5, 'max': 2.0}, // 1.5 Turbo, 1.6 Turbo/Dizel, 2.0 Dizel/Benzin
+      'horsepower': {'min': 136, 'max': 220}, // 136-220 HP (Premium segment)
+    },
+    
+    // BAVORA C SERİSİ (3 Serisi) - %40 spawn
+    'Bavora_C Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Station Wagon']}, // Touring (SW) nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // i (Benzin), d (Dizel)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 8 İleri Steptronic (ZF - ÇOK GÜVENİLİR!)
+      'driveType': 'Arkadan', // RWD - Standart (xDrive opsiyonel)
+      'engineSize': {'min': 1.6, 'max': 2.0}, // 1.6/2.0 Benzin, 1.6/2.0 Dizel
+      'horsepower': {'min': 136, 'max': 258}, // 136-258 HP (Premium performans)
+    },
+    
+    // BAVORA E SERİSİ (5 Serisi) - %25 spawn
+    'Bavora_E Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Station Wagon']}, // Touring nadir lüks
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel', 'Hybrid']}, // i, d, e (Hibrit)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 8 İleri Steptronic (ZF - ÇOK GÜVENİLİR!)
+      'driveType': 'Arkadan', // RWD - Standart (xDrive opsiyonel)
+      'engineSize': {'min': 2.0, 'max': 3.0}, // 2.0 (en yaygın), 3.0 (performans)
+      'horsepower': {'min': 170, 'max': 340}, // 170-340 HP (En güçlü segment)
+    },
+    
+    // BAVORA A SERİSİ (1 Serisi) - %22 spawn
+    'Bavora_A Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2019], 'types': ['Hatchback']}, // F20 - 3 ve 5 kapı
+          {'years': [2020, 2025], 'types': ['Hatchback']}, // F40 - 5 kapı
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // i, d
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 8 İleri (ESKİ - GÜVENİLİR) / 7 İleri DCT (YENİ - RİSK!)
+      'driveType': 'Arkadan', // F20: RWD (eski), F40: FWD (yeni) - ÇEKİŞ FARKI KRİTİK!
+      'engineSize': {'min': 1.5, 'max': 1.6}, // 1.5 (3 silindir), 1.6
+      'horsepower': {'min': 116, 'max': 190}, // 116-190 HP
+    },
+    
+    // BAVORA D SERİSİ (4 Serisi) - %13 spawn
+    'Bavora_D Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Coupe', 'Sedan', 'Convertible']}, // Gran Coupe (Sedan), Cabrio
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // i (Benzin en yaygın), d (Dizel)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 8 İleri Steptronic (ZF - ÇOK GÜVENİLİR!)
+      'driveType': 'Arkadan', // RWD - Standart (xDrive opsiyonel)
+      'engineSize': {'min': 2.0, 'max': 2.0}, // 2.0 Benzin/Dizel (vergi avantajı)
+      'horsepower': {'min': 184, 'max': 258}, // 184-258 HP (Sportif segment)
+    },
+    
+    // FORTRAN ODAK (Focus) - %59.08 spawn
+    'Fortran_Odak': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback', 'Sedan', 'Station Wagon']}, // SW nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // EcoBoost, EcoBlue/TDCi
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Powershift (ESKİ - RİSKLİ!) / 8 İleri Tork (YENİ - GÜVENİLİR)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.6}, // 1.0 EcoBoost, 1.5 EcoBoost/EcoBlue, 1.6 TDCi
+      'horsepower': {'min': 100, 'max': 182}, // 100-182 HP
+    },
+    
+    // FORTRAN VISTA (Fiesta) - %21.69 spawn
+    'Fortran_Vista': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // 3 ve 5 kapı
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // EcoBoost, TDCi
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Powershift (ESKİ - RİSKLİ!) / Tam Otomatik/7 İleri DCT (YENİ)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.5}, // 1.0 EcoBoost, 1.4/1.5 Benzin, 1.4/1.5 Dizel
+      'horsepower': {'min': 75, 'max': 140}, // 75-140 HP
+    },
+    
+    // FORTRAN AVGER (Ranger) - %10.32 spawn
+    'Fortran_Avger': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Pick-up']}, // Çift Kabin yaygın, Tek Kabin nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Dizel']}, // EcoBlue/TDCi (Benzinli Raptor nadir)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 6 İleri Manuel/Oto, 10 İleri Oto (YENİ - GÜVENİLİR)
+      'driveType': '4x4', // 4x4 en yaygın ve değerli, 4x2 daha ucuz
+      'engineSize': {'min': 2.0, 'max': 3.2}, // 2.0 Bi-Turbo (yeni), 2.2/3.2 TDCi (eski)
+      'horsepower': {'min': 160, 'max': 213}, // 160-213 HP (Raptor daha yüksek)
+    },
+    
+    // FORTRAN TUPA (Kuga) - %8.91 spawn
+    'Fortran_Tupa': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['SUV']}, // 5 kapılı SUV
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel', 'Hybrid']}, // EcoBoost, EcoBlue/TDCi, Hibrit
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Powershift (ESKİ - RİSKLİ!) / 8 İleri Tork (YENİ - GÜVENİLİR)
+      'driveType': 'Önden', // FWD yaygın, AWD (4x4) nadir premium
+      'engineSize': {'min': 1.5, 'max': 2.5}, // 1.5 EcoBoost/EcoBlue, 2.0 EcoBlue, 2.5 Hibrit
+      'horsepower': {'min': 120, 'max': 190}, // 120-190 HP
+    },
+    
+    // MERCURION 3 SERİSİ (C-Class) - %42.18 spawn
+    'Mercurion_3 Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Coupe', 'Convertible', 'Station Wagon']}, // Coupe/Cabrio nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel', 'Hybrid']}, // i, d, e
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 7G/9G-Tronic (ÇOK GÜVENİLİR!)
+      'driveType': 'Arkadan', // RWD - Standart (4MATIC opsiyonel)
+      'engineSize': {'min': 1.5, 'max': 2.0}, // 1.5/1.6/2.0 Benzin/Dizel
+      'horsepower': {'min': 156, 'max': 258}, // 156-258 HP
+    },
+    
+    // MERCURION 5 SERİSİ (E-Class) - %28.40 spawn
+    'Mercurion_5 Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Coupe', 'Convertible', 'Station Wagon']}, // Coupe/Cabrio çok nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel', 'Hybrid']}, // i, d, e
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 7G/9G-Tronic (ÇOK GÜVENİLİR!)
+      'driveType': 'Arkadan', // RWD - Standart (4MATIC opsiyonel)
+      'engineSize': {'min': 1.6, 'max': 2.0}, // 1.6 Dizel (eski), 2.0 yaygın
+      'horsepower': {'min': 170, 'max': 367}, // 170-367 HP (Oyunun en güçlü sedanlarından)
+    },
+    
+    // MERCURION 1 SERİSİ (A-Class) - %10.19 spawn
+    'Mercurion_1 Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback', 'Sedan']}, // A Sedan (CLA benzeri)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel', 'Hybrid']}, // i, d, EQ Boost
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 7G-DCT (ÇİFT KAVRAMA - DSG RİSKİ!)
+      'driveType': 'Önden', // FWD - Standart (4MATIC opsiyonel)
+      'engineSize': {'min': 1.33, 'max': 2.0}, // 1.33 turbo, 1.5/2.0 Dizel
+      'horsepower': {'min': 116, 'max': 163}, // 116-163 HP
+    },
+    
+    // MERCURION GJE (CLA) - %9.98 spawn
+    'Mercurion_GJE': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Station Wagon']}, // 4 Kapı Coupe, Shooting Brake nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // i, d
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 7G/8G-DCT (ÇİFT KAVRAMA - DSG RİSKİ!)
+      'driveType': 'Önden', // FWD - Standart (4MATIC opsiyonel)
+      'engineSize': {'min': 1.33, 'max': 2.0}, // 1.33 turbo, 2.0 Dizel
+      'horsepower': {'min': 136, 'max': 224}, // 136-224 HP (Daha güçlü)
+    },
+    
+    // MERCURION 8 SERİSİ (G-Class) - %9.26 spawn
+    'Mercurion_8 Serisi': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['SUV', 'Convertible']}, // Cabrio çok nadir bonus
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // i, d (AMG benzin)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // 7G/9G-Tronic (ÇOK GÜVENİLİR!)
+      'driveType': '4x4', // 4MATIC - Standart (3 diferansiyel kilidi)
+      'engineSize': {'min': 3.0, 'max': 4.0}, // 3.0 Dizel, 4.0 V8 (AMG)
+      'horsepower': {'min': 245, 'max': 585}, // 245-585 HP (OYUNUN EN GÜÇLÜ ARACI!)
+    },
+    
+    // HYUNDARO A10 (i20) - %52.15 spawn
+    'Hyundaro_A10': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // 5 kapı
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel', 'Benzin+LPG']}, // MPi/T-GDI, CRDi
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Tork Konvertörlü (GÜVENİLİR!) / DCT (YENİ - ORTA RİSK)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.4}, // 1.0 T-GDI, 1.4 MPi
+      'horsepower': {'min': 75, 'max': 120}, // 75-120 HP
+    },
+    
+    // HYUNDARO TECENT RED (Accent Blue) - %19.25 spawn
+    'Hyundaro_Tecent Red': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2018], 'types': ['Sedan']}, // 4 kapı (üretim durdu)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2018], 'types': ['Benzin', 'Dizel', 'Benzin+LPG']}, // CVVT, CRDi
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Tork Konvertörlü (ÇOK GÜVENİLİR!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.4, 'max': 1.6}, // 1.4 CVVT, 1.6 CRDi
+      'horsepower': {'min': 109, 'max': 136}, // 109-136 HP
+    },
+    
+    // HYUNDARO TECENT WHITE (Accent Era) - %10.95 spawn
+    'Hyundaro_Tecent White': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2012], 'types': ['Sedan']}, // 4 kapı (üretim durdu - eski)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2012], 'types': ['Benzin', 'Dizel', 'Benzin+LPG']}, // CVVT, CRDi
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Tork Konvertörlü (GÜVENİLİR - ESKİ)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.4, 'max': 1.6}, // 1.4/1.6 CVVT, 1.5 CRDi
+      'horsepower': {'min': 97, 'max': 110}, // 97-110 HP
+    },
+    
+    // HYUNDARO A20 (i30) - %9.95 spawn
+    'Hyundaro_A20': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback', 'Station Wagon']}, // SW nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // T-GDI, CRDi
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Tork Konvertörlü (ESKİ) / DCT (YENİ - ORTA RİSK)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.4, 'max': 1.6}, // 1.4 T-GDI, 1.6 CRDi
+      'horsepower': {'min': 120, 'max': 140}, // 120-140 HP
+    },
+    
+    // HYUNDARO KASCON (Tucson) - %7.69 spawn
+    'Hyundaro_Kascon': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['SUV']}, // 5 kapı SUV
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel', 'Hybrid']}, // T-GDI, CRDi, HEV/PHEV
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // Tork Konvertörlü (ESKİ) / DCT (YENİ - ORTA RİSK)
+      'driveType': 'Önden', // FWD yaygın, 4x4 nadir premium
+      'engineSize': {'min': 1.6, 'max': 2.0}, // 1.6 T-GDI/CRDi, 2.0
+      'horsepower': {'min': 136, 'max': 230}, // 136-230 HP (Hibrit en yüksek)
+    },
+    
+    // TOYOTO AIROKO (Corolla) - %81.93 spawn
+    'Toyoto_Airoko': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Hatchback']}, // Sedan en yaygın, HB nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Hybrid', 'Benzin+LPG']}, // VVT-i, Hibrit
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // CVT (ÇOK GÜVENİLİR!) - Hiç MMT YOK
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.6, 'max': 1.8}, // 1.6 VVT-i, 1.8 Hibrit
+      'horsepower': {'min': 124, 'max': 140}, // 124-140 HP
+    },
+    
+    // TOYOTO LOTUS (Auris) - %11.65 spawn
+    'Toyoto_Lotus': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2018], 'types': ['Hatchback']}, // 5 kapı (üretim durdu)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2018], 'types': ['Benzin', 'Dizel', 'Hybrid', 'Benzin+LPG']}, // VVT-i, D-4D, Hibrit
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // CVT (GÜVENİLİR) + MMT (YARI OTOMATİK - RİSKLİ!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.4, 'max': 1.8}, // 1.4 D-4D, 1.6 VVT-i, 1.8 Hibrit
+      'horsepower': {'min': 90, 'max': 136}, // 90-136 HP
+    },
+    
+    // TOYOTO KARMA (Yaris) - %6.43 spawn
+    'Toyoto_Karma': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // 5 kapı (eski nesil 3 kapı nadir)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Hybrid']}, // VVT-i, Hibrit
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // CVT (GÜVENİLİR) + MMT (ESKİ - YARI OTOMATİK - RİSKLİ!)
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.0, 'max': 1.5}, // 1.0, 1.33, 1.5 Hibrit
+      'horsepower': {'min': 69, 'max': 116}, // 69-116 HP
+    },
+    
+    // AUDIRA B3 (A3) - %45.05 spawn
+    'Audira_B3': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Hatchback']}, // Sedan Türkiye'de popüler, Sportback (HB)
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // TFSI, TDI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // S tronic (DSG RİSKİ!) - Manuel nadir
+      'driveType': 'Önden', // FWD standart, Quattro güçlü motorlarda
+      'engineSize': {'min': 1.0, 'max': 2.0}, // 1.0, 1.5 TFSI, 1.6 TDI
+      'horsepower': {'min': 110, 'max': 190}, // 110-190 HP
+    },
+    
+    // AUDIRA B4 (A4) - %23.75 spawn
+    'Audira_B4': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'SW']}, // Sedan yaygın, Avant (SW) nadir Quattro
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // TFSI, TDI
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // S tronic (DSG) + Multitronic (ESKİ CVT RİSKİ!) + Tiptronic (Quattro GÜVENİLİR!)
+      'driveType': 'Önden', // FWD standart, Quattro güçlü paketlerde
+      'engineSize': {'min': 1.4, 'max': 2.0}, // 1.4, 2.0 TFSI/TDI
+      'horsepower': {'min': 150, 'max': 252}, // 150-252 HP
+    },
+    
+    // AUDIRA B6 (A6) - %20.87 spawn
+    'Audira_B6': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'SW']}, // Sedan prestijli, Avant (SW) nadir güçlü
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Dizel', 'Benzin']}, // TDI yaygın, TFSI yeni
+        ],
+      },
+      'transmissions': ['Otomatik'], // S tronic (DSG RİSK) + Tiptronic (Quattro GÜVENİLİR!)
+      'driveType': 'Önden', // FWD, Quattro güçlü motorlarda
+      'engineSize': {'min': 2.0, 'max': 3.0}, // 2.0 yaygın, 3.0 V6 prestijli
+      'horsepower': {'min': 190, 'max': 340}, // 190-340 HP
+    },
+    
+    // AUDIRA B5 (A5) - %10.33 spawn
+    'Audira_B5': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Coupe', 'Hatchback']}, // Sportback (4 kapı) yaygın, Coupe (2 kapı) nadir, Cabriolet çok nadir
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Dizel']}, // TFSI, TDI
+        ],
+      },
+      'transmissions': ['Otomatik'], // S tronic (DSG RİSK!) - Manuel çok nadir
+      'driveType': 'Önden', // FWD standart, Quattro güçlü motorlarda
+      'engineSize': {'min': 2.0, 'max': 2.0}, // 2.0 TFSI/TDI
+      'horsepower': {'min': 190, 'max': 252}, // 190-252 HP
+    },
+    
+    // HONDARO VICE (Civic) - %80.46 spawn
+    'Hondaro_Vice': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan', 'Hatchback']}, // Sedan en yaygın, HB 10. nesilde popüler
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG']}, // VTEC, ECO (fabrika LPG)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // CVT (ÇOK GÜVENİLİR!) + eski tork konv.
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.5, 'max': 1.6}, // 1.6 VTEC, 1.5 VTEC Turbo
+      'horsepower': {'min': 125, 'max': 182}, // 125-182 HP (RS Turbo tavan)
+    },
+    
+    // HONDARO VHL (CR-V) - %10.34 spawn
+    'Hondaro_VHL': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['SUV']}, // 5 kapı SUV
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Hybrid']}, // VTEC Turbo, Hibrit
+        ],
+      },
+      'transmissions': ['Otomatik'], // CVT (ÇOK GÜVENİLİR!) - Manuel nadir
+      'driveType': 'Önden', // FWD yaygın, AWD (4x4) eski/güçlü motorlarda
+      'engineSize': {'min': 1.5, 'max': 2.0}, // 1.5 Turbo, 2.0 atmosferik/Hibrit
+      'horsepower': {'min': 155, 'max': 193}, // 155-193 HP
+    },
+    
+    // HONDARO KENT (City) - %5.75 spawn
+    'Hondaro_Kent': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Sedan']}, // 4 kapı - tek kasa
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG']}, // i-VTEC
+        ],
+      },
+      'transmissions': ['Otomatik'], // CVT (GÜVENİLİR!) - Manuel yok
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.5, 'max': 1.5}, // 1.5 i-VTEC
+      'horsepower': {'min': 121, 'max': 121}, // 121 HP sabit
+    },
+    
+    // HONDARO CAZ (Jazz) - %3.45 spawn
+    'Hondaro_Caz': {
+      'bodyTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Hatchback']}, // 5 kapı - tek kasa
+        ],
+      },
+      'fuelTypes': {
+        'rule': 'year_based',
+        'ranges': [
+          {'years': [2010, 2025], 'types': ['Benzin', 'Hybrid', 'Benzin+LPG']}, // VTEC, Hibrit (yeni)
+        ],
+      },
+      'transmissions': ['Manuel', 'Otomatik'], // CVT (ÇOK GÜVENİLİR!) - Eski manuel de var
+      'driveType': 'Önden', // FWD - Standart
+      'engineSize': {'min': 1.3, 'max': 1.5}, // 1.3, 1.5 Hibrit
+      'horsepower': {'min': 90, 'max': 122}, // 90-122 HP (Hibrit tavan)
     },
   };
 
@@ -341,8 +1278,8 @@ class MarketRefreshService {
     // Model seç (spawn oranlarına göre veya eşit dağılım)
     final model = _selectRandomModel(brand);
     
-    // Gerçekçi yıl dağılımı (2015-2024, ağırlıklı son 5 yıl)
-    final year = _generateRealisticYear();
+    // Gerçekçi yıl dağılımı (marka-bazlı)
+    final year = _generateRealisticYear(brand: brand, model: model);
     
     // Gerçekçi kilometre dağılımı
     final mileage = _generateRealisticMileage();
@@ -389,6 +1326,9 @@ class MarketRefreshService {
       transmission: transmission,
       hasAccidentRecord: hasAccidentRecord,
       sellerType: sellerType,
+      driveType: driveType,
+      bodyType: bodyType,
+      horsepower: horsepower,
     );
     
     // Araç objesi oluştur
@@ -407,7 +1347,15 @@ class MarketRefreshService {
       driveType: driveType,
       hasWarranty: _random.nextBool(),
       hasAccidentRecord: hasAccidentRecord,
-      description: _generateDescription(),
+      description: _generateDescription(
+        brand: brand,
+        model: model,
+        fuelType: fuelType,
+        transmission: transmission,
+        year: year,
+        driveType: driveType,
+        horsepower: horsepower,
+      ),
       bodyType: bodyType,
       horsepower: horsepower,
       sellerType: sellerType,
@@ -514,20 +1462,40 @@ class MarketRefreshService {
     }
   }
 
-  /// Gerçekçi yıl oluştur (ağırlıklı)
-  int _generateRealisticYear() {
+  /// Gerçekçi yıl oluştur (ağırlıklı, marka-bazlı)
+  int _generateRealisticYear({String? brand, String? model}) {
     final rand = _random.nextDouble();
     final currentYear = DateTime.now().year;
     
-    if (rand < 0.40) {
-      // %40: Son 3 yıl (2022-2024)
+    // Premium markalar ve pick-up'lar için daha eski araçlar (fiyat gerçekçiliği)
+    final isPremium = brand == 'Voltswagen' || brand == 'Bavora' || brand == 'Mercurion' || brand == 'Audira' || brand == 'Opexel';
+    final isUltraLux = brand == 'Mercurion' && model == '8 Serisi'; // G-Class ultra lüks
+    final isPickupOrSUV = (brand == 'Fortran' && (model == 'Avger' || model == 'Tupa'));
+    
+    if (isPremium || isPickupOrSUV) {
+      // Premium markalar: Daha eski araçlar ağırlıklı (fiyat gerçekçiliği için)
+      if (rand < 0.15) {
+        // %15: Son 3 yıl (2022-2024)
       return currentYear - _random.nextInt(3);
-    } else if (rand < 0.70) {
-      // %30: 4-7 yaşında (2017-2021)
+      } else if (rand < 0.50) {
+        // %35: 4-7 yaşında (2018-2021)
       return currentYear - (4 + _random.nextInt(4));
     } else {
-      // %30: 8+ yaşında (2015 ve öncesi)
-      return currentYear - (8 + _random.nextInt(10));
+        // %50: 8-15 yaşında (2010-2017) - EN YAYGIN
+        return currentYear - (8 + _random.nextInt(8));
+      }
+    } else {
+      // Normal markalar: Daha dengeli dağılım
+      if (rand < 0.30) {
+        // %30: Son 3 yıl (2022-2024)
+        return currentYear - _random.nextInt(3);
+      } else if (rand < 0.65) {
+        // %35: 4-7 yaşında (2018-2021)
+        return currentYear - (4 + _random.nextInt(4));
+      } else {
+        // %35: 8+ yaşında (2010-2017)
+        return currentYear - (8 + _random.nextInt(8));
+      }
     }
   }
 
@@ -557,6 +1525,9 @@ class MarketRefreshService {
     required String transmission,
     required bool hasAccidentRecord,
     required String sellerType,
+    required String driveType,
+    required String bodyType,
+    required int horsepower,
   }) {
     // Base price al (2025 tavan fiyatı)
     double basePrice = _basePrices2025[brand]?[model] ?? 500000.0;
@@ -577,6 +1548,156 @@ class MarketRefreshService {
     }
     yearFactor = yearFactor.clamp(0.10, 1.0);
     
+    // MODEL-SPESİFİK DEĞER KAYBI ORANI
+    if (brand == 'Renauva') {
+      if (model == 'Flow') {
+        // Fluence: Üretimi durmuş, daha hızlı değer kaybediyor
+        yearFactor *= 0.92; // Ekstra %8 değer kaybı
+      } else if (model == 'Tallion') {
+        // Taliant: Yeni nesil, değer koruması daha iyi
+        yearFactor *= 1.05; // %5 daha iyi değer koruması
+      } else if (model == 'Signa') {
+        // Symbol: Ekonomik segment, orta düzey değer kaybı
+        yearFactor *= 0.95; // %5 değer kaybı
+      }
+    } else if (brand == 'Voltswagen') {
+      if (model == 'Jago') {
+        // Jetta: Üretimi durmuş (2018), değer kaybı hızlı
+        yearFactor *= 0.90; // Ekstra %10 değer kaybı
+      } else if (model == 'Paso') {
+        // Passat: Premium segment, değer koruması iyi
+        yearFactor *= 1.03; // %3 daha iyi değer koruması
+      } else if (model == 'Tenis') {
+        // Golf: Yüksek talep, değer koruması çok iyi
+        yearFactor *= 1.05; // %5 daha iyi değer koruması
+      }
+    } else if (brand == 'Fialto') {
+      if (model == 'Lagua' || model == 'Zorno') {
+        // Linea ve Punto: Üretimi durmuş, değer kaybı hızlı
+        yearFactor *= 0.88; // Ekstra %12 değer kaybı (stokta tutma riski)
+      } else if (model == 'Agna') {
+        // Egea: Yüksek hacim, rekabet nedeniyle orta değer koruması
+        yearFactor *= 0.97; // %3 değer kaybı
+      }
+    } else if (brand == 'Opexel') {
+      if (model == 'Mornitia') {
+        // Insignia: Premium segment, iyi değer koruması
+        yearFactor *= 1.02; // %2 daha iyi değer koruması
+      } else if (model == 'Tasra') {
+        // Astra: Orta segment, dengeli değer koruması
+        yearFactor *= 1.00; // Standart
+      } else if (model == 'Lorisa') {
+        // Corsa: Küçük segment, orta değer koruması
+        yearFactor *= 0.98; // %2 değer kaybı
+      }
+    } else if (brand == 'Bavora') {
+      // Premium marka - genel olarak iyi değer koruması
+      if (model == 'E Serisi') {
+        // 5 Serisi: En prestijli, en iyi değer koruması
+        yearFactor *= 1.08; // %8 daha iyi değer koruması
+      } else if (model == 'C Serisi') {
+        // 3 Serisi: Popüler, çok iyi değer koruması
+        yearFactor *= 1.06; // %6 daha iyi değer koruması
+      } else if (model == 'D Serisi') {
+        // 4 Serisi: Sportif, iyi değer koruması
+        yearFactor *= 1.05; // %5 daha iyi değer koruması
+      } else if (model == 'A Serisi') {
+        // 1 Serisi: Kompakt premium, iyi değer koruması
+        yearFactor *= 1.04; // %4 daha iyi değer koruması
+      }
+    } else if (brand == 'Fortran') {
+      if (model == 'Avger') {
+        // Ranger: Pick-up, yüksek değer koruması
+        yearFactor *= 1.07; // %7 daha iyi değer koruması (ticari araç talebi)
+      } else if (model == 'Tupa') {
+        // Kuga: SUV segment, iyi değer koruması
+        yearFactor *= 1.03; // %3 daha iyi değer koruması
+      } else if (model == 'Odak') {
+        // Focus: Popüler C segment, dengeli
+        yearFactor *= 1.00; // Standart
+      } else if (model == 'Vista') {
+        // Fiesta: B segment, orta değer koruması
+        yearFactor *= 0.98; // %2 değer kaybı
+      }
+    } else if (brand == 'Mercurion') {
+      // Ultra premium - en yüksek değer koruması
+      if (model == '8 Serisi') {
+        // G-Class: Efsanevi değer koruması
+        yearFactor *= 1.12; // %12 daha iyi (yatırım aracı)
+      } else if (model == '5 Serisi') {
+        // E-Class: Premium lüks, yüksek değer koruması
+        yearFactor *= 1.09; // %9 daha iyi
+      } else if (model == '3 Serisi') {
+        // C-Class: Popüler premium, çok iyi değer koruması
+        yearFactor *= 1.07; // %7 daha iyi
+      } else if (model == 'GJE') {
+        // CLA: Sportif coupe, iyi değer koruması
+        yearFactor *= 1.06; // %6 daha iyi
+      } else if (model == '1 Serisi') {
+        // A-Class: Kompakt premium, iyi değer koruması
+        yearFactor *= 1.05; // %5 daha iyi
+      }
+    } else if (brand == 'Hyundaro') {
+      if (model == 'Kascon') {
+        // Tucson: SUV segment, iyi değer koruması
+        yearFactor *= 1.04; // %4 daha iyi
+      } else if (model == 'A20') {
+        // i30: Orta segment, dengeli değer koruması
+        yearFactor *= 1.02; // %2 daha iyi
+      } else if (model == 'A10') {
+        // i20: B segment, standart değer koruması
+        yearFactor *= 1.00; // Standart
+      } else if (model == 'Tecent Red') {
+        // Accent Blue: Üretimi durmuş, orta değer kaybı
+        yearFactor *= 0.95; // %5 değer kaybı
+      } else if (model == 'Tecent White') {
+        // Accent Era: Çok eski, hızlı değer kaybı
+        yearFactor *= 0.88; // %12 değer kaybı (taksi/filo riski)
+      }
+    } else if (brand == 'Toyoto') {
+      // Maksimum güvenilirlik ve değer koruması
+      if (model == 'Airoko') {
+        // Corolla: EN AZ değer kaybı - efsanevi güvenilirlik
+        yearFactor *= 1.10; // %10 daha iyi (maksimum değer koruması)
+      } else if (model == 'Lotus') {
+        // Auris: Üretimi durmuş ama Toyota güvenilirliği
+        yearFactor *= 1.03; // %3 daha iyi (markaya güven)
+      } else if (model == 'Karma') {
+        // Yaris: Kompakt premium, çok iyi değer koruması
+        yearFactor *= 1.07; // %7 daha iyi
+      }
+    } else if (brand == 'Audira') {
+      // Premium segment ama yüksek arıza riski nedeniyle daha hızlı değer kaybı
+      if (model == 'B3') {
+        // A3: Premium kompakt ama DSG riski
+        yearFactor *= 0.95; // %5 değer kaybı (DSG riski)
+      } else if (model == 'B4') {
+        // A4: D segment ama çoklu şanzıman riski
+        yearFactor *= 0.92; // %8 değer kaybı (S tronic/Multitronic riski)
+      } else if (model == 'B6') {
+        // A6: E segment + elektronik + şanzıman çift riski
+        yearFactor *= 0.88; // %12 değer kaybı (çift risk: şanzıman + elektronik)
+      } else if (model == 'B5') {
+        // A5: Sportif premium ama DSG riski
+        yearFactor *= 0.93; // %7 değer kaybı (DSG riski + niş segment)
+      }
+    } else if (brand == 'Hondaro') {
+      // İkinci el kralı - Corolla benzeri değer koruması
+      if (model == 'Vice') {
+        // Civic: EN AZ değer kaybeden sedanlardan - ikinci el kralı
+        yearFactor *= 1.09; // %9 daha iyi (maksimum değer koruması)
+      } else if (model == 'VHL') {
+        // CR-V: SUV segmentinde en az değer kaybeden
+        yearFactor *= 1.07; // %7 daha iyi
+      } else if (model == 'Kent') {
+        // City: Honda güvenilirliği
+        yearFactor *= 1.05; // %5 daha iyi
+      } else if (model == 'Caz') {
+        // Jazz: Sihirli koltuk - niş ama değerli
+        yearFactor *= 1.06; // %6 daha iyi
+      }
+    }
+    
     // KİLOMETRE FAKTÖRÜ
     double kmFactor = 1.0;
     if (mileage <= 20000) {
@@ -595,29 +1716,609 @@ class MarketRefreshService {
       kmFactor = 0.45;
     }
     
+    // Tecent White (Accent Era) taksi/filo geçmişi riski
+    if (brand == 'Hyundaro' && model == 'Tecent White' && mileage > 200000) {
+      kmFactor *= 0.90; // Yüksek km Accent Era taksi riski - ekstra %10 değer kaybı
+    }
+    
+    // Audira A6 (B6) kilometre hassasiyeti - E segment uzun yol riski
+    if (brand == 'Audira' && model == 'B6' && mileage > 150000) {
+      kmFactor *= 0.87; // Yüksek km A6 - çok yüksek arıza riski (motor/şanzıman/elektronik)
+    }
+    
     // YAKIT TİPİ FAKTÖRÜ
     double fuelFactor = 1.0;
     if (fuelType == 'Dizel') {
       fuelFactor = 1.10; // Dizel %10 daha değerli
     } else if (fuelType == 'Hybrid') {
       fuelFactor = 1.15; // Hybrid %15 daha değerli
-    } else if (fuelType == 'Elektrik') {
-      fuelFactor = 1.20; // Elektrik %20 daha değerli
+    } 
+    // else if (fuelType == 'Elektrik') {
+    //   fuelFactor = 1.20; // Elektrik %20 daha değerli
+    // } 
+    else if (fuelType == 'Benzin+LPG') {
+      fuelFactor = 1.12; // LPG %12 daha değerli (yakıt tasarrufu)
     } else {
       fuelFactor = 1.0; // Benzin
     }
     
-    // VİTES FAKTÖRÜ
-    double transFactor = transmission == 'Otomatik' ? 1.08 : 1.0; // Otomatik %8 daha değerli
+    // MODEL-SPESİFİK YAKIT DEĞERİ
+    if (brand == 'Renauva') {
+      if (model == 'Flow' && fuelType == 'Dizel') {
+        // Fluence 1.5 dCi: Çok popüler kombinasyon
+        fuelFactor *= 1.05; // Ekstra %5 değer
+      } else if (model == 'Signa' && fuelType == 'Dizel') {
+        // Symbol 1.5 dCi: En çok talep gören
+        fuelFactor *= 1.08; // Ekstra %8 değer
+      } else if (model == 'Tallion' && fuelType == 'Benzin+LPG') {
+        // Taliant Fabrika LPG: Yüksek talep
+        fuelFactor *= 1.10; // Ekstra %10 değer
+      }
+    } else if (brand == 'Voltswagen') {
+      if (fuelType == 'Dizel') {
+        // TDI motorlar Voltswagen'de çok popüler
+        if (model == 'Paso' || model == 'Tenis') {
+          fuelFactor *= 1.12; // Paso/Tenis TDI çok değerli
+        } else if (model == 'Jago') {
+          fuelFactor *= 1.15; // Jetta 1.6 TDI en popüler kombinasyon
+        }
+      }
+    } else if (brand == 'Fialto') {
+      if (fuelType == 'Dizel') {
+        // Multijet Dizel motorlar Fialto'da çok popüler
+        if (model == 'Agna') {
+          fuelFactor *= 1.10; // Agna 1.3/1.6 Multijet çok talep görüyor
+        } else if (model == 'Lagua' || model == 'Zorno') {
+          fuelFactor *= 1.12; // Lagua/Zorno 1.3 Multijet en popüler
+        }
+      }
+      
+      // TİCARİ GEÇMŞ RİSKİ (Agna için)
+      if (model == 'Agna' && mileage > 150000) {
+        // Yüksek kilometreli Agna: Ticari filo / taksi riski
+        fuelFactor *= 0.93; // %7 değer düşüşü (ağır kullanım riski)
+      }
+    } else if (brand == 'Opexel') {
+      if (fuelType == 'Dizel') {
+        // CDTI Dizel motorlar Opexel'de çok popüler ve verimli
+        if (model == 'Tasra') {
+          fuelFactor *= 1.12; // Tasra 1.6 CDTI çok talep görüyor
+        } else if (model == 'Lorisa') {
+          fuelFactor *= 1.10; // Lorisa Dizel düşük tüketim - yüksek talep
+        } else if (model == 'Mornitia') {
+          fuelFactor *= 1.14; // Mornitia 1.6/2.0 CDTI premium değer
+        }
+      }
+    } else if (brand == 'Bavora') {
+      if (fuelType == 'Dizel') {
+        // d motorlar (Dizel) çok popüler ve verimli
+        if (model == 'C Serisi') {
+          fuelFactor *= 1.15; // 320d/318d en popüler kombinasyon
+        } else if (model == 'E Serisi') {
+          fuelFactor *= 1.18; // 520d/530d lüks segment en verimli
+        } else if (model == 'A Serisi') {
+          fuelFactor *= 1.12; // 116d/118d ekonomik premium
+        } else if (model == 'D Serisi') {
+          fuelFactor *= 1.14; // 420d sportif dizel
+        }
+      } else if (fuelType == 'Hybrid') {
+        // Hibrit (e motorlar) - yüksek teknoloji
+        if (model == 'E Serisi') {
+          fuelFactor *= 1.25; // 530e hibrit en yüksek teknoloji primi
+        }
+      }
+    } else if (brand == 'Fortran') {
+      if (fuelType == 'Dizel') {
+        // EcoBlue/TDCi Dizel motorlar çok popüler
+        if (model == 'Odak') {
+          fuelFactor *= 1.10; // Focus 1.5 EcoBlue/TDCi popüler
+        } else if (model == 'Vista') {
+          fuelFactor *= 1.08; // Fiesta Dizel ekonomik
+        } else if (model == 'Avger') {
+          fuelFactor *= 1.12; // Ranger Dizel en yaygın
+        } else if (model == 'Tupa') {
+          fuelFactor *= 1.11; // Kuga Dizel verimli
+        }
+      } else if (fuelType == 'Hybrid') {
+        // Hibrit (Kuga) - yüksek teknoloji primi
+        if (model == 'Tupa') {
+          fuelFactor *= 1.22; // Kuga Hibrit yüksek teknoloji + vergi avantajı
+        }
+      }
+    } else if (brand == 'Mercurion') {
+      if (fuelType == 'Dizel') {
+        // Dizel motorlar (d) çok popüler ve verimli
+        if (model == '3 Serisi') {
+          fuelFactor *= 1.16; // C200d/C220d çok talep görüyor
+        } else if (model == '5 Serisi') {
+          fuelFactor *= 1.19; // E220d/E200d lüks segment en verimli
+        } else if (model == '1 Serisi') {
+          fuelFactor *= 1.13; // A180d ekonomik premium
+        } else if (model == 'GJE') {
+          fuelFactor *= 1.15; // CLA 200d sportif dizel
+        } else if (model == '8 Serisi') {
+          fuelFactor *= 1.10; // G 350d verimli arazi (benzin daha popüler)
+        }
+      } else if (fuelType == 'Hybrid') {
+        // Hibrit (e motorlar) - yüksek teknoloji primi
+        if (model == '3 Serisi') {
+          fuelFactor *= 1.24; // C200/C300 hibrit yüksek teknoloji
+        } else if (model == '5 Serisi') {
+          fuelFactor *= 1.27; // E300e hibrit en yüksek teknoloji primi
+        }
+      } else if (fuelType == 'Benzin') {
+        // G-Class'ta benzin (özellikle AMG) çok değerli
+        if (model == '8 Serisi') {
+          fuelFactor *= 1.20; // G 500 / G 63 AMG benzin king
+        }
+      }
+    } else if (brand == 'Toyoto') {
+      if (fuelType == 'Hybrid') {
+        // Hibrit teknolojisi - Toyota'nın ana gücü
+        if (model == 'Airoko') {
+          fuelFactor *= 1.28; // Corolla 1.8 Hibrit en popüler (+%28 değer!)
+        } else if (model == 'Lotus') {
+          fuelFactor *= 1.24; // Auris Hibrit yüksek talep (+%24 değer)
+        } else if (model == 'Karma') {
+          fuelFactor *= 1.25; // Yaris 1.5 Hibrit kompakt premium (+%25 değer)
+        }
+      } else if (fuelType == 'Dizel') {
+        // Dizel (sadece Auris'te)
+        if (model == 'Lotus') {
+          fuelFactor *= 1.09; // Auris 1.4 D-4D verimli
+        }
+      } else if (fuelType == 'Benzin+LPG') {
+        // LPG uyumu
+        fuelFactor *= 0.97; // LPG dönüşüm -%3 değer
+      }
+    } else if (brand == 'Hondaro') {
+      if (fuelType == 'Hybrid') {
+        // Hibrit teknolojisi - Honda'nın güçlü yönü
+        if (model == 'VHL') {
+          fuelFactor *= 1.26; // CR-V 2.0 Hibrit premium SUV (+%26 değer!)
+        } else if (model == 'Caz') {
+          fuelFactor *= 1.23; // Jazz 1.5 e:HEV hibrit kompakt (+%23 değer)
+        }
+      } else if (fuelType == 'Benzin+LPG') {
+        // ECO (FABRİKA ÇIKIŞLI LPG) - Honda'nın özel avantajı
+        if (model == 'Vice') {
+          fuelFactor *= 1.11; // Civic ECO fabrika LPG - yüksek talep (+%11 değer)
+        } else if (model == 'Kent') {
+          fuelFactor *= 1.09; // City LPG uyumu (+%9 değer)
+        } else if (model == 'Caz') {
+          fuelFactor *= 1.08; // Jazz LPG uyumu (+%8 değer)
+        }
+      }
+    } else if (brand == 'Audira') {
+      if (fuelType == 'Dizel') {
+        // Dizel premium segmentte çok değerli
+        if (model == 'B6') {
+          fuelFactor *= 1.21; // A6 2.0/3.0 TDI çok talep görür (+%21 değer)
+        } else if (model == 'B4') {
+          fuelFactor *= 1.18; // A4 2.0 TDI popüler (+%18 değer)
+        } else if (model == 'B5') {
+          fuelFactor *= 1.16; // A5 40 TDI yakıt ekonomisi (+%16 değer)
+        } else if (model == 'B3') {
+          fuelFactor *= 1.14; // A3 TDI verimli (+%14 değer)
+        }
+      }
+    } else if (brand == 'Hyundaro') {
+      if (fuelType == 'Dizel') {
+        // CRDi Dizel motorlar güçlü ve verimli
+        if (model == 'Tecent Red') {
+          fuelFactor *= 1.14; // Accent Blue 1.6 CRDi güçlü (+%14 değer)
+        } else if (model == 'Tecent White') {
+          fuelFactor *= 1.12; // Accent Era 1.5 CRDi ekonomik
+        } else if (model == 'A20') {
+          fuelFactor *= 1.13; // i30 1.6 CRDi popüler
+        } else if (model == 'Kascon') {
+          fuelFactor *= 1.15; // Tucson 1.6 CRDi SUV verimli
+        }
+      } else if (fuelType == 'Hybrid') {
+        // Hibrit (Tucson) - yüksek teknoloji primi
+        if (model == 'Kascon') {
+          fuelFactor *= 1.26; // Tucson Hibrit en yüksek talep (+%26 değer!)
+        }
+      } else if (fuelType == 'Benzin+LPG') {
+        // LPG ekonomik seçenek
+        if (model == 'A10' || model == 'Tecent Red' || model == 'Tecent White') {
+          fuelFactor *= 0.96; // LPG dönüşüm değer kaybı -%4
+        }
+      }
+    }
+    
+    // VİTES FAKTÖRÜ (Model-spesifik vites tipleri)
+    double transFactor = 1.0;
+    if (transmission == 'Otomatik') {
+      transFactor = 1.08; // Temel otomatik %8 daha değerli
+      
+      // MODEL-SPESİFİK VİTES DEĞERİ (Renauva için)
+      if (brand == 'Renauva') {
+        if (model == 'Signa') {
+          // Symbol Easy-R: Düşük güvenilirlik, düşük değer
+          transFactor = 0.95; // Manuel'den bile %5 düşük (risk faktörü)
+        } else if (model == 'Tallion') {
+          // Taliant X-Tronic CVT: Modern ve güvenilir
+          transFactor = 1.12; // %12 daha değerli
+        } else if (model == 'Slim' || model == 'Magna') {
+          // Clio/Megane EDC/X-Tronic: Güvenilir otomatik
+          transFactor = 1.10; // %10 daha değerli
+        } else if (model == 'Flow') {
+          // Fluence EDC: İyi ama bir nesil eski
+          transFactor = 1.06; // %6 daha değerli (eski nesil riski)
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Voltswagen için - DSG RİSKİ!)
+      else if (brand == 'Voltswagen') {
+        // DSG (Çift Kavrama) - Yüksek talep AMA yüksek arıza riski
+        final vehicleAge = 2025 - year;
+        
+        if (model == 'Jago') {
+          // Jetta: ESKİ NESIL DSG - EN YÜKSEK RİSK!
+          if (vehicleAge >= 8) {
+            // 2017 ve öncesi - Çok riskli
+            transFactor = 0.92; // Manuel'den bile düşük (arıza riski çok yüksek)
+          } else if (vehicleAge >= 5) {
+            transFactor = 1.02; // Minimal değer artışı (risk var)
+          } else {
+            transFactor = 1.08; // Nispeten güvenli
+          }
+        } else if (model == 'Paso') {
+          // Passat: Büyük DSG - Orta-Yüksek risk
+          if (vehicleAge >= 8 || mileage > 150000) {
+            transFactor = 0.98; // Arıza riski nedeniyle düşük değer
+          } else if (vehicleAge >= 5) {
+            transFactor = 1.05; // Orta seviye bonus
+          } else {
+            transFactor = 1.14; // Yeni ve güvenli - yüksek talep
+          }
+        } else if (model == 'Tenis') {
+          // Golf: En popüler DSG - Orta risk
+          if (vehicleAge >= 8) {
+            transFactor = 1.00; // Manuel ile eşit (risk dengesi)
+          } else if (vehicleAge >= 5) {
+            transFactor = 1.08; // İyi değer
+          } else {
+            transFactor = 1.15; // Yüksek talep ve değer
+          }
+        } else if (model == 'Colo') {
+          // Polo: Küçük DSG - Düşük risk
+          transFactor = 1.10; // Küçük motor, daha az yıpranma
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Fialto için - DUALOGIC RİSKİ!)
+      else if (brand == 'Fialto') {
+        if (model == 'Lagua' || model == 'Zorno') {
+          // Dualogic (Yarı Otomatik) - Easy-R gibi düşük güvenilirlik!
+          transFactor = 0.90; // Manuel'den %10 düşük (arıza riski + düşük talep)
+        } else if (model == 'Agna') {
+          // Agna: DCT/Tork Konvertörlü - Daha güvenilir
+          transFactor = 1.06; // %6 daha değerli (DSG kadar prestijli değil)
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Opexel için - TORK KONVERTÖRLÜ GÜVENİLİRLİK!)
+      else if (brand == 'Opexel') {
+        final vehicleAge = 2025 - year;
+        
+        if (model == 'Lorisa') {
+          // Corsa: Nesil farkı kritik!
+          if (vehicleAge >= 6) {
+            // 2019 öncesi (Corsa D/E) - Easytronic riski!
+            transFactor = 0.93; // Easy-R gibi yarı otomatik - yüksek risk
+          } else {
+            // 2020+ (Corsa F) - Modern tork konvertörlü
+            transFactor = 1.12; // Güvenilir ve prestijli
+          }
+        } else if (model == 'Tasra' || model == 'Mornitia') {
+          // Astra/Insignia: Tork Konvertörlü - DSG'den daha güvenilir!
+          // "Daha Az Riskli Otomatik" algısı
+          if (vehicleAge >= 8 || mileage > 180000) {
+            transFactor = 1.06; // Eski ama güvenilir - orta bonus
+          } else if (vehicleAge >= 5) {
+            transFactor = 1.10; // İyi değer - güvenilirlik bonusu
+          } else {
+            transFactor = 1.13; // DSG riskinden kaçan alıcılar - yüksek talep
+          }
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Bavora için - ZF GÜVENİLİRLİĞİ!)
+      else if (brand == 'Bavora') {
+        final vehicleAge = 2025 - year;
+        
+        if (model == 'A Serisi') {
+          // 1 Serisi: Nesil ve çekiş farkı KRİTİK!
+          if (vehicleAge >= 6) {
+            // 2019 öncesi (F20 - RWD + ZF 8 ileri) - Çok güvenilir!
+            transFactor = 1.15; // RWD + ZF güvenilirliği - sportif premium
+          } else {
+            // 2020+ (F40 - FWD + 7 ileri DCT) - DSG benzeri risk!
+            transFactor = 1.05; // DCT riski var ama yeni teknoloji
+          }
+        } else if (model == 'C Serisi' || model == 'E Serisi' || model == 'D Serisi') {
+          // 3/4/5 Serisi: ZF 8 ileri Steptronic - ÇOK GÜVENİLİR!
+          // DSG'den ve DCT'den çok daha güvenilir
+          if (vehicleAge >= 10 || mileage > 200000) {
+            transFactor = 1.08; // Eski ama ZF güvenilirliği - orta bonus
+          } else if (vehicleAge >= 5) {
+            transFactor = 1.12; // İyi değer - ZF güvenilirlik bonusu
+          } else {
+            transFactor = 1.16; // Yeni + ZF = en güvenilir otomatik kombinasyon
+          }
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Fortran için - POWERSHIFT RİSKİ!)
+      else if (brand == 'Fortran') {
+        final vehicleAge = 2025 - year;
+        
+        if (model == 'Odak' || model == 'Vista' || model == 'Tupa') {
+          // Focus/Fiesta/Kuga: Powershift riski KRİTİK!
+          if (vehicleAge >= 9) {
+            // 2016 öncesi - Powershift çift kavrama - YÜKSEK RİSK!
+            transFactor = 0.88; // DSG gibi yüksek arıza riski - manuel'den %12 düşük
+          } else if (vehicleAge >= 7) {
+            // 2018 öncesi - Hala Powershift riski var
+            transFactor = 0.92; // Orta risk - manuel'den %8 düşük
+          } else {
+            // 2018+ - Yeni 8 ileri tork konvertörlü - GÜVENİLİR!
+            if (model == 'Odak') {
+              transFactor = 1.10; // Focus yeni nesil güvenilir
+            } else if (model == 'Vista') {
+              transFactor = 1.08; // Fiesta yeni nesil güvenilir
+            } else if (model == 'Tupa') {
+              transFactor = 1.12; // Kuga SUV + güvenilir otomatik
+            }
+          }
+        } else if (model == 'Avger') {
+          // Ranger: 6 ileri veya 10 ileri otomatik - Powershift yok
+          if (vehicleAge <= 3) {
+            transFactor = 1.14; // 10 ileri otomatik - modern ve prestijli
+          } else {
+            transFactor = 1.08; // 6 ileri otomatik - güvenilir
+          }
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Mercurion için - 7G/9G vs DCT)
+      else if (brand == 'Mercurion') {
+        final vehicleAge = 2025 - year;
+        
+        if (model == '1 Serisi' || model == 'GJE') {
+          // A-Class/CLA: 7G-DCT çift kavrama - DSG benzeri risk!
+          if (vehicleAge >= 7) {
+            transFactor = 0.95; // Eski DCT - orta risk
+          } else {
+            transFactor = 1.07; // Yeni DCT - teknoloji primi ama risk var
+          }
+        } else if (model == '3 Serisi' || model == '5 Serisi' || model == '8 Serisi') {
+          // C/E/G-Class: 7G/9G-Tronic - ÇOK GÜVENİLİR!
+          // ZF seviyesinde güvenilirlik
+          if (vehicleAge >= 10 || mileage > 200000) {
+            transFactor = 1.10; // Eski ama 7G/9G güvenilirliği
+          } else if (vehicleAge >= 5) {
+            transFactor = 1.14; // İyi değer - Mercedes güvenilirlik bonusu
+          } else {
+            transFactor = 1.18; // Yeni + 9G = en güvenilir otomatik
+          }
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Hyundaro için - TORK KONVERTÖRLÜ GÜVENİLİRLİK!)
+      else if (brand == 'Hyundaro') {
+        final vehicleAge = 2025 - year;
+        
+        if (model == 'Tecent White' || model == 'Tecent Red') {
+          // Accent Era/Blue: Tork konvertörlü - Symbol/Lagua'dan GÜVENİLİR!
+          // Easy-R/Dualogic riskine karşı avantaj
+          transFactor = 1.11; // Tork konvertörlü güvenilirlik bonusu
+        } else if (model == 'A10') {
+          // i20: Eski tork konvertörlü, yeni DCT
+          if (vehicleAge >= 5) {
+            transFactor = 1.09; // Eski tork konvertörlü - güvenilir
+          } else {
+            transFactor = 1.04; // Yeni DCT - orta risk (Powershift'ten iyi, tork'tan az güvenilir)
+          }
+        } else if (model == 'A20') {
+          // i30: Eski tork konvertörlü, yeni DCT
+          if (vehicleAge >= 6) {
+            transFactor = 1.10; // Eski tork konvertörlü - güvenilir
+          } else {
+            transFactor = 1.05; // Yeni DCT - orta risk
+          }
+        } else if (model == 'Kascon') {
+          // Tucson: Eski tork konvertörlü, yeni DCT
+          if (vehicleAge >= 6) {
+            transFactor = 1.11; // Eski tork konvertörlü - SUV + güvenilir
+          } else {
+            transFactor = 1.07; // Yeni DCT - orta risk ama SUV primi
+          }
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Toyoto için - CVT GÜVENİLİRLİĞİ!)
+      else if (brand == 'Toyoto') {
+        final vehicleAge = 2025 - year;
+        
+        if (model == 'Airoko') {
+          // Corolla: Sadece CVT - HİÇ MMT YOK - EN GÜVENİLİR!
+          // DSG/Powershift/DCT risklerinden TAM UZAK
+          transFactor = 1.17; // CVT güvenilirlik + Toyota markası = MAKSIMUM BONUS
+        } else if (model == 'Lotus') {
+          // Auris: CVT (güvenilir) + MMT (riskli)
+          // MMT sadece 1.4 D-4D Dizel'de kullanılır
+          if (fuelType == 'Dizel' && vehicleAge >= 7) {
+            // Eski 1.4 D-4D MMT - Easy-R/Dualogic gibi YARI OTOMATİK RİSK!
+            transFactor = 0.89; // MMT yarı otomatik - yüksek arıza riski
+          } else {
+            // CVT (Hibrit/Benzin) - Çok güvenilir
+            transFactor = 1.14; // CVT güvenilirlik bonusu
+          }
+        } else if (model == 'Karma') {
+          // Yaris: CVT (güvenilir) + MMT (eski riskli)
+          if (vehicleAge >= 10) {
+            // Eski nesil (2010-2015) MMT riski var
+            transFactor = 0.91; // MMT yarı otomatik riski (1.33 benzin)
+          } else {
+            // Yeni CVT (Hibrit/1.5 Benzin) - Çok güvenilir
+            transFactor = 1.13; // CVT güvenilirlik bonusu
+          }
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Audira için - S tronic/MULTITRONIC RİSKİ!)
+      else if (brand == 'Audira') {
+        final vehicleAge = 2025 - year;
+        
+        // Quattro kontrolü (driveType'dan)
+        final bool hasQuattro = driveType == '4x4';
+        
+        if (model == 'B3') {
+          // A3: S tronic (DSG) risk - Premium parça maliyeti!
+          if (vehicleAge >= 5) {
+            // Eski S tronic - DSG riski yüksek ama premium parça daha pahalı
+            transFactor = 0.87; // S tronic (DSG) riski - premium onarım (-%13)
+          } else {
+            // Yeni S tronic - orta risk
+            transFactor = 0.92; // Yeni DSG orta risk (-%8)
+          }
+        } else if (model == 'B4') {
+          // A4: Multitronic (ESKİ) + S tronic + Tiptronic (QUATTRO)
+          if (hasQuattro && vehicleAge >= 8) {
+            // Quattro + Tiptronic (Tork Konvertörlü) - EN GÜVENİLİR!
+            transFactor = 1.19; // Tiptronic güvenilirlik + Quattro premyumu (+%19)
+          } else if (vehicleAge >= 8 && vehicleAge <= 12) {
+            // ESKİ NESİL (B8) - MULTİTRONİC CVT TUZAĞI!
+            // CVT gibi ama ÇOK yüksek arıza riski
+            transFactor = 0.79; // Multitronic CVT - YÜKSEK RİSK (-%21)
+          } else if (vehicleAge >= 5) {
+            // Orta yaş S tronic - DSG riski
+            transFactor = 0.85; // S tronic (DSG) riski (-%15)
+          } else {
+            // Yeni S tronic - orta risk
+            transFactor = 0.91; // Yeni DSG orta risk (-%9)
+          }
+        } else if (model == 'B6') {
+          // A6: S tronic + Tiptronic (QUATTRO 3.0 V6)
+          if (hasQuattro && vehicleAge >= 5) {
+            // Quattro + Tiptronic (3.0 V6) - GÜVENİLİR + PRESTIJ!
+            transFactor = 1.23; // Tiptronic güvenilirlik + Quattro + V6 premyumu (+%23)
+          } else if (vehicleAge >= 6) {
+            // Eski S tronic - yüksek risk + elektronik risk
+            transFactor = 0.82; // S tronic + elektronik çift risk (-%18)
+          } else {
+            // Yeni S tronic - orta risk
+            transFactor = 0.89; // Yeni DSG orta risk (-%11)
+          }
+        } else if (model == 'B5') {
+          // A5: S tronic (DSG) risk - Sportif segment
+          if (hasQuattro) {
+            // Quattro + S tronic - sportif + 4x4
+            transFactor = 0.94; // Quattro primi DSG riskini azaltır (-%6)
+          } else if (vehicleAge >= 5) {
+            // Eski S tronic - DSG riski
+            transFactor = 0.86; // S tronic (DSG) riski (-%14)
+          } else {
+            // Yeni S tronic - orta risk
+            transFactor = 0.91; // Yeni DSG orta risk (-%9)
+          }
+        }
+      }
+      // MODEL-SPESİFİK VİTES DEĞERİ (Hondaro için - CVT GÜVENİLİRLİĞİ!)
+      else if (brand == 'Hondaro') {
+        final vehicleAge = 2025 - year;
+        
+        // AWD kontrolü (CR-V için)
+        final bool hasAWD = driveType == '4x4';
+        
+        if (model == 'Vice') {
+          // Civic: CVT (10-11. nesil) + eski tork konv. - ÇOK GÜVENİLİR!
+          // DSG/Powershift/DCT risklerinden TAM UZAK
+          transFactor = 1.15; // CVT güvenilirlik + Honda markası = YÜ KSEK BONUS
+          
+          // RS/Turbo performans versiyonu ek bonusu
+          if (horsepower != null && horsepower >= 170) {
+            transFactor *= 1.07; // RS/Turbo performans primi (+%7 ekstra)
+          }
+        } else if (model == 'VHL') {
+          // CR-V: CVT - ÇOK GÜVENİLİR!
+          transFactor = 1.16; // CVT güvenilirlik bonusu
+          
+          // AWD (4x4) ekstra primi
+          if (hasAWD) {
+            transFactor *= 1.14; // AWD dört çekiş prestij + performans (+%14 ekstra)
+          }
+        } else if (model == 'Kent') {
+          // City: CVT - GÜVENİLİR!
+          transFactor = 1.12; // CVT güvenilirlik bonusu
+        } else if (model == 'Caz') {
+          // Jazz: CVT - ÇOK GÜVENİLİR!
+          transFactor = 1.13; // CVT güvenilirlik bonusu
+          
+          // Sihirli koltuk pratiklik primi (her zaman)
+          transFactor *= 1.06; // Sihirli koltuk pratiklik (+%6 ekstra)
+        }
+      }
+    }
     
     // HASAR FAKTÖRÜ
     double accidentFactor = hasAccidentRecord ? 0.85 : 1.0; // Hasarlı %15 düşük
     
+    // Premium markalarda hasar kayıtlı araç daha büyük değer kaybı
+    if (brand == 'Bavora' && hasAccidentRecord) {
+      accidentFactor = 0.78; // Bavora hasarlı %22 düşük (onarım pahalı)
+    } else if (brand == 'Mercurion' && hasAccidentRecord) {
+      if (model == '8 Serisi') {
+        accidentFactor = 0.70; // G-Class hasarlı %30 düşük (astronomik onarım)
+      } else {
+        accidentFactor = 0.76; // Diğer Mercurion modeller %24 düşük
+      }
+    } else if (brand == 'Audira' && hasAccidentRecord) {
+      if (model == 'B6') {
+        accidentFactor = 0.74; // A6 hasarlı %26 düşük (karmaşık elektronik + yüksek onarım)
+      } else if (model == 'B5') {
+        accidentFactor = 0.77; // A5 hasarlı %23 düşük (sportif kasa pahalı onarım)
+      } else {
+        accidentFactor = 0.80; // B3/B4 hasarlı %20 düşük (premium parça)
+      }
+    }
+    
     // SATICI TİPİ FAKTÖRÜ (Galeriden biraz daha pahalı)
     double sellerFactor = sellerType == 'Galeriden' ? 1.05 : 1.0; // Galeri %5 daha pahalı
     
-    // GENEL HESAPLAMa
-    double finalPrice = basePrice * yearFactor * kmFactor * fuelFactor * transFactor * accidentFactor * sellerFactor;
+    // MODEL-SPESİFİK EK FAKTÖRLER
+    double trimFactor = 1.0;
+    
+    // Audira S Line / Teknoloji / Kasa Tipi Faktörleri
+    if (brand == 'Audira') {
+      // S Line paketi (rastgele %40 ihtimal)
+      final bool hasSLine = _random.nextDouble() < 0.40;
+      if (hasSLine) {
+        if (model == 'B5') {
+          trimFactor *= 1.18; // A5 S Line zorunluluğu - maksimum prim (+%18)
+        } else if (model == 'B6') {
+          trimFactor *= 1.16; // A6 S Line lüks prim (+%16)
+        } else if (model == 'B4') {
+          trimFactor *= 1.14; // A4 S Line değerli (+%14)
+        } else if (model == 'B3') {
+          trimFactor *= 1.12; // A3 S Line sportif (+%12)
+        }
+      }
+      
+      // Sanal Kokpit / Teknoloji paketi (yeni araçlarda %50 ihtimal)
+      if (year != null && year >= 2020 && _random.nextDouble() < 0.50) {
+        trimFactor *= 1.08; // Teknoloji primi (+%8)
+      }
+      
+      // Kasa tipi faktörleri
+      if (model == 'B3' && bodyType == 'Sedan') {
+        trimFactor *= 1.05; // A3 Sedan Türkiye'de popüler (+%5)
+      } else if (model == 'B5' && bodyType == 'Hatchback') {
+        trimFactor *= 1.07; // A5 Sportback en hızlı satan (+%7)
+      }
+    }
+    
+    // Hondaro Kent yüksek güç avantajı (121 HP sabit)
+    if (brand == 'Hondaro' && model == 'Kent') {
+      trimFactor *= 1.05; // Egea/Taliant'tan yüksek güç (121 HP) (+%5)
+    }
+    
+    // GENEL HESAPLAMA
+    double finalPrice = basePrice * yearFactor * kmFactor * fuelFactor * transFactor * accidentFactor * sellerFactor * trimFactor;
     
     // Rastgele varyasyon ±8% (pazar dinamikleri)
     final variation = ((_random.nextDouble() * 0.16) - 0.08);
@@ -626,9 +2327,10 @@ class MarketRefreshService {
     return finalPrice.clamp(50000.0, basePrice * 1.1);
   }
 
-  /// Açıklama oluştur
-  String _generateDescription() {
-    final descriptions = [
+  /// Açıklama oluştur (model-spesifik)
+  String _generateDescription({String? brand, String? model, String? fuelType, String? transmission, int? year, String? driveType, int? horsepower}) {
+    // Temel açıklamalar
+    final baseDescriptions = [
       'Tek elden, bakımlı ve temiz kullanım.',
       'Hasarsız, bakımlı ve sorunsuz bir araç.',
       'Garaj arabası. Hep düzenli kullanılmış.',
@@ -638,18 +2340,554 @@ class MarketRefreshService {
       'Ekonomik ve güvenilir araç.',
       'Değişensiz, boyasız ve hasarsız araç.',
     ];
-    return descriptions[_random.nextInt(descriptions.length)];
+    
+    // Model-spesifik ek açıklamalar
+    final List<String> extraNotes = [];
+    
+    if (brand == 'Renauva') {
+      if (model == 'Slim') {
+        extraNotes.addAll([
+          'Modern ve dinamik Hatchback.',
+          'Şehir içi kullanım için ideal.',
+          'Genç ve sporty tasarım.',
+        ]);
+      } else if (model == 'Magna') {
+        extraNotes.addAll([
+          'Konforlu ve geniş iç hacim.',
+          'Yol tutuşu mükemmel.',
+          'Aile arabası olarak çok uygun.',
+        ]);
+      } else if (model == 'Flow') {
+        extraNotes.addAll([
+          'Geniş bagaj hacmi ve konfor.',
+          'Uzun yol için ideal.',
+        ]);
+      } else if (model == 'Signa') {
+        extraNotes.addAll([
+          'Ekonomik ve pratik araç.',
+          'Yakıt tüketimi çok düşük.',
+        ]);
+      } else if (model == 'Tallion') {
+        extraNotes.addAll([
+          'Yeni nesil, modern teknoloji.',
+          'Aileniz için güvenli ve ekonomik.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları
+      if (fuelType == 'Dizel') {
+        extraNotes.add('1.5 dCi motor çok verimli ve ekonomik.');
+      } else if (fuelType == 'Benzin+LPG') {
+        extraNotes.add('Fabrika çıkışlı LPG, yakıt tasarrufu garantili.');
+      } else if (fuelType == 'Hybrid') {
+        extraNotes.add('Hibrit teknoloji ile çevre dostu.');
+      }
+      
+      // Vites tipi ek notları
+      if (transmission == 'Otomatik') {
+        if (model == 'Tallion') {
+          extraNotes.add('X-Tronic CVT otomatik vites, sürüş keyfi.');
+        } else if (model == 'Signa') {
+          extraNotes.add('Easy-R otomatik vites, şehir içi rahat.');
+        } else {
+          extraNotes.add('EDC çift kavrama, hızlı ve güvenli vites.');
+        }
+      }
+    } else if (brand == 'Voltswagen') {
+      if (model == 'Paso') {
+        extraNotes.addAll([
+          'Premium segment, lüks ve konfor.',
+          'Geniş iç hacim ve yüksek teknoloji.',
+          'Uzun yol için mükemmel seçim.',
+        ]);
+      } else if (model == 'Tenis') {
+        extraNotes.addAll([
+          'Kompakt ama ferah iç hacim.',
+          'Volkswagen kalitesi ve güvenilirliği.',
+          'Yüksek talep ve hızlı satış.',
+        ]);
+      } else if (model == 'Colo') {
+        extraNotes.addAll([
+          'Premium küçük araç segmenti.',
+          'Şehir içi kullanımda pratik.',
+          'Volkswagen prestiji uygun fiyata.',
+        ]);
+      } else if (model == 'Jago') {
+        extraNotes.addAll([
+          'Geniş bagajlı sedan.',
+          'Aile arabası olarak uygun.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Voltswagen)
+      if (fuelType == 'Dizel') {
+        extraNotes.add('TDI motor, verimli ve güçlü.');
+      }
+      
+      // Vites tipi ek notları (Voltswagen)
+      if (transmission == 'Otomatik') {
+        extraNotes.add('DSG çift kavrama otomatik şanzıman.');
+      }
+    } else if (brand == 'Fialto') {
+      if (model == 'Agna') {
+        extraNotes.addAll([
+          'Geniş kasa seçenekleri, pratik araç.',
+          'Ticari ve aile kullanımı için ideal.',
+          'Yüksek hacim, hızlı satış.',
+        ]);
+      } else if (model == 'Lagua') {
+        extraNotes.addAll([
+          'Basit ve sağlam yapı.',
+          'Ekonomik sedan.',
+          'Yüksek kilometrede güvenilir.',
+        ]);
+      } else if (model == 'Zorno') {
+        extraNotes.addAll([
+          'Kompakt ve ekonomik.',
+          'Şehir içi ideal.',
+          'Düşük işletme maliyeti.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Fialto)
+      if (fuelType == 'Dizel') {
+        extraNotes.add('Multijet dizel motor, verimli ve ekonomik.');
+      } else if (fuelType == 'Hybrid') {
+        extraNotes.add('Hibrit teknoloji ile yakıt tasarrufu.');
+      }
+      
+      // Vites tipi ek notları (Fialto)
+      if (transmission == 'Otomatik') {
+        if (model == 'Lagua' || model == 'Zorno') {
+          extraNotes.add('Dualogic yarı otomatik vites.');
+        } else {
+          extraNotes.add('Otomatik şanzıman, konforlu sürüş.');
+        }
+      }
+    } else if (brand == 'Opexel') {
+      if (model == 'Tasra') {
+        extraNotes.addAll([
+          'Güvenilir Alman kalitesi.',
+          'Geniş kasa seçeneği, konforlu.',
+          'Hem sedan hem hatchback mevcut.',
+        ]);
+      } else if (model == 'Lorisa') {
+        extraNotes.addAll([
+          'Kompakt ve ekonomik.',
+          'Şehir içi kullanımda pratik.',
+          'Güvenilir otomatik şanzıman.',
+        ]);
+      } else if (model == 'Mornitia') {
+        extraNotes.addAll([
+          'Premium segment, lüks donanım.',
+          'Uzun yol konforu üst seviye.',
+          'Prestijli ve güvenilir.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Opexel)
+      if (fuelType == 'Dizel') {
+        extraNotes.add('CDTI dizel motor, verimli ve güçlü.');
+      }
+      
+      // Vites tipi ek notları (Opexel)
+      if (transmission == 'Otomatik') {
+        if (model == 'Lorisa' && year != null && year < 2020) {
+          extraNotes.add('Easytronic yarı otomatik vites.');
+        } else {
+          extraNotes.add('Tork konvertörlü otomatik, güvenilir.');
+        }
+      }
+    } else if (brand == 'Bavora') {
+      if (model == 'C Serisi') {
+        extraNotes.addAll([
+          'Premium segment, yüksek prestij.',
+          'Arkadan itiş (RWD) sürüş keyfi.',
+          'M Sport paketi çok değerli.',
+        ]);
+      } else if (model == 'E Serisi') {
+        extraNotes.addAll([
+          'Lüks segment, en prestijli model.',
+          'Geniş iç hacim ve konfor.',
+          'Elektronik donanım zengin.',
+        ]);
+      } else if (model == 'A Serisi') {
+        extraNotes.addAll([
+          'Kompakt premium, şehir için ideal.',
+          'Genç ve dinamik karakter.',
+          'M Sport görsel paket popüler.',
+        ]);
+      } else if (model == 'D Serisi') {
+        extraNotes.addAll([
+          'Sportif coupe, şık tasarım.',
+          'M Sport standart gibi.',
+          'Gran Coupe en popüler kasa.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Bavora)
+      if (fuelType == 'Dizel') {
+        extraNotes.add('d motor, verimli ve güçlü dizel.');
+      } else if (fuelType == 'Hybrid') {
+        extraNotes.add('e motor, hibrit teknoloji, yüksek verim.');
+      }
+      
+      // Vites tipi ek notları (Bavora)
+      if (transmission == 'Otomatik') {
+        if (model == 'A Serisi' && year != null && year >= 2020) {
+          extraNotes.add('7 ileri DCT, çift kavramalı vites.');
+        } else {
+          extraNotes.add('8 ileri Steptronic (ZF), en güvenilir otomatik.');
+        }
+      }
+      
+      // Çekiş sistemi notu (Bavora RWD)
+      extraNotes.add('Arkadan çekişli (RWD), sportif karakter.');
+    } else if (brand == 'Fortran') {
+      if (model == 'Odak') {
+        extraNotes.addAll([
+          'Sürüş keyfi üst seviye.',
+          'C segmentinin lideri, konforlu.',
+          'Hatchback/Sedan/SW kasa seçenekleri.',
+        ]);
+      } else if (model == 'Vista') {
+        extraNotes.addAll([
+          'Kompakt ve çevik, şehir aracı.',
+          'Ekonomik yakıt tüketimi.',
+          'Genç ve dinamik tasarım.',
+        ]);
+      } else if (model == 'Avger') {
+        extraNotes.addAll([
+          'Güçlü pick-up, arazi ve yük taşıma.',
+          'Çift kabin konforu.',
+          'Wildtrak donanım lüks seviye.',
+        ]);
+      } else if (model == 'Tupa') {
+        extraNotes.addAll([
+          'SUV konforu, geniş iç hacim.',
+          'Aileler için ideal araç.',
+          'Modern teknoloji ve güvenlik.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Fortran)
+      if (fuelType == 'Dizel') {
+        if (model == 'Odak' || model == 'Tupa') {
+          extraNotes.add('EcoBlue dizel motor, verimli ve güçlü.');
+        } else if (model == 'Vista') {
+          extraNotes.add('TDCi dizel motor, ekonomik tüketim.');
+        } else if (model == 'Avger') {
+          extraNotes.add('Bi-Turbo dizel motor, yüksek tork.');
+        }
+      } else if (fuelType == 'Hybrid') {
+        extraNotes.add('Hibrit teknoloji, çevre dostu ve verimli.');
+      } else if (fuelType == 'Benzin') {
+        extraNotes.add('EcoBoost turbo benzin, performans ve verim.');
+      }
+      
+      // Vites tipi ek notları (Fortran)
+      if (transmission == 'Otomatik') {
+        if (year != null && year >= 2018) {
+          if (model == 'Avger') {
+            extraNotes.add('10 ileri otomatik, en modern şanzıman.');
+          } else {
+            extraNotes.add('8 ileri tork konvertörlü otomatik, güvenilir.');
+          }
+        } else {
+          extraNotes.add('Powershift otomatik vites.');
+        }
+      }
+      
+      // 4x4 notu (Avger, Tupa)
+      if (model == 'Avger') {
+        extraNotes.add('4x4 dört çekiş, arazi performansı üst düzey.');
+      } else if (model == 'Tupa') {
+        // AWD/FWD bilgisi eklenebilir
+      }
+    } else if (brand == 'Mercurion') {
+      if (model == '3 Serisi') {
+        extraNotes.addAll([
+          'Premium konfor, klasik lüks.',
+          'AMG Line sportif tasarım.',
+          'Yetkili servis geçmişi çok önemli.',
+        ]);
+      } else if (model == '5 Serisi') {
+        extraNotes.addAll([
+          'Üst düzey lüks sedan.',
+          'Makam aracı prestiji.',
+          'Elektronik donanım zengin.',
+        ]);
+      } else if (model == '1 Serisi') {
+        extraNotes.addAll([
+          'MBUX çift ekran teknoloji.',
+          'Kompakt premium, genç dinamik.',
+          'AMG Line görsel paket önemli.',
+        ]);
+      } else if (model == 'GJE') {
+        extraNotes.addAll([
+          '4 kapılı coupe, sportif tasarım.',
+          'Çerçevesiz camlar, şık detay.',
+          'Genç profesyonellere hitap eder.',
+        ]);
+      } else if (model == '8 Serisi') {
+        extraNotes.addAll([
+          'Efsanevi arazi aracı.',
+          'G 63 AMG en güçlü versiyon.',
+          '3 diferansiyel kilidi, saf arazi yeteneği.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Mercurion)
+      if (fuelType == 'Dizel') {
+        extraNotes.add('d motor, verimli ve güçlü dizel.');
+      } else if (fuelType == 'Hybrid') {
+        extraNotes.add('e motor, hibrit teknoloji, yüksek performans.');
+      }
+      
+      // Vites tipi ek notları (Mercurion)
+      if (transmission == 'Otomatik') {
+        if (model == '1 Serisi' || model == 'GJE') {
+          extraNotes.add('7G-DCT çift kavramalı otomatik.');
+        } else {
+          extraNotes.add('7G/9G-Tronic, en güvenilir otomatik şanzıman.');
+        }
+      }
+      
+      // Çekiş sistemi notu (Mercurion)
+      if (model == '8 Serisi') {
+        extraNotes.add('4MATIC dört çekiş, üç diferansiyel kilidi.');
+      } else {
+        extraNotes.add('Arkadan çekişli (RWD), premium karakter.');
+      }
+    } else if (brand == 'Hyundaro') {
+      if (model == 'A10') {
+        extraNotes.addAll([
+          'Güvenilir ve ekonomik hatchback.',
+          'Geniş donanım seçenekleri.',
+          'Yedek parça ucuz ve kolay.',
+        ]);
+      } else if (model == 'Tecent Red') {
+        extraNotes.addAll([
+          'Güçlü 1.6 CRDi dizel motor.',
+          'Ekonomik sedan, aile aracı.',
+          'Tork konvertörlü otomatik güvenilir.',
+        ]);
+      } else if (model == 'Tecent White') {
+        extraNotes.addAll([
+          'Basit ve sağlam yapı.',
+          'Ucuz onarım maliyetleri.',
+          'Ekonomik günlük kullanım.',
+        ]);
+      } else if (model == 'A20') {
+        extraNotes.addAll([
+          'C segment dengeli araç.',
+          'Zengin standart donanım.',
+          'N-Line sportif paket popüler.',
+        ]);
+      } else if (model == 'Kascon') {
+        extraNotes.addAll([
+          'Modern SUV, radikal tasarım.',
+          'Hibrit teknoloji mevcut.',
+          'Geniş iç hacim, konforlu.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Hyundaro)
+      if (fuelType == 'Dizel') {
+        extraNotes.add('CRDi dizel motor, güçlü ve verimli.');
+      } else if (fuelType == 'Hybrid') {
+        extraNotes.add('Hibrit teknoloji, yüksek verim ve düşük tüketim.');
+      }
+      
+      // Vites tipi ek notları (Hyundaro)
+      if (transmission == 'Otomatik') {
+        if (year != null && year >= 2019) {
+          extraNotes.add('DCT çift kavramalı otomatik.');
+        } else {
+          extraNotes.add('Tork konvertörlü otomatik, güvenilir.');
+        }
+      }
+    } else if (brand == 'Toyoto') {
+      if (model == 'Airoko') {
+        extraNotes.addAll([
+          'Efsanevi güvenilirlik.',
+          'En az arıza çıkaran sedan.',
+          'Yüksek kilometrede bile değerli.',
+        ]);
+      } else if (model == 'Lotus') {
+        extraNotes.addAll([
+          'Güvenilir Toyota kalitesi.',
+          'Hatchback pratikliği.',
+          'Hibrit versiyon çok talep görür.',
+        ]);
+      } else if (model == 'Karma') {
+        extraNotes.addAll([
+          'Şehir içi kullanımda pratik.',
+          'Kompakt boyut, kolay park.',
+          'Hibrit teknoloji mevcut.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Toyoto)
+      if (fuelType == 'Hybrid') {
+        extraNotes.add('Hibrit teknoloji, yakıt ekonomisi çok yüksek.');
+      } else if (fuelType == 'Dizel') {
+        extraNotes.add('D-4D dizel motor, verimli.');
+      }
+      
+      // Vites tipi ek notları (Toyoto)
+      if (transmission == 'Otomatik') {
+        if (fuelType == 'Hybrid') {
+          extraNotes.add('CVT otomatik, hibrit sistemle mükemmel uyum.');
+        } else if (fuelType == 'Dizel' && year != null && year <= 2015) {
+          extraNotes.add('MMT yarı otomatik vites (dikkatli kullanım gerektirir).');
+        } else if (model == 'Karma' && year != null && year <= 2015) {
+          extraNotes.add('MMT yarı otomatik vites (dikkatli kullanım gerektirir).');
+        } else {
+          extraNotes.add('CVT otomatik, en güvenilir şanzıman.');
+        }
+      }
+    } else if (brand == 'Audira') {
+      if (model == 'B3') {
+        extraNotes.addAll([
+          'Premium kompakt, yüksek kalite.',
+          'Sanal kokpit, modern teknoloji.',
+          'Sportif sürüş dinamikleri.',
+        ]);
+      } else if (model == 'B4') {
+        extraNotes.addAll([
+          'D segment konforu, prestij.',
+          'Yüksek malzeme kalitesi.',
+          'Uzun yol konforu üstün.',
+        ]);
+      } else if (model == 'B6') {
+        extraNotes.addAll([
+          'E segment lüks, üst düzey konfor.',
+          'Matrix LED, gelişmiş donanım.',
+          'Yönetici aracı, prestijli.',
+        ]);
+      } else if (model == 'B5') {
+        extraNotes.addAll([
+          'Sportif coupe tasarım.',
+          'Zarif akıcı hatlar, dikkat çekici.',
+          'Prestijli sportif sedan.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Audira)
+      if (fuelType == 'Dizel') {
+        if (model == 'B6') {
+          extraNotes.add('TDI dizel, yüksek tork ve verim.');
+        } else {
+          extraNotes.add('TDI dizel, ekonomik ve güçlü.');
+        }
+      }
+      
+      // Çekiş sistemi notu
+      if (driveType == '4x4') {
+        extraNotes.add('Quattro dört çekiş, maksimum güvenlik ve performans.');
+      }
+      
+      // Vites tipi ek notları (Audira)
+      if (transmission == 'Otomatik') {
+        if (year != null) {
+          final vehicleAge = 2025 - year;
+          if (driveType == '4x4' && vehicleAge >= 5) {
+            extraNotes.add('Tiptronic otomatik, güvenilir şanzıman.');
+          } else if (model == 'B4' && vehicleAge >= 8 && vehicleAge <= 12) {
+            extraNotes.add('Multitronic CVT vites (bakım geçmişi önemli).');
+          } else if (vehicleAge >= 5) {
+            extraNotes.add('S tronic otomatik (bakım geçmişi kontrol edilmeli).');
+          } else {
+            extraNotes.add('S tronic 7 ileri otomatik, sportif vites.');
+          }
+        }
+      }
+    } else if (brand == 'Hondaro') {
+      if (model == 'Vice') {
+        extraNotes.addAll([
+          'İkinci el kralı, değerini korur.',
+          'Güvenilir Honda kalitesi.',
+          'Yüksek kilometrede bile sorunsuz.',
+        ]);
+      } else if (model == 'VHL') {
+        extraNotes.addAll([
+          'SUV segmentinde lider konfor.',
+          'Geniş iç mekan, aile aracı.',
+          'Honda güvenilirliği.',
+        ]);
+      } else if (model == 'Kent') {
+        extraNotes.addAll([
+          'Ekonomik sedan, Honda kalitesi.',
+          'Geniş iç hacim, konforlu.',
+          'Yüksek motor gücü (121 HP).',
+        ]);
+      } else if (model == 'Caz') {
+        extraNotes.addAll([
+          'Sihirli koltuklar, yüksek tavan.',
+          'Kompakt ama geniş, pratik.',
+          'Şehir için ideal araç.',
+        ]);
+      }
+      
+      // Yakıt tipi ek notları (Hondaro)
+      if (fuelType == 'Hybrid') {
+        if (model == 'VHL') {
+          extraNotes.add('2.0 Hibrit, yakıt ekonomisi üstün.');
+        } else if (model == 'Caz') {
+          extraNotes.add('1.5 e:HEV hibrit, çok verimli.');
+        }
+      } else if (fuelType == 'Benzin+LPG') {
+        extraNotes.add('ECO fabrika çıkışlı LPG, düşük yakıt maliyeti.');
+      }
+      
+      // Çekiş sistemi notu
+      if (driveType == '4x4') {
+        extraNotes.add('AWD dört çekiş, maksimum güvenlik.');
+      }
+      
+      // Vites tipi ek notları (Hondaro)
+      if (transmission == 'Otomatik') {
+        extraNotes.add('CVT otomatik, en güvenilir şanzıman.');
+      }
+      
+      // Performans versiyonu
+      if (model == 'Vice' && horsepower != null && horsepower >= 170) {
+        extraNotes.add('RS/Turbo performans versiyonu, sportif sürüş.');
+      }
+    }
+    
+    // Ana açıklama + ek notlar
+    final baseDesc = baseDescriptions[_random.nextInt(baseDescriptions.length)];
+    
+    if (extraNotes.isNotEmpty && _random.nextBool()) {
+      final extraNote = extraNotes[_random.nextInt(extraNotes.length)];
+      return '$baseDesc $extraNote';
+    }
+    
+    return baseDesc;
   }
 
-  /// Aktif ilanları al (marka filtrelemesi ile)
-  List<Vehicle> getActiveListings({String? brand}) {
-    if (brand == null) {
-      return _activeListings.map((l) => l.vehicle).toList();
+  /// Aktif ilanları al (marka ve model filtrelemesi ile)
+  List<Vehicle> getActiveListings({String? brand, String? model}) {
+    var listings = _activeListings.map((l) => l.vehicle).toList();
+    
+    // Marka filtresi
+    if (brand != null) {
+      listings = listings.where((v) => v.brand == brand).toList();
     }
-    return _activeListings
-        .where((l) => l.vehicle.brand == brand)
-        .map((l) => l.vehicle)
-        .toList();
+    
+    // Model filtresi
+    if (model != null) {
+      listings = listings.where((v) => v.model == model).toList();
+    }
+    
+    return listings;
+  }
+
+  /// Marka-model eşleşmelerini döndür
+  Map<String, List<String>> getModelsByBrand() {
+    return Map.from(_modelsByBrand);
   }
 
   /// Toplam aktif ilan sayısı

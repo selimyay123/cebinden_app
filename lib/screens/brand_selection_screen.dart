@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
+import 'model_selection_screen.dart';
 
 class BrandSelectionScreen extends StatelessWidget {
   final String categoryName;
@@ -34,13 +35,13 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'B',
         'imagePath': 'assets/images/car_brands/bmv.jpeg',
       },
-      {
-        'name': 'Citronix', // Citroen
-        'originalHint': 'Fransız konforu',
-        'color': Colors.red[400]!,
-        'icon': 'C',
-        'imagePath': 'assets/images/car_brands/alfio.jpeg',
-      },
+      // {
+      //   'name': 'Citronix', // Citroen
+      //   'originalHint': 'Fransız konforu',
+      //   'color': Colors.red[400]!,
+      //   'icon': 'C',
+      //   'imagePath': 'assets/images/car_brands/alfio.jpeg',
+      // },
       {
         'name': 'Fialto', // Fiat
         'originalHint': 'İtalyan pratikliği',
@@ -83,13 +84,13 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'O',
         'imagePath': 'assets/images/car_brands/opex.jpeg',
       },
-      {
-        'name': 'Peugot', // Peugeot
-        'originalHint': 'Fransız zarafeti',
-        'color': Colors.blue[800]!,
-        'icon': 'P',
-        'imagePath': 'assets/images/car_brands/pejo.jpeg',
-      },
+      // {
+      //   'name': 'Peugot', // Peugeot
+      //   'originalHint': 'Fransız zarafeti',
+      //   'color': Colors.blue[800]!,
+      //   'icon': 'P',
+      //   'imagePath': 'assets/images/car_brands/pejo.jpeg',
+      // },
       {
         'name': 'Renauva', // Renault
         'originalHint': 'Fransız inovasyonu',
@@ -97,13 +98,13 @@ class BrandSelectionScreen extends StatelessWidget {
         'icon': 'R',
         'imagePath': 'assets/images/car_brands/renol.jpeg',
       },
-      {
-        'name': 'Skodra', // Škoda
-        'originalHint': 'Çek değeri',
-        'color': Colors.green[700]!,
-        'icon': 'Š',
-        'imagePath': 'assets/images/car_brands/skodai.jpeg',
-      },
+      // {
+      //   'name': 'Skodra', // Škoda
+      //   'originalHint': 'Çek değeri',
+      //   'color': Colors.green[700]!,
+      //   'icon': 'Š',
+      //   'imagePath': 'assets/images/car_brands/skodai.jpeg',
+      // },
       {
         'name': 'Toyoto', // Toyota
         'originalHint': 'Japon mükemmelliği',
@@ -208,6 +209,7 @@ class BrandSelectionScreen extends StatelessWidget {
                   categoryName: '$categoryName - ${'vehicles.allModels'.tr()}',
                   categoryColor: categoryColor,
                   brandName: null, // null = tüm markalar
+                  modelName: null, // null = tüm modeller
                 ),
               ),
             );
@@ -292,14 +294,14 @@ class BrandSelectionScreen extends StatelessWidget {
         shadowColor: Colors.black.withOpacity(0.05),
         child: InkWell(
           onTap: () async {
-            // Seçilen markaya göre araç listesi sayfasına git
+            // Seçilen markaya göre MODEL SEÇİM sayfasına git
             final purchased = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => VehicleListScreen(
-                  categoryName: '$categoryName - $name',
+                builder: (context) => ModelSelectionScreen(
+                  categoryName: categoryName,
                   categoryColor: categoryColor,
-                  brandName: name, // Spesifik marka
+                  brandName: name,
                 ),
               ),
             );

@@ -15,6 +15,7 @@ class DatabaseHelper {
   static const String userVehiclesBox = 'user_vehicles'; // Kullanıcıların araçları
   static const String offersBox = 'offers'; // Teklifler
   static const String notificationsBox = 'notifications'; // Bildirimler
+  static const String favoritesBox = 'favorites'; // Favori ilanlar
 
   // Initialize Hive
   static Future<void> init() async {
@@ -26,6 +27,7 @@ class DatabaseHelper {
     final userVehiclesBoxInstance = await Hive.openBox<Map>(userVehiclesBox);
     final offersBoxInstance = await Hive.openBox<Map>(offersBox);
     final notificationsBoxInstance = await Hive.openBox<Map>(notificationsBox);
+    final favoritesBoxInstance = await Hive.openBox<Map>(favoritesBox);
     
                 
     // Debug: Tüm kullanıcıları listele

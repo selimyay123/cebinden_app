@@ -227,17 +227,12 @@ class OfferService {
   /// Teklifi reddet
   Future<bool> rejectOffer(Offer offer) async {
     try {
-      
-      
-      bool success = await _db.updateOfferStatus(offer.offerId, OfferStatus.rejected);
-      
-      if (success) {
-        
-      }
+      // Reddedilen teklifleri artık veritabanından sil (güncelleme yerine)
+      bool success = await _db.deleteOffer(offer.offerId);
       
       return success;
     } catch (e) {
-      
+      debugPrint('❌ Error rejecting offer: $e');
       return false;
     }
   }
@@ -254,10 +249,11 @@ class OfferService {
       // AI satıcı profili oluştur
       final sellerProfile = SellerProfile.generateRandom();
       
-      // Teklifi değerlendir
+      // Teklifi değerlendir (ilk tur, currentRounds = 0)
       final evaluation = sellerProfile.evaluateOffer(
         offerPrice: offerPrice,
         listingPrice: vehicle.price,
+        currentRounds: 0, // 🆕 İlk teklif
       );
       
       final decision = evaluation['decision'] as String;
@@ -334,16 +330,20 @@ class OfferService {
     required double newOfferAmount,
   }) async {
     try {
+      // 🆕 PATIENCE METER: Tur sayısını artır
+      final newRounds = offer.negotiationRounds + 1;
+      
       // Satıcının önceki karşı teklifi
       final previousCounterOffer = offer.counterOfferAmount;
       
       // Yeni bir AI satıcı profili oluştur
       final sellerProfile = SellerProfile.generateRandom();
       
-      // Orijinal ilan fiyatına göre değerlendir
+      // 🆕 Orijinal ilan fiyatına göre değerlendir (sabır kontrolü ile)
       final evaluation = sellerProfile.evaluateOffer(
         offerPrice: newOfferAmount,
         listingPrice: offer.listingPrice,
+        currentRounds: newRounds, // 🆕 Tur sayısını geç
       );
       
       final decision = evaluation['decision'] as String;
@@ -410,6 +410,7 @@ class OfferService {
         'offerPrice': newOfferAmount, // Kullanıcının son teklifi
         'counterOfferAmount': newCounterAmount,
         'sellerResponse': newSellerResponse,
+        'negotiationRounds': newRounds, // 🆕 Tur sayısını güncelle
       };
       
       await _db.updateOffer(offer.offerId, updatedOffer);

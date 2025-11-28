@@ -553,47 +553,38 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      // Eğer araç zaten satışta ise uyarı ver
-                      if (vehicle.isListedForSale) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('myVehicles.alreadyListed'.tr()),
-                            backgroundColor: Colors.orange,
-                            duration: const Duration(seconds: 2),
+                // "Sat" butonu sadece araç satışta DEĞİLse görünsün
+                if (!vehicle.isListedForSale) ...[
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        // Satışa çıkarma ekranına git
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CreateListingScreen(vehicle: vehicle),
                           ),
                         );
-                        return;
-                      }
-                      
-                      // Satışa çıkarma ekranına git
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CreateListingScreen(vehicle: vehicle),
+                        
+                        // Eğer satışa çıkarma başarılıysa listeyi yenile
+                        if (result == true) {
+                          await _loadMyVehicles();
+                        }
+                      },
+                      icon: const Icon(Icons.sell, size: 18),
+                      label: Text('misc.sellVehicle'.tr()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      );
-                      
-                      // Eğer satışa çıkarma başarılıysa listeyi yenile
-                      if (result == true) {
-                        await _loadMyVehicles();
-                      }
-                    },
-                    icon: const Icon(Icons.sell, size: 18),
-                    label: Text('misc.sellVehicle'.tr()),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ],

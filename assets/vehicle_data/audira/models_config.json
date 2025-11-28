@@ -1,0 +1,303 @@
+{
+  "brand": "Audira",
+  "spawnRate": 0.053,
+  "description": "Premium risk/ödül markası, S tronic (DSG) riski, Multitronic tuzağı, Quattro cazibesi, S Line kritik, teknoloji primi",
+  "models": [
+    {
+      "code": "B3",
+      "realName": "A3",
+      "spawnRate": 0.4505,
+      "description": "Premium kompakt, teknoloji lideri, S tronic riski",
+      "segment": "C-Premium",
+      "basePriceTL": 2400000,
+      "priceRange": "1800000-2400000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Hatchback (Sportback)"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin (TFSI)", "Dizel (TDI)"]
+      },
+      "transmissions": {
+        "types": ["Manuel (nadir)", "Otomatik (S tronic)"],
+        "notes": "S tronic = DSG RİSKİ! - Premium parça maliyeti"
+      },
+      "driveType": "Önden (FWD) / Quattro (güçlü motorlar)",
+      "engineSizeRange": "1.0-2.0",
+      "horsepowerRange": "110-190",
+      "notes": [
+        "S TRONİC (DSG) RİSKİ - ana dinamik",
+        "Eski (5+ yaş) S tronic: -%13 değer - premium parça daha pahalı",
+        "Yeni S tronic: -%8 değer - orta risk",
+        "MANUEL ÇOK NADİR - otomatik baskın",
+        "S LINE PAKETİ - kritik donanım (+%12 değer)",
+        "SANAL KOKPİT - teknoloji primi (+%8 değer)",
+        "SEDAN TÜRKIYE'DE POPÜLER (+%5 değer) - Sportback'ten hızlı satar",
+        "Sportback: Genç/dinamik alıcı",
+        "1.5 TFSI: En yaygın ve verimli benzin",
+        "1.6 TDI: En yaygın dizel - verimli (+%14 değer)",
+        "Quattro (nadir): Güçlü motorlarla - 4x4 primi",
+        "110-150 HP: En çok satılan güç seviyeleri",
+        "190+ HP: Quattro yüksek performans",
+        "Premium değer kaybı: -%5 (DSG riski)",
+        "HASARLI: -%20 değer (premium parça)",
+        "BMW A Serisi / Mercurion 1 Serisi rakip",
+        "DSG riski Golf/Paso ile aynı ama onarım daha pahalı",
+        "S Line olmayan versiyonlar daha az talep görür",
+        "Sedan Türkiye tercih eder - hızlı satış",
+        "Edition One: En dolu donanım - maksimum fiyat"
+      ]
+    },
+    {
+      "code": "B4",
+      "realName": "A4",
+      "spawnRate": 0.2375,
+      "description": "D segment konforu, çoklu şanzıman riski",
+      "segment": "D-Premium",
+      "basePriceTL": 3600000,
+      "priceRange": "2600000-3600000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "SW (Avant)"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin (TFSI)", "Dizel (TDI)"]
+      },
+      "transmissions": {
+        "types": ["Manuel (nadir)", "Otomatik (S tronic/Multitronic/Tiptronic)"],
+        "notes": "S tronic (DSG RİSK) + Multitronic (ESKİ CVT TUZAĞI!) + Tiptronic (Quattro GÜVENİLİR!)"
+      },
+      "driveType": "Önden (FWD) / Quattro (güçlü paketler)",
+      "engineSizeRange": "1.4-2.0",
+      "horsepowerRange": "150-252",
+      "notes": [
+        "ŞANZIMAN TUZAĞI - ÇOKLU RİSK!",
+        "MULTİTRONİC (ESKİ B8 8-12 yaş) - CVT ama ÇOK YÜKSEK ARIZA RİSKİ! -%21 değer",
+        "Multitronic'den UZAK DUR veya ÇOK UCUZA AL!",
+        "S tronic (DSG) orta yaş (5+ yaş): -%15 değer",
+        "S tronic yeni: -%9 değer - orta risk",
+        "TİPTRONİC (Quattro) - EN GÜVENİLİR! +%19 değer",
+        "Tiptronic + Quattro: En güvenilir kombinasyon - yüksek güvenilirlik primi",
+        "QUATTRO PRİMİ - dört çekiş prestij + güvenlik",
+        "Quattro + Tiptronic: Yüksek sat - garantili",
+        "S LINE PAKETİ - en yüksek kar (+%14 değer)",
+        "Boş A4'ler daha yavaş ve düşük kârla satılır",
+        "SANAL KOKPİT - teknoloji primi (+%8 değer)",
+        "2.0 TDI: En yaygın dizel - yüksek talep (+%18 değer)",
+        "1.4 TFSI (eski): Vergi avantajı giriş motoru",
+        "150-190 HP: En çok satılan güç seviyeleri",
+        "252 HP: Quattro üst seviye tavan",
+        "Sedan: En yaygın ve prestijli",
+        "Avant (SW): Nadir - Quattro ile eşleşir - niş kitle",
+        "Premium değer kaybı: -%8 (çoklu şanzıman riski)",
+        "HASARLI: -%20 değer (premium parça)",
+        "3 Serisi / C Serisi rakip",
+        "Multitronic en büyük tuzak - mekanik arıza riski çok yüksek",
+        "Tiptronic sadece Quattro/güçlü versiyonlarda - ZF benzeri güvenilirlik",
+        "Design donanım: İyi - S Line en değerli"
+      ]
+    },
+    {
+      "code": "B6",
+      "realName": "A6",
+      "spawnRate": 0.2087,
+      "description": "E segment lüks, çift risk: şanzıman + elektronik",
+      "segment": "E-Luxury",
+      "basePriceTL": 5200000,
+      "priceRange": "4000000-5200000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "SW (Avant)"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Dizel (TDI)", "Benzin (TFSI)"]
+      },
+      "transmissions": {
+        "types": ["Otomatik (S tronic/Tiptronic)"],
+        "notes": "S tronic (DSG + ELEKTRONİK ÇİFT RİSK!) + Tiptronic (Quattro 3.0 V6 GÜVENİLİR!)"
+      },
+      "driveType": "Önden (FWD) / Quattro (güçlü motorlar)",
+      "engineSizeRange": "2.0-3.0",
+      "horsepowerRange": "190-340",
+      "notes": [
+        "ÇİFT RİSK: ŞANZIMAN + ELEKTRONİK!",
+        "EN RISKLI VE EN KÂRLI LÜKS TICARET",
+        "S tronic eski (6+ yaş): -%18 değer - DSG + elektronik çift risk",
+        "Karmaşık elektronik arızaları - onarım çok pahalı",
+        "Çoklu ekran (C8 yeni): Elektronik arıza riski yüksek",
+        "S tronic yeni: -%11 değer - orta risk + elektronik",
+        "TİPTRONİC + QUATTRO (3.0 V6) - EN GÜVENİLİR + PRESTIJ! +%23 değer",
+        "Quattro + Tiptronic + 3.0 V6: En güvenilir + en prestijli versiyon",
+        "Bu kombinasyonu ARA - garantili yüksek kar",
+        "3.0 V6 DİZEL: En prestijli motor - yüksek tork - maksimum konfor",
+        "2.0 TDI/TFSI: En yaygın - vergi/tüketim avantajı (+%21 değer dizel)",
+        "Matrix LED farlar - gelişmiş donanım - önemli",
+        "Head-Up Display - lüks teknoloji",
+        "Gelişmiş sürüş destek sistemleri",
+        "S LINE / EXCLUSIVE PAKETLERİ - kritik (+%16 değer)",
+        "Boş A6'lar çok daha düşük fiyatla satılır",
+        "190-245 HP: En çok satılan verimli motorlar",
+        "300+ HP: 3.0 V6 ve üstü tavan",
+        "Sedan: En yaygın ve prestijli",
+        "Avant (SW): Nadir - genellikle güçlü + Quattro",
+        "KİLOMETRE HASSASİYETİ - uzun yol aracı",
+        "Yüksek km (150K+): Ekstra -%13 değer - çok yüksek arıza riski",
+        "Premium değer kaybı: -%12 (çift risk)",
+        "HASARLI: -%26 değer (karmaşık elektronik + yüksek onarım)",
+        "5 Serisi / E Serisi rakip",
+        "En kârlı ama en riskli segment",
+        "Quattro + Tiptronic ODAKLAN - güvenilir yatırım",
+        "S tronic + yüksek km UZAK DUR - arıza garantisi",
+        "Donanım kompleksitesi kritik - Matrix LED/Kokpit/HUD değerli"
+      ]
+    },
+    {
+      "code": "B5",
+      "realName": "A5",
+      "spawnRate": 0.1033,
+      "description": "Sportif coupe, tasarım primi, DSG riski",
+      "segment": "D-Sporty",
+      "basePriceTL": 4000000,
+      "priceRange": "3000000-4000000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback (Sportback 4 kapı)", "Coupe (2 kapı)", "Cabriolet"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin (TFSI)", "Dizel (TDI)"]
+      },
+      "transmissions": {
+        "types": ["Otomatik (S tronic)", "Manuel (çok nadir)"],
+        "notes": "S tronic (DSG RİSK!) - Manuel çok nadir"
+      },
+      "driveType": "Önden (FWD) / Quattro (güçlü motorlar)",
+      "engineSizeRange": "2.0",
+      "horsepowerRange": "190-252",
+      "notes": [
+        "TASARIM ODAKLI PRİM - A4'ten daha pahalı",
+        "Sportif akıcı tasarım - prestijli kasa - stil için ekstra ödeme",
+        "S TRONİC (DSG) RİSKİ - ana dinamik",
+        "S tronic eski (5+ yaş): -%14 değer - yüksek risk",
+        "S tronic yeni: -%9 değer - orta risk",
+        "QUATTRO + S tronic: -%6 değer - Quattro primi DSG riskini azaltır",
+        "Quattro sportif + 4x4 kombinasyonu",
+        "KASA TİPLERİ DİNAMİĞİ:",
+        "SPORTBACK (4 kapı): EN HIZLI SATAN - en güvenli kar (+%7 değer)",
+        "Sportback en popüler - pratiklik + tasarım",
+        "COUPE (2 kapı): Nadir - genç + niş alıcı",
+        "CABRIOLET: En nadir - en yüksek fiyat - alıcı bulması zor (uzun bekleme)",
+        "S LINE ZORUNLULUĞU - sportiflik arayan alıcı (+%18 değer)",
+        "S Line olmayan A5'ler daha az talep - düşük kar marjı",
+        "Design/boş versiyonlar piyasada yavaş satar",
+        "SANAL KOKPİT - teknoloji primi (+%8 değer)",
+        "2.0 TFSI/TDI: Hem benzin hem dizel en yaygın",
+        "40 TDI: Yakıt ekonomisi - yüksek talep (+%16 değer)",
+        "40 TFSI: Turbo benzinli - sportif",
+        "190 HP: En çok satılan güç",
+        "252 HP: Yüksek performans tavan",
+        "Premium değer kaybı: -%7 (DSG riski + niş segment)",
+        "HASARLI: -%23 değer (sportif kasa pahalı onarım)",
+        "4 Serisi (D Serisi) rakip",
+        "BMW 4'ün ZF'sine karşı Audi'nin riskli S tronic'i",
+        "Sportback ARA - hızlı sat",
+        "Coupe/Cabriolet sabırlı ol - niş alıcı",
+        "S Line YOK = düşük talep"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "B3": "S tronic (DSG) riski premium parça - Sedan Türkiye popüler - S Line kritik - teknoloji primi",
+      "B4": "Multitronic TUZAK (-%21) - S tronic risk - Tiptronic + Quattro GÜVENİLİR (+%19) - S Line değerli",
+      "B6": "ÇİFT RİSK (şanzıman + elektronik -%18) - Tiptronic + Quattro + 3.0 V6 PRESTIJ (+%23) - yüksek km hızlı değer kaybı",
+      "B5": "Tasarım primi A4'ten yüksek - S tronic risk - Sportback hızlı satar - S Line zorunlu - Coupe/Cabriolet niş"
+    },
+    "transmissionRisks": {
+      "S_tronic_DSG": "TÜM MODELLERDE - premium parça maliyeti yüksek - Golf/Paso DSG ile aynı arıza ama daha pahalı onarım",
+      "B3_S_tronic_Eski": "5+ yaş - -%13 değer - premium onarım",
+      "B3_S_tronic_Yeni": "-%8 değer - orta risk",
+      "B4_Multitronic_ESKİ_TUZAK": "8-12 yaş (B8) - CVT ama ÇOK yüksek arıza - -%21 değer - UZAK DUR!",
+      "B4_S_tronic": "5+ yaş -%15, yeni -%9",
+      "B4_Tiptronic_Quattro": "EN GÜVENİLİR - +%19 değer - ZF benzeri - garantili yüksek sat",
+      "B6_S_tronic_Eski_Elektronik": "6+ yaş - DSG + elektronik - -%18 değer - çift risk",
+      "B6_S_tronic_Yeni": "-%11 değer - elektronik risk devam",
+      "B6_Tiptronic_Quattro_3.0V6": "EN GÜVENİLİR + PRESTIJ - +%23 değer - maksimum güvenilirlik + lüks",
+      "B5_S_tronic": "5+ yaş -%14, yeni -%9",
+      "B5_Quattro_S_tronic": "-%6 değer - Quattro primi riski azaltır"
+    },
+    "quattroPremium": {
+      "B3": "Nadir - güçlü motorlarla - 4x4 avantajı",
+      "B4": "Tiptronic ile kombinasyon - EN GÜVENİLİR (+%19)",
+      "B6": "3.0 V6 ile kombinasyon - EN PRESTIJ (+%23) - garantili kar",
+      "B5": "Sportif 4x4 - DSG riskini azaltır (-%6)"
+    },
+    "trimLevelCritical": {
+      "S_Line_B3": "+%12 değer - sportif",
+      "S_Line_B4": "+%14 değer - en yüksek kar",
+      "S_Line_B6": "+%16 değer - lüks prim",
+      "S_Line_B5": "+%18 değer - ZORUNLU sportiflik",
+      "Teknoloji_Sanal_Kokpit": "+%8 değer - yeni araçlarda (2020+)",
+      "B3_Sedan": "+%5 değer - Türkiye popüler",
+      "B5_Sportback": "+%7 değer - en hızlı satan"
+    },
+    "bodyTypeDynamics": {
+      "B3_Sedan": "Türkiye'de çok popüler - Sportback'ten hızlı satar (+%5)",
+      "B3_Sportback": "Genç/dinamik alıcı",
+      "B4_Sedan": "En yaygın - prestijli",
+      "B4_Avant": "Nadir - Quattro ile - niş kitle",
+      "B6_Sedan": "En yaygın - prestijli",
+      "B6_Avant": "Nadir - güçlü + Quattro",
+      "B5_Sportback": "EN HIZLI SATAN - pratiklik + tasarım (+%7)",
+      "B5_Coupe": "Nadir - genç + niş",
+      "B5_Cabriolet": "En nadir - en yüksek fiyat - uzun bekleme"
+    },
+    "fuelAdvantage": {
+      "Dizel_Premium_Segment": "Çok değerli - uzun yol verimliliği",
+      "B3_TDI": "+%14 değer - verimli",
+      "B4_2.0_TDI": "+%18 değer - popüler",
+      "B6_2.0_TDI": "+%21 değer - çok talep",
+      "B6_3.0_V6_TDI": "En prestijli - yüksek tork - maksimum konfor",
+      "B5_40_TDI": "+%16 değer - yakıt ekonomisi"
+    },
+    "mileageRisk": {
+      "B6_High_Mileage": "150K+ ekstra -%13 değer - uzun yol aracı - çok yüksek arıza riski (motor/şanzıman/elektronik)",
+      "General": "E segment yüksek km alt segmentlere göre çok daha hızlı değer kaybı"
+    },
+    "accidentPenalty": {
+      "B3_B4": "-%20 değer - premium parça",
+      "B5": "-%23 değer - sportif kasa pahalı onarım",
+      "B6": "-%26 değer - karmaşık elektronik + yüksek onarım"
+    },
+    "valueDepreciation": {
+      "B3": "-%5 - DSG riski",
+      "B4": "-%8 - çoklu şanzıman riski",
+      "B6": "-%12 - çift risk (şanzıman + elektronik)",
+      "B5": "-%7 - DSG riski + niş segment"
+    },
+    "profitStrategy": {
+      "B3": "S LINE ARA! Sedan Türkiye'de popüler - teknoloji önemli - S tronic risk dikkat - eski düşük al/onar",
+      "B4": "MULTİTRONİC'TEN UZAK! Tiptronic + Quattro ARA (garantili yüksek sat +%19) - S Line değerli - S tronic eski düşük al/onar",
+      "B6": "TİPTRONİC + QUATTRO + 3.0 V6 ARA! (maksimum kar +%23) - S tronic + elektronik + yüksek km UZAK DUR - S Line/Exclusive kritik - Matrix LED/kokpit değerli",
+      "B5": "SPORTBACK ARA! (hızlı sat +%7) - S LINE ZORUNLU (+%18) - Coupe/Cabriolet sabır gerek - S tronic risk dikkat - Quattro riski azaltır"
+    },
+    "competitivePositioning": {
+      "B3_vs_A_Serisi_1_Serisi": "Premium kompakt - DSG riski ortak ama Audira onarım daha pahalı - teknoloji lideri - Sedan Türkiye avantajı",
+      "B4_vs_3_Serisi_C_Serisi": "Multitronic tuzak - Tiptronic Quattro güvenilir - BMW ZF vs Audi S tronic riski - S Line kritik",
+      "B6_vs_5_Serisi_E_Serisi": "Çift risk en yüksek - Tiptronic Quattro 3.0 V6 en güvenilir + prestijli - yüksek km en riskli - donanım kompleksitesi kritik",
+      "B5_vs_4_Serisi": "Tasarım primi - BMW ZF güvenilir vs Audi S tronic riskli - Sportback avantajı - S Line zorunlu"
+    },
+    "criticalFactors": [
+      "S TRONİC (DSG) RİSKİ = Tüm modellerde - premium parça maliyeti yüksek - Golf/Paso ile aynı arıza ama daha pahalı onarım",
+      "MULTİTRONİC TUZAĞI (B4 eski 8-12 yaş) = CVT ama ÇOK yüksek arıza riski (-%21) - UZAK DUR!",
+      "TİPTRONİC + QUATTRO = EN GÜVENİLİR kombinasyon - B4 +%19, B6 +%23 - garantili kar",
+      "B6 ÇİFT RİSK = Şanzıman + elektronik (-%18) - en riskli ama en kârlı",
+      "S LINE KRİTİK = Tüm modellerde - B5 ZORUNLU (+%18), B6 lüks (+%16), B4 kar (+%14), B3 sportif (+%12)",
+      "QUATTRO PRİMİ = Prestij + güvenlik + performans - B6 3.0 V6 maksimum, B4 güvenilir, B5 riski azaltır",
+      "B3 SEDAN TÜRKİYE = +%5 değer - Sportback'ten hızlı satar",
+      "B5 SPORTBACK = +%7 değer - en hızlı satan - Coupe/Cabriolet niş",
+      "B6 YÜKSEK KM = 150K+ ekstra -%13 - çok yüksek arıza riski",
+      "DİZEL PREMIUM = B6 +%21, B4 +%18, B5 +%16, B3 +%14 - uzun yol verimliliği",
+      "3.0 V6 DİZEL = B6 en prestijli motor - Quattro ile maksimum",
+      "TEKNOLOJİ PRİMİ = Sanal kokpit +%8 (2020+) - Matrix LED/HUD kritik",
+      "HASARLI PAHALΙ = B6 -%26, B5 -%23, B3/B4 -%20 - premium/karmaşık onarım",
+      "DEĞER KAYBI = B6 -%12 (çift risk), B4 -%8 (çoklu şanzıman), B5 -%7 (niş), B3 -%5 (DSG)"
+    ]
+  }
+}
+

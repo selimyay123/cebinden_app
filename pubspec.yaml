@@ -60,6 +60,9 @@ dependencies:
   # Kutlama animasyonu
   confetti: ^0.7.0
   
+  # Lottie animasyonlar
+  lottie: ^3.1.0
+  
   # Zaman gösterimi (2 dakika önce, 1 saat önce)
   timeago: ^3.6.1
   
@@ -98,6 +101,7 @@ flutter:
     - assets/images/car_brands/
     - assets/images/app_logo/
     - assets/translations/
+    - assets/animations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

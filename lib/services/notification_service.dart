@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import '../models/notification_model.dart';
 import '../models/offer_model.dart';
 import 'database_helper.dart';
@@ -150,6 +151,32 @@ class NotificationService {
   /// Tüm bildirimleri sil
   Future<void> deleteAllNotifications(String userId) async {
     await _db.deleteAllNotifications(userId);
+  }
+
+  /// 24 saatlik bildirim sıfırlama kontrolü
+  /// Eğer son sıfırlamadan 24 saat geçtiyse bildirimleri sıfırla
+  Future<void> checkAndResetDailyNotifications(String userId) async {
+    try {
+      // Son sıfırlama zamanını al
+      final lastReset = await SettingsHelper.getLastNotificationReset();
+      final now = DateTime.now();
+      
+      // İlk kullanım veya 24 saat geçmiş mi kontrol et
+      if (lastReset == null || now.difference(lastReset).inHours >= 24) {
+        // Bildirimleri sıfırla
+        await deleteAllNotifications(userId);
+        
+        // Son sıfırlama zamanını güncelle
+        await SettingsHelper.setLastNotificationReset(now);
+        
+        debugPrint('✅ Bildirimler 24 saatlik süreden sonra sıfırlandı.');
+      } else {
+        final hoursRemaining = 24 - now.difference(lastReset).inHours;
+        debugPrint('ℹ️ Bildirimler sıfırlanmadı. Kalan süre: $hoursRemaining saat');
+      }
+    } catch (e) {
+      debugPrint('❌ Bildirim sıfırlama kontrolü başarısız: $e');
+    }
   }
 }
 

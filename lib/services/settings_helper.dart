@@ -25,6 +25,7 @@ class SettingsHelper {
   static const String _keyGameDayDuration = 'game_day_duration';
   static const String _keyLastMarketRefresh = 'last_market_refresh';
   static const String _keyTotalPlayedMinutes = 'total_played_minutes';
+  static const String _keyLastNotificationReset = 'last_notification_reset';
 
   // Dark Mode
   Future<bool> getDarkMode() async {
@@ -113,6 +114,19 @@ class SettingsHelper {
   static Future<void> setTotalPlayedMinutes(int minutes) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyTotalPlayedMinutes, minutes);
+  }
+
+  // Last Notification Reset (Son bildirim sıfırlama zamanı)
+  static Future<DateTime?> getLastNotificationReset() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = prefs.getInt(_keyLastNotificationReset);
+    if (timestamp == null) return null;
+    return DateTime.fromMillisecondsSinceEpoch(timestamp);
+  }
+
+  static Future<void> setLastNotificationReset(DateTime time) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyLastNotificationReset, time.millisecondsSinceEpoch);
   }
 
   // Clear all settings

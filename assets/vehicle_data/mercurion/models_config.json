@@ -1,0 +1,301 @@
+{
+  "brand": "Mercurion",
+  "spawnRate": 0.089,
+  "description": "Ultra lüks segment, 7G/9G-Tronic güvenilirliği, AMG Line cazibesi, en yüksek prestij",
+  "models": [
+    {
+      "code": "3 Serisi",
+      "realName": "C-Class",
+      "spawnRate": 0.4218,
+      "description": "Premium konfor, klasik lüks, popüler sedan",
+      "segment": "D-Premium",
+      "basePriceTL": 4000000,
+      "priceRange": "2800000-4000000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Coupe", "Convertible", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel", "Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "7G/9G-Tronic (ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "Arkadan (RWD)",
+      "engineSizeRange": "1.5-2.0",
+      "horsepowerRange": "156-258",
+      "notes": [
+        "7G/9G-Tronic - ZF seviyesinde güvenilirlik!",
+        "Bavora C Serisi ile doğrudan rakip",
+        "AMG Line vs Exclusive Line donanım savaşı",
+        "AMG Line: Sportif, genç/dinamik alıcılar - daha hızlı satış",
+        "Exclusive Line: Klasik lüks, geleneksel alıcılar",
+        "C200d/C220d Dizel en popüler (+%16 değer)",
+        "C200/C300 Hibrit yüksek teknoloji (+%24 değer)",
+        "Sedan: En yaygın, standart kar",
+        "Coupe/Cabrio: Sportif niş - yüksek kar marjı",
+        "YETKİLİ SERVİS GEÇMİŞİ HAYATI!",
+        "Servis kayıtlı: Yüksek güvenilirlik primi",
+        "Servis kayıtsız: Ciddi değer kaybı",
+        "Elektronik risk: Hava süspansiyonu/MBUX ekran",
+        "Hasarlı %24 düşük (pahalı onarım)",
+        "En yüksek birim kar potansiyeli"
+      ]
+    },
+    {
+      "code": "5 Serisi",
+      "realName": "E-Class",
+      "spawnRate": 0.2840,
+      "description": "Üst düzey lüks, makam aracı prestiji",
+      "segment": "E-Luxury",
+      "basePriceTL": 5500000,
+      "priceRange": "3800000-5500000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Coupe", "Convertible", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel", "Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "7G/9G-Tronic (ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "Arkadan (RWD)",
+      "engineSizeRange": "1.6-2.0",
+      "horsepowerRange": "170-367",
+      "notes": [
+        "OYUNUN PRESTİJ TAVANI - Bavora E Serisi ile rekabet",
+        "9G-Tronic en yüksek güvenilirlik seviyesi",
+        "EN YÜKSEK ELEKTRONİK RİSK!",
+        "Dijital kokpit/Multibeam far/Sürüş asistan - astronomik onarım",
+        "MAKAM/FİLO GEÇMİŞİ - yetkili servis kayıtları ZORUNLU",
+        "Servis kayıtlı: Yüksek prim",
+        "Servis kayıtsız/Ticari geçmiş: BÜYÜK değer kaybı",
+        "E220d/E200d Dizel en popüler eski nesil (+%19 değer)",
+        "E300e Hibrit EN YÜKSEK teknoloji primi (+%27 değer!)",
+        "AMG Line maksimum kar marjı",
+        "Sedan: En yaygın lüks",
+        "Coupe/Cabrio: ÇOK NADİR - ultra yüksek kar",
+        "AIR MATIC (Hava Süspansiyonu) RİSKİ!",
+        "Air Matic: Konfor primi AMA DSG'den daha riskli onarım",
+        "Hasarlı %24 düşük",
+        "YÜKSEK RİSK - YÜKSEK ÖDÜL - ileri seviye ticaret"
+      ]
+    },
+    {
+      "code": "1 Serisi",
+      "realName": "A-Class",
+      "spawnRate": 0.1019,
+      "description": "Kompakt premium, MBUX teknoloji lideri",
+      "segment": "C-Premium",
+      "basePriceTL": 2200000,
+      "priceRange": "1700000-2200000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback", "Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel", "Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "7G-DCT (ÇİFT KAVRAMA - DSG RİSKİ!)"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.33-2.0",
+      "horsepowerRange": "116-163",
+      "notes": [
+        "MBUX (çift ekran) - EN BÜYÜK SATIŞ KOZU",
+        "Dijital kokpit teknoloji primi - genç alıcılar",
+        "7G-DCT ÇİFT KAVRAMA - DSG benzeri risk!",
+        "DCT riski: Tork konvertörden yüksek, DSG'den düşük",
+        "Eski DCT (7+ yaş): Orta risk (-% 5 değer)",
+        "Yeni DCT: Teknoloji primi ama dikkat (+%7 değer)",
+        "AMG Line ZORUNLU - tasarım odaklı alıcılar",
+        "AMG Line: Satış hızı 2x - yüksek kar",
+        "AMG Line olmayan: Yavaş satış - düşük kar",
+        "A180d Dizel ekonomik premium (+%13 değer)",
+        "A180/A200 1.33 turbo en yaygın motor",
+        "Hatchback: En yaygın",
+        "A Sedan: Coupe görünümlü (CLA benzeri) - çeşitlilik",
+        "Bavora A Serisi'nden bir adım yüksek fiyat",
+        "Teknoloji vs Sportiflik (BMW daha sportif)",
+        "MBUX ekran arızası: Yüksek onarım maliyeti",
+        "Hasarlı %24 düşük"
+      ]
+    },
+    {
+      "code": "GJE",
+      "realName": "CLA",
+      "spawnRate": 0.0998,
+      "description": "4 Kapı Coupe, sportif şık tasarım",
+      "segment": "D-Sporty",
+      "basePriceTL": 3000000,
+      "priceRange": "2400000-3000000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "7G/8G-DCT (ÇİFT KAVRAMA - DSG RİSKİ!)"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.33-2.0",
+      "horsepowerRange": "136-224",
+      "notes": [
+        "TASARIM PRİMİ - A Sedan'dan daha sportif",
+        "4 kapılı coupe silüeti - genç profesyoneller",
+        "Stil ve tasarım için ekstra kar marjı",
+        "ÇERÇEVES İZ CAMLAR RİSKİ!",
+        "Cam mekanizması arızası: Yüksek onarım maliyeti",
+        "AMG Line ZORUNLU - CLA'nın amacı sportif görünmek",
+        "AMG Line olmayan (Style/Progressive): Düşük talep - düşük kar",
+        "CLA 200d Dizel sportif kombinasyon (+%15 değer)",
+        "CLA 180/200 1.33 turbo yaygın",
+        "4 Kapılı Coupe: En yaygın - hızlı satış",
+        "Shooting Brake (SW): ÇOK NADİR!",
+        "Shooting Brake: Niş pazar - uzun bekleme AMA yüksek kar",
+        "7G/8G-DCT risk - A Serisi ile aynı",
+        "Genç kitle - tasarım sevenler",
+        "Hasarlı %24 düşük"
+      ]
+    },
+    {
+      "code": "8 Serisi",
+      "realName": "G-Class",
+      "spawnRate": 0.0926,
+      "description": "Efsanevi arazi, ultra lüks, yatırım aracı",
+      "segment": "Ultra-Luxury-SUV",
+      "basePriceTL": 25000000,
+      "priceRange": "15000000-25000000+",
+      "bodyTypes": {
+        "2010-2025": ["SUV", "Convertible"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "7G/9G-Tronic (ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "4x4 (4MATIC)",
+      "engineSizeRange": "3.0-4.0",
+      "horsepowerRange": "245-585",
+      "notes": [
+        "OYUNUN EN PAHALI ARACI! ₺15.000.000-₺25.000.000+",
+        "ULTRA YÜKSEK SERMAYE GEREKSİNİMİ",
+        "Doğru alım: EN YÜKSEK birim kar marjı",
+        "Yanlış alım: Büyük zarar riski",
+        "G 63 AMG ZORUNLU - en yüksek talep",
+        "G 63 AMG: 4.0 V8 - 585 HP - OYUNUN EN GÜÇLÜSÜ",
+        "G 500 Benzin: Orta talep",
+        "G 350d Dizel: Verimli ama AMG'den düşük talep (+%10 değer)",
+        "G 500/G 63 Benzin: KİNG (+%20 değer)",
+        "EFSANEY Vİ DEĞER KORUMASI (+%12)",
+        "Yatırım aracı - değer kaybetmez",
+        "YETKİLİ SERVİS GEÇMİŞİ HAYATI!",
+        "Hasarsızlık ZORUNLU - hasar astronomik değer kaybı (%30!)",
+        "Hasarlı: Fiyatın çok altında al - onarım ASTRONOMİK",
+        "YIPRANMA DİNAMİĞİ:",
+        "Arazi kullanımı gizli hasarlar (şasi eğrilikleri/diferansiyel)",
+        "Çoğu şehirde kullanılır ama arazi riski var",
+        "3 diferansiyel kilidi - saf arazi yeteneği",
+        "Kutu tasarım - klasik ve ikonik",
+        "SUV: En yaygın",
+        "Cabrio: ÇOK NADİR - koleksiyonluk - astronomik fiyat",
+        "İleri seviye - büyük ölçekli ticaret",
+        "En prestijli araç"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "3 Serisi": "Bavora rakibi - AMG Line kritik - servis geçmişi hayati - en yüksek birim kar",
+      "5 Serisi": "Prestij tavanı - elektronik risk yüksek - makam aracı - Air Matic kumar - servis zorunlu",
+      "1 Serisi": "MBUX teknoloji kozu - DCT riski var - AMG Line zorunlu - Bavora'dan bir adım yüksek",
+      "GJE": "Tasarım primi - çerçevesiz cam riski - AMG Line kritik - Shooting Brake nadir bonus",
+      "8 Serisi": "OYUNUN ZİRVESİ - ultra sermaye - G 63 AMG zorunlu - yatırım aracı - astronomik risk/ödül"
+    },
+    "transmissionAdvantage": {
+      "7G_9G_Tronic": "ZF SEVİYESİNDE güvenilir - 3/5/8 Serisi - ana satış avantajı",
+      "7G_DCT_Risk": "1 Serisi/GJE çift kavrama - DSG benzeri orta risk - dikkatli ol"
+    },
+    "bodyTypeValues": {
+      "3_Sedan": "En yaygın, standart kar",
+      "3_Coupe_Cabrio": "Sportif niş - yüksek kar",
+      "5_Sedan": "En yaygın lüks",
+      "5_Coupe_Cabrio": "ÇOK NADİR - ultra yüksek kar",
+      "1_Hatchback": "En yaygın",
+      "1_A_Sedan": "Coupe görünümlü - çeşitlilik",
+      "GJE_4_Door_Coupe": "En yaygın - hızlı satış",
+      "GJE_Shooting_Brake": "ÇOK NADİR - niş - uzun bekleme - yüksek kar",
+      "8_SUV": "En yaygın",
+      "8_Cabrio": "ÇOK NADİR - koleksiyonluk - astronomik"
+    },
+    "enginePopularity": {
+      "C200d_C220d (3)": "Dizel popüler - +%16 değer",
+      "C200_C300_Hibrit (3)": "Teknoloji primi - +%24 değer",
+      "E220d_E200d (5)": "Dizel lüks - +%19 değer",
+      "E300e_Hibrit (5)": "EN YÜKSEK teknoloji - +%27 değer!",
+      "A180d (1)": "Ekonomik premium - +%13 değer",
+      "CLA_200d (GJE)": "Sportif dizel - +%15 değer",
+      "G_350d (8)": "Verimli arazi - +%10 değer",
+      "G_500_G_63_AMG (8)": "Benzin KING - +%20 değer"
+    },
+    "equipmentLevels": {
+      "AMG_Line": "TÜM MODELLERDE KRİTİK - maksimum kar - hızlı satış - ZORUNLU (1/GJE)",
+      "Exclusive_Line": "Klasik lüks - geleneksel alıcılar (3/5)",
+      "Executive_Designo": "En lüks - en yüksek fiyat (5)",
+      "Style_Progressive": "Baz donanım - düşük talep (GJE)"
+    },
+    "electronicRisk": {
+      "MBUX_Ekran": "1 Serisi ana özellik - arıza pahalı",
+      "Dijital_Kokpit": "5 Serisi - astronomik onarım",
+      "Multibeam_Farlar": "5 Serisi - çok pahalı",
+      "Sürüş_Asistan": "5 Serisi - yüksek maliyet",
+      "Air_Matic": "5 Serisi - DSG'den RİSKLİ - konfor primi ama yüksek arıza",
+      "Çerçevesiz_Camlar": "GJE - cam mekanizması pahalı"
+    },
+    "serviceHistory": {
+      "Yetkili_Servis_ZORUNLU": "3/5/8 Serisi - yüksek güvenilirlik primi",
+      "Servis_Kayıtsız": "Büyük değer kaybı - riskli yatırım",
+      "Makam_Filo_Geçmişi": "5 Serisi yaygın - düşük değer - zor satış",
+      "Ticari_Geçmiş_Taksi": "5 Serisi (W212) - ciddi değer kaybı"
+    },
+    "competitivePositioning": {
+      "3_vs_Bavora_C": "Klasik lüks vs sportif sürüş - AMG vs M Sport - servis geçmişi eşit kritik",
+      "5_vs_Bavora_E": "Prestij tavanı rekabeti - elektronik risk eşit - makam aracı imajı",
+      "1_vs_Bavora_A": "Teknoloji (MBUX) vs sportif (RWD) - DCT vs DCT risk - Mercurion daha lüks",
+      "GJE_Niş": "Tasarım ve stil odaklı - çerçevesiz cam ayırt edici - genç profesyoneller",
+      "8_Mutlak_Lider": "Efsanevi araç - yatırım aracı - rakipsiz prestij"
+    },
+    "profitStrategy": {
+      "3 Serisi": "AMG Line ara - C200d/Hibrit ideal - SERVİS GEÇMİŞİ kontrol - Coupe/Cabrio fırsatı",
+      "5 Serisi": "SERVİS GEÇMİŞİ ZORUNLU! - Elektronik kontrol - Air Matic dikkat - E300e hibrit maksimum - Makam geçmişinden kaçın",
+      "1 Serisi": "AMG Line ZORUNLU - MBUX ekran kontrol - DCT dikkat - A180d ekonomik seçim",
+      "GJE": "AMG Line kritik - Çerçevesiz cam kontrol - Shooting Brake şans eseri - Tasarım primi sat",
+      "8 Serisi": "G 63 AMG ARA! - SERVİS GEÇMİŞİ ZORUNLU - Hasarsızlık kritik - Arazi kullanımı tespit et - Cabrio koleksiyonluk"
+    },
+    "criticalFactors": [
+      "7G/9G-Tronic = ZF SEVİYESİNDE güvenilir (3/5/8 Serisi)",
+      "7G-DCT = DSG benzeri orta risk (1 Serisi/GJE)",
+      "AMG Line = TÜM MODELLERDE kritik (+hızlı satış +yüksek kar)",
+      "AMG Line ZORUNLU = 1 Serisi/GJE (AMG'siz satılmaz)",
+      "YETKİLİ SERVİS GEÇMİŞİ = 3/5/8 Serisi HAYATI",
+      "MBUX Teknoloji = 1 Serisi ana satış kozu",
+      "Elektronik Risk = 5 Serisi en yüksek (astronomik onarım)",
+      "Air Matic = 5 Serisi yüksek risk (DSG'den daha riskli)",
+      "Makam/Filo Geçmişi = 5 Serisi değer düşürücü",
+      "Çerçevesiz Camlar = GJE riski (pahalı onarım)",
+      "Shooting Brake = GJE nadir bonus",
+      "G 63 AMG = 8 Serisi zorunlu (en yüksek talep)",
+      "8 Serisi Değer Koruması = Efsanevi (+%12 - yatırım aracı)",
+      "Hasarlı 8 Serisi = %30 düşük (astronomik onarım)",
+      "Hibrit = En yüksek teknoloji primi (E300e +%27)",
+      "Dizel = Her modelde yüksek talep"
+    ]
+  }
+}
+

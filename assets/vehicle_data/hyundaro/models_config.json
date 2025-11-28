@@ -1,0 +1,280 @@
+{
+  "brand": "Hyundaro",
+  "spawnRate": 0.089,
+  "description": "Güvenilirlik odaklı, tork konvertörlü avantaj, yüksek hacim ticareti, yerli üretim",
+  "models": [
+    {
+      "code": "A10",
+      "realName": "i20",
+      "spawnRate": 0.5215,
+      "description": "Güvenilir ekonomik hatchback, yüksek hacim",
+      "segment": "B",
+      "basePriceTL": 1100000,
+      "priceRange": "900000-1100000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel", "Benzin+LPG"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Tork Konvertörlü (ESKİ - GÜVENİLİR!) / DCT (YENİ - ORTA RİSK)"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.0-1.4",
+      "horsepowerRange": "75-120",
+      "notes": [
+        "GÜVENİLİRLİK PRİMİ - ana avantaj",
+        "1.4 MPi tork konvertörlü - Easy-R/Easytronic'ten GÜVENİLİR (+%9 değer)",
+        "Lorisa Easytronic/Vista Powershift riskine karşı güvenli alternatif",
+        "1.0 T-GDI yeni nesil turbo - güçlü ve verimli",
+        "1.0 T-GDI + DCT - orta risk (Powershift'ten iyi, tork'tan az güvenilir)",
+        "YERLİ ÜRETİM AVANTAJI - ucuz yedek parça",
+        "Onarım süresi kısa - işletme maliyeti düşük",
+        "YÜKSEK TİCARET HACMİ - hızlı satış",
+        "Slim/Vista ile birlikte en hızlı satan B segment",
+        "LPG uyumu (eski nesil) - yakıt tasarrufu (-% 4 değer ama ekonomik)",
+        "Düşük birim kar marjı ama yüksek hacim stratejisi"
+      ]
+    },
+    {
+      "code": "Tecent Red",
+      "realName": "Accent Blue",
+      "spawnRate": 0.1925,
+      "description": "Güçlü dizel, ekonomik sedan, tork konvertörlü",
+      "segment": "B-Sedan",
+      "basePriceTL": 700000,
+      "priceRange": "550000-700000",
+      "bodyTypes": {
+        "2010-2018": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2018": ["Benzin", "Dizel", "Benzin+LPG"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Tork Konvertörlü (ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.4-1.6",
+      "horsepowerRange": "109-136",
+      "notes": [
+        "ÜRETİMİ DURMUŞ - değer kaybı orta (-%5)",
+        "TORK KONVERTÖRLÜ GÜVENİLİRLİK = Ana satış avantajı",
+        "Signa Easy-R/Lagua Dualogic'ten ÇOK GÜVENİLİR (+%11 değer)",
+        "EN GÜVENİLİR ekonomik sedan otomatiği",
+        "1.6 CRDi DİZEL PERFORMANS - rakiplerden GÜÇLÜ",
+        "1.6 CRDi 136 HP - Signa/Lagua 1.5'ten daha güçlü (+%14 değer)",
+        "Manuel versiyonlara göre otomatik daha yüksek kar",
+        "YÜKSEK KİLOMETRE DİNAMİĞİ:",
+        "Dizel otomatik: Ticari filo/uzun yol kullanımı yaygın",
+        "Yüksek km bakımlı: Düşük al - makul kâr sat",
+        "PAZAR DARALMAS I - Tallion/Agna'ya göre yavaş değer kaybı",
+        "Çok eski modeller hızla elden çıkar",
+        "LPG uyumu (benzinli) - ekonomik seçenek"
+      ]
+    },
+    {
+      "code": "Tecent White",
+      "realName": "Accent Era",
+      "spawnRate": 0.1095,
+      "description": "Eski model, taksi/filo riski, hurda potansiyeli",
+      "segment": "B-Sedan-Old",
+      "basePriceTL": 520000,
+      "priceRange": "400000-520000",
+      "bodyTypes": {
+        "2010-2012": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2012": ["Benzin", "Dizel", "Benzin+LPG"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Tork Konvertörlü (GÜVENİLİR - ESKİ NESİL)"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.4-1.6",
+      "horsepowerRange": "97-110",
+      "notes": [
+        "YÜKSEK RİSKLİ HURDA SEGMENTİ - küçük bütçe ticareti",
+        "TAKSİ/FİLO GEÇMİŞİ YÜKSEK RİSK!",
+        "300.000+ km örnekler yaygın - ağır hasar geçmişi sık",
+        "Yüksek km (200k+) ekstra %10 değer kaybı",
+        "Çok düşük fiyata al (hurda maliyeti) - temel onarım - sat",
+        "TORK KONVERTÖRLÜ GÜVENİLİR - Signa/Lagua'dan iyi",
+        "Yarı otomatik riskine karşı avantaj (+%11 değer)",
+        "ONARIM MALİYETİ AVANTAJI - en düşük",
+        "Basit yapı + yaygın yedek parça = ucuz onarım",
+        "Tüm rakiplere göre EN DÜŞÜK onarım maliyeti",
+        "Kar marjı korunur",
+        "TİCARET HIZI - Lagua/eski Signa ile en hızlı",
+        "Her zaman ucuz araç arayan kitle var",
+        "1.5 CRDi dizel en çok aranan",
+        "LPG uyumu - ekonomik",
+        "Küçük bütçeli oyuncular için ticaret yolu"
+      ]
+    },
+    {
+      "code": "A20",
+      "realName": "i30",
+      "spawnRate": 0.0995,
+      "description": "C segment dengeli, zengin donanım, güvenilir",
+      "segment": "C",
+      "basePriceTL": 1600000,
+      "priceRange": "1250000-1600000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Tork Konvertörlü (ESKİ - GÜVENİLİR) / DCT (YENİ - ORTA RİSK)"
+      },
+      "driveType": "Önden (FWD)",
+      "engineSizeRange": "1.4-1.6",
+      "horsepowerRange": "120-140",
+      "notes": [
+        "FİYAT/DONANIM AVANTAJI - Tenis/Odak'tan ucuz ama benzer donanım",
+        "Tenis/Odak'tan düşük al - Golf hemen altında sat = YÜKSEK birim kar",
+        "DCT (ÇİFT KAVRAMA) RİSKİ - yeni nesil (i30 III)",
+        "7 İleri DCT: Odak Powershift kadar riskli DEĞİL",
+        "Tork konvertörlü eski nesil'den daha yüksek arıza potansiyeli",
+        "Bakım geçmişi kontrol önemli",
+        "Eski nesil tork konvertörlü: Güvenilir (+%10 değer)",
+        "Yeni DCT: Orta risk (+%5 değer)",
+        "1.6 CRDi DİZEL OTOMATİK = EN ÇOK TALEP",
+        "Bu kombinasyon en hızlı satılan - kârı maksimize eder (+%13 değer)",
+        "N-LINE PRİMİ - ST-Line gibi",
+        "N-Line sportif görünüm: Genç alıcılar - estetik prim",
+        "Satış fiyatı artırır",
+        "SW (Station Wagon): NADİR - niş kitle - geniş bagaj",
+        "Hatchback: En yaygın"
+      ]
+    },
+    {
+      "code": "Kascon",
+      "realName": "Tucson",
+      "spawnRate": 0.0769,
+      "description": "Modern SUV, hibrit teknoloji, radikal tasarım",
+      "segment": "C-SUV",
+      "basePriceTL": 2500000,
+      "priceRange": "1800000-2500000",
+      "bodyTypes": {
+        "2010-2025": ["SUV"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel", "Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Tork Konvertörlü (ESKİ - GÜVENİLİR) / DCT (YENİ - ORTA RİSK)"
+      },
+      "driveType": "Önden (FWD) / 4x4 (AWD)",
+      "engineSizeRange": "1.6-2.0",
+      "horsepowerRange": "136-230",
+      "notes": [
+        "TASARIM VE HİBRİT PRİMİ - en yüksek talep",
+        "NX4 (yeni nesil) radikal tasarım + Hibrit = en yüksek talep SUV",
+        "Rakiplere göre daha yüksek prim - en hızlı satış",
+        "1.6 T-GDI HİBRİT - EN YÜKSEK FİYAT (+%26 değer!)",
+        "230 HP hibrit: En güçlü ve verimli",
+        "DCT DİNAMİĞİ - Tupa 8 ileri tork'tan güvenilir DEĞİL",
+        "Odak eski Powershift kadar riskli DEĞİL",
+        "Orta seviye arıza potansiyeli = risk/ödül dengesi",
+        "Eski tork konvertörlü: Güvenilir (+%11 değer)",
+        "Yeni DCT: Orta risk ama SUV primi (+%7 değer)",
+        "4x4 NİŞİ - daha nadir",
+        "AWD dört çekiş: FWD'den nadir - arazi yeteneği",
+        "Niş alıcılar için ekstra fiyat primi",
+        "DONANIM FARKI - Elite Plus/N-Line ÇOK değerli",
+        "Dolu paketler: Boş paketlerden çok daha değerli",
+        "Panoramik tavan + Deri koltuk = kolay yüksek fiyat satış",
+        "1.6 CRDi Dizel: SUV verimli (+%15 değer)",
+        "Tupa ile rekabet",
+        "FWD: En yaygın, standart"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "A10": "Yüksek hacim - tork konvertörlü güvenilirlik - hızlı satış - düşük birim kar",
+      "Tecent Red": "Üretim durmuş - tork konvertörlü GÜVENİLİR - 1.6 CRDi güçlü - otomatik hızlı satış",
+      "Tecent White": "Taksi/filo riski - hurda segment - ucuz onarım - küçük bütçe ticareti - hızlı döngü",
+      "A20": "Fiyat/donanım avantajı - DCT orta risk - 1.6 CRDi Dizel Oto en talep - N-Line primi",
+      "Kascon": "Tasarım/hibrit primi - en yüksek talep SUV - DCT orta risk - 4x4 niş - donanım kritik"
+    },
+    "transmissionAdvantage": {
+      "Tork_Konvertörlü_GÜVENİLİRLİK": "Tecent White/Red - Easy-R/Dualogic/Powershift'ten ÇOK GÜVENİLİR - ana satış avantajı",
+      "Eski_Tork_Konvertörlü": "A10/A20/Kascon eski nesil - güvenilir (+%9-11 değer)",
+      "DCT_Orta_Risk": "A10/A20/Kascon yeni nesil - Powershift'ten iyi, tork'tan az güvenilir (+%4-7 değer)"
+    },
+    "bodyTypeValues": {
+      "A10_Hatchback": "5 kapı - tek kasa - standart",
+      "Tecent_Red_Sedan": "4 kapı sedan - aile aracı",
+      "Tecent_White_Sedan": "4 kapı sedan - eski - taksi yaygın",
+      "A20_Hatchback": "En yaygın",
+      "A20_SW": "Station Wagon - nadir - niş - geniş bagaj",
+      "Kascon_SUV": "5 kapılı SUV - tek kasa"
+    },
+    "driveTypeValues": {
+      "Kascon_4x4": "AWD dört çekiş - nadir - arazi yeteneği - ekstra prim",
+      "Kascon_FWD": "En yaygın - standart değer"
+    },
+    "fuelTypePopularity": {
+      "Tecent_Red_1.6_CRDi": "Güçlü dizel performans - +%14 değer",
+      "Tecent_White_1.5_CRDi": "Ekonomik dizel - +%12 değer",
+      "A10_1.0_T_GDI": "Yeni turbo benzin - güçlü ve verimli",
+      "A20_1.6_CRDi": "En popüler dizel - +%13 değer",
+      "Kascon_1.6_T_GDI_Hibrit": "EN YÜKSEK teknoloji primi - +%26 değer!",
+      "Kascon_1.6_CRDi": "SUV verimli dizel - +%15 değer",
+      "LPG": "Ekonomik seçenek - -%4 değer"
+    },
+    "equipmentLevels": {
+      "Elite_Plus (A10/Kascon)": "En üst donanım - en yüksek fiyat",
+      "Style_Plus (A10)": "Üst donanım - iyi fiyat",
+      "N_Line (A20/Kascon)": "Sportif görünüm paketi - genç kitle - estetik prim",
+      "Mode_Plus (Tecent Red)": "Üst donanım - son model",
+      "Team_Select (Tecent White)": "Eski donanım seviyeleri"
+    },
+    "taxiFleetRisk": {
+      "Tecent_White_YÜKSEK": "300k+ km yaygın - ağır hasar sık - taksi geçmişi - ekstra %10 değer kaybı (200k+ km)",
+      "Tecent_Red_Orta": "Dizel otomatik filo kullanımı - yüksek km bakımlı: düşük al makul sat"
+    },
+    "repairCostAdvantage": {
+      "Yerli_Üretim (A10)": "Ucuz yedek parça - kısa onarım süresi - düşük işletme maliyeti",
+      "Tecent_White_EN_UCUZ": "Basit yapı - yaygın parça - TÜM rakiplere göre EN DÜŞÜK onarım - kar marjı korunur"
+    },
+    "competitivePositioning": {
+      "A10_vs_Vista_Lorisa": "Tork konvertörlü GÜVENİLİR - Powershift/Easytronic riskine karşı - hızlı satış",
+      "Tecent_Red_vs_Signa_Lagua": "Tork konvertörlü EN GÜVENİLİR - Easy-R/Dualogic'ten çok daha iyi - 1.6 CRDi güçlü",
+      "Tecent_White_Hurda": "Taksi/filo riski - ucuz onarım avantajı - küçük bütçe ticareti",
+      "A20_vs_Tenis_Odak": "Fiyat/donanım avantajı - Golf altında sat - YÜKSEK birim kar - 1.6 CRDi Dizel Oto king",
+      "Kascon_vs_Tupa": "Tasarım/hibrit primi - radikal NX4 en talep - DCT orta risk eşit - 4x4 niş"
+    },
+    "profitStrategy": {
+      "A10": "YÜKSEK HACIM stratejisi - tork konvertörlü sat - düşük birim kar ama hızlı döngü - LPG tolere",
+      "Tecent Red": "Tork konvertörlü vurgusu - 1.6 CRDi Dizel Oto ara - otomatik hızlı satış - yüksek km bakımlı fırsat",
+      "Tecent White": "TAKSİ RİSKİ KONTROL! - Çok düşük al (hurda) - temel onarım - ucuz onarım avantajı - hızlı sat - küçük bütçe",
+      "A20": "Fiyat avantajı kullan - 1.6 CRDi Dizel Oto ARA - N-Line sportif prim - SW nadir fırsat - DCT dikkat",
+      "Kascon": "HİBRİT ARA! En yüksek talep - 4x4 niş prim - Elite Plus/N-Line donanım - Panoramik tavan/deri değerli"
+    },
+    "criticalFactors": [
+      "TORK KONVERTÖRLÜ GÜVENİLİRLİK = Hyundaro ana avantajı (Tecent White/Red +%11)",
+      "Tecent White taksi/filo riski = 200k+ km ekstra %10 değer kaybı",
+      "Tecent White hurda segment = Küçük bütçe ticareti - ucuz onarım avantajı",
+      "DCT orta risk = A10/A20/Kascon yeni nesil - Powershift'ten iyi, tork'tan az (+%4-7)",
+      "Yerli üretim avantajı = Ucuz yedek parça - kısa onarım",
+      "1.6 CRDi güçlü = Tecent Red/A20 rakiplerden performanslı (+%13-14)",
+      "Kascon hibrit primi = EN YÜKSEK talep SUV (+%26 değer)",
+      "Fiyat/donanım avantajı = A20 yüksek birim kar",
+      "N-Line sportif = A20/Kascon genç kitle prim",
+      "4x4 niş = Kascon AWD nadir ekstra prim",
+      "Yüksek hacim = A10/Tecent White hızlı döngü",
+      "LPG ekonomik = -%4 değer ama yakıt tasarrufu"
+    ]
+  }
+}
+

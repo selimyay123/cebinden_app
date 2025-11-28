@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
+import 'package:lottie/lottie.dart';
 import '../models/vehicle_model.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
@@ -8,6 +9,7 @@ import '../models/offer_model.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/offer_service.dart';
+import '../services/favorite_service.dart';
 import '../services/localization_service.dart';
 import '../widgets/vehicle_top_view.dart';
 import 'my_offers_screen.dart';
@@ -32,7 +34,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
   final OfferService _offerService = OfferService();
+  final FavoriteService _favoriteService = FavoriteService();
   User? _currentUser;
+  bool _isFavorite = false;
 
   @override
   void initState() {
@@ -52,9 +56,53 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   Future<void> _loadCurrentUser() async {
     final user = await _authService.getCurrentUser();
     if (user != null) {
+      // Favori durumunu kontrol et
+      final isFavorite = _favoriteService.isFavorite(user.id, widget.vehicle.id);
       setState(() {
         _currentUser = user;
+        _isFavorite = isFavorite;
       });
+    }
+  }
+
+  /// Favori durumunu değiştir
+  Future<void> _toggleFavorite() async {
+    if (_currentUser == null) return;
+
+    if (_isFavorite) {
+      // Favoriden kaldır
+      final success = await _favoriteService.removeFavorite(_currentUser!.id, widget.vehicle.id);
+      if (success) {
+        setState(() {
+          _isFavorite = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('favorites.removedFromFavorites'.tr()),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } else {
+      // Favorilere ekle
+      final success = await _favoriteService.addFavorite(_currentUser!.id, widget.vehicle);
+      if (success) {
+        setState(() {
+          _isFavorite = true;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('favorites.addedToFavorites'.tr()),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -73,6 +121,20 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             expandedHeight: 300,
             pinned: true,
             backgroundColor: Colors.deepPurple,
+            actions: [
+              // Favori Butonu
+              if (_currentUser != null)
+                IconButton(
+                  icon: Icon(
+                    _isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: _isFavorite ? Colors.red : Colors.white,
+                  ),
+                  onPressed: _toggleFavorite,
+                  tooltip: _isFavorite 
+                      ? 'favorites.removeFromFavorites'.tr() 
+                      : 'favorites.addToFavorites'.tr(),
+                ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 color: Colors.grey[300],
@@ -414,6 +476,84 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   Future<void> _processPurchase() async {
     if (_currentUser == null) return;
 
+    // 🎬 Tam ekran animasyon overlay'ini göster
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.85),
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false, // Geri tuşunu devre dışı bırak
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Dönen çekiç/tokmak animasyonu
+              Lottie.asset(
+                'assets/animations/resolving_animation.json',
+                width: 300,
+                height: 300,
+                repeat: false, // Sadece 1 kez oynat
+              ),
+              const SizedBox(height: 40),
+              // Bilgi kutusu
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 40),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.deepPurple.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      '🚗 Araç Satın Alınıyor',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${widget.vehicle.brand} ${widget.vehicle.model}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Lütfen bekleyiniz...',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Animasyon süresi kadar bekle (~2 saniye)
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    if (!mounted) return;
+    Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+
     try {
       // 1️⃣ Bakiyeyi düş
       final newBalance = _currentUser!.balance - widget.vehicle.price;
@@ -426,7 +566,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         throw Exception('Bakiye güncellenemedi');
       }
 
-      // 2️⃣ Aracı kullanıcıya ekle
+      // 2️⃣ Aracı tüm kullanıcıların favorilerinden kaldır (ilan satıldı)
+      await _favoriteService.removeVehicleFromAllFavorites(widget.vehicle.id);
+
+      // 3️⃣ Aracı kullanıcıya ekle
       final userVehicle = UserVehicle.purchase(
         userId: _currentUser!.id,
         vehicleId: widget.vehicle.id,
@@ -457,10 +600,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         throw Exception('Araç garajınıza eklenemedi');
       }
 
-      // 3️⃣ Kullanıcıyı güncelle
+      // 4️⃣ Kullanıcıyı güncelle
       await _loadCurrentUser();
 
-      // 4️⃣ Başarılı! Kutlama göster
+      // 5️⃣ Başarılı! Kutlama göster
+      HapticFeedback.heavyImpact(); // Güçlü titreşim - satın alma anı
       _confettiController.play();
 
       if (!mounted) return;

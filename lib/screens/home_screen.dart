@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
   final AdService _adService = AdService();
+  final NotificationService _notificationService = NotificationService();
   User? _currentUser;
   bool _isLoading = true;
   int _vehicleCount = 0;
@@ -52,68 +53,33 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadCurrentUser() async {
     final user = await _authService.getCurrentUser();
     
-    // Eski kullanıcıların bakiyesini güncelle (özel bonus! 🎁)
-    // 1,000,000'dan az olan tüm kullanıcılar → 5,000,000 TL
-    if (user != null && user.balance < 1000000.0) {
-      await _db.updateUser(user.id, {'balance': 5000000.0});
-      // Güncellenmiş kullanıcıyı tekrar yükle
-      final updatedUser = await _authService.getCurrentUser();
+    // Kullanıcının araçlarını yükle
+    if (user != null) {
+      // 24 saatlik bildirim sıfırlama kontrolü (arka planda)
+      _notificationService.checkAndResetDailyNotifications(user.id);
       
-      // Kullanıcının araçlarını yükle
-      final vehicles = await _db.getUserActiveVehicles(updatedUser!.id);
+      final vehicles = await _db.getUserActiveVehicles(user.id);
       final vehicleCount = vehicles.length;
       
       // Kullanıcının satışa çıkardığı araçları yükle
-      final listedVehicles = await _db.getUserListedVehicles(updatedUser.id);
+      final listedVehicles = await _db.getUserListedVehicles(user.id);
       
       // Bekleyen teklifleri yükle
-      final pendingOffers = await _db.getPendingOffersCount(updatedUser.id);
+      final pendingOffers = await _db.getPendingOffersCount(user.id);
       
       setState(() {
-        _currentUser = updatedUser;
+        _currentUser = user;
         _userVehicles = vehicles;
         _vehicleCount = vehicleCount;
         _userListedVehicles = listedVehicles;
         _pendingOffersCount = pendingOffers;
         _isLoading = false;
       });
-      
-      // Kullanıcıya bilgi ver
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('home.bonusAwarded'.tr()),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
     } else {
-      // Kullanıcının araçlarını yükle
-      if (user != null) {
-        final vehicles = await _db.getUserActiveVehicles(user.id);
-        final vehicleCount = vehicles.length;
-        
-        // Kullanıcının satışa çıkardığı araçları yükle
-        final listedVehicles = await _db.getUserListedVehicles(user.id);
-        
-        // Bekleyen teklifleri yükle
-        final pendingOffers = await _db.getPendingOffersCount(user.id);
-        
-        setState(() {
-          _currentUser = user;
-          _userVehicles = vehicles;
-          _vehicleCount = vehicleCount;
-          _userListedVehicles = listedVehicles;
-          _pendingOffersCount = pendingOffers;
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _currentUser = user;
-          _isLoading = false;
-        });
-      }
+      setState(() {
+        _currentUser = user;
+        _isLoading = false;
+      });
     }
   }
 
@@ -334,9 +300,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 16),
                         
                         // Galeri Satın Al
-                        _buildBuyGalleryButton(),
+                        // _buildBuyGalleryButton(),
                         
-                        const SizedBox(height: 16),
+                        // const SizedBox(height: 16),
                         
                         // İstatistikler
                         _buildStatistics(),

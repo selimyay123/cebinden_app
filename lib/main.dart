@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
 import 'services/database_helper.dart';
+import 'services/favorite_service.dart';
 import 'services/localization_service.dart';
 import 'services/ad_service.dart';
 import 'services/game_time_service.dart';
@@ -21,6 +22,9 @@ void main() async {
   
   // Hive database'i initialize et
   await DatabaseHelper.init();
+  
+  // Favorite service'i initialize et
+  await FavoriteService.init();
   
   // Localization'ı initialize et
   await LocalizationService().initialize();

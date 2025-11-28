@@ -8,12 +8,14 @@ class VehicleListScreen extends StatefulWidget {
   final String categoryName;
   final Color categoryColor;
   final String? brandName; // null = tüm markalar
+  final String? modelName; // null = tüm modeller
 
   const VehicleListScreen({
     super.key,
     required this.categoryName,
     required this.categoryColor,
     this.brandName,
+    this.modelName,
   });
 
   @override
@@ -56,7 +58,10 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   // Araçları market servisinden yükle
   void _loadVehicles() {
     setState(() {
-      allVehicles = _marketService.getActiveListings(brand: widget.brandName);
+      allVehicles = _marketService.getActiveListings(
+        brand: widget.brandName,
+        model: widget.modelName,
+      );
       filteredVehicles = List.from(allVehicles);
     });
   }

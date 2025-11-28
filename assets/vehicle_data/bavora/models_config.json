@@ -1,0 +1,235 @@
+{
+  "brand": "Bavora",
+  "spawnRate": 0.089,
+  "description": "Premium lüks segment, ZF güvenilirliği, M Sport cazibesi, yüksek kar potansiyeli",
+  "models": [
+    {
+      "code": "C Serisi",
+      "realName": "3 Serisi",
+      "spawnRate": 0.40,
+      "description": "Popüler premium, en çok satan model",
+      "segment": "D-Premium",
+      "basePriceTL": 3500000,
+      "priceRange": "2500000-3500000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "8 İleri Steptronic (ZF - ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "Arkadan (RWD)",
+      "engineSizeRange": "1.6-2.0",
+      "horsepowerRange": "136-258",
+      "notes": [
+        "8 İleri Steptronic (ZF) - DSG'den ÇOK daha güvenilir!",
+        "Arkadan itiş (RWD) - sportif sürüş keyfi",
+        "xDrive (4x4) opsiyonel - kış güvenliği (+değer)",
+        "M Sport paketi - YÜKSEK DEĞERLİ! (+%15-20 kar)",
+        "Luxury Line/Sport Line - orta donanım",
+        "Modern Line - baz donanım",
+        "320d/318d (Dizel) - EN POPÜLER kombinasyon (+%15 değer)",
+        "320i/330i (Benzin) - performans arayanlar",
+        "Touring (Station Wagon) - NADİR ve ÖZEL alıcılar",
+        "HASAR RİSKİ YÜKSEK - sportif kullanım yaygın (hasarlı %22 düşük)",
+        "Laser far/Hayalet gösterge - pahalı onarım riski",
+        "Sedan en yaygın kasa",
+        "En yüksek birim kar potansiyeli"
+      ]
+    },
+    {
+      "code": "E Serisi",
+      "realName": "5 Serisi",
+      "spawnRate": 0.25,
+      "description": "Lüks segment, en prestijli model",
+      "segment": "E-Luxury",
+      "basePriceTL": 5000000,
+      "priceRange": "3500000-5000000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel", "Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "8 İleri Steptronic (ZF - ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "Arkadan (RWD)",
+      "engineSizeRange": "2.0-3.0",
+      "horsepowerRange": "170-340",
+      "notes": [
+        "OYUNUN EN PAHALI ARACI - en yüksek sermaye gereksinimi",
+        "8 İleri Steptronic (ZF) - güvenilirlik standartı",
+        "520d/530d (Dizel) - EN POPÜLER eski nesil (+%18 değer)",
+        "520i/530i (Benzin) - yeni nesil vergi avantajı",
+        "530e (Hibrit) - EN YÜKSEK TEKNOLOJİ PREMİ (+%25 değer!)",
+        "M Sport/Executive - en dolu donanım - maksimum kar",
+        "Touring (Station Wagon) - NADİR lüks wagon",
+        "ELEKTRONİK RİSK YÜKSEK - Laser far/Hayalet gösterge/Gelişmiş sürüş destek",
+        "Onarım maliyetleri ÇOK PAHALI - dikkatli kontrol!",
+        "MAKAM ARACI GEÇMİŞİ - yetkili servis kayıtları çok değerli",
+        "Servis kayıtlı: Yüksek güvenilirlik primi",
+        "Servis kayıtsız: Büyük değer kaybı",
+        "Siyah/Beyaz renk - hızlı satış",
+        "Diğer renkler (Kahverengi/Mavi) - zor satış",
+        "YÜKSEK RISK - YÜKSEK ÖDÜL stratejisi"
+      ]
+    },
+    {
+      "code": "A Serisi",
+      "realName": "1 Serisi",
+      "spawnRate": 0.22,
+      "description": "Kompakt premium, genç ve dinamik",
+      "segment": "C-Premium",
+      "basePriceTL": 1850000,
+      "priceRange": "1500000-1850000",
+      "bodyTypes": {
+        "2010-2019": ["Hatchback"],
+        "2020-2025": ["Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "8 İleri (ESKİ - GÜVENİLİR) / 7 İleri DCT (YENİ - RİSK!)"
+      },
+      "driveType": "Çekiş Sistemi Nesle Göre Değişir",
+      "engineSizeRange": "1.5-1.6",
+      "horsepowerRange": "116-190",
+      "notes": [
+        "ÇEKİŞ FARKI DİNAMİĞİ - EN KRİTİK FAKTÖR!",
+        "F20 Kasası (2019-): RWD (Arkadan İtiş) + ZF 8 İleri (+%15 değer)",
+        "F20 RWD: Sportif sürüş keyfi, yüksek premium",
+        "F40 Kasası (2020+): FWD (Önden Çekiş) + 7 İleri DCT (+%5 değer)",
+        "F40 DCT: DSG benzeri risk - bakım geçmişi kontrol!",
+        "116d/118d (Dizel) - yakıt ekonomisi, Türkiye'de çok popüler (+%12 değer)",
+        "116i/118i (Benzin) - yeni nesil vergi avantajı",
+        "M Sport paketi - GENÇ ALICILAR için kritik (+yüksek kar)",
+        "3 kapı (eski): Sportif, genç kitle, küçük premium",
+        "5 kapı: En yaygın, standart değer",
+        "Tenis (Golf)'e göre daha yüksek prestij",
+        "Benzer donanımda Tenis'ten daha pahalı",
+        "M135i/120d - yüksek performans versiyonları nadir"
+      ]
+    },
+    {
+      "code": "D Serisi",
+      "realName": "4 Serisi",
+      "spawnRate": 0.13,
+      "description": "Sportif coupe, şık ve güçlü",
+      "segment": "D-Sporty",
+      "basePriceTL": 4000000,
+      "priceRange": "2800000-4000000",
+      "bodyTypes": {
+        "2010-2025": ["Coupe", "Sedan", "Convertible"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "8 İleri Steptronic (ZF - ÇOK GÜVENİLİR!)"
+      },
+      "driveType": "Arkadan (RWD)",
+      "engineSizeRange": "2.0-2.0",
+      "horsepowerRange": "184-258",
+      "notes": [
+        "NİŞ TALEP - YÜKSEK KÂR MARJİ (C Serisi'nden daha yüksek birim kar)",
+        "Gran Coupe (4 kapı Sedan) - EN YAYGIN KASA - hızlı satış",
+        "Coupe (2 kapı): En sportif ve standart kasa",
+        "Cabrio (Üstü Açık): EN NADİR ve EN PAHALI",
+        "CABRIO TAVAN MEKANİZMASI RİSKİ - yüksek onarım maliyeti!",
+        "Cabrio: Alıcı bekleme süresi uzun (niş talep)",
+        "420i (Benzin) - EN YAYGIN motor, vergi avantajı",
+        "420d (Dizel) - yakıt ekonomisi, yüksek talep (+%14 değer)",
+        "M Sport paketi - NEREDEYSE ZORUNLU (M Sport'suz zor satılır)",
+        "Luxury Line/Modern Line: Düşük kar marjı",
+        "HASAR PREMİ - sportif kullanım teşvik eder, kazalı örnekler yaygın",
+        "Hasar onarımı ana kazanç kapısı",
+        "xDrive opsiyonel - güvenlik primi",
+        "8 İleri Steptronic (ZF) - DSG riski yok"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "C Serisi": "Popüler premium - yüksek birim kar - M Sport kritik - hasar riski yüksek",
+      "E Serisi": "En pahalı - elektronik risk - servis geçmişi çok önemli - yüksek risk/ödül",
+      "A Serisi": "Çekiş farkı kritik! F20 RWD güvenilir, F40 FWD DCT riskli - M Sport genç kitle",
+      "D Serisi": "Niş talep - en yüksek kar marjı - Gran Coupe yaygın - Cabrio nadir/riskli - M Sport zorunlu"
+    },
+    "transmissionAdvantage": {
+      "ZF_8_İleri_Steptronic": "DSG'den ve DCT'den ÇOK GÜVENİLİR - ana satış avantajı",
+      "DCT_Risk_A_Serisi_Yeni": "F40 (2020+) 7 ileri DCT - DSG benzeri risk - bakım kontrol!"
+    },
+    "driveTypeDynamics": {
+      "A_Serisi_F20_RWD": "2019- Arkadan itiş - sportif premium - yüksek değer",
+      "A_Serisi_F40_FWD": "2020+ Önden çekiş - geniş kitle - teknoloji primi"
+    },
+    "bodyTypeValues": {
+      "C_Sedan": "En yaygın, standart değer",
+      "C_Touring": "Nadir - özel alıcılar - yüksek premium",
+      "E_Sedan": "En yaygın lüks, standart",
+      "E_Touring": "Nadir lüks wagon - çok özel",
+      "A_5_Door": "En yaygın, standart",
+      "A_3_Door": "Eski sportif, genç kitle, küçük premium",
+      "D_Gran_Coupe": "En yaygın - 4 kapı coupe - hızlı satış",
+      "D_Coupe": "2 kapı sportif, standart D Serisi",
+      "D_Cabrio": "EN NADİR - EN PAHALI - tavan riski - uzun bekleme"
+    },
+    "enginePopularity": {
+      "320d_318d (C)": "En popüler dizel kombinasyon - +%15 değer",
+      "520d_530d (E)": "Lüks dizel - +%18 değer",
+      "530e (E)": "Hibrit teknoloji - +%25 değer!",
+      "116d_118d (A)": "Ekonomik premium dizel - +%12 değer",
+      "420i (D)": "Sportif benzin - en yaygın",
+      "420d (D)": "Sportif dizel - +%14 değer"
+    },
+    "equipmentLevels": {
+      "M_Sport": "EN ÜST DONANIM - maksimum kar marjı - tüm modellerde kritik",
+      "Executive_E_Serisi": "Lüks donanım - yüksek kar",
+      "Luxury_Line": "Üst donanım - iyi kar",
+      "Sport_Line": "Orta donanım - orta kar",
+      "Modern_Line": "Baz donanım - düşük kar"
+    },
+    "electronicRisk": {
+      "Laser_Far": "Çok pahalı onarım - C/E Serisi",
+      "Hayalet_Gösterge": "Pahalı arıza - E Serisi",
+      "Gelişmiş_Sürüş_Destek": "Yüksek maliyet - E Serisi"
+    },
+    "serviceHistory": {
+      "Yetkili_Servis_Kayıtlı": "Yüksek güvenilirlik primi - özellikle E Serisi",
+      "Servis_Kayıtsız": "Büyük değer kaybı - riskli yatırım"
+    },
+    "competitivePositioning": {
+      "C_vs_Paso": "C Serisi ZF güvenilir - Paso DSG riskli - daha yüksek prestij",
+      "E_vs_All": "En lüks - en pahalı - en riskli - en ödüllü",
+      "A_vs_Tenis": "A Serisi daha prestijli - benzer donanımda daha pahalı",
+      "D_vs_All": "En sportif - niş talep - yüksek kar marjı"
+    },
+    "profitStrategy": {
+      "C Serisi": "M Sport ara - 320d ideal - Touring fırsatı - hasar kontrol DİKKATLE",
+      "E Serisi": "SERVİS GEÇMİŞİ KONTROL! - Elektronik donanım kontrol - 530e hibrit ara - Siyah/Beyaz renk öncelik",
+      "A Serisi": "NESİL KONTROL! F20 RWD güvenli, F40 DCT dikkat - M Sport genç kitle",
+      "D Serisi": "Gran Coupe en güvenli - M Sport ZORUNLU - Cabrio yüksek risk/ödül - hasar onarımı kar kapısı"
+    },
+    "criticalFactors": [
+      "ZF 8 İleri Steptronic = DSG'den ÇOK GÜVENİLİR (önemli satış avantajı)",
+      "M Sport paketi = TÜM MODELLERDE KRİTİK (+%15-20 kar)",
+      "A Serisi çekiş farkı = F20 RWD güvenli, F40 FWD DCT riskli",
+      "E Serisi elektronik risk = Pahalı onarım - servis geçmişi zorunlu",
+      "D Serisi M Sport zorunlu = M Sport'suz zor satılır",
+      "Hasar riski yüksek = Sportif kullanım - hasarlı %22 düşük",
+      "Renk önemli (E Serisi) = Siyah/Beyaz hızlı, diğer renkler zor",
+      "Cabrio tavan riski = Yüksek onarım maliyeti",
+      "Dizel motorlar = Her modelde yüksek talep",
+      "530e Hibrit = En yüksek teknoloji primi (+%25)"
+    ]
+  }
+}
+

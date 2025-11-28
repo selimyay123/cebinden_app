@@ -1,29 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/user_vehicle_model.dart';
+import '../models/vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
+import '../services/favorite_service.dart';
 import '../services/localization_service.dart';
 import '../utils/brand_colors.dart';
+import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
 
 class MyListingsScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın ilanlarını göster
+  final int initialTab; // 0 = İlanlarım, 1 = Favori İlanlarım
 
   const MyListingsScreen({
     super.key,
     this.selectedBrand,
+    this.initialTab = 0,
   });
 
   @override
   State<MyListingsScreen> createState() => _MyListingsScreenState();
 }
 
-class _MyListingsScreenState extends State<MyListingsScreen> {
+class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerProviderStateMixin {
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
+  final FavoriteService _favoriteService = FavoriteService();
   List<UserVehicle> _userListedVehicles = [];
+  List<Vehicle> _favoriteListings = [];
   bool _isLoading = true;
+  late TabController _tabController;
   
   // Marka bazında gruplandırılmış ilanlar
   Map<String, List<UserVehicle>> _listingsByBrand = {};
@@ -31,7 +39,15 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTab);
     _loadUserListedVehicles();
+    _loadFavoriteListings();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUserListedVehicles() async {
@@ -65,28 +81,74 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     }
   }
 
+  Future<void> _loadFavoriteListings() async {
+    final currentUser = await _authService.getCurrentUser();
+    if (currentUser != null) {
+      final favorites = await _favoriteService.getUserFavorites(currentUser.id);
+      setState(() {
+        _favoriteListings = favorites;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
+        // Eğer belirli bir marka seçilmişse, eski davranışı koru
+        if (widget.selectedBrand != null) {
+          return Scaffold(
+            backgroundColor: Colors.grey[100],
+            appBar: AppBar(
+              title: Text(widget.selectedBrand!),
+              elevation: 0,
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+            ),
+            body: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _buildListingList(),
+          );
+        }
+        
+        // Yeni TabBar'lı görünüm
         return Scaffold(
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
-            title: Text(widget.selectedBrand != null 
-              ? widget.selectedBrand! 
-              : 'listings.title'.tr()),
+            title: Text('listings.title'.tr()),
             elevation: 0,
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
+            bottom: TabBar(
+              controller: _tabController,
+              indicatorColor: Colors.white,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              tabs: [
+                Tab(text: 'listings.myListings'.tr()),
+                Tab(text: 'favorites.myFavorites'.tr()),
+              ],
+            ),
           ),
-          body: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _userListedVehicles.isEmpty
-                  ? _buildEmptyState()
-                  : widget.selectedBrand != null
-                      ? _buildListingList()
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              // Tab 1: İlanlarım
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _userListedVehicles.isEmpty
+                      ? _buildEmptyState()
                       : _buildBrandList(),
+              
+              // Tab 2: Favori İlanlarım
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _favoriteListings.isEmpty
+                      ? _buildEmptyFavoritesState()
+                      : _buildFavoritesList(),
+            ],
+          ),
         );
       },
     );
@@ -271,6 +333,205 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
               textAlign: TextAlign.center,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyFavoritesState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.favorite_border,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'favorites.noFavorites'.tr(),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'favorites.noFavoritesDesc'.tr(),
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFavoritesList() {
+    return RefreshIndicator(
+      onRefresh: () async {
+        await _loadFavoriteListings();
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _favoriteListings.length,
+        itemBuilder: (context, index) {
+          final vehicle = _favoriteListings[index];
+          return _buildFavoriteVehicleCard(vehicle);
+        },
+      ),
+    );
+  }
+
+  Widget _buildFavoriteVehicleCard(Vehicle vehicle) {
+    final brandColor = BrandColors.getColor(vehicle.brand, defaultColor: Colors.deepPurple);
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () async {
+          // Araç detay sayfasına git
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VehicleDetailScreen(vehicle: vehicle),
+            ),
+          );
+          // Geri dönünce favorileri yenile (ilan satılmış olabilir)
+          await _loadFavoriteListings();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  // Araç ikonu
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: brandColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.directions_car,
+                      color: brandColor,
+                      size: 40,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          vehicle.fullName,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on, size: 14, color: Colors.grey[500]),
+                            const SizedBox(width: 4),
+                            Text(
+                              vehicle.location,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Favori ikonu
+                  IconButton(
+                    icon: const Icon(Icons.favorite, color: Colors.red),
+                    onPressed: () async {
+                      final currentUser = await _authService.getCurrentUser();
+                      if (currentUser != null) {
+                        await _favoriteService.removeFavorite(currentUser.id, vehicle.id);
+                        await _loadFavoriteListings();
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('favorites.removedFromFavorites'.tr()),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    tooltip: 'favorites.removeFromFavorites'.tr(),
+                  ),
+                ],
+              ),
+              const Divider(height: 24),
+              
+              // Fiyat ve Teknik Bilgiler
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'vehicles.price'.tr(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${_formatCurrency(vehicle.price)} TL',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _buildInfoChip(Icons.local_gas_station, vehicle.fuelType),
+                      const SizedBox(height: 6),
+                      _buildInfoChip(Icons.settings, vehicle.transmission),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

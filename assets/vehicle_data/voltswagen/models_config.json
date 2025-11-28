@@ -1,0 +1,161 @@
+{
+  "brand": "Voltswagen",
+  "spawnRate": 0.144,
+  "description": "Alman mühendislik üstünlüğü, DSG teknolojisi ve premium kalite",
+  "models": [
+    {
+      "code": "Paso",
+      "spawnRate": 0.40,
+      "description": "Premium Segment, lüks ve güç",
+      "segment": "D",
+      "basePriceTL": 2200000,
+      "priceRange": "1800000-2200000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (6-7 ileri) + DSG (Çift Kavrama - YÜKSEK RİSK!)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.4-2.0",
+      "horsepowerRange": "120-240",
+      "notes": [
+        "Yeni nesil en popüler",
+        "DSG şanzıman: Yüksek talep AMA eski/yüksek KM'de arıza riski ÇOK YÜKSEK",
+        "Donanım paketleri (Comfortline, Highline, R-Line) fiyatı %15-25 etkiliyor",
+        "Station Wagon (Variant) nadir, özel müşteri kitlesi, yüksek fiyat",
+        "1.6 TDI ve 2.0 TDI en popüler motorlar",
+        "4Motion (4x4) versiyonları çok nadir bonus araç"
+      ]
+    },
+    {
+      "code": "Tenis",
+      "spawnRate": 0.25,
+      "description": "Kompakt Premium, en yüksek talep",
+      "segment": "C",
+      "basePriceTL": 1800000,
+      "priceRange": "1400000-1800000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (6-7 ileri) + DSG (Çift Kavrama - ORTA RİSK)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.0-1.6",
+      "horsepowerRange": "90-150",
+      "notes": [
+        "En yeni nesil (2023-2025)",
+        "En popüler DSG kullanımı - hızlı satış garantisi",
+        "Donanım ve görsel paketler (R-Line, Highline) ekstra kar sağlıyor",
+        "Baz modeller (Trendline, Impression) daha düşük kar marjı",
+        "1.0 TSI, 1.2 TSI, 1.6 TDI en yaygın motorlar",
+        "GTI/R versiyonları 200+ HP, oyun içi bonus araç olabilir",
+        "Her zaman yüksek talep - en güvenli yatırım"
+      ]
+    },
+    {
+      "code": "Colo",
+      "spawnRate": 0.22,
+      "description": "Premium Küçük, şehir kullanımı",
+      "segment": "B",
+      "basePriceTL": 1300000,
+      "priceRange": "1050000-1300000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5 ileri) + DSG (Küçük motor - DÜŞÜK RİSK)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.0-1.6",
+      "horsepowerRange": "75-115",
+      "notes": [
+        "Slim/Signa'ya göre daha yüksek kar marjı (marka prestiji)",
+        "Şehir içi kullanımda düşük KM çok değerli",
+        "DSG riski daha düşük (küçük motor, az yıpranma)",
+        "1.0 TSI en popüler motor",
+        "Comfortline/Highline donanım farkı belirgin",
+        "Hasarsızlık ve düşük KM kritik faktörler"
+      ]
+    },
+    {
+      "code": "Jago",
+      "spawnRate": 0.13,
+      "description": "Geniş Sedan, üretim durdu",
+      "segment": "C",
+      "basePriceTL": 1150000,
+      "priceRange": "950000-1150000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (6-7 ileri) + DSG (ESKİ NESIL - ÇOK YÜKSEK RİSK!)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.2-1.6",
+      "horsepowerRange": "105-150",
+      "notes": [
+        "Üretimi 2018'de durdu - değer kaybı hızlı",
+        "1.6 TDI + DSG kombinasyonu en popüler",
+        "ESKİ NESIL DSG (2010-2015) ÇOK RİSKLİ - en yüksek arıza potansiyeli",
+        "Passat'a bütçesi yetmeyenler için alternatif",
+        "Megane'dan daha yüksek, Passat'tan daha düşük fiyat",
+        "Yüksek kilometreli olanlar yaygın (aile aracı)",
+        "Motor/şanzıman kontrolü zorunlu - büyük risk/kar fırsatı"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "Paso": "Üst segment ticaretin anahtarı, yüksek kar marjları, DSG riski en kritik faktör",
+      "Tenis": "En popüler model, her zaman hızlı satış, donanım paketi önemli, DSG orta risk",
+      "Colo": "Premium küçük segment, şehir kullanımı, düşük KM önemli, DSG düşük risk",
+      "Jago": "Riskli yatırım, üretim durdu, eski DSG çok tehlikeli ama iyi kar fırsatı"
+    },
+    "dsgRiskLevels": {
+      "Jago_2010-2017": "ÇOK YÜKSEK RİSK - Manuel'den bile düşük değer",
+      "Paso_2010-2017_HighKM": "YÜKSEK RİSK - Arıza potansiyeli çok yüksek",
+      "Paso_2018-2025": "ORTA RİSK - Yeni nesil daha güvenilir",
+      "Tenis_2010-2017": "ORTA RİSK - Popülerlik riski dengeliyor",
+      "Tenis_2018-2025": "DÜŞÜK-ORTA RİSK - Nispeten güvenilir",
+      "Colo_AllYears": "DÜŞÜK RİSK - Küçük motor, az yıpranma"
+    },
+    "equipmentPackages": {
+      "R-Line": "En yüksek görsel cazibe, +%20-25 ekstra değer",
+      "Highline": "Üst donanım, +%15-20 ekstra değer",
+      "Comfortline": "Orta donanım, +%8-12 ekstra değer",
+      "Trendline/Impression": "Baz donanım, düşük talep, düşük kar marjı"
+    },
+    "enginePopularity": {
+      "1.6_TDI": "En popüler dizel, Jetta/Paso/Tenis'te yüksek değer",
+      "2.0_TDI": "Güçlü dizel, Paso'da premium seçenek",
+      "1.5_TSI": "Modern turbo benzin, Tenis/Paso'da popüler",
+      "1.0_TSI": "Küçük turbo, Colo/Tenis'te ekonomik seçenek"
+    },
+    "criticalFactors": [
+      "DSG arıza kontrolü ZORUNLU - En büyük risk/kar faktörü",
+      "Donanım paketi fiyatı çok etkiliyor",
+      "Kilometre ve yaş kombinasyonu DSG riskini belirliyor",
+      "Jago eski DSG'si oyunun en riskli yatırımı",
+      "Tenis her zaman garanti satış - güvenli yatırım"
+    ]
+  }
+}
+

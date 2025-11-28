@@ -127,8 +127,10 @@
     "engine": "Engine",
     "power": "Power",
     "category": "Category",
+    "benzinLpg": "Gasoline+LPG",
     "selectCategory": "Select Vehicle Category",
     "selectBrand": "Select Brand",
+    "selectModel": "Select Model",
     "noVehicles": "No Vehicles Found",
     "noVehiclesDesc": "No vehicles yet. Start buying now!",
     "purchasePrice": "Purchase Price",
@@ -371,12 +373,22 @@
   },
   "listings": {
     "title": "My Listings",
+    "myListings": "My Listings",
     "activeListings": "Active Listings",
     "noListings": "No Listings Yet",
     "noListingsDesc": "Your listed vehicles will appear here",
     "listedDate": "Listed Date",
     "views": "Views",
     "offersReceived": "Offers Received"
+  },
+  "favorites": {
+    "myFavorites": "Favorite Listings",
+    "addToFavorites": "Add to Favorites",
+    "removeFromFavorites": "Remove from Favorites",
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites",
+    "noFavorites": "No Favorite Listings Yet",
+    "noFavoritesDesc": "Add your favorite listings to easily access them later"
   },
   "settings": {
     "title": "Settings",

@@ -26,6 +26,9 @@ class Offer {
   final bool isUserOffer; // Kullanıcı teklifi mi, AI teklifi mi?
   final double? counterOfferAmount; // Karşı teklif tutarı (varsa)
   final String? sellerResponse; // Satıcının/AI'nin cevabı
+  
+  // 🆕 PATIENCE METER: Pazarlık tur sayısı
+  final int negotiationRounds; // Kaç tur pazarlık yapıldı (0'dan başlar)
 
   // Araç bilgileri (UI'da göstermek için)
   final String vehicleBrand;
@@ -49,6 +52,7 @@ class Offer {
     this.isUserOffer = false,
     this.counterOfferAmount,
     this.sellerResponse,
+    this.negotiationRounds = 0, // 🆕 Varsayılan: 0 tur
     required this.vehicleBrand,
     required this.vehicleModel,
     required this.vehicleYear,
@@ -100,6 +104,7 @@ class Offer {
       isUserOffer: json['isUserOffer'] ?? false,
       counterOfferAmount: json['counterOfferAmount']?.toDouble(),
       sellerResponse: json['sellerResponse'],
+      negotiationRounds: json['negotiationRounds'] ?? 0, // 🆕
       vehicleBrand: json['vehicleBrand'],
       vehicleModel: json['vehicleModel'],
       vehicleYear: json['vehicleYear'],
@@ -125,6 +130,7 @@ class Offer {
       'isUserOffer': isUserOffer,
       'counterOfferAmount': counterOfferAmount,
       'sellerResponse': sellerResponse,
+      'negotiationRounds': negotiationRounds, // 🆕
       'vehicleBrand': vehicleBrand,
       'vehicleModel': vehicleModel,
       'vehicleYear': vehicleYear,

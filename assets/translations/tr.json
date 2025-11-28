@@ -127,8 +127,10 @@
     "engine": "Motor",
     "power": "Güç",
     "category": "Kategori",
+    "benzinLpg": "Benzin+LPG",
     "selectCategory": "Araç Kategorisi Seçin",
     "selectBrand": "Marka Seçin",
+    "selectModel": "Model Seçin",
     "noVehicles": "Araç Bulunamadı",
     "noVehiclesDesc": "Henüz araç yok. Hemen satın almaya başlayın!",
     "purchasePrice": "Alış Fiyatı",
@@ -371,12 +373,22 @@
   },
   "listings": {
     "title": "İlanlarım",
+    "myListings": "İlanlarım",
     "activeListings": "Aktif İlanlar",
     "noListings": "Henüz İlan Yok",
     "noListingsDesc": "Satışa çıkardığınız araçlar burada görünecek",
     "listedDate": "İlan Tarihi",
     "views": "Görüntülenme",
     "offersReceived": "Gelen Teklif"
+  },
+  "favorites": {
+    "myFavorites": "Favori İlanlarım",
+    "addToFavorites": "Favorilere Ekle",
+    "removeFromFavorites": "Favorilerden Çıkar",
+    "addedToFavorites": "Favorilere eklendi",
+    "removedFromFavorites": "Favorilerden çıkarıldı",
+    "noFavorites": "Henüz Favori İlan Yok",
+    "noFavoritesDesc": "Beğendiğiniz ilanları favorilere ekleyerek daha sonra kolayca erişebilirsiniz"
   },
   "settings": {
     "title": "Ayarlar",

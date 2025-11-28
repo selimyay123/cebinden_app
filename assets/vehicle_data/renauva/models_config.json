@@ -1,0 +1,170 @@
+{
+  "brand": "Renauva",
+  "spawnRate": 0.179,
+  "description": "Fransız otomotiv devi, Türkiye'de en çok satan markalardan biri",
+  "models": [
+    {
+      "code": "Slim",
+      "spawnRate": 0.3782,
+      "description": "Modern Hatchback, genç ve dinamik",
+      "segment": "B",
+      "basePriceTL": 1450000,
+      "priceRange": "1200000-1450000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Benzin+LPG"],
+        "2010-2020": ["Dizel"],
+        "2020-2025": ["Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5-6 ileri) + EDC/X-Tronic CVT"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "0.9-1.5",
+      "horsepowerRange": "65-140",
+      "notes": [
+        "Yeni nesil (2010 sonrası) sadece 5 kapı",
+        "Hibrit versiyonu 140 HP",
+        "EDC/X-Tronic otomatik vitesi güvenilir ve modern"
+      ]
+    },
+    {
+      "code": "Magna",
+      "spawnRate": 0.3443,
+      "description": "Premium Orta Sınıf, en yüksek kar marjı",
+      "segment": "C",
+      "basePriceTL": 1850000,
+      "priceRange": "1500000-1850000",
+      "bodyTypes": {
+        "2010-2015": ["Sedan", "Hatchback", "Coupe", "Station Wagon"],
+        "2016-2025": ["Sedan", "Hatchback", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2010-2015": ["Benzin", "Benzin+LPG", "Dizel"],
+        "2016-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (6 ileri) + EDC Otomatik (Çift Kavrama)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.3-1.6",
+      "horsepowerRange": "95-140",
+      "notes": [
+        "Yeni nesil (2016+) en popüler",
+        "1.3 TCe ve 1.5 dCi motorlar en çok talep görür",
+        "EDC otomatik şanzıman güvenilir ve hızlı",
+        "Sport Tourer (Station Wagon) nadir ve aile müşterileri arasında yüksek talep"
+      ]
+    },
+    {
+      "code": "Flow",
+      "spawnRate": 0.1349,
+      "description": "Eski Nesil Konfor, popüler dizel otomatik",
+      "segment": "C",
+      "basePriceTL": 825000,
+      "priceRange": "700000-825000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Benzin+LPG", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5-6 ileri) + EDC Otomatik"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.5-1.6",
+      "horsepowerRange": "90-110",
+      "notes": [
+        "Üretimi 2016'da sonlandı",
+        "1.5 dCi Türkiye'de en popüler motor",
+        "EDC otomatik bir nesil eski, yüksek kilometrede arıza riski",
+        "Konfor odaklı sedan, geniş iç hacim",
+        "Değer kaybı Megane'dan daha hızlı"
+      ]
+    },
+    {
+      "code": "Signa",
+      "spawnRate": 0.1150,
+      "description": "Ekonomik Sedan, yüksek ticaret hacmi, Easy-R riski",
+      "segment": "B",
+      "basePriceTL": 875000,
+      "priceRange": "750000-875000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Benzin+LPG", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5 ileri) + Easy-R (Yarı Otomatik - düşük güvenilirlik)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.2-1.5",
+      "horsepowerRange": "65-95",
+      "notes": [
+        "En çok ticaret hacmine sahip, en düşük maliyetli model",
+        "1.5 dCi Türkiye'de en çok talep gören motor",
+        "Easy-R otomatik vites problemi çok, oyunda düşük değer faktörü",
+        "Ekonomik yapı, düşük vergi dilimi",
+        "Yüksek riskli - yüksek ödüllü araç (eğer arızasızsa)"
+      ]
+    },
+    {
+      "code": "Tallion",
+      "spawnRate": 0.0273,
+      "description": "Yeni Nesil Ekonomi, LPG değeri yüksek",
+      "segment": "B",
+      "basePriceTL": 1050000,
+      "priceRange": "900000-1050000",
+      "bodyTypes": {
+        "2021-2025": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2021-2025": ["Benzin", "Benzin+LPG"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5 ileri) + X-Tronic CVT (Modern ve güvenilir)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.0-1.0",
+      "horsepowerRange": "65-90",
+      "notes": [
+        "2021 sonrası yeni model, üretimde aktif",
+        "Dizel motor yok, sadece Benzin/LPG",
+        "Fabrika çıkışlı LPG versiyonları yüksek talep görür",
+        "X-Tronic CVT otomatik, Easy-R'den çok daha güvenilir",
+        "Symbol'ün halefi, daha modern tasarım",
+        "Değer koruması Symbol'den daha iyi",
+        "Ticari filo alıcıları için cazip (LPG nedeniyle)"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "Slim": "Modern Hatchback segmenti, yüksek talep, genç alıcılar",
+      "Magna": "Premium segment, en yüksek kar marjları, daha seçkin müşteri kitlesi",
+      "Flow": "Eski nesil ama popüler, EDC arıza riski potansiyel zorluk yaratabilir",
+      "Signa": "Yüksek ticaret hacmi, düşük maliyet, Easy-R riski oyun zorluğunu artırır",
+      "Tallion": "Yeni nesil güvenilir yatırım, LPG versiyonları hızlı satılır"
+    },
+    "transmissionRisks": {
+      "EDC (Slim, Magna, Flow)": "Güvenilir çift kavrama, yüksek fiyat değeri",
+      "X-Tronic CVT (Tallion)": "Modern CVT, Easy-R'den çok daha güvenilir",
+      "Easy-R (Signa)": "Yarı otomatik, düşük güvenilirlik, oyunda düşük değer faktörü"
+    },
+    "fuelDynamics": {
+      "1.5 dCi Dizel": "Flow ve Signa'da en popüler, yüksek talep",
+      "Fabrika LPG": "Tallion'da önemli değer faktörü, yakıt maliyeti tasarrufu",
+      "E-Tech Hibrit": "Slim'de en pahalı ve en düşük yakıt tüketimli"
+    }
+  }
+}
+

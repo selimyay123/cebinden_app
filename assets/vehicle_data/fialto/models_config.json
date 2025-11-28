@@ -1,0 +1,140 @@
+{
+  "brand": "Fialto",
+  "spawnRate": 0.108,
+  "description": "İtalyan pratikliği, yüksek hacim, ekonomik fiyatlar",
+  "models": [
+    {
+      "code": "Agna",
+      "spawnRate": 0.7145,
+      "description": "Hacim Kralı, çok satan model",
+      "segment": "C",
+      "basePriceTL": 1250000,
+      "priceRange": "1050000-1250000",
+      "bodyTypes": {
+        "2015-2025": ["Sedan", "Hatchback", "Cross", "Station Wagon"]
+      },
+      "fuelTypes": {
+        "2015-2025": ["Benzin", "Dizel"],
+        "2020-2025": ["Hybrid"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5-6 ileri) + DCT/Tork Konvertörlü (DSG'den daha düşük prestij)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.0-1.6",
+      "horsepowerRange": "95-130",
+      "notes": [
+        "En hızlı satılabilir araç - kısa alıcı bekleme süresi",
+        "Düşük birim kar marjı - hacim ile kar",
+        "1.3 ve 1.6 Multijet Dizel en popüler motorlar",
+        "Ticari filo / taksi kullanımı yaygın - yüksek km riski",
+        "Cross ve Limited donanım daha yüksek kar marjı",
+        "Sedan en yaygın, Cross SUV görünümlü nadir",
+        "Yüksek km'de (150k+) ticari geçmiş riski - %7 değer düşüşü"
+      ]
+    },
+    {
+      "code": "Lagua",
+      "spawnRate": 0.2280,
+      "description": "Ekonomik Sedan, üretim durdu (2016)",
+      "segment": "C",
+      "basePriceTL": 650000,
+      "priceRange": "500000-650000",
+      "bodyTypes": {
+        "2010-2025": ["Sedan"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5 ileri) + Dualogic (YARI OTOMATİK - RİSKLİ!)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.3-1.6",
+      "horsepowerRange": "77-105",
+      "notes": [
+        "Üretimi 2016'da durdu - hızlı değer kaybı (%12 ekstra)",
+        "En düşük bütçeli segment - düşük giriş fiyatı",
+        "1.3 Multijet en popüler motor",
+        "Yüksek kilometreli olanlar çok yaygın",
+        "Dualogic yarı otomatik: Easy-R gibi YÜKSEK ARIZA RİSKİ",
+        "Dualogic manuel'den %10 daha düşük değer",
+        "Stokta kısa süre tutulmalı - pazar daralması",
+        "Kozmetik onarımla iyi kar fırsatı"
+      ]
+    },
+    {
+      "code": "Zorno",
+      "spawnRate": 0.0572,
+      "description": "Kompakt Hatchback, üretim durdu",
+      "segment": "B",
+      "basePriceTL": 580000,
+      "priceRange": "450000-580000",
+      "bodyTypes": {
+        "2010-2025": ["Hatchback"]
+      },
+      "fuelTypes": {
+        "2010-2025": ["Benzin", "Dizel"]
+      },
+      "transmissions": {
+        "types": ["Manuel", "Otomatik"],
+        "notes": "Manuel (5 ileri) + Dualogic (YARI OTOMATİK - RİSKLİ!)"
+      },
+      "driveType": "Önden",
+      "engineSizeRange": "1.2-1.4",
+      "horsepowerRange": "77-95",
+      "notes": [
+        "Üretimi durdu - hızlı değer kaybı (%12 ekstra)",
+        "En uygun fiyatlı hatchback (Colo/Slim'den ucuz)",
+        "1.3 Multijet en popüler motor",
+        "Dualogic yarı otomatik: YÜKSEK ARIZA RİSKİ",
+        "Dualogic manuel'den %10 daha düşük değer",
+        "City Modu (direksiyonu yumuşatır) - direksiy arızası potansiyeli",
+        "3 kapılı Sport versiyonlar nadir - genç alıcılar - küçük premium kar",
+        "5 kapı en yaygın kasa"
+      ]
+    }
+  ],
+  "gameplayNotes": {
+    "marketDynamics": {
+      "Agna": "Hacim kralı - hızlı satış - düşük birim kar - ticari geçmiş riski yüksek",
+      "Lagua": "En ucuz ticaret - yüksek km yaygın - Dualogic çok riskli - hızlı stok devri",
+      "Zorno": "Uygun hatchback - Dualogic riski - City Modu direksiy arızası - 3 kapı nadir"
+    },
+    "transmissionRisks": {
+      "Dualogic (Lagua, Zorno)": "YÜKSEK RİSK - Easy-R gibi yarı otomatik, manuel'den %10 düşük değer",
+      "DCT/Tork (Agna)": "ORTA RİSK - DSG'den daha az prestijli ama güvenilir"
+    },
+    "commercialRisk": {
+      "Agna_HighKM": "150k+ km'de ticari filo/taksi riski - %7 değer düşüşü"
+    },
+    "bodyTypeValues": {
+      "Sedan (Agna)": "En yaygın, standart değer",
+      "Hatchback (Agna)": "Orta talep",
+      "Cross (Agna)": "SUV görünümlü, nadir, yüksek talep, premium kar",
+      "Station Wagon (Agna)": "Nadir, aileler için, orta premium kar",
+      "3 Kapı (Zorno)": "Sport görünüm, nadir, genç alıcılar, küçük premium"
+    },
+    "enginePopularity": {
+      "1.3_Multijet": "En popüler dizel - tüm modellerde +%10-12 değer",
+      "1.6_Multijet": "Güçlü dizel - Agna'da +%10 değer",
+      "1.4_Fire": "Giriş benzin - standart değer"
+    },
+    "profitStrategy": {
+      "Agna": "Hacim ile kar - çok sayıda satış - hızlı nakit akışı",
+      "Lagua": "Düşük bütçeli yatırım - yüksek km tolere - Dualogic'ten kaçın",
+      "Zorno": "En ucuz hatchback - City Modu riski - Sport versiyonlar fırsat"
+    },
+    "criticalFactors": [
+      "Düşük birim kar marjı - hacim odaklı ticaret",
+      "Ticari geçmiş kontrolü zorunlu (özellikle Agna yüksek km)",
+      "Dualogic MUTLAKA KAÇINILMALI veya çok ucuza alınmalı",
+      "Üretimi durmuş modeller (Lagua, Zorno) - stokta tutma riski",
+      "Cross donanım Agna'da premium kar fırsatı",
+      "En hızlı satış döngüsü - nakit akışını hızlandırır"
+    ]
+  }
+}
+
