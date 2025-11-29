@@ -6,6 +6,7 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../services/notification_service.dart';
 import '../services/ad_service.dart';
+import '../services/xp_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import 'login_screen.dart';
@@ -31,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final DatabaseHelper _db = DatabaseHelper();
   final AdService _adService = AdService();
   final NotificationService _notificationService = NotificationService();
+  final XPService _xpService = XPService();
   User? _currentUser;
   bool _isLoading = true;
   int _vehicleCount = 0;
@@ -87,6 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _pendingOffersCount = pendingOffers;
         _isLoading = false;
       });
+      
+      // Günlük giriş bonusunu kontrol et
+      _checkDailyLoginBonus();
       
       // Kullanıcı yüklendikten sonra tutorial'ı kontrol et
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -310,6 +315,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         // Profil ve Bakiye Kartı
                         _buildProfileCard(),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // XP Progress Kartı ve Reklam İzle yan yana
+                        _buildXPAndAdRow(),
                         
                         const SizedBox(height: 16),
                         
@@ -577,6 +587,386 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  
+  // XP Progress Card - Mor kartın altında ayrı bir kart
+  Widget _buildXPCard() {
+    if (_currentUser == null) return const SizedBox.shrink();
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Seviye ve XP bilgisi
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Colors.amber, Colors.orange],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.workspace_premium,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Seviye ${_currentUser!.level}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '${_currentUser!.xp} XP',
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${(_currentUser!.levelProgress * 100).toStringAsFixed(0)}%',
+                  style: const TextStyle(
+                    color: Colors.deepPurple,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Progress Bar
+          Stack(
+            children: [
+              // Arka plan
+              Container(
+                height: 12,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              // İlerleme
+              FractionallySizedBox(
+                widthFactor: _currentUser!.levelProgress,
+                child: Container(
+                  height: 12,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Colors.amber,
+                        Colors.orange,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withOpacity(0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Sonraki seviye için gereken XP
+          // Text(
+          //   '${_currentUser!.xpToNextLevel} XP Sonraki seviyeye ${_currentUser!.level + 1}',
+          //   style: TextStyle(
+          //     color: Colors.grey[600],
+          //     fontSize: 12,
+          //   ),
+          // ),
+        ],
+      ),
+    );
+  }
+  
+  // XP Kartı ve Reklam İzle yan yana
+  Widget _buildXPAndAdRow() {
+    if (_currentUser == null) return const SizedBox.shrink();
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          // XP Kartı (Eşit genişlik)
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Seviye ve XP bilgisi
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Colors.amber, Colors.orange],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.amber.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.workspace_premium,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Seviye ${_currentUser!.level}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${_currentUser!.xp} XP',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${(_currentUser!.levelProgress * 100).toStringAsFixed(0)}%',
+                          style: const TextStyle(
+                            color: Colors.deepPurple,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 10),
+                  
+                  // Progress Bar
+                  Stack(
+                    children: [
+                      // Arka plan
+                      Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      // İlerleme
+                      FractionallySizedBox(
+                        widthFactor: _currentUser!.levelProgress,
+                        child: Container(
+                          height: 10,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Colors.amber,
+                                Colors.orange,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.amber.withOpacity(0.4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 6),
+                  
+                  // Sonraki seviye için gereken XP
+                  Text(
+                    '${_currentUser!.xpToNextLevel} XP Sonraki seviyeye ${_currentUser!.level + 1}',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          const SizedBox(width: 12),
+          
+          // Reklam İzle Butonu (Eşit genişlik)
+          Expanded(
+            child: InkWell(
+              onTap: _watchRewardedAd,
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.play_circle_filled,
+                      color: Colors.amber,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Reklam\nİzle',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '0.01 ⭐',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          ),
+        ],
+      ),
+    );
+  }
 
   // Hızlı İşlemler
   Widget _buildQuickActions() {
@@ -680,13 +1070,7 @@ class _HomeScreenState extends State<HomeScreen> {
           await _loadCurrentUser();
         },
       },
-      {
-        'icon': Icons.play_circle_filled,
-        'label': 'home.watchAd'.tr(),
-        'color': Colors.amber,
-        'reward': '0.01 ${'store.gold'.tr()}', // Ödül gösterimi
-        'onTap': () => _watchRewardedAd(),
-      },
+      // NOT: Reklam İzle butonu artık XP kartının yanında
       {
         'icon': Icons.store,
         'label': 'store.title'.tr(),
@@ -728,7 +1112,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisCount: 2, // 2 sütun
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1.3, // Buton yükseklik/genişlik oranı
+          childAspectRatio: 1.5, // Buton yükseklik/genişlik oranı (daha alçak)
         ),
         itemCount: quickActions.length,
         itemBuilder: (context, index) {
@@ -737,7 +1121,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Tutorial için key'leri atıyoruz
           Key? buttonKey;
           if (index == 0) {
-            buttonKey = _marketButtonKey; // Market butonu
+            buttonKey = _marketButtonKey; // Araç Al butonu
           } else if (index == 1) {
             buttonKey = _sellVehicleButtonKey; // Araç Sat butonu
           } else if (index == 2) {
@@ -745,6 +1129,7 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (index == 4) {
             buttonKey = _offersButtonKey; // Teklifler butonu
           }
+          // NOT: Reklam İzle artık XP kartının yanında, index'lerden çıkarıldı
           
           return _buildActionButton(
             key: buttonKey,
@@ -774,7 +1159,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -792,12 +1177,12 @@ class _HomeScreenState extends State<HomeScreen> {
               clipBehavior: Clip.none,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: color, size: 30),
+                  child: Icon(icon, color: color, size: 26),
                 ),
                 // Badge
                 if (badge != null && badge > 0)
@@ -2142,14 +2527,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// İlk açılış kontrolü ve tutorial gösterimi
   Future<void> _checkAndShowTutorial() async {
-    final prefs = await SharedPreferences.getInstance();
-    final tutorialCompleted = prefs.getBool('tutorial_completed') ?? false;
-    
-    // Tutorial daha önce gösterilmediyse ve kullanıcı giriş yapmışsa göster
-    if (!tutorialCompleted && _currentUser != null && mounted) {
+    // ====== TEST MODU: Her açılışta tutorial göster ======
+    if (_currentUser != null && mounted) {
       await Future.delayed(const Duration(milliseconds: 800));
       _showTutorial();
     }
+    
+    // ====== ASIL KOD (Test bitince aktif et) ======
+    // final prefs = await SharedPreferences.getInstance();
+    // final tutorialCompleted = prefs.getBool('tutorial_completed') ?? false;
+    // 
+    // // Tutorial daha önce gösterilmediyse ve kullanıcı giriş yapmışsa göster
+    // if (!tutorialCompleted && _currentUser != null && mounted) {
+    //   await Future.delayed(const Duration(milliseconds: 800));
+    //   _showTutorial();
+    // }
   }
 
   /// Tutorial'ı tamamlandı olarak işaretle
@@ -2270,7 +2662,7 @@ class _HomeScreenState extends State<HomeScreen> {
         radius: 15,
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
+            align: ContentAlign.top,
             builder: (context, controller) => Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -2305,7 +2697,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const Icon(
-                        Icons.arrow_downward,
+                        Icons.arrow_upward,
                         color: Colors.white,
                         size: 24,
                       ),
@@ -2502,6 +2894,221 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     ];
+  }
+  
+  // ========== XP SİSTEMİ METODLARI ==========
+  
+  /// Günlük giriş bonusunu kontrol et ve ver
+  Future<void> _checkDailyLoginBonus() async {
+    if (_currentUser == null) return;
+    
+    final result = await _xpService.checkDailyLoginBonus(_currentUser!.id);
+    
+    if (result.hasGain && mounted) {
+      // Kullanıcıyı yenile
+      await _loadCurrentUser();
+      
+      // XP animasyonu göster
+      _showXPGainAnimation(result);
+      
+      // Seviye atlandıysa dialog göster
+      if (result.leveledUp) {
+        await Future.delayed(const Duration(milliseconds: 1500));
+        _showLevelUpDialog(result);
+      }
+    }
+  }
+  
+  /// XP kazanım animasyonu göster
+  void _showXPGainAnimation(XPGainResult result) {
+    if (result.xpGained <= 0 || !mounted) return;
+    
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+    
+    entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).size.height * 0.4,
+        left: 0,
+        right: 0,
+        child: TweenAnimationBuilder(
+          duration: const Duration(milliseconds: 800),
+          tween: Tween<double>(begin: 0, end: 1),
+          onEnd: () {
+            Future.delayed(const Duration(seconds: 2), () {
+              entry.remove();
+            });
+          },
+          builder: (context, double value, child) {
+            return Transform.scale(
+              scale: value,
+              child: Opacity(
+                opacity: value,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Colors.amber, Colors.orange],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.6),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.stars,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '+${result.xpGained} XP',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    
+    overlay.insert(entry);
+  }
+  
+  /// Seviye atlama dialogu göster
+  void _showLevelUpDialog(XPGainResult result) {
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Kutlama ikonu
+            const Icon(
+              Icons.celebration,
+              size: 80,
+              color: Colors.amber,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '🎉 ${'xp.levelUp'.tr()} 🎉',
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Seviye ${result.newLevel}',
+              style: const TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (result.rewards != null) ...[
+              const Divider(),
+              Text(
+                '${'xp.rewards'.tr()}:',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (result.rewards!.cashBonus > 0)
+                Text(
+                  '💰 ${_formatCurrency(result.rewards!.cashBonus)} ${'common.currency'.tr()}',
+                  style: const TextStyle(fontSize: 18, color: Colors.green),
+                ),
+              if (result.rewards!.goldBonus > 0)
+                Text(
+                  '⭐ ${result.rewards!.goldBonus.toStringAsFixed(2)} ${'store.gold'.tr()}',
+                  style: const TextStyle(fontSize: 18, color: Colors.amber),
+                ),
+              if (result.rewards!.unlocks.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                ...result.rewards!.unlocks.map((unlock) => 
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      '🔓 ${unlock.tr()}',
+                      style: const TextStyle(fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'xp.awesome'.tr(),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+        actionsAlignment: MainAxisAlignment.center,
+      ),
+    );
+  }
+  
+  /// XP Kazandır (diğer entegrasyon noktaları için helper)
+  Future<void> _awardXP(XPGainResult result) async {
+    if (!result.hasGain || !mounted) return;
+    
+    // Kullanıcıyı yenile
+    await _loadCurrentUser();
+    
+    // XP animasyonu göster
+    _showXPGainAnimation(result);
+    
+    // Seviye atlandıysa dialog göster
+    if (result.leveledUp) {
+      await Future.delayed(const Duration(milliseconds: 1500));
+      _showLevelUpDialog(result);
+    }
   }
 }
 

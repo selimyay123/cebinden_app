@@ -609,5 +609,40 @@
     "step4_desc": "Manage incoming and sent offers here.",
     "step5_title": "Balance 💵",
     "step5_desc": "Grow your money by trading. Good luck!"
+  },
+  "xp": {
+    "level": "Level",
+    "xpShort": "XP",
+    "toNextLevel": "To next level",
+    "progress": "Progress",
+    "gained": "Gained",
+    "levelUp": "LEVEL UP!",
+    "congratulations": "Congratulations!",
+    "newLevel": "New Level",
+    "rewards": "Rewards",
+    "cashBonus": "Cash Bonus",
+    "goldBonus": "Gold Bonus",
+    "unlocked": "Unlocked",
+    "awesome": "Awesome!",
+    "continue": "Continue",
+    "dailyLoginBonus": "Daily Login Bonus",
+    "consecutiveDays": "Consecutive Days",
+    "keepStreak": "Keep Your Streak!",
+    "unlock": {
+      "premiumVehicles": "Premium Vehicle Categories",
+      "advancedOffers": "Advanced Offer System",
+      "autoSellBot": "Auto-Sell Bot",
+      "vipStatus": "VIP Status",
+      "specialBadges": "Special Achievement Badges"
+    },
+    "source": {
+      "vehiclePurchase": "Vehicle Purchase",
+      "vehicleSale": "Vehicle Sale",
+      "offerMade": "Offer Made",
+      "offerAccepted": "Offer Accepted",
+      "counterOfferSuccess": "Successful Counter Offer",
+      "dailyLogin": "Daily Login",
+      "profitBonus": "Profit Bonus"
+    }
   }
 }

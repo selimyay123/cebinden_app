@@ -15,6 +15,17 @@ class User {
   final String authProvider; // Giriş yöntemi: 'email' veya 'google'
   final String? googleUserId; // Google kullanıcı ID'si (Google Sign-In için)
   final String? email; // E-posta adresi (Google Sign-In için)
+  
+  // ========== XP SİSTEMİ ==========
+  final int xp; // Toplam deneyim puanı
+  final int level; // Kullanıcı seviyesi
+  final int totalVehiclesBought; // Toplam satın alınan araç sayısı
+  final int totalVehiclesSold; // Toplam satılan araç sayısı
+  final int totalOffersMade; // Toplam yapılan teklif sayısı
+  final int totalOffersReceived; // Toplam alınan teklif sayısı
+  final int successfulNegotiations; // Başarılı pazarlık sayısı
+  final int consecutiveLoginDays; // Ardışık giriş günü sayısı
+  final DateTime? lastLoginDate; // Son giriş tarihi
 
   User({
     required this.id,
@@ -31,6 +42,16 @@ class User {
     this.authProvider = 'email', // Varsayılan giriş yöntemi
     this.googleUserId,
     this.email,
+    // XP Sistemi
+    this.xp = 0,
+    this.level = 1,
+    this.totalVehiclesBought = 0,
+    this.totalVehiclesSold = 0,
+    this.totalOffersMade = 0,
+    this.totalOffersReceived = 0,
+    this.successfulNegotiations = 0,
+    this.consecutiveLoginDays = 0,
+    this.lastLoginDate,
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -61,6 +82,54 @@ class User {
     return age;
   }
 
+  // ========== XP SİSTEMİ HESAPLAMALARI ==========
+  
+  /// XP'den seviye hesaplama (Matematiksel formül)
+  /// Her seviye için gereken XP: level^2 * 100
+  static int calculateLevel(int xp) {
+    int level = 1;
+    int requiredXp = 100;
+    int totalXp = 0;
+    
+    while (totalXp + requiredXp <= xp) {
+      totalXp += requiredXp;
+      level++;
+      requiredXp = level * level * 100;
+    }
+    
+    return level;
+  }
+  
+  /// Belirli bir seviye için gereken toplam XP
+  static int xpForLevel(int level) {
+    int totalXp = 0;
+    for (int i = 1; i < level; i++) {
+      totalXp += i * i * 100;
+    }
+    return totalXp;
+  }
+  
+  /// Bir sonraki seviye için gereken XP miktarı
+  static int xpForNextLevel(int level) {
+    return level * level * 100;
+  }
+  
+  /// Mevcut seviyedeki ilerleme yüzdesi (0.0 - 1.0)
+  double get levelProgress {
+    int currentLevelXp = User.xpForLevel(level);
+    int nextLevelXp = User.xpForNextLevel(level);
+    int progressXp = xp - currentLevelXp;
+    
+    return (progressXp / nextLevelXp).clamp(0.0, 1.0);
+  }
+  
+  /// Bir sonraki seviyeye kalan XP
+  int get xpToNextLevel {
+    int currentLevelXp = User.xpForLevel(level);
+    int nextLevelTotalXp = currentLevelXp + User.xpForNextLevel(level);
+    return nextLevelTotalXp - xp;
+  }
+
   // JSON'dan User nesnesi oluşturma
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -78,6 +147,18 @@ class User {
       authProvider: json['authProvider'] as String? ?? 'email',
       googleUserId: json['googleUserId'] as String?,
       email: json['email'] as String?,
+      // XP Sistemi
+      xp: json['xp'] as int? ?? 0,
+      level: json['level'] as int? ?? 1,
+      totalVehiclesBought: json['totalVehiclesBought'] as int? ?? 0,
+      totalVehiclesSold: json['totalVehiclesSold'] as int? ?? 0,
+      totalOffersMade: json['totalOffersMade'] as int? ?? 0,
+      totalOffersReceived: json['totalOffersReceived'] as int? ?? 0,
+      successfulNegotiations: json['successfulNegotiations'] as int? ?? 0,
+      consecutiveLoginDays: json['consecutiveLoginDays'] as int? ?? 0,
+      lastLoginDate: json['lastLoginDate'] != null 
+          ? DateTime.parse(json['lastLoginDate'] as String)
+          : null,
     );
   }
 
@@ -98,6 +179,16 @@ class User {
       'authProvider': authProvider,
       'googleUserId': googleUserId,
       'email': email,
+      // XP Sistemi
+      'xp': xp,
+      'level': level,
+      'totalVehiclesBought': totalVehiclesBought,
+      'totalVehiclesSold': totalVehiclesSold,
+      'totalOffersMade': totalOffersMade,
+      'totalOffersReceived': totalOffersReceived,
+      'successfulNegotiations': successfulNegotiations,
+      'consecutiveLoginDays': consecutiveLoginDays,
+      'lastLoginDate': lastLoginDate?.toIso8601String(),
     };
   }
 
@@ -117,6 +208,15 @@ class User {
     String? authProvider,
     String? googleUserId,
     String? email,
+    int? xp,
+    int? level,
+    int? totalVehiclesBought,
+    int? totalVehiclesSold,
+    int? totalOffersMade,
+    int? totalOffersReceived,
+    int? successfulNegotiations,
+    int? consecutiveLoginDays,
+    DateTime? lastLoginDate,
   }) {
     return User(
       id: id ?? this.id,
@@ -133,6 +233,15 @@ class User {
       authProvider: authProvider ?? this.authProvider,
       googleUserId: googleUserId ?? this.googleUserId,
       email: email ?? this.email,
+      xp: xp ?? this.xp,
+      level: level ?? this.level,
+      totalVehiclesBought: totalVehiclesBought ?? this.totalVehiclesBought,
+      totalVehiclesSold: totalVehiclesSold ?? this.totalVehiclesSold,
+      totalOffersMade: totalOffersMade ?? this.totalOffersMade,
+      totalOffersReceived: totalOffersReceived ?? this.totalOffersReceived,
+      successfulNegotiations: successfulNegotiations ?? this.successfulNegotiations,
+      consecutiveLoginDays: consecutiveLoginDays ?? this.consecutiveLoginDays,
+      lastLoginDate: lastLoginDate ?? this.lastLoginDate,
     );
   }
 

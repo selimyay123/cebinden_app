@@ -609,5 +609,40 @@
     "step4_desc": "Gelen ve gönderdiğiniz teklifleri buradan yönetin.",
     "step5_title": "Bakiye 💵",
     "step5_desc": "Paranızı al-sat yaparak artırın. Bol şans!"
+  },
+  "xp": {
+    "level": "Seviye",
+    "xpShort": "XP",
+    "toNextLevel": "Sonraki seviyeye",
+    "progress": "İlerleme",
+    "gained": "Kazanıldı",
+    "levelUp": "SEVİYE ATLANDI!",
+    "congratulations": "Tebrikler!",
+    "newLevel": "Yeni Seviye",
+    "rewards": "Ödüller",
+    "cashBonus": "Para Bonusu",
+    "goldBonus": "Altın Bonusu",
+    "unlocked": "Kilidi Açıldı",
+    "awesome": "Harika!",
+    "continue": "Devam Et",
+    "dailyLoginBonus": "Günlük Giriş Bonusu",
+    "consecutiveDays": "Ardışık Gün",
+    "keepStreak": "Serini Devam Ettir!",
+    "unlock": {
+      "premiumVehicles": "Premium Araç Kategorileri",
+      "advancedOffers": "Gelişmiş Teklif Sistemi",
+      "autoSellBot": "Otomatik Satış Botu",
+      "vipStatus": "VIP Statüsü",
+      "specialBadges": "Özel Başarı Rozetleri"
+    },
+    "source": {
+      "vehiclePurchase": "Araç Satın Alma",
+      "vehicleSale": "Araç Satışı",
+      "offerMade": "Teklif Gönderme",
+      "offerAccepted": "Teklif Kabul Edildi",
+      "counterOfferSuccess": "Başarılı Karşı Teklif",
+      "dailyLogin": "Günlük Giriş",
+      "profitBonus": "Kâr Bonusu"
+    }
   }
 }

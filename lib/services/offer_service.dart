@@ -9,6 +9,7 @@ import '../models/seller_profile_model.dart';
 import 'database_helper.dart';
 import 'notification_service.dart';
 import 'game_time_service.dart';
+import 'xp_service.dart';
 
 /// Teklif servisi - AI alıcılar ve teklif yönetimi
 class OfferService {
@@ -18,6 +19,7 @@ class OfferService {
 
   final DatabaseHelper _db = DatabaseHelper();
   final GameTimeService _gameTime = GameTimeService();
+  final XPService _xpService = XPService();
 
   /// Servisi başlat ve günlük teklif sistemini aktifleştir
   Future<void> initialize() async {
@@ -213,9 +215,9 @@ class OfferService {
         salePrice: offer.offerPrice,
       );
       
-      
-      
-      
+      // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu)
+      final profit = offer.offerPrice - vehicle.purchasePrice;
+      await _xpService.onVehicleSale(offer.sellerId, profit);
       
       return true;
     } catch (e) {
@@ -583,6 +585,10 @@ class OfferService {
   /// Gelen teklifin kabulünü işle (satıcı bakiyesini artır, aracı sat)
   Future<bool> _processIncomingOfferAcceptance(Offer offer, double finalPrice) async {
     try {
+      // Aracı getir (kâr hesabı için)
+      final vehicle = await _db.getUserVehicleById(offer.vehicleId);
+      if (vehicle == null) return false;
+      
       // Satıcıyı getir
       final sellerMap = await _db.getUserById(offer.sellerId);
       if (sellerMap == null) return false;
@@ -609,6 +615,11 @@ class OfferService {
         vehicleName: '${offer.vehicleBrand} ${offer.vehicleModel}',
         salePrice: finalPrice,
       );
+      
+      // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu + Başarılı Pazarlık)
+      final profit = finalPrice - vehicle.purchasePrice;
+      await _xpService.onVehicleSale(offer.sellerId, profit);
+      await _xpService.onCounterOfferSuccess(offer.sellerId);
       
       return true;
     } catch (e) {

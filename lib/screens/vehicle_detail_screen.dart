@@ -11,6 +11,7 @@ import '../services/database_helper.dart';
 import '../services/offer_service.dart';
 import '../services/favorite_service.dart';
 import '../services/localization_service.dart';
+import '../services/xp_service.dart';
 import '../widgets/vehicle_top_view.dart';
 import 'my_offers_screen.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +36,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   final DatabaseHelper _db = DatabaseHelper();
   final OfferService _offerService = OfferService();
   final FavoriteService _favoriteService = FavoriteService();
+  final XPService _xpService = XPService();
   User? _currentUser;
   bool _isFavorite = false;
 
@@ -602,10 +604,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
       // 4️⃣ Kullanıcıyı güncelle
       await _loadCurrentUser();
-
+      
+      // 💎 XP Kazandır (Araç Satın Alma)
+      final xpResult = await _xpService.onVehiclePurchase(_currentUser!.id);
+      
       // 5️⃣ Başarılı! Kutlama göster
       HapticFeedback.heavyImpact(); // Güçlü titreşim - satın alma anı
       _confettiController.play();
+      
+      // XP Animasyonu göster (confetti ile birlikte)
+      if (xpResult.hasGain && mounted) {
+        _showXPGainAnimationOverlay(xpResult);
+      }
 
       if (!mounted) return;
 
@@ -1323,6 +1333,21 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       if (!result['success']) {
         throw Exception(result['error'] ?? 'Unknown error');
       }
+      
+      // 💎 XP Kazandır (Teklif Gönderme)
+      final xpResult = await _xpService.onOfferMade(_currentUser!.id);
+      if (xpResult.hasGain && mounted) {
+        // Sessiz XP (küçük miktar, animasyon gösterme)
+        // _showXPGainAnimationOverlay(xpResult); // İsteğe bağlı
+      }
+      
+      // Eğer teklif kabul edildiyse ekstra XP
+      if (result['decision'] == 'accept') {
+        final acceptXP = await _xpService.onOfferAccepted(_currentUser!.id);
+        if (acceptXP.hasGain && mounted) {
+          _showXPGainAnimationOverlay(acceptXP);
+        }
+      }
 
       // Sonuç dialogunu göster ve yönlendir
       _showOfferResultDialog(result);
@@ -1454,6 +1479,186 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             child: Text('offer.viewOffers'.tr()),
           ),
         ],
+      ),
+    );
+  }
+  
+  // ========== XP SİSTEMİ METODLARI ==========
+  
+  /// XP kazanım animasyonu göster (overlay)
+  void _showXPGainAnimationOverlay(XPGainResult result) {
+    if (result.xpGained <= 0 || !mounted) return;
+    
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+    
+    entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).size.height * 0.4,
+        left: 0,
+        right: 0,
+        child: TweenAnimationBuilder(
+          duration: const Duration(milliseconds: 800),
+          tween: Tween<double>(begin: 0, end: 1),
+          onEnd: () {
+            Future.delayed(const Duration(seconds: 2), () {
+              entry.remove();
+              // Level up varsa dialog göster
+              if (result.leveledUp && mounted) {
+                _showLevelUpDialog(result);
+              }
+            });
+          },
+          builder: (context, double value, child) {
+            return Transform.scale(
+              scale: value,
+              child: Opacity(
+                opacity: value,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Colors.amber, Colors.orange],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.6),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.stars,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '+${result.xpGained} XP',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+    
+    overlay.insert(entry);
+  }
+  
+  /// Seviye atlama dialogu göster
+  void _showLevelUpDialog(XPGainResult result) {
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.celebration,
+              size: 80,
+              color: Colors.amber,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              '🎉 ${'xp.levelUp'.tr()} 🎉',
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Seviye ${result.newLevel}',
+              style: const TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (result.rewards != null) ...[
+              const Divider(),
+              Text(
+                '${'xp.rewards'.tr()}:',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (result.rewards!.cashBonus > 0)
+                Text(
+                  '💰 ${_formatCurrency(result.rewards!.cashBonus)} ${'common.currency'.tr()}',
+                  style: const TextStyle(fontSize: 18, color: Colors.green),
+                ),
+              if (result.rewards!.goldBonus > 0)
+                Text(
+                  '⭐ ${result.rewards!.goldBonus.toStringAsFixed(2)} ${'store.gold'.tr()}',
+                  style: const TextStyle(fontSize: 18, color: Colors.amber),
+                ),
+              if (result.rewards!.unlocks.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                ...result.rewards!.unlocks.map((unlock) => 
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      '🔓 ${unlock.tr()}',
+                      style: const TextStyle(fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'xp.awesome'.tr(),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+        actionsAlignment: MainAxisAlignment.center,
       ),
     );
   }
