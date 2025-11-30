@@ -26,6 +26,7 @@ class User {
   final int successfulNegotiations; // Başarılı pazarlık sayısı
   final int consecutiveLoginDays; // Ardışık giriş günü sayısı
   final DateTime? lastLoginDate; // Son giriş tarihi
+  final DateTime? lastDailyRewardDate; // Son günlük ödül alınan tarih
 
   User({
     required this.id,
@@ -52,6 +53,7 @@ class User {
     this.successfulNegotiations = 0,
     this.consecutiveLoginDays = 0,
     this.lastLoginDate,
+    this.lastDailyRewardDate,
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -159,6 +161,9 @@ class User {
       lastLoginDate: json['lastLoginDate'] != null 
           ? DateTime.parse(json['lastLoginDate'] as String)
           : null,
+      lastDailyRewardDate: json['lastDailyRewardDate'] != null 
+          ? DateTime.parse(json['lastDailyRewardDate'] as String)
+          : null,
     );
   }
 
@@ -189,6 +194,7 @@ class User {
       'successfulNegotiations': successfulNegotiations,
       'consecutiveLoginDays': consecutiveLoginDays,
       'lastLoginDate': lastLoginDate?.toIso8601String(),
+      'lastDailyRewardDate': lastDailyRewardDate?.toIso8601String(),
     };
   }
 
@@ -217,6 +223,7 @@ class User {
     int? successfulNegotiations,
     int? consecutiveLoginDays,
     DateTime? lastLoginDate,
+    DateTime? lastDailyRewardDate,
   }) {
     return User(
       id: id ?? this.id,
@@ -242,6 +249,7 @@ class User {
       successfulNegotiations: successfulNegotiations ?? this.successfulNegotiations,
       consecutiveLoginDays: consecutiveLoginDays ?? this.consecutiveLoginDays,
       lastLoginDate: lastLoginDate ?? this.lastLoginDate,
+      lastDailyRewardDate: lastDailyRewardDate ?? this.lastDailyRewardDate,
     );
   }
 

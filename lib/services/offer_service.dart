@@ -10,6 +10,8 @@ import 'database_helper.dart';
 import 'notification_service.dart';
 import 'game_time_service.dart';
 import 'xp_service.dart';
+import 'daily_quest_service.dart';
+import '../models/daily_quest_model.dart';
 
 /// Teklif servisi - AI alıcılar ve teklif yönetimi
 class OfferService {
@@ -20,6 +22,7 @@ class OfferService {
   final DatabaseHelper _db = DatabaseHelper();
   final GameTimeService _gameTime = GameTimeService();
   final XPService _xpService = XPService();
+  final DailyQuestService _questService = DailyQuestService();
 
   /// Servisi başlat ve günlük teklif sistemini aktifleştir
   Future<void> initialize() async {
@@ -218,6 +221,12 @@ class OfferService {
       // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu)
       final profit = offer.offerPrice - vehicle.purchasePrice;
       await _xpService.onVehicleSale(offer.sellerId, profit);
+      
+      // 🎯 Günlük Görev Güncellemesi: Araç Satışı ve Kâr
+      await _questService.updateProgress(offer.sellerId, QuestType.sellVehicle, 1);
+      if (profit > 0) {
+        await _questService.updateProgress(offer.sellerId, QuestType.earnProfit, profit.toInt());
+      }
       
       return true;
     } catch (e) {
@@ -620,6 +629,12 @@ class OfferService {
       final profit = finalPrice - vehicle.purchasePrice;
       await _xpService.onVehicleSale(offer.sellerId, profit);
       await _xpService.onCounterOfferSuccess(offer.sellerId);
+      
+      // 🎯 Günlük Görev Güncellemesi: Araç Satışı ve Kâr
+      await _questService.updateProgress(offer.sellerId, QuestType.sellVehicle, 1);
+      if (profit > 0) {
+        await _questService.updateProgress(offer.sellerId, QuestType.earnProfit, profit.toInt());
+      }
       
       return true;
     } catch (e) {

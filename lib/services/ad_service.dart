@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// Reklam yönetim servisi (Test modunda çalışır)
@@ -96,27 +97,49 @@ class AdService {
 
   /// Ödüllü reklam göster
   Future<bool> showRewardedAd({
-    required Function(double reward) onRewarded,
-    required Function() onAdNotReady,
+    Function(double reward)? onRewarded,
+    Function()? onAdNotReady,
   }) async {
     if (!isAdReady) {
-      
-      onAdNotReady();
+      if (onAdNotReady != null) onAdNotReady();
       return false;
     }
 
+    final completer = Completer<bool>();
     bool rewardEarned = false;
 
-    _rewardedAd?.show(
-      onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+    _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (RewardedAd ad) {
+        ad.dispose();
+        _rewardedAd = null;
+        _isAdLoaded = false;
+        loadRewardedAd();
         
-        rewardEarned = true;
-        // Ödülü ver (1000 TL sabit)
-        onRewarded(1000.0);
+        if (!completer.isCompleted) {
+          completer.complete(rewardEarned);
+        }
+      },
+      onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
+        ad.dispose();
+        _rewardedAd = null;
+        _isAdLoaded = false;
+        loadRewardedAd();
+        
+        if (!completer.isCompleted) {
+          completer.complete(false);
+        }
       },
     );
 
-    return rewardEarned;
+    _rewardedAd?.show(
+      onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+        rewardEarned = true;
+        // Ödülü ver (1000 TL sabit veya parametre ile)
+        if (onRewarded != null) onRewarded(1000.0);
+      },
+    );
+
+    return completer.future;
   }
 
   /// Servisi temizle

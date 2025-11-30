@@ -12,6 +12,8 @@ import '../services/offer_service.dart';
 import '../services/favorite_service.dart';
 import '../services/localization_service.dart';
 import '../services/xp_service.dart';
+import '../services/daily_quest_service.dart';
+import '../models/daily_quest_model.dart';
 import '../widgets/vehicle_top_view.dart';
 import 'my_offers_screen.dart';
 import 'package:intl/intl.dart';
@@ -37,6 +39,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   final OfferService _offerService = OfferService();
   final FavoriteService _favoriteService = FavoriteService();
   final XPService _xpService = XPService();
+  final DailyQuestService _questService = DailyQuestService();
   User? _currentUser;
   bool _isFavorite = false;
 
@@ -616,6 +619,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       if (xpResult.hasGain && mounted) {
         _showXPGainAnimationOverlay(xpResult);
       }
+
+      // 🎯 Günlük Görev Güncellemesi: Araç Satın Alma
+      await _questService.updateProgress(_currentUser!.id, QuestType.buyVehicle, 1);
 
       if (!mounted) return;
 
@@ -1340,6 +1346,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         // Sessiz XP (küçük miktar, animasyon gösterme)
         // _showXPGainAnimationOverlay(xpResult); // İsteğe bağlı
       }
+      
+      // 🎯 Günlük Görev Güncellemesi: Teklif Gönderme
+      await _questService.updateProgress(_currentUser!.id, QuestType.makeOffer, 1);
       
       // Eğer teklif kabul edildiyse ekstra XP
       if (result['decision'] == 'accept') {

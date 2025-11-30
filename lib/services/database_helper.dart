@@ -28,6 +28,7 @@ class DatabaseHelper {
     final offersBoxInstance = await Hive.openBox<Map>(offersBox);
     final notificationsBoxInstance = await Hive.openBox<Map>(notificationsBox);
     final favoritesBoxInstance = await Hive.openBox<Map>(favoritesBox);
+    final dailyQuestsBoxInstance = await Hive.openBox<Map>(dailyQuestsBox);
     
                 
     // Debug: Tüm kullanıcıları listele
@@ -714,6 +715,102 @@ class DatabaseHelper {
     } catch (e) {
       
       return false;
+    }
+  }
+
+  // ============================================================================
+  // DAILY QUESTS (Günlük Görevler)
+  // ============================================================================
+
+  static const String dailyQuestsBox = 'daily_quests';
+
+  // Daily Quests box'ını al
+  Box<Map> get _dailyQuestsBox => Hive.box<Map>(dailyQuestsBox);
+
+  // Görev ekle
+  Future<bool> addDailyQuest(Map<String, dynamic> questMap) async {
+    try {
+      final questId = questMap['id'] as String;
+      await _dailyQuestsBox.put(questId, questMap);
+      await _dailyQuestsBox.flush();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Kullanıcının belirli bir tarihteki görevlerini getir
+  Future<List<Map<String, dynamic>>> getUserDailyQuests(String userId, DateTime date) async {
+    try {
+      final allQuests = _dailyQuestsBox.values;
+      final userQuests = <Map<String, dynamic>>[];
+      
+      for (var quest in allQuests) {
+        final questDate = DateTime.parse(quest['date'] as String);
+        if (quest['userId'] == userId && 
+            questDate.year == date.year && 
+            questDate.month == date.month && 
+            questDate.day == date.day) {
+          userQuests.add(Map<String, dynamic>.from(quest));
+        }
+      }
+      
+      return userQuests;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Belirli bir görevi getir
+  Future<Map<String, dynamic>?> getDailyQuestById(String questId) async {
+    try {
+      final questMap = _dailyQuestsBox.get(questId);
+      if (questMap != null) {
+        return Map<String, dynamic>.from(questMap);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Görevi güncelle
+  Future<bool> updateDailyQuest(String questId, Map<String, dynamic> updates) async {
+    try {
+      final questMap = _dailyQuestsBox.get(questId);
+      if (questMap == null) return false;
+
+      final updatedMap = Map<dynamic, dynamic>.from(questMap);
+      updates.forEach((key, value) {
+        updatedMap[key] = value;
+      });
+
+      await _dailyQuestsBox.put(questId, updatedMap);
+      await _dailyQuestsBox.flush();
+      
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Eski görevleri temizle (opsiyonel, veritabanı şişmesin diye)
+  Future<void> clearOldQuests(DateTime beforeDate) async {
+    try {
+      final keysToDelete = <String>[];
+      final allQuests = _dailyQuestsBox.toMap();
+      
+      allQuests.forEach((key, value) {
+        final questDate = DateTime.parse(value['date'] as String);
+        if (questDate.isBefore(beforeDate)) {
+          keysToDelete.add(key as String);
+        }
+      });
+      
+      await _dailyQuestsBox.deleteAll(keysToDelete);
+      await _dailyQuestsBox.flush();
+    } catch (e) {
+      // Hata olsa da devam et
     }
   }
 }

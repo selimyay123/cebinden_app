@@ -165,56 +165,7 @@ class XPService {
     return unlocks;
   }
   
-  /// Günlük giriş bonusunu kontrol et ve ver
-  Future<XPGainResult> checkDailyLoginBonus(String userId) async {
-    final userMap = await _db.getUserById(userId);
-    if (userMap == null) return XPGainResult.empty();
-    final user = User.fromJson(userMap);
-    
-    final now = DateTime.now();
-    final lastLogin = user.lastLoginDate;
-    
-    // İlk giriş
-    if (lastLogin == null) {
-      await _db.updateUser(userId, {
-        'lastLoginDate': now.toIso8601String(),
-        'consecutiveLoginDays': 1,
-      });
-      return await addXP(userId, XP_DAILY_LOGIN_BASE, XPSource.dailyLogin);
-    }
-    
-    // Aynı gün tekrar giriş (bonus yok)
-    if (_isSameDay(lastLogin, now)) {
-      return XPGainResult.empty();
-    }
-    
-    // Ardışık gün kontrolü
-    final isConsecutive = _isConsecutiveDay(lastLogin, now);
-    final newStreak = isConsecutive ? user.consecutiveLoginDays + 1 : 1;
-    
-    await _db.updateUser(userId, {
-      'lastLoginDate': now.toIso8601String(),
-      'consecutiveLoginDays': newStreak,
-    });
-    
-    // Bonus XP hesapla
-    final bonusXP = (XP_DAILY_LOGIN_BASE + (newStreak * XP_CONSECUTIVE_LOGIN_BONUS)).toInt();
-    
-    return await addXP(userId, bonusXP, XPSource.dailyLogin);
-  }
-  
-  /// Aynı gün mü kontrolü
-  bool _isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year && 
-           date1.month == date2.month && 
-           date1.day == date2.day;
-  }
-  
-  /// Ardışık gün mü kontrolü
-  bool _isConsecutiveDay(DateTime lastDate, DateTime currentDate) {
-    final difference = currentDate.difference(lastDate).inDays;
-    return difference == 1;
-  }
+
   
   /// Araç satın alma XP'si ver
   Future<XPGainResult> onVehiclePurchase(String userId) async {
