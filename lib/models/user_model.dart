@@ -27,6 +27,7 @@ class User {
   final int consecutiveLoginDays; // Ardışık giriş günü sayısı
   final DateTime? lastLoginDate; // Son giriş tarihi
   final DateTime? lastDailyRewardDate; // Son günlük ödül alınan tarih
+  final int garageLimit; // Garaj limiti
 
   User({
     required this.id,
@@ -54,6 +55,7 @@ class User {
     this.consecutiveLoginDays = 0,
     this.lastLoginDate,
     this.lastDailyRewardDate,
+    this.garageLimit = 3, // Varsayılan limit
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -162,8 +164,9 @@ class User {
           ? DateTime.parse(json['lastLoginDate'] as String)
           : null,
       lastDailyRewardDate: json['lastDailyRewardDate'] != null 
-          ? DateTime.parse(json['lastDailyRewardDate'] as String)
+          ? DateTime.parse(json['lastDailyRewardDate']) 
           : null,
+      garageLimit: json['garageLimit'] as int? ?? 3,
     );
   }
 
@@ -195,6 +198,7 @@ class User {
       'consecutiveLoginDays': consecutiveLoginDays,
       'lastLoginDate': lastLoginDate?.toIso8601String(),
       'lastDailyRewardDate': lastDailyRewardDate?.toIso8601String(),
+      'garageLimit': garageLimit,
     };
   }
 
@@ -224,6 +228,7 @@ class User {
     int? consecutiveLoginDays,
     DateTime? lastLoginDate,
     DateTime? lastDailyRewardDate,
+    int? garageLimit,
   }) {
     return User(
       id: id ?? this.id,
@@ -250,6 +255,7 @@ class User {
       consecutiveLoginDays: consecutiveLoginDays ?? this.consecutiveLoginDays,
       lastLoginDate: lastLoginDate ?? this.lastLoginDate,
       lastDailyRewardDate: lastDailyRewardDate ?? this.lastDailyRewardDate,
+      garageLimit: garageLimit ?? this.garageLimit,
     );
   }
 

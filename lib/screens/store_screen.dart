@@ -62,6 +62,13 @@ class _StoreScreenState extends State<StoreScreen> {
                             _buildBalanceCard(),
                             const SizedBox(height: 24),
                             
+                            // Garaj Genişletme
+                            _buildSectionTitle('Garaj Genişletme'),
+                            const SizedBox(height: 12),
+                            _buildGarageExpansionCard(),
+                            
+                            const SizedBox(height: 32),
+
                             // Altın Satın Alma Paketleri
                             _buildSectionTitle('store.buyGold'.tr()),
                             const SizedBox(height: 12),
@@ -161,6 +168,81 @@ class _StoreScreenState extends State<StoreScreen> {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGarageExpansionCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.garage, color: Colors.blue, size: 32),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Garaj Kapasitesi',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Mevcut Limit: ${_currentUser!.garageLimit} Araç',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => _showExpandGarageDialog(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  '+1 Slot',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '1 ${'store.gold'.tr()}',
+                  style: const TextStyle(fontSize: 10),
                 ),
               ],
             ),
@@ -545,6 +627,88 @@ class _StoreScreenState extends State<StoreScreen> {
               foregroundColor: Colors.white,
             ),
             child: Text('store.buy'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showExpandGarageDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Garajı Genişlet'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.garage, size: 64, color: Colors.blue),
+            const SizedBox(height: 16),
+            Text(
+              'Mevcut Limit: ${_currentUser!.garageLimit}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            const Icon(Icons.arrow_downward, color: Colors.grey),
+            const SizedBox(height: 8),
+            Text(
+              'Yeni Limit: ${_currentUser!.garageLimit + 1}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Bedel: 1 ${'store.gold'.tr()}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (_currentUser!.gold >= 1) {
+                Navigator.pop(context);
+                
+                // Altını düş ve limiti artır
+                final newGold = _currentUser!.gold - 1;
+                final newLimit = _currentUser!.garageLimit + 1;
+                
+                await _db.updateUser(_currentUser!.id, {
+                  'gold': newGold,
+                  'garageLimit': newLimit,
+                });
+                
+                await _loadCurrentUser();
+                
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Garaj başarıyla genişletildi! 🎉'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } else {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('store.insufficientGold'.tr()),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Satın Al'),
           ),
         ],
       ),

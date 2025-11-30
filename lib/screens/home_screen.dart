@@ -24,6 +24,7 @@ import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
 import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
+import 'taxi_game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -119,11 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _watchRewardedAd() async {
     await _adService.showRewardedAd(
       onRewarded: (double reward) async {
-        // Kullanıcıya ödülü ver (0.01 Altın)
+        // Kullanıcıya ödülü ver (5000 TL)
         if (_currentUser != null) {
-          final goldReward = 0.01;
-          final newGold = _currentUser!.gold + goldReward;
-          await _db.updateUser(_currentUser!.id, {'gold': newGold});
+          final moneyReward = 5000.0;
+          final newBalance = _currentUser!.balance + moneyReward;
+          await _db.updateUser(_currentUser!.id, {'balance': newBalance});
           
           // UI'ı güncelle
           await _loadCurrentUser();
@@ -143,17 +144,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      Icons.stars,
+                      Icons.attach_money,
                       size: 64,
-                      color: Colors.amber,
+                      color: Colors.green,
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      '+${goldReward.toStringAsFixed(2)} ${'store.gold'.tr()}',
+                      '+5000 TL',
                       style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.amber,
+                        color: Colors.green,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -475,8 +476,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: Colors.amber,
                           width: 1.5,
@@ -935,13 +936,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   // ),
                   const SizedBox(height: 8),
                   Text(
-                    'Reklam izleyerek altın kazan!',
+                    'Reklam izleyerek para kazan!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey[800],
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      fontStyle: FontStyle.italic,
                       height: 1.2,
                     ),
                   ),
@@ -955,11 +955,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.amber,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      '+0.01 ⭐',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
+                    child: const Text(
+                      '5000 TL',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -1089,6 +1089,22 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
           // Sayfa kapanınca dashboard'u yenile (altın bozdurulmuş olabilir)
+          await _loadCurrentUser();
+        },
+      },
+      {
+        'icon': Icons.local_taxi,
+        'label': 'Taksiye Çık',
+        'color': Colors.amber,
+        'onTap': () async {
+          // Taksi oyununa git
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const TaxiGameScreen(),
+            ),
+          );
+          // Sayfa kapanınca dashboard'u yenile (para kazanılmış olabilir)
           await _loadCurrentUser();
         },
       },

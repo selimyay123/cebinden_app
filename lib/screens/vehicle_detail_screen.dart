@@ -481,6 +481,52 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   Future<void> _processPurchase() async {
     if (_currentUser == null) return;
 
+    // Garaj limiti kontrolü
+    final currentVehicleCount = await _db.getUserVehicleCount(_currentUser!.id);
+    if (currentVehicleCount >= _currentUser!.garageLimit) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Garaj Dolu!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.garage, size: 64, color: Colors.orange),
+              const SizedBox(height: 16),
+              Text(
+                'Garaj limitine (${_currentUser!.garageLimit} araç) ulaştın.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Yeni araç almak için garajını genişletmelisin.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Tamam'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Dialogu kapat
+                Navigator.pop(context); // Detay sayfasını kapat
+                // Mağaza sayfasına yönlendir (HomeScreen üzerinden veya direkt)
+                // Şimdilik basitçe kullanıcıya mağazaya gitmesini söyleyelim
+                // İleride direkt yönlendirme eklenebilir
+              },
+              child: const Text('Mağazaya Git'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     // 🎬 Tam ekran animasyon overlay'ini göster
     showDialog(
       context: context,
