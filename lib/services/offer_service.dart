@@ -832,23 +832,18 @@ class OfferService {
     
     double baseFMV = vehicle.purchasePrice * fluctuation;
     
-    // 2. Skor Etkisi: Araç temizse değeri artar
-    double scoreMultiplier = vehicle.score / 100.0;
-    scoreMultiplier = scoreMultiplier.clamp(0.8, 1.2); // Çok cezalandırma, çok ödüllendirme
+    // NOT: Skor etkisi (scoreMultiplier) kaldırıldı çünkü purchasePrice zaten aracın kondisyonunu yansıtıyor.
+    // Tekrar skor cezası uygulamak, düşük kondisyonlu araçların asla kârla satılamamasına neden oluyor.
     
-    // 3. Yıl Etkisi: Yeni araçlar değerini korur
-    // Basitçe: Her yıl için %2 değer kaybı (ama zaten purchasePrice bunu içeriyor olabilir, 
-    // o yüzden burada sadece "piyasa algısı"nı ekliyoruz)
-    
-    return baseFMV * scoreMultiplier;
+    return baseFMV;
   }
 
   /// Günlük alıcı sayısını hesapla
   Future<int> _calculateDailyBuyerCount(UserVehicle listing) async {
     final random = Random();
     
-    // Base: 3-8 arası alıcı (daha fazla teklif için artırıldı)
-    int baseCount = 3 + random.nextInt(6);
+    // Base: 4-10 arası alıcı (biraz artırıldı)
+    int baseCount = 4 + random.nextInt(7);
     
     // Yetenek Kontrolü: Piyasa Kurdu (Market Guru)
     // İlanlar %50 daha fazla görüntülenir -> %50 daha fazla alıcı
@@ -866,8 +861,11 @@ class OfferService {
     
     // --- ALICI TOLERANS EĞRİSİ (BUYER TOLERANCE CURVE) ---
     
-    // Maksimum Tolerans Sınırı (Varsayılan: 1.30 -> %30 kâr)
-    double maxTolerance = 1.30;
+    // Maksimum Tolerans Sınırı (Varsayılan: 1.40 -> %40 kâr)
+    // Kullanıcı %15 kâr ile satmak istiyor, piyasa dalgalanması (%90) ile birleşince
+    // oran 1.15 / 0.9 = 1.27 olabiliyor. 1.30 sınırda kalıyor.
+    // Bu yüzden toleransı 1.40'a çekiyoruz.
+    double maxTolerance = 1.40;
     
     // Yetenek Etkisi: Ballı Dil (Charisma)
     // Toleransı artırır (Daha pahalıya satabilirsin)

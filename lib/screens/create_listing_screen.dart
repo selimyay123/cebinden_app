@@ -306,6 +306,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   }
 
   Widget _buildPriceInput() {
+    final maxPrice = widget.vehicle.purchasePrice * 1.15;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -332,6 +334,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             ),
             filled: true,
             fillColor: Colors.grey[100],
+            helperText: 'Maksimum: ${_formatCurrency(maxPrice)} TL (%15 Kâr Sınırı)',
+            helperStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -340,6 +344,12 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             final price = double.tryParse(value);
             if (price == null || price <= 0) {
               return 'Geçerli bir fiyat girin';
+            }
+            if (price < 150000) {
+              return 'Minimum satış fiyatı 150.000 TL olmalıdır';
+            }
+            if (price > maxPrice) {
+              return 'Fiyat, alış fiyatının %15 fazlasını geçemez!';
             }
             return null;
           },

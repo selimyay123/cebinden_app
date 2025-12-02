@@ -76,6 +76,7 @@ dependencies:
   
   # Tutorial sistemi
   tutorial_coach_mark: ^1.2.11
+  animations: ^2.1.1
 
 dev_dependencies:
   flutter_test:

@@ -983,6 +983,8 @@ class _EditListingDialogState extends State<_EditListingDialog> {
         ? (profit / widget.vehicle.purchasePrice) * 100 
         : 0;
 
+    final maxPrice = widget.vehicle.purchasePrice * 1.15;
+
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -1083,6 +1085,8 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   ),
                   filled: true,
                   fillColor: Colors.grey[50],
+                  helperText: 'Max: ${_formatCurrency(maxPrice)} TL (%15 Kâr)',
+                  helperStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -1091,6 +1095,12 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   final price = double.tryParse(value.replaceAll('.', ''));
                   if (price == null || price <= 0) {
                     return 'vehicles.validPrice'.tr();
+                  }
+                  if (price < 150000) {
+                    return 'Min 150.000 TL olmalı';
+                  }
+                  if (price > maxPrice) {
+                    return 'Max %15 kâr eklenebilir!';
                   }
                   return null;
                 },

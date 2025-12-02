@@ -35,14 +35,14 @@ class AIBuyer {
     // Tip seç (ağırlıklı random)
     BuyerType type;
     double typeRoll = random.nextDouble();
-    if (typeRoll < 0.50) {
-      type = BuyerType.bargainer; // %50
-    } else if (typeRoll < 0.80) {
-      type = BuyerType.realistic; // %30
-    } else if (typeRoll < 0.95) {
-      type = BuyerType.urgent; // %15
+    if (typeRoll < 0.45) {
+      type = BuyerType.bargainer; // %45 (Eskiden %50)
+    } else if (typeRoll < 0.75) {
+      type = BuyerType.realistic; // %30 (Değişmedi)
+    } else if (typeRoll < 0.93) {
+      type = BuyerType.urgent; // %18 (Eskiden %15)
     } else {
-      type = BuyerType.generous; // %5
+      type = BuyerType.generous; // %7 (Eskiden %5)
     }
 
     // İsim oluştur
