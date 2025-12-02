@@ -25,6 +25,7 @@ import '../models/daily_quest_model.dart';
 import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
 import 'taxi_game_screen.dart';
+import 'skill_tree_screen.dart'; // Yetenek Ağacı Ekranı
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -1072,6 +1073,21 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
           // Sayfa kapanınca dashboard'u yenile
+          await _loadCurrentUser();
+        },
+      },
+      {
+        'icon': Icons.psychology, // Yetenekler ikonu
+        'label': 'Yetenekler',
+        'color': Colors.indigo,
+        'badge': (_currentUser?.skillPoints ?? 0) > 0 ? (_currentUser!.skillPoints) : null,
+        'onTap': () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SkillTreeScreen(),
+            ),
+          );
           await _loadCurrentUser();
         },
       },

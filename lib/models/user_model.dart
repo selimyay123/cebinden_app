@@ -29,6 +29,10 @@ class User {
   final DateTime? lastDailyRewardDate; // Son günlük ödül alınan tarih
   final int garageLimit; // Garaj limiti
 
+  // ========== YETENEK SİSTEMİ ==========
+  final int skillPoints; // Harcanabilir yetenek puanı
+  final List<String> unlockedSkills; // Açılan yeteneklerin ID listesi
+
   User({
     required this.id,
     required this.username,
@@ -56,6 +60,9 @@ class User {
     this.lastLoginDate,
     this.lastDailyRewardDate,
     this.garageLimit = 3, // Varsayılan limit
+    // Yetenek Sistemi
+    this.skillPoints = 0,
+    this.unlockedSkills = const [],
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -167,6 +174,9 @@ class User {
           ? DateTime.parse(json['lastDailyRewardDate']) 
           : null,
       garageLimit: json['garageLimit'] as int? ?? 3,
+      // Yetenek Sistemi - Migration Logic: Eğer skillPoints null ise ve level > 1 ise, puan ver.
+      skillPoints: json['skillPoints'] as int? ?? ((json['level'] as int? ?? 1) - 1),
+      unlockedSkills: (json['unlockedSkills'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 
@@ -199,6 +209,9 @@ class User {
       'lastLoginDate': lastLoginDate?.toIso8601String(),
       'lastDailyRewardDate': lastDailyRewardDate?.toIso8601String(),
       'garageLimit': garageLimit,
+      // Yetenek Sistemi
+      'skillPoints': skillPoints,
+      'unlockedSkills': unlockedSkills,
     };
   }
 
@@ -229,6 +242,8 @@ class User {
     DateTime? lastLoginDate,
     DateTime? lastDailyRewardDate,
     int? garageLimit,
+    int? skillPoints,
+    List<String>? unlockedSkills,
   }) {
     return User(
       id: id ?? this.id,
@@ -256,6 +271,8 @@ class User {
       lastLoginDate: lastLoginDate ?? this.lastLoginDate,
       lastDailyRewardDate: lastDailyRewardDate ?? this.lastDailyRewardDate,
       garageLimit: garageLimit ?? this.garageLimit,
+      skillPoints: skillPoints ?? this.skillPoints,
+      unlockedSkills: unlockedSkills ?? this.unlockedSkills,
     );
   }
 

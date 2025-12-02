@@ -7,6 +7,7 @@ import '../services/localization_service.dart';
 import '../utils/brand_colors.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
+import '../services/skill_service.dart'; // Yetenek Servisi
 
 class MyVehiclesScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
@@ -81,13 +82,103 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
           ),
           body: _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : _myVehicles.isEmpty
-                  ? _buildEmptyState()
-                  : widget.selectedBrand != null
-                      ? _buildVehicleList()
-                      : _buildBrandList(),
+              : Column(
+                  children: [
+                    // Limit Göstergesi
+                    _buildLimitIndicator(),
+                    
+                    // İçerik
+                    Expanded(
+                      child: _myVehicles.isEmpty
+                          ? _buildEmptyState()
+                          : widget.selectedBrand != null
+                              ? _buildVehicleList()
+                              : _buildBrandList(),
+                    ),
+                  ],
+                ),
         );
       },
+    );
+  }
+
+  Widget _buildLimitIndicator() {
+    if (_currentUser == null) return const SizedBox.shrink();
+
+    final baseLimit = _currentUser!.garageLimit;
+    final bonusLimit = SkillService.getGarageLimitBonus(_currentUser!);
+    final totalLimit = baseLimit + bonusLimit;
+    final currentCount = _myVehicles.length;
+    final isFull = currentCount >= totalLimit;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isFull ? Colors.red.withOpacity(0.1) : Colors.deepPurple.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.garage,
+              color: isFull ? Colors.red : Colors.deepPurple,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Araç Limiti',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      '$currentCount / $totalLimit',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: isFull ? Colors.red : Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: currentCount / totalLimit,
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      isFull ? Colors.red : Colors.deepPurple,
+                    ),
+                    minHeight: 6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
   

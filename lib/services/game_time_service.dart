@@ -29,7 +29,7 @@ class GameTimeService with WidgetsBindingObserver {
   Timer? _updateTimer;
   
   // Ayarlar
-  int _gameDayDurationMinutes = 10; // Default: 1 oyun günü = 10 dakika
+  int _gameDayDurationMinutes = 5; // Default: 1 oyun günü = 5 dakika
   
   /// Oyun zamanını başlat
   Future<void> initialize() async {
@@ -69,8 +69,8 @@ class GameTimeService with WidgetsBindingObserver {
   
   /// Oyun günü süresini değiştir
   Future<void> setGameDayDuration(int minutes) async {
-    if (minutes < 5 || minutes > 30) {
-      throw Exception('Oyun günü süresi 5-30 dakika arasında olmalıdır');
+    if (minutes < 2 || minutes > 30) {
+      throw Exception('Oyun günü süresi 2-30 dakika arasında olmalıdır');
     }
     _gameDayDurationMinutes = minutes;
     await SettingsHelper.setGameDayDuration(minutes);

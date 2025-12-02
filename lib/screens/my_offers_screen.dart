@@ -9,6 +9,9 @@ import '../services/auth_service.dart';
 import '../services/offer_service.dart';
 import '../services/localization_service.dart';
 import '../utils/brand_colors.dart';
+import '../services/market_refresh_service.dart'; // Araç detayları için
+import '../models/vehicle_model.dart'; // Vehicle modeli için
+import 'dart:math'; // Random için
 
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
@@ -2584,25 +2587,43 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         return false;
       }
 
-      // 3. Aracı kullanıcıya ekle
-      final userVehicle = UserVehicle.purchase(
-        userId: user.id,
-        vehicleId: offer.vehicleId,
-        brand: offer.vehicleBrand,
-        model: offer.vehicleModel,
-        year: offer.vehicleYear,
-        mileage: 50000, // Varsayılan
-        purchasePrice: offer.counterOfferAmount!,
-        color: 'Bilinmiyor',
-        fuelType: 'Benzin',
-        transmission: 'Manuel',
-        engineSize: '1.6',
-        driveType: 'Önden',
-        hasWarranty: false,
-        hasAccidentRecord: false,
-        score: 75,
-        imageUrl: offer.vehicleImageUrl,
-      );
+      // Aracı bulmaya çalış (MarketRefreshService'den)
+    final marketService = MarketRefreshService();
+    final activeListings = marketService.getActiveListings();
+    Vehicle? sourceVehicle;
+    
+    try {
+      sourceVehicle = activeListings.firstWhere((v) => v.id == offer.vehicleId);
+    } catch (e) {
+      sourceVehicle = null;
+    }
+    
+    // Fallback değerler
+    final random = Random();
+    final colors = ['Beyaz', 'Siyah', 'Gri', 'Kırmızı', 'Mavi', 'Gümüş', 'Kahverengi', 'Yeşil'];
+    final fuelTypes = ['Benzin', 'Dizel', 'Hybrid'];
+    final transmissions = ['Manuel', 'Otomatik'];
+    final engineSizes = ['1.0', '1.2', '1.4', '1.6', '2.0'];
+
+    // 3. Aracı kullanıcıya ekle
+    final userVehicle = UserVehicle.purchase(
+      userId: user.id,
+      vehicleId: offer.vehicleId,
+      brand: offer.vehicleBrand,
+      model: offer.vehicleModel,
+      year: offer.vehicleYear,
+      mileage: sourceVehicle?.mileage ?? (10000 + random.nextInt(190000)),
+      purchasePrice: offer.counterOfferAmount!,
+      color: sourceVehicle?.color ?? colors[random.nextInt(colors.length)],
+      fuelType: sourceVehicle?.fuelType ?? fuelTypes[random.nextInt(fuelTypes.length)],
+      transmission: sourceVehicle?.transmission ?? transmissions[random.nextInt(transmissions.length)],
+      engineSize: sourceVehicle?.engineSize ?? engineSizes[random.nextInt(engineSizes.length)],
+      driveType: sourceVehicle?.driveType ?? 'Önden',
+      hasWarranty: sourceVehicle?.hasWarranty ?? false,
+      hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
+      score: sourceVehicle?.score ?? 75,
+      imageUrl: offer.vehicleImageUrl,
+    );
 
       bool vehicleAdded = await _db.addUserVehicle(userVehicle);
       if (!vehicleAdded) {

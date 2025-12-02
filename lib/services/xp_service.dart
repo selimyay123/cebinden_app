@@ -86,8 +86,15 @@ class XPService {
     if (userMap == null) return XPGainResult.empty();
     final user = User.fromJson(userMap);
     
+    // Yetenek Kontrolü: Hızlı Öğrenen (XP Booster)
+    // Her işlemden %10 daha fazla XP
+    int finalXP = xpAmount;
+    if (user.unlockedSkills.contains('xp_booster')) {
+      finalXP = (finalXP * 1.1).round();
+    }
+    
     final oldLevel = user.level;
-    final newXP = user.xp + xpAmount;
+    final newXP = user.xp + finalXP;
     final newLevel = User.calculateLevel(newXP);
     final leveledUp = newLevel > oldLevel;
     
@@ -112,7 +119,7 @@ class XPService {
     }
     
     return XPGainResult(
-      xpGained: xpAmount,
+      xpGained: finalXP,
       oldLevel: oldLevel,
       newLevel: newLevel,
       leveledUp: leveledUp,

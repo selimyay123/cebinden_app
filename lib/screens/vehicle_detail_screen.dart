@@ -14,8 +14,10 @@ import '../services/localization_service.dart';
 import '../services/xp_service.dart';
 import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
+import '../services/skill_service.dart'; // Yetenek Servisi
 import '../widgets/vehicle_top_view.dart';
 import 'my_offers_screen.dart';
+import 'my_vehicles_screen.dart';
 import 'package:intl/intl.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
@@ -229,14 +231,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            Text(
-                              '${_formatCurrency(widget.vehicle.price)} TL',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
+                            _buildPriceDisplay(),
                           ],
                         ),
                       ),
@@ -366,11 +361,83 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     );
   }
 
+  Widget _buildPriceDisplay() {
+    if (_currentUser == null) {
+      return Text(
+        '${_formatCurrency(widget.vehicle.price)} TL',
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.deepPurple,
+        ),
+      );
+    }
+
+    final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
+    final discountedPrice = widget.vehicle.price * multiplier;
+
+    if (multiplier >= 1.0) {
+      return Text(
+        '${_formatCurrency(widget.vehicle.price)} TL',
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.deepPurple,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          '${_formatCurrency(widget.vehicle.price)} TL',
+          style: TextStyle(
+            fontSize: 14,
+            decoration: TextDecoration.lineThrough,
+            color: Colors.grey[600],
+          ),
+        ),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '-%${((1 - multiplier) * 100).toStringAsFixed(0)}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${_formatCurrency(discountedPrice)} TL',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Future<void> _showPurchaseDialog() async {
     if (_currentUser == null) return;
 
     final currentBalance = _currentUser!.balance;
-    final vehiclePrice = widget.vehicle.price;
+    // Yetenek indirimi uygula
+    final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
+    final vehiclePrice = widget.vehicle.price * multiplier;
+    
     final remainingBalance = currentBalance - vehiclePrice;
     final canAfford = remainingBalance >= 0;
 
@@ -606,8 +673,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     Navigator.of(context).pop(); // Animasyon overlay'ini kapat
 
     try {
-      // 1️⃣ Bakiyeyi düş
-      final newBalance = _currentUser!.balance - widget.vehicle.price;
+      // 1️⃣ Bakiyeyi düş (İndirimli fiyat)
+      final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
+      final finalPrice = widget.vehicle.price * multiplier;
+      
+      final newBalance = _currentUser!.balance - finalPrice;
       final balanceUpdateSuccess = await _db.updateUser(
         _currentUser!.id,
         {'balance': newBalance},
@@ -628,7 +698,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         model: widget.vehicle.model,
         year: widget.vehicle.year,
         mileage: widget.vehicle.mileage,
-        purchasePrice: widget.vehicle.price,
+        purchasePrice: finalPrice, // İndirimli fiyatı kaydet
         color: widget.vehicle.color,
         fuelType: widget.vehicle.fuelType,
         transmission: widget.vehicle.transmission,
@@ -1424,6 +1494,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final decision = result['decision'] as String;
     final response = result['response'] as String;
     final counterOffer = result['counterOffer'] as double?;
+    final offer = result['offer'] as Offer?;
 
     IconData icon;
     Color iconColor;
@@ -1445,6 +1516,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: Row(
           children: [
@@ -1471,16 +1543,28 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   border: Border.all(color: Colors.orange.shade200),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('offer.counterOfferAmount'.tr()),
-                    Text(
-                      '${_formatCurrency(counterOffer)} TL',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Colors.deepOrange,
-                      ),
+                    const Icon(Icons.local_offer, color: Colors.orange),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'offer.counterOfferAmount'.tr(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        Text(
+                          '${_formatCurrency(counterOffer)} TL',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepOrange,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1514,8 +1598,21 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('common.ok'.tr()),
+            child: Text('common.cancel'.tr()),
           ),
+          // Kabul Et Butonu (Karşı teklif varsa)
+          if (decision == 'counter' && counterOffer != null && offer != null)
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Dialog'u kapat
+                _handleAcceptCounterOffer(offer);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Kabul Et'),
+            ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context); // Dialog'u kapat
@@ -1536,6 +1633,71 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         ],
       ),
     );
+  }
+
+  /// Karşı teklifi kabul et
+  Future<void> _handleAcceptCounterOffer(Offer offer) async {
+    // Loading göster
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final result = await _offerService.acceptCounterOffer(offer);
+      
+      // Loading kapat
+      if (mounted) Navigator.pop(context);
+
+      if (result['success']) {
+        if (mounted) {
+          // Başarılı mesajı
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Teklif kabul edildi ve araç satın alındı!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          
+          // Konfetiyi patlat (opsiyonel ama hoş olur)
+          // Konfetiyi patlat (opsiyonel ama hoş olur)
+          _confettiController.play();
+          
+          // Biraz bekle ve araçlarım sayfasına git
+          await Future.delayed(const Duration(seconds: 1));
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MyVehiclesScreen(),
+              ),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['error'] ?? 'Bir hata oluştu'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Loading kapat
+      if (mounted) Navigator.pop(context);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Hata: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
   
   // ========== XP SİSTEMİ METODLARI ==========

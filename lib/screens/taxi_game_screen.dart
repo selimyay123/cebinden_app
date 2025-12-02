@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../services/database_helper.dart';
 import '../models/user_model.dart';
 import '../services/localization_service.dart';
+import '../services/ad_service.dart'; // AdService eklendi
 
 class TaxiGameScreen extends StatefulWidget {
   const TaxiGameScreen({super.key});
@@ -14,6 +15,7 @@ class TaxiGameScreen extends StatefulWidget {
 
 class _TaxiGameScreenState extends State<TaxiGameScreen> {
   final DatabaseHelper _db = DatabaseHelper();
+  final AdService _adService = AdService(); // AdService instance
   
   // Oyun Ayarları
   static const int laneCount = 3;
@@ -43,6 +45,9 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> {
   }
 
   void _startGame() {
+    // Oyun başlarken reklam yükle
+    _adService.loadRewardedAd();
+
     setState(() {
       _isPlaying = true;
       _isGameOver = false;
@@ -144,46 +149,125 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Text('KAZA YAPTIN!'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.car_crash, color: Colors.red, size: 64),
-              const SizedBox(height: 16),
-              Text(
-                'Toplam Kazanç:',
-                style: TextStyle(color: Colors.grey[600]),
+        builder: (context) => StatefulBuilder(
+          builder: (context, setDialogState) {
+            bool isAdWatched = false;
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Row(
+                children: [
+                  Icon(Icons.flag, color: Colors.deepPurple),
+                  SizedBox(width: 8),
+                  Text('Yolculuk Bitti'),
+                ],
               ),
-              Text(
-                '$_moneyEarned TL',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // const Icon(Icons.car_crash, color: Colors.red, size: 64),
+                  // const SizedBox(height: 16),
+                  Text(
+                    'Toplam Kazanç:',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                  Text(
+                    '$_moneyEarned TL',
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                  if (isAdWatched)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        '2x KAZANÇ AKTİF!',
+                        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                  Text('Geçilen Araç: $_score', style: const TextStyle(fontSize: 16)),
+                ],
+              ),
+              actions: [
+                if (!isAdWatched && _moneyEarned > 0)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        // Reklam izle
+                        await _adService.showRewardedAd(
+                          onRewarded: (reward) async {
+                            // Ödülü ikiye katla (ekstra bir kez daha ekle)
+                            final userMap = await _db.getCurrentUser();
+                            if (userMap != null) {
+                              final user = User.fromJson(userMap);
+                              await _db.updateUser(user.id, {
+                                'balance': user.balance + _moneyEarned, // Zaten bir kere eklenmişti, bir daha ekle
+                              });
+                            }
+                            
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Tebrikler! Kazancınız ikiye katlandı!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              
+                              // Dialog'u kapat
+                              Navigator.pop(context);
+                              // Ekranı kapat (Ana sayfaya dön)
+                              Navigator.pop(context);
+                            }
+                          },
+                          onAdNotReady: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Reklam şu an hazır değil, lütfen tekrar deneyin.')),
+                            );
+                            _adService.loadRewardedAd(); // Tekrar yüklemeyi dene
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.play_circle_filled),
+                      label: const Text('2x Kazanç (Reklam İzle)'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Dialog kapat
+                        Navigator.pop(context); // Ekranı kapat
+                      },
+                      child: const Text('Çıkış'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _startGame();
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                      child: const Text('Tekrar Oyna'),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text('Geçilen Araç: $_score'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Dialog kapat
-                Navigator.pop(context); // Ekranı kapat
-              },
-              child: const Text('Çıkış'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _startGame();
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-              child: const Text('Tekrar Oyna'),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       );
     }

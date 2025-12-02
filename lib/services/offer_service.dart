@@ -12,6 +12,8 @@ import 'game_time_service.dart';
 import 'xp_service.dart';
 import 'daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
+import '../services/skill_service.dart'; // Yetenek Servisi
+import 'market_refresh_service.dart'; // Araç detayları için
 
 /// Teklif servisi - AI alıcılar ve teklif yönetimi
 class OfferService {
@@ -61,8 +63,18 @@ class OfferService {
       // Adil fiyatı hesapla
       double fairPrice = _calculateFairPrice(listing);
       
+      // Satıcıyı getir ve yetenek çarpanını uygula
+      final sellerMap = await _db.getUserById(listing.userId);
+      if (sellerMap != null) {
+        final seller = User.fromJson(sellerMap);
+        final multiplier = SkillService.getSellingMultiplier(seller);
+        // Adil fiyatı artır (AI alıcılar daha yüksek teklif vermeye meyilli olur)
+        fairPrice *= multiplier;
+      }
+      
       // Bugün kaç alıcı gelecek? (0-5 arası)
-      int buyerCount = _calculateDailyBuyerCount(listing);
+      // NOT: _calculateDailyBuyerCount artık async ve kullanıcı ID'si alıyor
+      int buyerCount = await _calculateDailyBuyerCount(listing);
       
       int offersCreated = 0;
       
@@ -439,6 +451,43 @@ class OfferService {
     }
   }
 
+  /// Kullanıcı AI satıcının karşı teklifini kabul eder
+  Future<Map<String, dynamic>> acceptCounterOffer(Offer offer) async {
+    try {
+      if (offer.counterOfferAmount == null) {
+        return {'success': false, 'error': 'Karşı teklif bulunamadı'};
+      }
+
+      // Teklifi güncelle: Fiyatı karşı teklif fiyatı yap, durumu accepted yap
+      final updatedOffer = offer.copyWith(
+        offerPrice: offer.counterOfferAmount!,
+        status: OfferStatus.accepted,
+      );
+
+      // DB'de güncelle
+      await _db.updateOffer(offer.offerId, {
+        'offerPrice': updatedOffer.offerPrice,
+        'status': OfferStatus.accepted.index,
+      });
+
+      // Satın alma işlemini gerçekleştir
+      final success = await _processUserOfferAcceptance(updatedOffer, offer.buyerId);
+
+      if (success) {
+        return {'success': true};
+      } else {
+        // Başarısız olursa (örn: bakiye yetersiz), durumu geri al
+        await _db.updateOffer(offer.offerId, {
+          'offerPrice': offer.offerPrice, // Eski fiyata dön
+          'status': OfferStatus.pending.index,
+        });
+        return {'success': false, 'error': 'Satın alma işlemi başarısız (Bakiye yetersiz olabilir)'};
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   /// Satıcı gelen teklife karşı teklif gönderir (AI alıcı değerlendirir)
   Future<Map<String, dynamic>> sendCounterOfferToIncomingOffer({
     required Offer originalOffer,
@@ -708,23 +757,41 @@ class OfferService {
       // Bakiyeyi düş
       await _db.updateUser(userId, {'balance': user.balance - offer.offerPrice});
       
-      // Aracı kullanıcıya ekle
+      // Aracı bulmaya çalış (MarketRefreshService'den)
+      final marketService = MarketRefreshService();
+      final activeListings = marketService.getActiveListings();
+      Vehicle? sourceVehicle;
+      
+      try {
+        sourceVehicle = activeListings.firstWhere((v) => v.id == offer.vehicleId);
+      } catch (e) {
+        // Araç bulunamadı (süresi dolmuş olabilir)
+        sourceVehicle = null;
+      }
+      
+      // Fallback değerler (Eğer araç bulunamazsa)
+      final random = Random();
+      final colors = ['Beyaz', 'Siyah', 'Gri', 'Kırmızı', 'Mavi', 'Gümüş', 'Kahverengi', 'Yeşil'];
+      final fuelTypes = ['Benzin', 'Dizel', 'Hybrid'];
+      final transmissions = ['Manuel', 'Otomatik'];
+      final engineSizes = ['1.0', '1.2', '1.4', '1.6', '2.0'];
+      
       final userVehicle = UserVehicle.purchase(
         userId: userId,
         vehicleId: offer.vehicleId,
         brand: offer.vehicleBrand,
         model: offer.vehicleModel,
         year: offer.vehicleYear,
-        mileage: 50000, // Varsayılan
+        mileage: sourceVehicle?.mileage ?? (10000 + random.nextInt(190000)),
         purchasePrice: offer.offerPrice,
-        color: 'Bilinmiyor',
-        fuelType: 'Benzin',
-        transmission: 'Manuel',
-        engineSize: '1.6',
-        driveType: 'Önden',
-        hasWarranty: false,
-        hasAccidentRecord: false,
-        score: 75,
+        color: sourceVehicle?.color ?? colors[random.nextInt(colors.length)],
+        fuelType: sourceVehicle?.fuelType ?? fuelTypes[random.nextInt(fuelTypes.length)],
+        transmission: sourceVehicle?.transmission ?? transmissions[random.nextInt(transmissions.length)],
+        engineSize: sourceVehicle?.engineSize ?? engineSizes[random.nextInt(engineSizes.length)],
+        driveType: sourceVehicle?.driveType ?? 'Önden',
+        hasWarranty: sourceVehicle?.hasWarranty ?? false,
+        hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
+        score: sourceVehicle?.score ?? 75,
         imageUrl: offer.vehicleImageUrl,
       );
       
@@ -755,38 +822,86 @@ class OfferService {
     }
   }
 
-  /// Adil fiyatı hesapla (skordan)
+  /// Adil fiyatı hesapla (FMV - Fair Market Value)
   double _calculateFairPrice(UserVehicle vehicle) {
-    // Skor 100 üzerinden, adil fiyat = satın alma fiyatı * (skor/100)
+    // 1. Baz Değer: Satın alma fiyatı üzerinden bir varyasyon (Piyasa dalgalanması)
+    // Gerçek hayatta her zaman aldığımız fiyata satamayız, bazen ucuza almışızdır bazen pahalıya.
+    // Bunu simüle etmek için sabit bir hash (ID) kullanarak tutarlı bir "gerçek değer" üretiyoruz.
+    final random = Random(vehicle.id.hashCode); 
+    final fluctuation = 0.9 + random.nextDouble() * 0.2; // %90 - %110 arası
+    
+    double baseFMV = vehicle.purchasePrice * fluctuation;
+    
+    // 2. Skor Etkisi: Araç temizse değeri artar
     double scoreMultiplier = vehicle.score / 100.0;
+    scoreMultiplier = scoreMultiplier.clamp(0.8, 1.2); // Çok cezalandırma, çok ödüllendirme
     
-    // Minimum %50, maksimum %100
-    scoreMultiplier = scoreMultiplier.clamp(0.5, 1.0);
+    // 3. Yıl Etkisi: Yeni araçlar değerini korur
+    // Basitçe: Her yıl için %2 değer kaybı (ama zaten purchasePrice bunu içeriyor olabilir, 
+    // o yüzden burada sadece "piyasa algısı"nı ekliyoruz)
     
-    return vehicle.purchasePrice * scoreMultiplier;
+    return baseFMV * scoreMultiplier;
   }
 
   /// Günlük alıcı sayısını hesapla
-  int _calculateDailyBuyerCount(UserVehicle listing) {
+  Future<int> _calculateDailyBuyerCount(UserVehicle listing) async {
     final random = Random();
     
     // Base: 3-8 arası alıcı (daha fazla teklif için artırıldı)
     int baseCount = 3 + random.nextInt(6);
     
-    // İndirim varsa artır
+    // Yetenek Kontrolü: Piyasa Kurdu (Market Guru)
+    // İlanlar %50 daha fazla görüntülenir -> %50 daha fazla alıcı
+    final sellerMap = await _db.getUserById(listing.userId);
+    if (sellerMap != null) {
+      final seller = User.fromJson(sellerMap);
+      if (seller.unlockedSkills.contains('market_guru')) {
+        baseCount = (baseCount * 1.5).round();
+      }
+    }
+    
+    // İndirim/Bindirim Oranı
     double fairPrice = _calculateFairPrice(listing);
     double priceRatio = listing.listingPrice! / fairPrice;
     
-    if (priceRatio < 0.80) {
-      // %20+ indirim → +3-5 alıcı
-      baseCount += 3 + random.nextInt(3);
-    } else if (priceRatio < 0.90) {
-      // %10-20 indirim → +2-3 alıcı
-      baseCount += 2 + random.nextInt(2);
-    } else if (priceRatio < 1.0) {
-      // Adil fiyat → +1-2 alıcı
-      baseCount += 1 + random.nextInt(2);
+    // --- ALICI TOLERANS EĞRİSİ (BUYER TOLERANCE CURVE) ---
+    
+    // Maksimum Tolerans Sınırı (Varsayılan: 1.30 -> %30 kâr)
+    double maxTolerance = 1.30;
+    
+    // Yetenek Etkisi: Ballı Dil (Charisma)
+    // Toleransı artırır (Daha pahalıya satabilirsin)
+    // Not: Bu kontrolü yukarıda yapmıştık ama burada tolerans için tekrar sellerMap lazım
+    // Performans için yukarıdaki sellerMap'i kullanabiliriz ama scope farklı.
+    // Şimdilik tekrar çekiyoruz (Hive hızlıdır).
+    final sellerMapCheck = await _db.getUserById(listing.userId);
+    if (sellerMapCheck != null) {
+      final seller = User.fromJson(sellerMapCheck);
+      // Ballı Dil yeteneği varsa tolerans artar
+      // (Burada basitçe yetenek kontrolü yapıyoruz, detaylı ID kontrolü skill_service'de olmalı ama
+      // şimdilik hardcode 'charisma' kontrolü yapıyoruz)
+      if (seller.unlockedSkills.any((s) => s.startsWith('charisma'))) {
+        maxTolerance = 1.50; // %50 kâra kadar tolerans
+      }
     }
+    
+    if (priceRatio > maxTolerance) {
+      // Fiyat çok yüksek! Kimse ilgilenmez.
+      debugPrint('🚫 Price too high! Ratio: $priceRatio > Tolerance: $maxTolerance');
+      return 0;
+    } else if (priceRatio > 1.15) {
+      // Biraz pahalı (%15-%30 arası) -> Alıcı sayısı ciddi düşer
+      baseCount = (baseCount * 0.3).round(); // %70 azalma
+    } else if (priceRatio > 1.05) {
+      // Makul kâr (%5-%15) -> Hafif azalma
+      baseCount = (baseCount * 0.8).round(); // %20 azalma
+    } else if (priceRatio < 0.95) {
+      // Kelepir (<%95) -> Alıcı patlaması
+      baseCount = (baseCount * 1.5).round();
+    }
+    
+    // En az 0 alıcı
+    if (baseCount < 0) baseCount = 0;
     
     // İlan yaşı hesapla (listedDate varsa)
     if (listing.listedDate != null) {

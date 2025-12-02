@@ -35,7 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationPriceDrops = true;
   bool _notificationOffers = true;
   bool _notificationSystem = true;
-  int _gameDayDuration = 10; // Dakika cinsinden
+  int _gameDayDuration = 5; // Dakika cinsinden
 
   @override
   void initState() {
@@ -484,11 +484,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _gameDayDuration,
                   underline: const SizedBox(),
                   items: const [
+                    DropdownMenuItem(value: 2, child: Text('2 dk')),
                     DropdownMenuItem(value: 5, child: Text('5 dk')),
                     DropdownMenuItem(value: 10, child: Text('10 dk')),
                     DropdownMenuItem(value: 15, child: Text('15 dk')),
-                    DropdownMenuItem(value: 20, child: Text('20 dk')),
-                    DropdownMenuItem(value: 30, child: Text('30 dk')),
                   ],
                   onChanged: _changeGameDayDuration,
                 ),

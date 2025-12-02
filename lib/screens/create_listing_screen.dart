@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:math'; // Random için
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../services/skill_service.dart'; // Yetenek Servisi
+import '../models/user_model.dart';
 
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
@@ -22,13 +25,99 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   final _priceController = TextEditingController();
   final _descriptionController = TextEditingController();
   bool _isLoading = false;
+  
+  // Fiyat analizi için
+  Color _priceColor = Colors.grey;
+  String _priceFeedback = '';
+  double _fairMarketValue = 0;
+  double _maxTolerance = 1.3; // Varsayılan %30
 
   @override
   void initState() {
     super.initState();
     // Önerilen fiyat: Satın alma fiyatı + %10
+    // Yetenek çarpanını sonradan yükleyeceğiz
     final suggestedPrice = widget.vehicle.purchasePrice * 1.1;
     _priceController.text = suggestedPrice.toStringAsFixed(0);
+    
+    // FMV Hesapla (OfferService ile aynı mantık)
+    final random = Random(widget.vehicle.id.hashCode); 
+    final fluctuation = 0.9 + random.nextDouble() * 0.2;
+    double baseFMV = widget.vehicle.purchasePrice * fluctuation;
+    double scoreMultiplier = widget.vehicle.score / 100.0;
+    scoreMultiplier = scoreMultiplier.clamp(0.8, 1.2);
+    _fairMarketValue = baseFMV * scoreMultiplier;
+    
+    _loadUserAndCalculateBonus();
+    
+    // Listener ekle
+    _priceController.addListener(_updatePriceFeedback);
+  }
+
+  void _updatePriceFeedback() {
+    final priceText = _priceController.text;
+    if (priceText.isEmpty) {
+      setState(() {
+        _priceFeedback = '';
+        _priceColor = Colors.grey;
+      });
+      return;
+    }
+    
+    final price = double.tryParse(priceText);
+    if (price == null || price <= 0) return;
+    
+    final ratio = price / _fairMarketValue;
+    
+    setState(() {
+      if (ratio > _maxTolerance) {
+        _priceFeedback = '⚠️ Fiyat Çok Yüksek! Alıcı çıkmayabilir.';
+        _priceColor = Colors.red;
+      } else if (ratio > 1.15) {
+        _priceFeedback = 'Biraz Pahalı. Satış yavaş olabilir.';
+        _priceColor = Colors.orange;
+      } else if (ratio > 1.05) {
+        _priceFeedback = '✅ Makul Fiyat. Normal talep.';
+        _priceColor = Colors.green;
+      } else {
+        _priceFeedback = '🔥 Kelepir! Telefonun susmayacak.';
+        _priceColor = Colors.blue;
+      }
+    });
+  }
+
+  Future<void> _loadUserAndCalculateBonus() async {
+    final userMap = await _db.getCurrentUser();
+    if (userMap != null) {
+      final user = User.fromJson(userMap);
+      final multiplier = SkillService.getSellingMultiplier(user);
+      
+      // Ballı Dil yeteneği varsa toleransı artır
+      if (user.unlockedSkills.any((s) => s.startsWith('charisma'))) {
+        setState(() {
+          _maxTolerance = 1.5; // %50'ye kadar tolerans
+        });
+      }
+      
+      if (multiplier > 1.0) {
+        final baseSuggested = widget.vehicle.purchasePrice * 1.1;
+        final bonusSuggested = baseSuggested * multiplier;
+        
+        setState(() {
+          _priceController.text = bonusSuggested.toStringAsFixed(0);
+        });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Yetenek Bonusu: Önerilen fiyat %${((multiplier - 1) * 100).toStringAsFixed(0)} artırıldı!'),
+              backgroundColor: Colors.indigo,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -264,6 +353,37 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             fontStyle: FontStyle.italic,
           ),
         ),
+        if (_priceFeedback.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: _priceColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: _priceColor.withOpacity(0.5)),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _priceColor == Colors.red ? Icons.warning : Icons.info,
+                  color: _priceColor,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _priceFeedback,
+                    style: TextStyle(
+                      color: _priceColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }

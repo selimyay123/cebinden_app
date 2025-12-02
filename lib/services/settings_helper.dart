@@ -84,7 +84,7 @@ class SettingsHelper {
 
   static Future<int> getGameDayDuration() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_keyGameDayDuration) ?? 10; // Default: 10 dakika
+    return prefs.getInt(_keyGameDayDuration) ?? 5; // Default: 5 dakika
   }
 
   static Future<void> setGameDayDuration(int minutes) async {
