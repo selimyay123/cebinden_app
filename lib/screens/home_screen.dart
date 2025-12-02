@@ -7,6 +7,7 @@ import '../services/localization_service.dart';
 import '../services/notification_service.dart';
 import '../services/ad_service.dart';
 import '../services/xp_service.dart';
+import '../services/game_time_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import 'login_screen.dart';
@@ -42,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final XPService _xpService = XPService();
   final DailyQuestService _questService = DailyQuestService();
   final DailyLoginService _loginService = DailyLoginService();
+  final GameTimeService _gameTime = GameTimeService();
   User? _currentUser;
   bool _isLoading = true;
   int _vehicleCount = 0;
@@ -65,12 +67,37 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadCurrentUser();
     // İlk reklam yükleme
     _adService.loadRewardedAd();
+    
+    // Gün değişimini dinle
+    _gameTime.addDayChangeListener(_onGameDayChanged);
   }
 
   @override
   void dispose() {
+    _gameTime.removeDayChangeListener(_onGameDayChanged);
     _adService.dispose();
     super.dispose();
+  }
+
+  /// Gün değiştiğinde çağrılır
+  void _onGameDayChanged(int oldDay, int newDay) {
+    if (!mounted) return;
+    
+    // Tekliflerin oluşması için biraz bekle ve yenile
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        _loadCurrentUser();
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Yeni gün başladı! (Gün $newDay)'),
+            backgroundColor: Colors.blue,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
   }
 
   Future<void> _loadCurrentUser() async {
@@ -1066,54 +1093,50 @@ class _HomeScreenState extends State<HomeScreen> {
           // );
           
           // Doğrudan marka seçim sayfasına git (Otomobil kategorisi)
-          final purchased = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BrandSelectionScreen(
-                categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
-                categoryColor: Colors.blue,
-              ),
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BrandSelectionScreen(
+              categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
+              categoryColor: Colors.blue,
             ),
-          );
-          
-          // Eğer satın alma başarılıysa, dashboard'u yenile
-          if (purchased == true) {
-            await _loadCurrentUser();
-          }
+          ),
+        );
+        
+        // Sayfa kapanınca dashboard'u yenile
+        await _loadCurrentUser();  }
         },
-      },
       {
         'icon': Icons.sell,
         'label': 'home.sellVehicle'.tr(),
         'color': Colors.orange,
         'onTap': () async {
-          // Araç satış sayfasına git ve sonuç bekle
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SellVehicleScreen(),
-            ),
-          );
-          
-          // Eğer işlem başarılıysa, dashboard'u yenile
-          if (result == true) {
-            await _loadCurrentUser();
-          }
-        },
-      },
+        // Araç satış sayfasına git ve sonuç bekle
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SellVehicleScreen(),
+          ),
+        );
+        
+        // Sayfa kapanınca dashboard'u yenile
+        await _loadCurrentUser();
+      },  },
       {
         'icon': Icons.garage,
         'label': 'home.myVehicles'.tr(),
         'color': Colors.green,
         'badge': _vehicleCount > 0 ? _vehicleCount : null, // Araç sayısı badge'i
-        'onTap': () {
+        'onTap': () async {
           // Kullanıcının satın aldığı araçları göster
-          Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const MyVehiclesScreen(),
             ),
           );
+          // Sayfa kapanınca dashboard'u yenile (araç satılmış olabilir)
+          await _loadCurrentUser();
         },
       },
       {

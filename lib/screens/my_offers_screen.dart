@@ -49,6 +49,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   Map<String, List<Offer>> _sentOffersByBrand = {}; // Markaya göre grupla
 
   bool _isLoading = true;
+  bool _shouldRefreshParent = false; // Üst ekrana güncelleme sinyali göndermek için
 
   @override
   void initState() {
@@ -128,6 +129,16 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, _shouldRefreshParent);
+        return false;
+      },
+      child: _buildContent(),
+    );
+  }
+
+  Widget _buildContent() {
     // Eğer bir marka ve araç seçilmişse, o aracın tekliflerini göster
     if (widget.selectedBrand != null && widget.selectedVehicleId != null) {
       return _buildVehicleOffersScreen();
@@ -211,8 +222,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepOrange);
     
     return InkWell(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => MyOffersScreen(
@@ -223,6 +234,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             ),
           ),
         );
+
+        if (result == true && mounted) {
+          _loadOffers();
+          _shouldRefreshParent = true;
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -543,6 +559,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           // Eğer teklifler silindi/değişti ise listeyi yenile
           if (result == true && mounted) {
             _loadOffers();
+            _shouldRefreshParent = true;
           }
         },
         borderRadius: BorderRadius.circular(12),
@@ -1242,6 +1259,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
           // Listeyi yenile
           await _loadOffers();
+          _shouldRefreshParent = true;
           
           // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
           if (widget.selectedVehicleId != null) {
@@ -1644,6 +1662,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
         // Listeyi yenile
         await _loadOffers();
+        _shouldRefreshParent = true;
         
         // Eğer tüm bekleyen teklifler silindiyse, bir önceki ekrana dön ve güncelleme sinyali gönder
         if (successCount > 0 && widget.selectedVehicleId != null) {
@@ -1689,6 +1708,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
           // Listeyi yenile
           await _loadOffers();
+          _shouldRefreshParent = true;
           
           // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
           if (widget.selectedVehicleId != null) {

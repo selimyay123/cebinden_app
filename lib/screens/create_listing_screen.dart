@@ -6,6 +6,7 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
 import '../models/user_model.dart';
+import '../utils/currency_input_formatter.dart';
 
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
@@ -38,7 +39,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     // Önerilen fiyat: Satın alma fiyatı + %10
     // Yetenek çarpanını sonradan yükleyeceğiz
     final suggestedPrice = widget.vehicle.purchasePrice * 1.1;
-    _priceController.text = suggestedPrice.toStringAsFixed(0);
+    _priceController.text = CurrencyInputFormatter.format(suggestedPrice);
     
     // FMV Hesapla (OfferService ile aynı mantık)
     final random = Random(widget.vehicle.id.hashCode); 
@@ -64,7 +65,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       return;
     }
     
-    final price = double.tryParse(priceText);
+    final price = CurrencyInputFormatter.parse(priceText);
     if (price == null || price <= 0) return;
     
     final ratio = price / _fairMarketValue;
@@ -104,7 +105,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         final bonusSuggested = baseSuggested * multiplier;
         
         setState(() {
-          _priceController.text = bonusSuggested.toStringAsFixed(0);
+          _priceController.text = CurrencyInputFormatter.format(bonusSuggested);
         });
         
         if (mounted) {
@@ -137,7 +138,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     });
 
     try {
-      final listingPrice = double.parse(_priceController.text);
+      final listingPrice = CurrencyInputFormatter.parse(_priceController.text);
       final listingDescription = _descriptionController.text.trim();
 
       final success = await _db.listVehicleForSale(
@@ -324,6 +325,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
+            CurrencyInputFormatter(),
           ],
           decoration: InputDecoration(
             hintText: 'Örn: 350000',
@@ -341,8 +343,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             if (value == null || value.isEmpty) {
               return 'Fiyat girmelisiniz';
             }
-            final price = double.tryParse(value);
-            if (price == null || price <= 0) {
+            final price = CurrencyInputFormatter.parse(value);
+            if (price <= 0) {
               return 'Geçerli bir fiyat girin';
             }
             if (price < 150000) {
