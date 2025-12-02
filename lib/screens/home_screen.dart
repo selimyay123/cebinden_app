@@ -90,8 +90,26 @@ class _HomeScreenState extends State<HomeScreen> {
       // Bekleyen teklifleri yükle
       final pendingOffers = await _db.getPendingOffersCount(user.id);
       
+      // Günlük kar/zarar sıfırlama kontrolü
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      
+      User updatedUser = user;
+      
+      // Eğer son sıfırlama tarihi bugün değilse (veya null ise), sıfırla
+      if (user.lastDailyResetDate == null || 
+          DateTime(user.lastDailyResetDate!.year, user.lastDailyResetDate!.month, user.lastDailyResetDate!.day) != today) {
+        
+        updatedUser = user.copyWith(
+          dailyStartingBalance: user.balance,
+          lastDailyResetDate: now,
+        );
+        
+        await _db.updateUser(user.id, updatedUser.toJson());
+      }
+
       setState(() {
-        _currentUser = user;
+        _currentUser = updatedUser;
         _userVehicles = vehicles;
         _vehicleCount = vehicleCount;
         _userListedVehicles = listedVehicles;
@@ -460,6 +478,62 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                   ),
+                ),
+                
+                // Günlük Kar/Zarar Göstergesi
+                Builder(
+                  builder: (context) {
+                    final dailyProfit = _currentUser!.balance - _currentUser!.dailyStartingBalance;
+                    final isPositive = dailyProfit >= 0;
+                    final percentage = _currentUser!.dailyStartingBalance > 0 
+                        ? (dailyProfit / _currentUser!.dailyStartingBalance) * 100 
+                        : 0.0;
+                    
+                    // Eğer değişim yoksa %0 göster
+                    if (dailyProfit.abs() < 1) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          '%0.0 (0 TL)',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isPositive ? Icons.arrow_upward : Icons.arrow_downward,
+                            color: isPositive ? Colors.greenAccent : Colors.redAccent,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '%${percentage.abs().toStringAsFixed(1)} ',
+                            style: TextStyle(
+                              color: isPositive ? Colors.greenAccent : Colors.redAccent,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '(${isPositive ? '+' : ''}${_formatCurrency(dailyProfit)} TL)',
+                            style: TextStyle(
+                              color: isPositive ? Colors.greenAccent.withOpacity(0.9) : Colors.redAccent.withOpacity(0.9),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                 ),
                 
                 const SizedBox(height: 12),

@@ -1482,7 +1482,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('offer.sendError'.tr()),
+          content: Text('${'offer.sendError'.tr()}\n$e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -1596,39 +1596,63 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          // Kabul Et Butonu (Karşı teklif varsa)
-          if (decision == 'counter' && counterOffer != null && offer != null)
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Dialog'u kapat
-                _handleAcceptCounterOffer(offer);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Tamam'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Dialog'u kapat
+                        // MyOffers sayfasına yönlendir (Gönderdiğim Teklifler sekmesi)
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyOffersScreen(initialTab: 1),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        'offer.viewOffers'.tr(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: const Text('Kabul Et'),
-            ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Dialog'u kapat
-              // MyOffers sayfasına yönlendir (Gönderdiğim Teklifler sekmesi)
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MyOffersScreen(initialTab: 1),
+              if (decision == 'counter' && counterOffer != null && offer != null) ...[
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Dialog'u kapat
+                      _handleAcceptCounterOffer(offer);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text('Kabul Et'),
+                  ),
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('offer.viewOffers'.tr()),
+              ],
+            ],
           ),
         ],
       ),

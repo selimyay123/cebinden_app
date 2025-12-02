@@ -820,260 +820,33 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   }
 
   void _showEditListingDialog(UserVehicle vehicle) {
-    final priceController = TextEditingController(
-      text: _formatCurrency((vehicle.listingPrice ?? 0)).replaceAll('.', ''),
-    );
-    final descriptionController = TextEditingController(
-      text: vehicle.listingDescription ?? '',
-    );
-    final formKey = GlobalKey<FormState>();
-
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          // Dinamik Kar/Zarar Hesabı
-          double currentPrice = 0;
-          try {
-            currentPrice = double.parse(priceController.text.replaceAll('.', ''));
-          } catch (e) {
-            currentPrice = 0;
-          }
+      builder: (context) => _EditListingDialog(
+        vehicle: vehicle,
+        onSave: (double price, String description) async {
+          // İlanı güncelle
+          final success = await _db.updateUserVehicle(vehicle.id, {
+            'listingPrice': price,
+            'listingDescription': description,
+          });
           
-          final profit = currentPrice - vehicle.purchasePrice;
-          final isProfit = profit >= 0;
-          final profitPercent = vehicle.purchasePrice > 0 
-              ? (profit / vehicle.purchasePrice) * 100 
-              : 0;
-
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Row(
-              children: [
-                const Icon(Icons.edit, color: Colors.deepPurple),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text('sell.editListing'.tr()),
-                ),
-              ],
-            ),
-            content: Form(
-              key: formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Araç Bilgisi
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            vehicle.fullName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          // Alış Fiyatı Gösterimi
-                          Row(
-                            children: [
-                              Icon(Icons.shopping_cart, size: 14, color: Colors.grey[600]),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${'vehicles.purchasePrice'.tr()}: ',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              Text(
-                                '${_formatCurrency(vehicle.purchasePrice)} TL',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[800],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Fiyat Girişi
-                    Text(
-                      'vehicles.listingPrice'.tr(),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: priceController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        _ThousandsSeparatorInputFormatter(),
-                      ],
-                      onChanged: (value) {
-                        setState(() {}); // UI'ı güncelle
-                      },
-                      decoration: InputDecoration(
-                        prefixText: '₺ ',
-                        suffixText: 'TL',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'vehicles.priceRequired'.tr();
-                        }
-                        final price = double.tryParse(value.replaceAll('.', ''));
-                        if (price == null || price <= 0) {
-                          return 'vehicles.validPrice'.tr();
-                        }
-                        return null;
-                      },
-                    ),
-                    
-                    // Dinamik Kar/Zarar Göstergesi
-                    if (priceController.text.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isProfit ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isProfit ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              isProfit ? Icons.trending_up : Icons.trending_down,
-                              color: isProfit ? Colors.green : Colors.red,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '${isProfit ? 'Kar' : 'Zarar'}: ${_formatCurrency(profit.abs())} TL (%${profitPercent.abs().toStringAsFixed(1)})',
-                                style: TextStyle(
-                                  color: isProfit ? Colors.green[700] : Colors.red[700],
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-
-                    const SizedBox(height: 16),
-                    
-                    // Açıklama Girişi
-                    Text(
-                      'myListings.description'.tr(),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: descriptionController,
-                      maxLines: 4,
-                      maxLength: 500,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[50],
-                        hintText: 'vehicles.descriptionHint'.tr(),
-                      ),
-                    ),
-                  ],
-                ),
+          if (success && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('sell.listingUpdated'.tr()),
+                backgroundColor: Colors.green,
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  priceController.dispose();
-                  descriptionController.dispose();
-                  Navigator.pop(context);
-                },
-                child: Text('common.cancel'.tr()),
+            );
+            _loadUserListedVehicles(); // Listeyi yenile
+          } else if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('sell.listingUpdateFailed'.tr()),
+                backgroundColor: Colors.red,
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    Navigator.pop(context);
-                    
-                    // İlanı güncelle
-                    final newPrice = double.parse(priceController.text.replaceAll('.', ''));
-                    final newDescription = descriptionController.text.trim();
-                    
-                    final success = await _db.updateUserVehicle(vehicle.id, {
-                      'listingPrice': newPrice,
-                      'listingDescription': newDescription,
-                    });
-                    
-                    priceController.dispose();
-                    descriptionController.dispose();
-                    
-                    if (success && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('sell.listingUpdated'.tr()),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                      _loadUserListedVehicles(); // Listeyi yenile
-                    } else if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('sell.listingUpdateFailed'.tr()),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text('common.save'.tr()),
-              ),
-            ],
-          );
+            );
+          }
         },
       ),
     );
@@ -1139,6 +912,278 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
     return number.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
+    );
+  }
+}
+
+
+class _EditListingDialog extends StatefulWidget {
+  final UserVehicle vehicle;
+  final Function(double price, String description) onSave;
+
+  const _EditListingDialog({
+    required this.vehicle,
+    required this.onSave,
+  });
+
+  @override
+  State<_EditListingDialog> createState() => _EditListingDialogState();
+}
+
+class _EditListingDialogState extends State<_EditListingDialog> {
+  late TextEditingController _priceController;
+  late TextEditingController _descriptionController;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _priceController = TextEditingController(
+      text: _formatCurrency((widget.vehicle.listingPrice ?? 0)).replaceAll('.', ''),
+    );
+    _descriptionController = TextEditingController(
+      text: widget.vehicle.listingDescription ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _priceController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  String _formatCurrency(double amount) {
+    return amount.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
+  String _formatNumber(int number) {
+    return number.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Dinamik Kar/Zarar Hesabı
+    double currentPrice = 0;
+    try {
+      currentPrice = double.parse(_priceController.text.replaceAll('.', ''));
+    } catch (e) {
+      currentPrice = 0;
+    }
+    
+    final profit = currentPrice - widget.vehicle.purchasePrice;
+    final isProfit = profit >= 0;
+    final profitPercent = widget.vehicle.purchasePrice > 0 
+        ? (profit / widget.vehicle.purchasePrice) * 100 
+        : 0;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      title: Row(
+        children: [
+          const Icon(Icons.edit, color: Colors.deepPurple),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text('sell.editListing'.tr()),
+          ),
+        ],
+      ),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Araç Bilgisi
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.vehicle.fullName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${widget.vehicle.year} • ${_formatNumber(widget.vehicle.mileage)} km',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Alış Fiyatı Gösterimi
+                    Row(
+                      children: [
+                        Icon(Icons.shopping_cart, size: 14, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${'vehicles.purchasePrice'.tr()}: ',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          '${_formatCurrency(widget.vehicle.purchasePrice)} TL',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Fiyat Girişi
+              Text(
+                'vehicles.listingPrice'.tr(),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _priceController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  _ThousandsSeparatorInputFormatter(),
+                ],
+                onChanged: (value) {
+                  setState(() {}); // UI'ı güncelle
+                },
+                decoration: InputDecoration(
+                  prefixText: '₺ ',
+                  suffixText: 'TL',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'vehicles.priceRequired'.tr();
+                  }
+                  final price = double.tryParse(value.replaceAll('.', ''));
+                  if (price == null || price <= 0) {
+                    return 'vehicles.validPrice'.tr();
+                  }
+                  return null;
+                },
+              ),
+              
+              // Dinamik Kar/Zarar Göstergesi
+              if (_priceController.text.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isProfit ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isProfit ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isProfit ? Icons.trending_up : Icons.trending_down,
+                        color: isProfit ? Colors.green : Colors.red,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${isProfit ? 'Kar' : 'Zarar'}: ${_formatCurrency(profit.abs())} TL (%${profitPercent.abs().toStringAsFixed(1)})',
+                          style: TextStyle(
+                            color: isProfit ? Colors.green[700] : Colors.red[700],
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 16),
+              
+              // Açıklama Girişi
+              Text(
+                'myListings.description'.tr(),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _descriptionController,
+                maxLines: 4,
+                maxLength: 500,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  hintText: 'vehicles.descriptionHint'.tr(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('common.cancel'.tr()),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              Navigator.pop(context);
+              
+              final newPrice = double.parse(_priceController.text.replaceAll('.', ''));
+              final newDescription = _descriptionController.text.trim();
+              
+              widget.onSave(newPrice, newDescription);
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+          ),
+          child: Text('common.save'.tr()),
+        ),
+      ],
     );
   }
 }

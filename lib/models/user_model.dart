@@ -29,6 +29,10 @@ class User {
   final DateTime? lastDailyRewardDate; // Son günlük ödül alınan tarih
   final int garageLimit; // Garaj limiti
 
+  // ========== GÜNLÜK İSTATİSTİKLER ==========
+  final double dailyStartingBalance; // Gün başlangıcındaki bakiye
+  final DateTime? lastDailyResetDate; // Son günlük sıfırlama tarihi
+
   // ========== YETENEK SİSTEMİ ==========
   final int skillPoints; // Harcanabilir yetenek puanı
   final List<String> unlockedSkills; // Açılan yeteneklerin ID listesi
@@ -60,6 +64,9 @@ class User {
     this.lastLoginDate,
     this.lastDailyRewardDate,
     this.garageLimit = 3, // Varsayılan limit
+    // Günlük İstatistikler
+    this.dailyStartingBalance = 1000000.0,
+    this.lastDailyResetDate,
     // Yetenek Sistemi
     this.skillPoints = 0,
     this.unlockedSkills = const [],
@@ -174,6 +181,11 @@ class User {
           ? DateTime.parse(json['lastDailyRewardDate']) 
           : null,
       garageLimit: json['garageLimit'] as int? ?? 3,
+      // Günlük İstatistikler
+      dailyStartingBalance: (json['dailyStartingBalance'] as num?)?.toDouble() ?? (json['balance'] as num?)?.toDouble() ?? 1000000.0,
+      lastDailyResetDate: json['lastDailyResetDate'] != null 
+          ? DateTime.parse(json['lastDailyResetDate']) 
+          : null,
       // Yetenek Sistemi - Migration Logic: Eğer skillPoints null ise ve level > 1 ise, puan ver.
       skillPoints: json['skillPoints'] as int? ?? ((json['level'] as int? ?? 1) - 1),
       unlockedSkills: (json['unlockedSkills'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
@@ -209,6 +221,9 @@ class User {
       'lastLoginDate': lastLoginDate?.toIso8601String(),
       'lastDailyRewardDate': lastDailyRewardDate?.toIso8601String(),
       'garageLimit': garageLimit,
+      // Günlük İstatistikler
+      'dailyStartingBalance': dailyStartingBalance,
+      'lastDailyResetDate': lastDailyResetDate?.toIso8601String(),
       // Yetenek Sistemi
       'skillPoints': skillPoints,
       'unlockedSkills': unlockedSkills,
@@ -242,6 +257,8 @@ class User {
     DateTime? lastLoginDate,
     DateTime? lastDailyRewardDate,
     int? garageLimit,
+    double? dailyStartingBalance,
+    DateTime? lastDailyResetDate,
     int? skillPoints,
     List<String>? unlockedSkills,
   }) {
@@ -271,6 +288,8 @@ class User {
       lastLoginDate: lastLoginDate ?? this.lastLoginDate,
       lastDailyRewardDate: lastDailyRewardDate ?? this.lastDailyRewardDate,
       garageLimit: garageLimit ?? this.garageLimit,
+      dailyStartingBalance: dailyStartingBalance ?? this.dailyStartingBalance,
+      lastDailyResetDate: lastDailyResetDate ?? this.lastDailyResetDate,
       skillPoints: skillPoints ?? this.skillPoints,
       unlockedSkills: unlockedSkills ?? this.unlockedSkills,
     );

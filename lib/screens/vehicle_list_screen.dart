@@ -34,13 +34,12 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   String? selectedMileageRange;
   String? selectedPriceRange;
   String? selectedYearRange;
+  String? _selectedSortOption; // 'price_asc', 'price_desc'
   
   // Yakıt tipi mapping (backend değerleri)
   final Map<String, String> _fuelTypeMapping = {
     'Benzin': 'vehicles.fuelGasoline',
     'Dizel': 'vehicles.fuelDiesel',
-    'Hybrid': 'vehicles.fuelHybrid',
-    'Elektrik': 'vehicles.fuelElectric',
   };
   
   // Vites tipi mapping (backend değerleri)
@@ -106,6 +105,13 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         
         return true;
       }).toList();
+
+      // Sıralama
+      if (_selectedSortOption == 'price_asc') {
+        filteredVehicles.sort((a, b) => a.price.compareTo(b.price));
+      } else if (_selectedSortOption == 'price_desc') {
+        filteredVehicles.sort((a, b) => b.price.compareTo(a.price));
+      }
     });
   }
   
@@ -255,6 +261,46 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+
+          // Sıralama Filtresi
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(color: Colors.grey[200]!),
+                bottom: BorderSide(color: Colors.grey[200]!),
+              ),
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Icon(Icons.sort, size: 16, color: Colors.grey[600]),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Sırala:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildSortChip(
+                    'Fiyat: Düşükten Yükseğe',
+                    'price_asc',
+                  ),
+                  const SizedBox(width: 8),
+                  _buildSortChip(
+                    'Fiyat: Yüksekten Düşüğe',
+                    'price_desc',
+                  ),
+                ],
+              ),
             ),
           ),
           
@@ -1356,6 +1402,40 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     return amount.toStringAsFixed(0).replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
+    );
+  }
+
+  Widget _buildSortChip(String label, String value) {
+    final isSelected = _selectedSortOption == value;
+    return InkWell(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            _selectedSortOption = null;
+          } else {
+            _selectedSortOption = value;
+          }
+          _applyFilters();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? widget.categoryColor.withOpacity(0.1) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? widget.categoryColor : Colors.grey[300]!,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? widget.categoryColor : Colors.grey[700],
+          ),
+        ),
+      ),
     );
   }
 }
