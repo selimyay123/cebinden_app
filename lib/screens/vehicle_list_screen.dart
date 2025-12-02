@@ -373,6 +373,12 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
             ),
           );
           
+          // Listeyi yenile (Ekspertiz durumu değişmiş olabilir)
+          if (context.mounted) {
+            _loadVehicles();
+            _applyFilters();
+          }
+          
           // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
           if (purchased == true && context.mounted) {
             Navigator.pop(context, true);

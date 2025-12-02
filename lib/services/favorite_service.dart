@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/vehicle_model.dart';
+import 'market_refresh_service.dart';
 
 /// Favori ilanları yöneten servis
 class FavoriteService {
@@ -68,8 +69,17 @@ class FavoriteService {
         if (key.startsWith('${userId}_')) {
           try {
             final vehicleMap = Map<String, dynamic>.from(entry.value);
-            final vehicle = Vehicle.fromJson(vehicleMap);
-            favorites.add(vehicle);
+            final storedVehicle = Vehicle.fromJson(vehicleMap);
+            
+            // Market servisinden güncel veriyi kontrol et
+            // Eğer araç hala markette ise, güncel halini (ekspertiz yapılmış vs.) al
+            final marketVehicle = MarketRefreshService().getVehicleById(storedVehicle.id);
+            
+            if (marketVehicle != null) {
+              favorites.add(marketVehicle);
+            } else {
+              favorites.add(storedVehicle);
+            }
           } catch (e) {
             print('Favori vehicle parse hatası: $e');
           }

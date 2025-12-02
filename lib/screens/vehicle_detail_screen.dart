@@ -15,6 +15,8 @@ import '../services/xp_service.dart';
 import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
+import '../services/skill_service.dart'; // Yetenek Servisi
+import '../services/market_refresh_service.dart'; // Market Servisi (Fiyat hesaplama için)
 import '../widgets/vehicle_top_view.dart';
 import 'my_offers_screen.dart';
 import 'my_vehicles_screen.dart';
@@ -42,12 +44,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   final FavoriteService _favoriteService = FavoriteService();
   final XPService _xpService = XPService();
   final DailyQuestService _questService = DailyQuestService();
+  final MarketRefreshService _marketService = MarketRefreshService();
   User? _currentUser;
   bool _isFavorite = false;
+  late Vehicle _vehicle;
 
   @override
   void initState() {
     super.initState();
+    _vehicle = widget.vehicle;
     _tabController = TabController(length: 2, vsync: this);
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     _loadCurrentUser();
@@ -64,7 +69,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final user = await _authService.getCurrentUser();
     if (user != null) {
       // Favori durumunu kontrol et
-      final isFavorite = _favoriteService.isFavorite(user.id, widget.vehicle.id);
+      final isFavorite = _favoriteService.isFavorite(user.id, _vehicle.id);
       setState(() {
         _currentUser = user;
         _isFavorite = isFavorite;
@@ -78,7 +83,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     if (_isFavorite) {
       // Favoriden kaldır
-      final success = await _favoriteService.removeFavorite(_currentUser!.id, widget.vehicle.id);
+      final success = await _favoriteService.removeFavorite(_currentUser!.id, _vehicle.id);
       if (success) {
         setState(() {
           _isFavorite = false;
@@ -95,7 +100,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       }
     } else {
       // Favorilere ekle
-      final success = await _favoriteService.addFavorite(_currentUser!.id, widget.vehicle);
+      final success = await _favoriteService.addFavorite(_currentUser!.id, _vehicle);
       if (success) {
         setState(() {
           _isFavorite = true;
@@ -192,7 +197,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.vehicle.fullName,
+                        _vehicle.fullName,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -205,7 +210,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                           Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                           const SizedBox(width: 4),
                           Text(
-                            widget.vehicle.location,
+                            _vehicle.location,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -373,12 +378,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       );
     }
 
+    // Ekspertiz sonrası fiyat değişimi kontrolü
+    // Eğer ekspertiz yapıldıysa ve fiyat düştüyse, eski fiyatı çizili göster
+    final bool priceDropped = _vehicle.isExpertiseDone && _vehicle.price < _vehicle.declaredPrice;
+    
+    // Yetenek indirimi
     final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
-    final discountedPrice = widget.vehicle.price * multiplier;
+    final discountedPrice = _vehicle.price * multiplier;
+    final hasSkillDiscount = multiplier < 1.0;
 
-    if (multiplier >= 1.0) {
+    if (!priceDropped && !hasSkillDiscount) {
+      // Hiçbir indirim yok
       return Text(
-        '${_formatCurrency(widget.vehicle.price)} TL',
+        '${_formatCurrency(_vehicle.price)} TL',
         style: const TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
@@ -390,42 +402,68 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          '${_formatCurrency(widget.vehicle.price)} TL',
-          style: TextStyle(
-            fontSize: 14,
-            decoration: TextDecoration.lineThrough,
-            color: Colors.grey[600],
+        // 1. Ekspertiz öncesi fiyat (Eğer düştüyse)
+        if (priceDropped)
+          Text(
+            '${_formatCurrency(_vehicle.declaredPrice)} TL',
+            style: TextStyle(
+              fontSize: 14,
+              decoration: TextDecoration.lineThrough,
+              color: Colors.red[300],
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                '-%${((1 - multiplier) * 100).toStringAsFixed(0)}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+          
+        // 2. Güncel Liste Fiyatı (Eğer yetenek indirimi varsa çizili, yoksa normal)
+        if (hasSkillDiscount) ...[
+          Text(
+            '${_formatCurrency(_vehicle.price)} TL',
+            style: TextStyle(
+              fontSize: priceDropped ? 14 : 16, // Eğer üstte çizili varsa bunu da küçük yap
+              decoration: TextDecoration.lineThrough,
+              color: Colors.grey[600],
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '-%${((1 - multiplier) * 100).toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '${_formatCurrency(discountedPrice)} TL',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+              const SizedBox(width: 8),
+              Text(
+                '${_formatCurrency(discountedPrice)} TL',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
               ),
+            ],
+          ),
+        ] else ...[
+          // Sadece ekspertiz indirimi var, yetenek indirimi yok
+          Text(
+            '${_formatCurrency(_vehicle.price)} TL',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.green, // Fiyat düştüğü için yeşil
             ),
-          ],
-        ),
+          ),
+        ],
       ],
     );
   }
@@ -436,7 +474,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final currentBalance = _currentUser!.balance;
     // Yetenek indirimi uygula
     final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
-    final vehiclePrice = widget.vehicle.price * multiplier;
+    final vehiclePrice = _vehicle.price * multiplier;
     
     final remainingBalance = currentBalance - vehiclePrice;
     final canAfford = remainingBalance >= 0;
@@ -467,7 +505,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ),
               ),
               const SizedBox(height: 16),
-              _buildInfoRow('purchase.vehicle'.tr(), widget.vehicle.fullName),
+              _buildInfoRow('purchase.vehicle'.tr(), _vehicle.fullName),
               const Divider(),
               _buildInfoRow(
                 'purchase.currentBalance'.tr(),
@@ -641,7 +679,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '${widget.vehicle.brand} ${widget.vehicle.model}',
+                      '${_vehicle.brand} ${_vehicle.model}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -675,7 +713,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     try {
       // 1️⃣ Bakiyeyi düş (İndirimli fiyat)
       final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
-      final finalPrice = widget.vehicle.price * multiplier;
+      final finalPrice = _vehicle.price * multiplier;
       
       final newBalance = _currentUser!.balance - finalPrice;
       final balanceUpdateSuccess = await _db.updateUser(
@@ -688,26 +726,26 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       }
 
       // 2️⃣ Aracı tüm kullanıcıların favorilerinden kaldır (ilan satıldı)
-      await _favoriteService.removeVehicleFromAllFavorites(widget.vehicle.id);
+      await _favoriteService.removeVehicleFromAllFavorites(_vehicle.id);
 
       // 3️⃣ Aracı kullanıcıya ekle
       final userVehicle = UserVehicle.purchase(
         userId: _currentUser!.id,
-        vehicleId: widget.vehicle.id,
-        brand: widget.vehicle.brand,
-        model: widget.vehicle.model,
-        year: widget.vehicle.year,
-        mileage: widget.vehicle.mileage,
+        vehicleId: _vehicle.id,
+        brand: _vehicle.brand,
+        model: _vehicle.model,
+        year: _vehicle.year,
+        mileage: _vehicle.mileage,
         purchasePrice: finalPrice, // İndirimli fiyatı kaydet
-        color: widget.vehicle.color,
-        fuelType: widget.vehicle.fuelType,
-        transmission: widget.vehicle.transmission,
-        engineSize: widget.vehicle.engineSize,
-        driveType: widget.vehicle.driveType,
-        hasWarranty: widget.vehicle.hasWarranty,
-        hasAccidentRecord: widget.vehicle.hasAccidentRecord,
-        score: widget.vehicle.score, // İlan skoru (Vehicle'dan alınır)
-        imageUrl: widget.vehicle.imageUrl,
+        color: _vehicle.color,
+        fuelType: _vehicle.fuelType,
+        transmission: _vehicle.transmission,
+        engineSize: _vehicle.engineSize,
+        driveType: _vehicle.driveType,
+        hasWarranty: _vehicle.hasWarranty,
+        hasAccidentRecord: _vehicle.hasAccidentRecord,
+        score: _vehicle.score, // İlan skoru (Vehicle'dan alınır)
+        imageUrl: _vehicle.imageUrl,
       );
 
       final vehicleAddSuccess = await _db.addUserVehicle(userVehicle);
@@ -788,7 +826,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  widget.vehicle.fullName,
+                  _vehicle.fullName,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 20,
@@ -929,6 +967,288 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     );
   }
 
+  Widget _buildExpertiseCard() {
+    final bool hasIssues = _vehicle.isExpertiseDone && 
+        (_vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord || 
+         _vehicle.declaredMileage != _vehicle.mileage ||
+         _vehicle.declaredPartConditions.toString() != _vehicle.partConditions.toString());
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: _vehicle.isExpertiseDone 
+            ? Border.all(color: hasIssues ? Colors.red : Colors.green, width: 2)
+            : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.fact_check, 
+                    color: _vehicle.isExpertiseDone 
+                        ? (hasIssues ? Colors.red : Colors.green)
+                        : Colors.deepPurple, 
+                    size: 24
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _vehicle.isExpertiseDone ? 'Ekspertiz Raporu' : 'Ekspertiz Durumu',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: _vehicle.isExpertiseDone 
+                          ? (hasIssues ? Colors.red : Colors.green)
+                          : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              if (_vehicle.isExpertiseDone)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: hasIssues ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    hasIssues ? 'FARK BULUNDU!' : 'TEMİZ',
+                    style: TextStyle(
+                      color: hasIssues ? Colors.red : Colors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (!_vehicle.isExpertiseDone) ...[
+            const Text(
+              'Araç bilgileri satıcı beyanına dayanmaktadır. Ekspertiz yaptırarak gerçek durumu öğrenebilirsiniz.',
+              style: TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _currentUser != null ? _showExpertiseDialog : null,
+                icon: const Icon(Icons.search),
+                label: const Text('Ekspertize Sok (3.000 TL)'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ] else ...[
+            // Rapor Detayları
+            _buildExpertiseRow(
+              'Hasar Kaydı', 
+              _vehicle.declaredAccidentRecord ? 'Var' : 'Yok',
+              _vehicle.hasAccidentRecord ? 'Var' : 'Yok',
+              isIssue: _vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord
+            ),
+            const Divider(),
+            _buildExpertiseRow(
+              'Kilometre', 
+              '${_formatNumber(_vehicle.declaredMileage)} km',
+              '${_formatNumber(_vehicle.mileage)} km',
+              isIssue: _vehicle.declaredMileage != _vehicle.mileage
+            ),
+            const Divider(),
+            _buildExpertiseRow(
+              'Parça Durumu', 
+              _checkPartsStatus(_vehicle.declaredPartConditions),
+              _checkPartsStatus(_vehicle.partConditions),
+              isIssue: _vehicle.declaredPartConditions.toString() != _vehicle.partConditions.toString()
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _checkPartsStatus(Map<String, String> parts) {
+    final issueCount = parts.values.where((v) => v != 'orijinal').length;
+    if (issueCount == 0) return 'Hatasız';
+    return '$issueCount Parça İşlemli';
+  }
+
+  Widget _buildExpertiseRow(String label, String declared, String real, {required bool isIssue}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+          ),
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Beyan: $declared', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                if (isIssue)
+                  Text('Gerçek: $real', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+                else
+                  const Text('Gerçek: Doğrulandı', style: TextStyle(color: Colors.green, fontSize: 13)),
+              ],
+            ),
+          ),
+          if (isIssue)
+            const Icon(Icons.warning, color: Colors.red, size: 20)
+          else
+            const Icon(Icons.check_circle, color: Colors.green, size: 20),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showExpertiseDialog() async {
+    if (_currentUser == null) return;
+    
+    final cost = 3000.0;
+    final canAfford = _currentUser!.balance >= cost;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ekspertiz Yaptır'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Aracın gerçek durumunu öğrenmek için ekspertize sokmak ister misiniz?'),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Ekspertiz Ücreti:'),
+                Text(
+                  '${_formatCurrency(cost)} TL',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                ),
+              ],
+            ),
+            if (!canAfford)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  'Yetersiz Bakiye!',
+                  style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.bold),
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: canAfford 
+                ? () {
+                    Navigator.pop(context);
+                    _performExpertise(cost);
+                  }
+                : null,
+            child: const Text('Onayla ve Öde'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performExpertise(double cost) async {
+    // 1. Ödemeyi al
+    final newBalance = _currentUser!.balance - cost;
+    await _db.updateUser(_currentUser!.id, {'balance': newBalance});
+    await _loadCurrentUser(); // Bakiyeyi güncelle
+
+    // 2. Animasyon göster (Opsiyonel, şimdilik loading)
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+    
+    await Future.delayed(const Duration(seconds: 2)); // Simüle et
+    
+    if (!mounted) return;
+    Navigator.pop(context); // Loading kapat
+
+    // 3. Gerçek değerleri hesapla ve güncelle
+    // Eğer yalan varsa, fiyatı gerçek değerlere göre güncelle
+    double newPrice = _vehicle.price;
+    bool hasLies = _vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord || 
+                   _vehicle.declaredMileage != _vehicle.mileage ||
+                   _vehicle.declaredPartConditions.toString() != _vehicle.partConditions.toString();
+
+    if (hasLies) {
+      newPrice = _marketService.generateRealisticPrice(
+        brand: _vehicle.brand,
+        model: _vehicle.model,
+        year: _vehicle.year,
+        mileage: _vehicle.mileage, // Gerçek KM
+        fuelType: _vehicle.fuelType,
+        transmission: _vehicle.transmission,
+        hasAccidentRecord: _vehicle.hasAccidentRecord, // Gerçek Hasar
+        sellerType: _vehicle.sellerType,
+        driveType: _vehicle.driveType,
+        bodyType: _vehicle.bodyType,
+        horsepower: _vehicle.horsepower,
+      );
+      
+      // Fiyatı güncelle
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Ekspertiz sonucunda gizli kusurlar bulundu! Fiyat güncellendi.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Araç temiz! Satıcı beyanı doğrulandı.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
+
+    setState(() {
+      _vehicle = _vehicle.copyWith(
+        isExpertiseDone: true,
+        price: newPrice,
+        // declaredPrice değişmez, böylece referans olarak kalır
+      );
+    });
+    
+    // Market servisindeki ilanı güncelle (Kalıcılık için)
+    _marketService.updateListing(_vehicle);
+  }
+
   Widget _buildSpecificationsTab() {
     return Container(
       color: Colors.grey[100],
@@ -936,13 +1256,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildExpertiseCard(),
+          const SizedBox(height: 12),
           _buildInfoCard(
             title: 'vehicles.listingInfo'.tr(),
             icon: Icons.info_outline,
             children: [
-              _buildInfoRow('vehicles.listingNo'.tr(), '#${widget.vehicle.id.substring(0, 8).toUpperCase()}'),
-              _buildInfoRow('vehicles.listingDate'.tr(), _formatDate(widget.vehicle.listedAt)),
-              _buildInfoRow('vehicles.sellerType'.tr(), widget.vehicle.sellerType),
+              _buildInfoRow('vehicles.listingNo'.tr(), '#${_vehicle.id.substring(0, 8).toUpperCase()}'),
+              _buildInfoRow('vehicles.listingDate'.tr(), _formatDate(_vehicle.listedAt)),
+              _buildInfoRow('vehicles.sellerType'.tr(), _vehicle.sellerType),
             ],
           ),
           const SizedBox(height: 12),
@@ -950,10 +1272,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             title: 'vehicles.vehicleInfo'.tr(),
             icon: Icons.directions_car,
             children: [
-              _buildInfoRow('vehicles.brand'.tr(), widget.vehicle.brand),
-              _buildInfoRow('vehicles.model'.tr(), widget.vehicle.model),
-              _buildInfoRow('vehicles.year'.tr(), widget.vehicle.year.toString()),
-              _buildInfoRow('vehicles.condition'.tr(), widget.vehicle.condition),
+              _buildInfoRow('vehicles.brand'.tr(), _vehicle.brand),
+              _buildInfoRow('vehicles.model'.tr(), _vehicle.model),
+              _buildInfoRow('vehicles.year'.tr(), _vehicle.year.toString()),
+              _buildInfoRow('vehicles.condition'.tr(), _vehicle.condition),
             ],
           ),
           const SizedBox(height: 12),
@@ -961,14 +1283,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             title: 'vehicles.technicalSpecs'.tr(),
             icon: Icons.settings,
             children: [
-              _buildInfoRow('vehicles.bodyType'.tr(), widget.vehicle.bodyType),
-              _buildInfoRow('vehicles.engineSize'.tr(), '${widget.vehicle.engineSize} L'),
-              _buildInfoRow('vehicles.horsepower'.tr(), '${widget.vehicle.horsepower} HP'),
-              _buildInfoRow('vehicles.fuelType'.tr(), widget.vehicle.fuelType),
-              _buildInfoRow('vehicles.transmission'.tr(), widget.vehicle.transmission),
-              _buildInfoRow('vehicles.driveType'.tr(), widget.vehicle.driveType),
-              _buildInfoRow('vehicles.mileage'.tr(), '${_formatNumber(widget.vehicle.mileage)} km'),
-              _buildInfoRow('vehicles.color'.tr(), widget.vehicle.color),
+              _buildInfoRow('vehicles.bodyType'.tr(), _vehicle.bodyType),
+              _buildInfoRow('vehicles.engineSize'.tr(), '${_vehicle.engineSize} L'),
+              _buildInfoRow('vehicles.horsepower'.tr(), '${_vehicle.horsepower} HP'),
+              _buildInfoRow('vehicles.fuelType'.tr(), _vehicle.fuelType),
+              _buildInfoRow('vehicles.transmission'.tr(), _vehicle.transmission),
+              _buildInfoRow('vehicles.driveType'.tr(), _vehicle.driveType),
+              _buildInfoRow('vehicles.mileage'.tr(), '${_formatNumber(_vehicle.mileage)} km'),
+              _buildInfoRow('vehicles.color'.tr(), _vehicle.color),
             ],
           ),
           const SizedBox(height: 12),
@@ -978,13 +1300,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             children: [
               _buildInfoRow(
                 'vehicles.warrantyStatus'.tr(),
-                widget.vehicle.hasWarranty ? '✅ ${'vehicles.available'.tr()}' : '❌ ${'vehicles.notAvailable'.tr()}',
-                valueColor: widget.vehicle.hasWarranty ? Colors.green : Colors.red,
+                _vehicle.hasWarranty ? '✅ ${'vehicles.available'.tr()}' : '❌ ${'vehicles.notAvailable'.tr()}',
+                valueColor: _vehicle.hasWarranty ? Colors.green : Colors.red,
               ),
               _buildInfoRow(
                 'vehicles.accidentRecord'.tr(),
-                widget.vehicle.hasAccidentRecord ? '⚠️ ${'vehicles.yes'.tr()}' : '✅ ${'vehicles.no'.tr()}',
-                valueColor: widget.vehicle.hasAccidentRecord ? Colors.red : Colors.green,
+                _vehicle.hasAccidentRecord ? '⚠️ ${'vehicles.yes'.tr()}' : '✅ ${'vehicles.no'.tr()}',
+                valueColor: _vehicle.hasAccidentRecord ? Colors.red : Colors.green,
               ),
             ],
           ),
@@ -1022,7 +1344,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 const SizedBox(height: 16),
                 Center(
                   child: VehicleTopView(
-                    partConditions: widget.vehicle.partConditions,
+                    partConditions: _vehicle.partConditions,
                     width: 250,
                     height: 400,
                   ),
@@ -1071,7 +1393,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              widget.vehicle.description,
+              _vehicle.description,
               style: TextStyle(
                 fontSize: 15,
                 height: 1.6,
@@ -1177,7 +1499,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     if (_currentUser != null) {
       final previousOffers = await _db.getOffersByBuyerId(_currentUser!.id);
       final rejectedOffer = previousOffers.where((o) => 
-        o.vehicleId == widget.vehicle.id && 
+        o.vehicleId == _vehicle.id && 
         o.status == OfferStatus.rejected
       ).firstOrNull;
 
@@ -1224,7 +1546,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${widget.vehicle.brand} ${widget.vehicle.model}',
+                '${_vehicle.brand} ${_vehicle.model}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -1232,7 +1554,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                '${'offer.listingPrice'.tr()}: ${_formatCurrency(widget.vehicle.price)} TL',
+                '${'offer.listingPrice'.tr()}: ${_formatCurrency(_vehicle.price)} TL',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -1282,7 +1604,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 return;
               }
 
-              if (offerAmount >= widget.vehicle.price) {
+              if (offerAmount >= _vehicle.price) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('offer.offerTooHighError'.tr())),
                 );
@@ -1335,7 +1657,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${widget.vehicle.brand} ${widget.vehicle.model}',
+                    '${_vehicle.brand} ${_vehicle.model}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -1350,7 +1672,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       Text(
-                        '${_formatCurrency(widget.vehicle.price)} TL',
+                        '${_formatCurrency(_vehicle.price)} TL',
                         style: const TextStyle(
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -1444,7 +1766,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       final result = await _offerService.submitUserOffer(
         userId: _currentUser!.id,
         userName: _currentUser!.username,
-        vehicle: widget.vehicle,
+        vehicle: _vehicle,
         offerPrice: offerAmount,
         message: null,
       );

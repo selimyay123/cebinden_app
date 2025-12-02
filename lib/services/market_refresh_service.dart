@@ -1316,15 +1316,53 @@ class MarketRefreshService {
     final hasAccidentRecord = _random.nextInt(10) < 2; // %20
     final sellerType = _sellerTypes[_random.nextInt(_sellerTypes.length)];
     
-    // Fiyat oluştur (yeni sistem)
-    final price = _generateRealisticPrice(
+    // Gerçek parça durumlarını oluştur
+    final realPartConditions = _generatePartConditions();
+    
+    // YALAN SÖYLEME MANTIĞI (Ekspertiz Sistemi)
+    // Varsayılan: Dürüst satıcı (Beyan = Gerçek)
+    bool declaredAccidentRecord = hasAccidentRecord;
+    int declaredMileage = mileage;
+    Map<String, String> declaredPartConditions = Map.from(realPartConditions);
+    
+    // %25 ihtimalle satıcı yalan söyler (eğer saklanacak bir şey varsa)
+    bool isLying = false;
+    if (_random.nextDouble() < 0.25) {
+      // 1. Hasar Kaydı Yalanı
+      if (hasAccidentRecord) {
+        declaredAccidentRecord = false; // "Hasar kaydı yok" yalanı
+        isLying = true;
+      }
+      
+      // 2. Kilometre Düşürme Yalanı (Yüksek km araçlarda)
+      if (mileage > 180000) {
+        // Km'yi %30-50 düşür
+        declaredMileage = (mileage * (0.5 + _random.nextDouble() * 0.2)).toInt();
+        isLying = true;
+      }
+      
+      // 3. Parça Durumu Yalanı (Boyalı/Değişen parçaları temiz gösterme)
+      final parts = realPartConditions.keys.toList();
+      for (var part in parts) {
+        if (realPartConditions[part] != 'orijinal') {
+          // %70 ihtimalle bu parçayı temiz göster
+          if (_random.nextDouble() < 0.70) {
+            declaredPartConditions[part] = 'orijinal';
+            isLying = true;
+          }
+        }
+      }
+    }
+    
+    // Fiyatı BEYAN EDİLEN özelliklere göre hesapla (Böylece ayıplı araç pahalıya satılır)
+    final price = generateRealisticPrice(
       brand: brand,
       model: model,
       year: year,
-      mileage: mileage,
+      mileage: declaredMileage, // Beyan edilen km
       fuelType: fuelType,
       transmission: transmission,
-      hasAccidentRecord: hasAccidentRecord,
+      hasAccidentRecord: declaredAccidentRecord, // Beyan edilen hasar durumu
       sellerType: sellerType,
       driveType: driveType,
       bodyType: bodyType,
@@ -1336,7 +1374,7 @@ class MarketRefreshService {
       brand: brand,
       model: model,
       year: year,
-      mileage: mileage,
+      mileage: mileage, // Gerçek km
       price: price,
       location: _cities[_random.nextInt(_cities.length)],
       color: _colors[_random.nextInt(_colors.length)],
@@ -1346,7 +1384,7 @@ class MarketRefreshService {
       engineSize: engineSize,
       driveType: driveType,
       hasWarranty: _random.nextBool(),
-      hasAccidentRecord: hasAccidentRecord,
+      hasAccidentRecord: hasAccidentRecord, // Gerçek hasar durumu
       description: _generateDescription(
         brand: brand,
         model: model,
@@ -1359,6 +1397,13 @@ class MarketRefreshService {
       bodyType: bodyType,
       horsepower: horsepower,
       sellerType: sellerType,
+      partConditions: realPartConditions, // Gerçek parçalar
+      
+      // Ekspertiz verileri
+      declaredAccidentRecord: declaredAccidentRecord,
+      declaredMileage: declaredMileage,
+      declaredPartConditions: declaredPartConditions,
+      isExpertiseDone: false,
     );
     
     // Yaşam süresi hesapla (skora göre)
@@ -1515,8 +1560,8 @@ class MarketRefreshService {
     }
   }
 
-  /// Gerçekçi fiyat oluştur
-  double _generateRealisticPrice({
+  /// Gerçekçi fiyat oluştur (Marka, model, yıl ve km bazlı)
+  double generateRealisticPrice({
     required String brand,
     required String model,
     required int year,
@@ -2324,7 +2369,28 @@ class MarketRefreshService {
     final variation = ((_random.nextDouble() * 0.16) - 0.08);
     finalPrice = finalPrice * (1 + variation);
     
-    return finalPrice.clamp(50000.0, basePrice * 1.1);
+    return finalPrice.clamp(150000.0, basePrice * 1.1);
+  }
+
+  /// Rastgele parça durumları oluştur
+  Map<String, String> _generatePartConditions() {
+    final parts = <String, String>{};
+    final conditions = ['orijinal', 'lokal_boyali', 'boyali', 'degisen'];
+    
+    // %70 oranında orijinal parçalar
+    parts['kaput'] = _random.nextInt(100) < 70 ? 'orijinal' : conditions[_random.nextInt(4)];
+    parts['tavan'] = _random.nextInt(100) < 85 ? 'orijinal' : conditions[_random.nextInt(3)]; // Tavan değişimi nadir
+    parts['bagaj'] = _random.nextInt(100) < 75 ? 'orijinal' : conditions[_random.nextInt(4)];
+    parts['sol_on_camurluk'] = _random.nextInt(100) < 80 ? 'orijinal' : conditions[_random.nextInt(4)];
+    parts['sag_on_camurluk'] = _random.nextInt(100) < 80 ? 'orijinal' : conditions[_random.nextInt(4)];
+    parts['sol_on_kapi'] = _random.nextInt(100) < 85 ? 'orijinal' : conditions[_random.nextInt(3)];
+    parts['sag_on_kapi'] = _random.nextInt(100) < 85 ? 'orijinal' : conditions[_random.nextInt(3)];
+    parts['sol_arka_kapi'] = _random.nextInt(100) < 85 ? 'orijinal' : conditions[_random.nextInt(3)];
+    parts['sag_arka_kapi'] = _random.nextInt(100) < 85 ? 'orijinal' : conditions[_random.nextInt(3)];
+    parts['sol_arka_camurluk'] = _random.nextInt(100) < 80 ? 'orijinal' : conditions[_random.nextInt(4)];
+    parts['sag_arka_camurluk'] = _random.nextInt(100) < 80 ? 'orijinal' : conditions[_random.nextInt(4)];
+    
+    return parts;
   }
 
   /// Açıklama oluştur (model-spesifik)
@@ -2900,6 +2966,27 @@ class MarketRefreshService {
   void dispose() {
     _gameTime.removeDayChangeListener(_onDayChange);
     _activeListings.clear();
+  }
+  /// İlanı güncelle (Ekspertiz sonrası vb.)
+  void updateListing(Vehicle updatedVehicle) {
+    final index = _activeListings.indexWhere((l) => l.vehicle.id == updatedVehicle.id);
+    if (index != -1) {
+      final oldListing = _activeListings[index];
+      _activeListings[index] = MarketListing(
+        vehicle: updatedVehicle,
+        createdDay: oldListing.createdDay,
+        expiryDay: oldListing.expiryDay,
+      );
+    }
+  }
+
+  /// ID'ye göre araç getir (Favoriler için güncel veri)
+  Vehicle? getVehicleById(String id) {
+    final index = _activeListings.indexWhere((l) => l.vehicle.id == id);
+    if (index != -1) {
+      return _activeListings[index].vehicle;
+    }
+    return null;
   }
 }
 

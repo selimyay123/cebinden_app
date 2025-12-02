@@ -25,6 +25,13 @@ class Vehicle {
   final int horsepower; // Motor gücü (HP)
   final String sellerType; // Kimden (Sahibinden, Galeriden)
   final Map<String, String> partConditions; // Parça durumları (orijinal, lokal_boyali, boyali, degisen)
+  
+  // Ekspertiz Sistemi Alanları
+  final bool declaredAccidentRecord; // Beyan edilen hasar durumu
+  final Map<String, String> declaredPartConditions; // Beyan edilen parça durumları
+  final int declaredMileage; // Beyan edilen kilometre
+  final double declaredPrice; // Beyan edilen (ilk) fiyat
+  final bool isExpertiseDone; // Ekspertiz yapıldı mı?
 
   Vehicle({
     required this.id,
@@ -51,6 +58,11 @@ class Vehicle {
     required this.horsepower,
     this.sellerType = 'Sahibinden',
     this.partConditions = const {},
+    required this.declaredAccidentRecord,
+    required this.declaredPartConditions,
+    required this.declaredMileage,
+    required this.declaredPrice,
+    this.isExpertiseDone = false,
   });
 
   // Yeni araç ilanı oluşturma factory
@@ -76,6 +88,12 @@ class Vehicle {
     required int horsepower,
     String sellerType = 'Sahibinden',
     Map<String, String>? partConditions,
+    // Ekspertiz opsiyonel alanları (verilmezse gerçek değerler kullanılır)
+    bool? declaredAccidentRecord,
+    Map<String, String>? declaredPartConditions,
+    int? declaredMileage,
+    double? declaredPrice,
+    bool isExpertiseDone = false,
   }) {
     // Skor hesapla (otomatik)
     final calculatedScore = _calculateScore(
@@ -89,6 +107,8 @@ class Vehicle {
       engineSize: engineSize,
       condition: condition,
     );
+
+    final finalPartConditions = partConditions ?? _generateRandomPartConditions();
 
     return Vehicle(
       id: const Uuid().v4(),
@@ -114,7 +134,12 @@ class Vehicle {
       bodyType: bodyType,
       horsepower: horsepower,
       sellerType: sellerType,
-      partConditions: partConditions ?? _generateRandomPartConditions(),
+      partConditions: finalPartConditions,
+      declaredAccidentRecord: declaredAccidentRecord ?? hasAccidentRecord,
+      declaredPartConditions: declaredPartConditions ?? finalPartConditions,
+      declaredMileage: declaredMileage ?? mileage,
+      declaredPrice: declaredPrice ?? price,
+      isExpertiseDone: isExpertiseDone,
     );
   }
 
@@ -332,6 +357,10 @@ class Vehicle {
       );
     }
 
+    final partConditions = json['partConditions'] != null 
+          ? Map<String, String>.from(json['partConditions'] as Map)
+          : _generateRandomPartConditions();
+
     return Vehicle(
       id: json['id'] as String,
       brand: json['brand'] as String,
@@ -356,9 +385,14 @@ class Vehicle {
       bodyType: json['bodyType'] as String? ?? 'Sedan',
       horsepower: json['horsepower'] as int? ?? 150,
       sellerType: json['sellerType'] as String? ?? 'Sahibinden',
-      partConditions: json['partConditions'] != null 
-          ? Map<String, String>.from(json['partConditions'] as Map)
-          : _generateRandomPartConditions(),
+      partConditions: partConditions,
+      declaredAccidentRecord: json['declaredAccidentRecord'] as bool? ?? json['hasAccidentRecord'] as bool? ?? false,
+      declaredPartConditions: json['declaredPartConditions'] != null 
+          ? Map<String, String>.from(json['declaredPartConditions'] as Map)
+          : partConditions,
+      declaredMileage: json['declaredMileage'] as int? ?? json['mileage'] as int,
+      declaredPrice: (json['declaredPrice'] as num?)?.toDouble() ?? (json['price'] as num).toDouble(),
+      isExpertiseDone: json['isExpertiseDone'] as bool? ?? false,
     );
   }
 
@@ -389,7 +423,77 @@ class Vehicle {
       'horsepower': horsepower,
       'sellerType': sellerType,
       'partConditions': partConditions,
+      'declaredAccidentRecord': declaredAccidentRecord,
+      'declaredPartConditions': declaredPartConditions,
+      'declaredMileage': declaredMileage,
+      'declaredPrice': declaredPrice,
+      'isExpertiseDone': isExpertiseDone,
     };
+  }
+
+  // CopyWith metodu
+  Vehicle copyWith({
+    String? id,
+    String? brand,
+    String? model,
+    int? year,
+    int? mileage,
+    double? price,
+    String? location,
+    String? color,
+    String? fuelType,
+    String? transmission,
+    String? imageUrl,
+    String? condition,
+    DateTime? listedAt,
+    String? sellerId,
+    String? engineSize,
+    String? driveType,
+    bool? hasWarranty,
+    bool? hasAccidentRecord,
+    String? description,
+    int? score,
+    String? bodyType,
+    int? horsepower,
+    String? sellerType,
+    Map<String, String>? partConditions,
+    bool? declaredAccidentRecord,
+    Map<String, String>? declaredPartConditions,
+    int? declaredMileage,
+    double? declaredPrice,
+    bool? isExpertiseDone,
+  }) {
+    return Vehicle(
+      id: id ?? this.id,
+      brand: brand ?? this.brand,
+      model: model ?? this.model,
+      year: year ?? this.year,
+      mileage: mileage ?? this.mileage,
+      price: price ?? this.price,
+      location: location ?? this.location,
+      color: color ?? this.color,
+      fuelType: fuelType ?? this.fuelType,
+      transmission: transmission ?? this.transmission,
+      imageUrl: imageUrl ?? this.imageUrl,
+      condition: condition ?? this.condition,
+      listedAt: listedAt ?? this.listedAt,
+      sellerId: sellerId ?? this.sellerId,
+      engineSize: engineSize ?? this.engineSize,
+      driveType: driveType ?? this.driveType,
+      hasWarranty: hasWarranty ?? this.hasWarranty,
+      hasAccidentRecord: hasAccidentRecord ?? this.hasAccidentRecord,
+      description: description ?? this.description,
+      score: score ?? this.score,
+      bodyType: bodyType ?? this.bodyType,
+      horsepower: horsepower ?? this.horsepower,
+      sellerType: sellerType ?? this.sellerType,
+      partConditions: partConditions ?? this.partConditions,
+      declaredAccidentRecord: declaredAccidentRecord ?? this.declaredAccidentRecord,
+      declaredPartConditions: declaredPartConditions ?? this.declaredPartConditions,
+      declaredMileage: declaredMileage ?? this.declaredMileage,
+      declaredPrice: declaredPrice ?? this.declaredPrice,
+      isExpertiseDone: isExpertiseDone ?? this.isExpertiseDone,
+    );
   }
 
   @override
