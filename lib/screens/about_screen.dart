@@ -51,7 +51,7 @@ class AboutScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Versiyon 1.0.0',
+                    'about.version'.tr(),
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -68,10 +68,7 @@ class AboutScreen extends StatelessWidget {
               icon: Icons.info_outline,
               title: 'about.aboutApp'.tr(),
               content:
-                  'Cebinden, eğlenceli ve interaktif bir araç alım-satım simülasyon oyunudur. '
-                  'Sanal para ile araç alıp satabilir, kar elde edebilir ve garajınızı büyütebilirsiniz!\n\n'
-                  'Bu oyunda gerçek para kullanılmaz, tüm işlemler tamamen simülasyondur. '
-                  'İlan açıklamaları komik ve eğlence amaçlıdır.',
+                  'about.description'.tr(),
             ),
 
             const SizedBox(height: 12),
@@ -81,13 +78,7 @@ class AboutScreen extends StatelessWidget {
               icon: Icons.star_outline,
               title: 'about.features'.tr(),
               content:
-                  '✓ Çeşitli marka ve modellerde araçlar\n'
-                  '✓ Detaylı filtreleme sistemi\n'
-                  '✓ Komik ve eğlenceli ilan açıklamaları\n'
-                  '✓ Kar/zarar takibi\n'
-                  '✓ Kişiselleştirilebilir ayarlar\n'
-                  '✓ Karanlık mod desteği (yakında)\n'
-                  '✓ Çoklu para birimi desteği',
+                  'about.featuresList'.tr(),
             ),
 
             const SizedBox(height: 12),
@@ -97,10 +88,7 @@ class AboutScreen extends StatelessWidget {
               icon: Icons.contact_mail_outlined,
               title: 'about.contactTitle'.tr(),
               content:
-                  'Geri bildirim, öneri veya sorularınız için:\n\n'
-                  '📧 E-posta: info@cebinden.com\n'
-                  '🌐 Web: www.cebinden.com\n'
-                  '📱 Instagram: @cebindenapp',
+                  'about.contactContent'.tr(),
             ),
 
             const SizedBox(height: 12),
@@ -110,9 +98,7 @@ class AboutScreen extends StatelessWidget {
               icon: Icons.code,
               title: 'about.developerTitle'.tr(),
               content:
-                  'Bu uygulama Flutter ile geliştirilmiştir.\n\n'
-                  '© 2024 Cebinden\n'
-                  'Tüm hakları saklıdır.',
+                  'about.developerContent'.tr(),
             ),
 
             const SizedBox(height: 20),
@@ -132,8 +118,7 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Bu bir oyun/simülasyon uygulamasıdır. Gerçek araç alım-satımı yapmaz. '
-                      'Tüm işlemler sanal ve eğlence amaçlıdır.',
+                      'about.disclaimer'.tr(),
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[700],
@@ -150,11 +135,11 @@ class AboutScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildSocialButton(Icons.language, 'Web'),
+                _buildSocialButton(Icons.language, 'about.web'.tr()),
                 const SizedBox(width: 12),
-                _buildSocialButton(Icons.mail, 'E-posta'),
+                _buildSocialButton(Icons.mail, 'about.email'.tr()),
                 const SizedBox(width: 12),
-                _buildSocialButton(Icons.camera_alt, 'Instagram'),
+                _buildSocialButton(Icons.camera_alt, 'about.instagram'.tr()),
               ],
             ),
           ],

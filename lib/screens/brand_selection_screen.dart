@@ -177,7 +177,7 @@ class BrandSelectionScreen extends StatelessWidget {
                 return _buildBrandCard(
                   context,
                   name: brand['name'] as String,
-                  hint: brand['originalHint'] as String,
+                  hint: 'brands.hints.${brand['name']}'.tr(),
                   color: brand['color'] as Color,
                   icon: brand['icon'] as String,
                   imagePath: brand['imagePath'] as String?,

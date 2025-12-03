@@ -161,7 +161,7 @@ class User {
       gold: (json['gold'] as num?)?.toDouble() ?? 0.0,
       profitLossPercentage: (json['profitLossPercentage'] as num?)?.toDouble() ?? 0.0,
       profileImageUrl: json['profileImageUrl'] as String?,
-      currency: json['currency'] as String? ?? 'TL',
+      currency: 'TL', // Always force TL
       authProvider: json['authProvider'] as String? ?? 'email',
       googleUserId: json['googleUserId'] as String?,
       email: json['email'] as String?,

@@ -282,7 +282,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                   Icon(Icons.sort, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 8),
                   Text(
-                    'Sırala:',
+                    'vehicles.sortBy'.tr(),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -291,12 +291,12 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                   ),
                   const SizedBox(width: 12),
                   _buildSortChip(
-                    'Fiyat: Düşükten Yükseğe',
+                    'vehicles.sortPriceLowToHigh'.tr(),
                     'price_asc',
                   ),
                   const SizedBox(width: 8),
                   _buildSortChip(
-                    'Fiyat: Yüksekten Düşüğe',
+                    'vehicles.sortPriceHighToLow'.tr(),
                     'price_desc',
                   ),
                 ],

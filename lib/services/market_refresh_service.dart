@@ -2369,7 +2369,7 @@ class MarketRefreshService {
     final variation = ((_random.nextDouble() * 0.16) - 0.08);
     finalPrice = finalPrice * (1 + variation);
     
-    return finalPrice.clamp(150000.0, basePrice * 1.1);
+    return finalPrice.clamp(1.0, basePrice * 1.1);
   }
 
   /// Rastgele parça durumları oluştur

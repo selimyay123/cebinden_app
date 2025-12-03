@@ -7,6 +7,7 @@
     "yes": "Evet",
     "no": "Hayır",
     "ok": "Tamam",
+    "pleaseWait": "Lütfen bekleyiniz...",
     "cancel": "İptal",
     "save": "Kaydet",
     "delete": "Sil",
@@ -29,6 +30,11 @@
     "continue": "Devam Et",
     "active": "Aktif",
     "dear": "Sayın"
+  },
+  "errors": {
+    "balanceUpdateFailed": "Bakiye güncellenemedi",
+    "vehicleAddFailed": "Araç garajınıza eklenemedi",
+    "errorWithDetail": "Hata: {detail}"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -130,7 +136,6 @@
     "benzinLpg": "Benzin+LPG",
     "selectCategory": "Araç Kategorisi Seçin",
     "selectBrand": "Marka Seçin",
-    "selectModel": "Model Seçin",
     "noVehicles": "Araç Bulunamadı",
     "noVehiclesDesc": "Henüz araç yok. Hemen satın almaya başlayın!",
     "purchasePrice": "Alış Fiyatı",
@@ -178,6 +183,12 @@
     "filterMileage": "Kilometre",
     "filterPrice": "Fiyat",
     "filterYear": "Yıl",
+    "selectModel": "Model Seçiniz",
+    "whichModelPrefer": "{brand} markasının hangi modelini tercih edersiniz?",
+    "viewAllModelsOfBrand": "{brand} markasının tüm modellerini görüntüle",
+    "sortBy": "Sırala:",
+    "sortPriceLowToHigh": "Fiyat: Düşükten Yükseğe",
+    "sortPriceHighToLow": "Fiyat: Yüksekten Düşüğe",
     "fuelGasoline": "Benzin",
     "fuelDiesel": "Dizel",
     "fuelHybrid": "Hybrid",
@@ -242,7 +253,8 @@
     "currentBalance": "Mevcut Bakiye",
     "vehiclePrice": "Araç Fiyatı",
     "remainingBalance": "Kalan Bakiye",
-    "confirmMessage": "bu aracı satın almak istediğinizden emin misiniz?",
+    "confirmMessage": "Bu işlemi onaylıyor musunuz?",
+    "purchasingVehicle": "🚗 Araç Satın Alınıyor",
     "insufficientBalance": "Yetersiz bakiye! Lütfen daha fazla para kazanın.",
     "purchaseSuccess": "Satın Alma Başarılı!",
     "purchaseSuccessMessage": "Tebrikler! Araç satın alma işleminiz başarıyla tamamlandı.",
@@ -267,13 +279,44 @@
     "noVehiclesToSellDesc": "Satışa çıkarabileceğiniz araç bulunmuyor. Önce araç satın alın!",
     "enterPrice": "Satış fiyatını girin",
     "enterDescription": "Açıklama girin (opsiyonel)",
-    "priceRequired": "Lütfen bir fiyat belirleyin",
-    "priceInvalid": "Geçersiz fiyat",
     "descriptionPlaceholder": "Araç hakkında detaylı bilgi verin...",
     "listingSuccess": "✅ Aracınız başarıyla satışa çıkarıldı!",
     "listingSuccessMessage": "Aracınız satışa çıkarıldı. Tekliflerim bölümünden teklifleri takip edebilirsiniz.",
     "listingError": "❌ İlan oluşturulurken bir hata oluştu.",
-    "listingErrorWithMessage": "❌ Hata",
+    "listingErrorWithMessage": "İlan oluşturulurken hata",
+    "priceTooHigh": "⚠️ Fiyat Çok Yüksek! Alıcı çıkmayabilir.",
+    "priceHigh": "Biraz Pahalı. Satış yavaş olabilir.",
+    "priceReasonable": "✅ Makul Fiyat. Normal talep.",
+    "priceCheap": "🔥 Kelepir! Telefonun susmayacak.",
+    "skillBonus": "Yetenek Bonusu: Önerilen fiyat %{percent} artırıldı!",
+    "creatingListing": "İlan Oluşturuluyor...",
+    "salePriceLabel": "Satış Fiyatı *",
+    "priceHint": "Örn: 350000",
+    "maxPriceHint": "Maksimum: {price} TL (%15 Kâr Sınırı)",
+    "priceRequired": "Fiyat girmelisiniz",
+    "priceInvalid": "Geçerli bir fiyat girin",
+    "priceLimitExceeded": "Fiyat, alış fiyatının %15 fazlasını geçemez!",
+    "suggestedPriceHint": "Önerilen fiyat: {price} TL (Alış fiyatı + %10)",
+    "descriptionLabel": "İlan Açıklaması *",
+    "descriptionHint": "Aracınız hakkında detaylı bilgi verin...",
+    "noVehicles": "Satılacak araç yok!",
+    "noVehiclesDesc": "Garajınızdaki araçları satışa çıkarabilirsiniz.",
+    "vehicleFeatures": "Araç Özellikleri",
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Yıl",
+    "mileage": "Kilometre",
+    "fuel": "Yakıt",
+    "transmission": "Vites",
+    "engine": "Motor",
+    "drive": "Çekiş",
+    "color": "Renk",
+    "warranty": "Garanti",
+    "accidentRecord": "Kaza Kaydı",
+    "var": "Var",
+    "yok": "Yok",
+    "purchasePrice": "Satın Alma Fiyatı",
+    "daysOwned": "Sahiplik Süresi",
     "removeListingConfirm": "İlanı kaldırmak istediğinizden emin misiniz?",
     "removeListing": "İlanı Kaldır",
     "listingRemoved": "✅ İlan başarıyla kaldırıldı!",
@@ -369,7 +412,43 @@
     "counterOfferRangeError": "Karşı teklifiniz, ilk teklifiniz ile satıcının karşı teklifi arasında olmalıdır",
     "newCounterOffer": "Yeni Karşı Teklif",
     "purchaseCompleted": "Satın alma işlemi tamamlandı! Araç garajınıza eklendi.",
-    "negotiationContinues": "Pazarlık devam ediyor. Tekliflerim sayfasından takip edebilirsiniz."
+    "negotiationContinues": "Pazarlık devam ediyor. Tekliflerim sayfasından takip edebilirsiniz.",
+    "offerAcceptedAndPurchased": "Teklif kabul edildi ve araç satın alındı!"
+  },
+  "xp": {
+    "level": "Seviye {level}",
+    "levelUp": "Seviye Atladın!",
+    "rewards": "Ödüller",
+    "awesome": "Harika!",
+    "xpShort": "XP",
+    "toNextLevel": "Sonraki seviyeye",
+    "progress": "İlerleme",
+    "gained": "Kazanıldı",
+    "congratulations": "Tebrikler!",
+    "newLevel": "Yeni Seviye",
+    "cashBonus": "Para Bonusu",
+    "goldBonus": "Altın Bonusu",
+    "unlocked": "Kilidi Açıldı",
+    "continue": "Devam Et",
+    "dailyLoginBonus": "Günlük Giriş Bonusu",
+    "consecutiveDays": "Ardışık Gün",
+    "keepStreak": "Serini Devam Ettir!",
+    "unlock": {
+      "premiumVehicles": "Premium Araç Kategorileri",
+      "advancedOffers": "Gelişmiş Teklif Sistemi",
+      "autoSellBot": "Otomatik Satış Botu",
+      "vipStatus": "VIP Statüsü",
+      "specialBadges": "Özel Başarı Rozetleri"
+    },
+    "source": {
+      "vehiclePurchase": "Araç Satın Alma",
+      "vehicleSale": "Araç Satışı",
+      "offerMade": "Teklif Gönderme",
+      "offerAccepted": "Teklif Kabulü",
+      "dailyLogin": "Günlük Giriş",
+      "questCompleted": "Görev Tamamlama",
+      "achievement": "Başarım"
+    }
   },
   "listings": {
     "title": "İlanlarım",
@@ -434,7 +513,10 @@
     "restartRequired": "Uygulamayı yeniden başlatmanız gerekebilir",
     "success": "Başarılı",
     "error": "Hata",
-    "ok": "Tamam"
+    "ok": "Tamam",
+    "gameSettings": "Oyun Ayarları",
+    "gameDayDuration": "Oyun Günü Süresi",
+    "gameDayDurationUpdated": "Oyun günü süresi {minutes} dakika olarak ayarlandı"
   },
   "profile": {
     "title": "Profil Bilgileri",
@@ -468,10 +550,10 @@
   },
   "about": {
     "title": "Hakkında",
-    "version": "Versiyon",
+    "version": "Versiyon 1.0.0",
     "developer": "Geliştirici",
     "developerName": "Cebinden Ekibi",
-    "description": "Cebinden, sanal araba ticareti yapabileceğiniz eğlenceli bir simülasyon oyunudur.",
+    "description": "Cebinden, eğlenceli ve interaktif bir araç alım-satım simülasyon oyunudur. Sanal para ile araç alıp satabilir, kar elde edebilir ve garajınızı büyütebilirsiniz!\n\nBu oyunda gerçek para kullanılmaz, tüm işlemler tamamen simülasyondur. İlan açıklamaları komik ve eğlence amaçlıdır.",
     "gameDescription": "Oyun Açıklaması",
     "gameDescriptionText": "Cebinden'de araç alıp satarak kar edebilir, kendi garajınızı oluşturabilir ve araba ticaretinin inceliklerini öğrenebilirsiniz.",
     "termsOfUse": "Kullanım Koşulları",
@@ -481,7 +563,14 @@
     "aboutApp": "Uygulama Hakkında",
     "features": "Özellikler",
     "contactTitle": "İletişim",
-    "developerTitle": "Geliştirici"
+    "developerTitle": "Geliştirici",
+    "featuresList": "✓ Çeşitli marka ve modellerde araçlar\n✓ Detaylı filtreleme sistemi\n✓ Komik ve eğlenceli ilan açıklamaları\n✓ Kar/zarar takibi\n✓ Kişiselleştirilebilir ayarlar\n✓ Karanlık mod desteği (yakında)\n✓ Çoklu para birimi desteği",
+    "contactContent": "Geri bildirim, öneri veya sorularınız için:\n\n📧 E-posta: info@cebinden.com\n🌐 Web: www.cebinden.com\n📱 Instagram: @cebindenapp",
+    "developerContent": "Bu uygulama Flutter ile geliştirilmiştir.\n\n© 2024 Cebinden\nmnTüm hakları saklıdır.",
+    "disclaimer": "Bu bir oyun/simülasyon uygulamasıdır. Gerçek araç alım-satımı yapmaz. Tüm işlemler sanal ve eğlence amaçlıdır.",
+    "web": "Web",
+    "email": "E-posta",
+    "instagram": "Instagram"
   },
   "drawer": {
     "dashboard": "Dashboard",
@@ -492,10 +581,19 @@
     "tasks": "Görevler",
     "settings": "Ayarlar",
     "tasksComingSoon": "Görevler sayfası yakında...",
-    "rentComingSoon": "Araç kiralama sayfası yakında..."
+    "rentComingSoon": "Araç kiralama sayfası yakında...",
+    "vehicle": "araç",
+    "vehicles": "araç",
+    "listing": "ilan",
+    "listings": "ilan",
+    "vehicleLimit": "Araç Limiti"
   },
   "myVehicles": {
     "buildCollection": "İlk aracınızı satın alarak koleksiyonunuzu oluşturun!",
+    "garageFull": "Garaj Dolu!",
+    "garageLimitReached": "Garaj limitine ulaştın.",
+    "expandGarageHint": "Yeni araç almak için garajını genişletmelisin.",
+    "goToStore": "Mağazaya Git",
     "alreadyListed": "Bu araç zaten satışta!"
   },
   "myListings": {
@@ -516,8 +614,21 @@
     "days": "gün",
     "hour": "saat",
     "minute": "dakika",
+    "minutes": "dakika",
+    "month": "ay",
+    "year": "yıl",
     "offers": "teklif",
     "offer": "teklif",
+    "noActiveOffers": "Aktif Teklif Yok",
+    "noPendingOffersForBrand": "Bu markada bekleyen teklifi olan araç bulunmuyor",
+    "rejectAll": "Tüm Teklifleri Reddet",
+    "noIncomingOffers": "Gelen Teklif Yok",
+    "noSentOffers": "Gönderilen Teklif Yok",
+    "noIncomingOffersDesc": "Henüz ilanlarınıza gelen bir teklif yok.",
+    "noSentOffersDesc": "Henüz gönderdiğiniz bir teklif bulunmuyor.",
+    "statusPending": "Bekleyen",
+    "statusAccepted": "Kabul",
+    "statusRejected": "Red",
     "offersCreated": "adet teklif oluşturuldu",
     "checkOffers": "Tekliflerim bölümünden kontrol edebilirsiniz",
     "generatingOffers": "Teklifler oluşturuluyor...",
@@ -528,6 +639,116 @@
     "sellVehicle": "Sat",
     "vehicleDetailComingSoon": "Araç detay sayfası yakında...",
     "sellFeatureComingSoon": "Araç satış özelliği yakında..."
+  },
+  "expertise": {
+    "reportTitle": "Ekspertiz Raporu",
+    "statusTitle": "Ekspertiz Durumu",
+    "issueFound": "FARK BULUNDU!",
+    "clean": "TEMİZ",
+    "disclaimer": "Araç bilgileri satıcı beyanına dayanmaktadır. Ekspertiz yaptırarak gerçek durumu öğrenebilirsiniz.",
+    "performAction": "Ekspertize Sok (3.000 TL)",
+    "accidentRecord": "Hasar Kaydı",
+    "exists": "Var",
+    "none": "Yok",
+    "mileage": "Kilometre",
+    "partsCondition": "Parça Durumu",
+    "partsClean": "Hatasız",
+    "partsIssue": "Parça İşlemli",
+    "declared": "Beyan:",
+    "real": "Gerçek:",
+    "verified": "Gerçek: Doğrulandı",
+    "dialogTitle": "Ekspertiz Yaptır",
+    "dialogMessage": "Aracın gerçek durumunu öğrenmek için ekspertize sokmak ister misiniz?",
+    "fee": "Ekspertiz Ücreti:",
+    "insufficientBalance": "Yetersiz Bakiye!",
+    "confirmAndPay": "Onayla ve Öde",
+    "issuesFoundMessage": "Ekspertiz sonucunda gizli kusurlar bulundu! Fiyat güncellendi.",
+    "cleanMessage": "Araç temiz! Satıcı beyanı doğrulandı."
+  },
+  "brands": {
+    "hints": {
+      "Audira": "Alman lüks performansı",
+      "Bavora": "Bavyera motoru",
+      "Fialto": "İtalyan pratikliği",
+      "Fortran": "Amerikan klasiği",
+      "Hyundaro": "Kore teknolojisi",
+      "Hondaro": "Japon güvenilirliği",
+      "Mercurion": "Alman lüksü",
+      "Opexel": "Alman pratikliği",
+      "Renauva": "Fransız inovasyonu",
+      "Toyoto": "Japon mükemmelliği",
+      "Voltswagen": "Halkın arabası"
+    }
+  },
+  "models": {
+    "descriptions": {
+      "Renauva": {
+        "Slim": "Modern Hatchback, genç ve dinamik",
+        "Magna": "Premium Orta Sınıf, konforlu",
+        "Flow": "Geniş Sedan, uzun yol konforu",
+        "Signa": "Ekonomik Sedan, pratik kullanım",
+        "Tallion": "Yeni Nesil, modern teknoloji"
+      },
+      "Voltswagen": {
+        "Paso": "Premium Segment, lüks ve güç",
+        "Tenis": "Kompakt Premium, yüksek talep",
+        "Colo": "Premium Küçük, kaliteli ve pratik",
+        "Jago": "Geniş Sedan, aile dostu"
+      },
+      "Fialto": {
+        "Agna": "Hacim Kralı, çok satan model",
+        "Lagua": "Ekonomik Sedan, basit ve sağlam",
+        "Zorno": "Kompakt Hatchback, şehir aracı"
+      },
+      "Opexel": {
+        "Tasra": "Güvenilir Alman kalitesi, popüler",
+        "Lorisa": "Kompakt, ekonomik ve güvenilir",
+        "Mornitia": "Premium Segment, lüks donanım"
+      },
+      "Bavora": {
+        "C Serisi": "Popüler Premium, en çok satan",
+        "E Serisi": "Lüks Segment, en prestijli",
+        "A Serisi": "Kompakt Premium, genç ve dinamik",
+        "D Serisi": "Sportif Coupe, şık ve güçlü"
+      },
+      "Fortran": {
+        "Odak": "C Segment lideri, sürüş keyfi",
+        "Vista": "Kompakt, ekonomik, dinamik",
+        "Avger": "Güçlü Pick-up, 4x4 arazi",
+        "Tupa": "SUV konfor, geniş ve modern"
+      },
+      "Mercurion": {
+        "3 Serisi": "Premium konfor, klasik lüks",
+        "5 Serisi": "Üst düzey lüks, makam aracı",
+        "1 Serisi": "Kompakt premium, MBUX teknoloji",
+        "GJE": "4 Kapı Coupe, sportif şık",
+        "8 Serisi": "Efsane arazi, ultra lüks"
+      },
+      "Hyundaro": {
+        "A10": "Güvenilir, ekonomik hatchback",
+        "Tecent Red": "Güçlü dizel, ekonomik sedan",
+        "Tecent White": "Basit sağlam, ucuz onarım",
+        "A20": "Dengeli C segment, zengin donanım",
+        "Kascon": "Modern SUV, hibrit teknoloji"
+      },
+      "Toyoto": {
+        "Airoko": "Efsane güvenilirlik, hibrit lider",
+        "Lotus": "Güvenilir hatchback, hibrit mevcut",
+        "Karma": "Kompakt pratik, hibrit teknoloji"
+      },
+      "Audira": {
+        "B3": "Premium kompakt, teknoloji lideri",
+        "B4": "D segment konforu, prestij",
+        "B6": "E segment lüks, üst düzey konfor",
+        "B5": "Sportif coupe, zarif tasarım"
+      },
+      "Hondaro": {
+        "Vice": "İkinci el kralı, CVT güvenilirlik",
+        "VHL": "SUV konforu, hibrit teknoloji",
+        "Kent": "Ekonomik sedan, yüksek güç",
+        "Caz": "Sihirli koltuk, hibrit mevcut"
+      }
+    }
   },
   "notifications": {
     "title": "Bildirimler",
@@ -609,40 +830,5 @@
     "step4_desc": "Gelen ve gönderdiğiniz teklifleri buradan yönetin.",
     "step5_title": "Bakiye 💵",
     "step5_desc": "Paranızı al-sat yaparak artırın. Bol şans!"
-  },
-  "xp": {
-    "level": "Seviye",
-    "xpShort": "XP",
-    "toNextLevel": "Sonraki seviyeye",
-    "progress": "İlerleme",
-    "gained": "Kazanıldı",
-    "levelUp": "SEVİYE ATLANDI!",
-    "congratulations": "Tebrikler!",
-    "newLevel": "Yeni Seviye",
-    "rewards": "Ödüller",
-    "cashBonus": "Para Bonusu",
-    "goldBonus": "Altın Bonusu",
-    "unlocked": "Kilidi Açıldı",
-    "awesome": "Harika!",
-    "continue": "Devam Et",
-    "dailyLoginBonus": "Günlük Giriş Bonusu",
-    "consecutiveDays": "Ardışık Gün",
-    "keepStreak": "Serini Devam Ettir!",
-    "unlock": {
-      "premiumVehicles": "Premium Araç Kategorileri",
-      "advancedOffers": "Gelişmiş Teklif Sistemi",
-      "autoSellBot": "Otomatik Satış Botu",
-      "vipStatus": "VIP Statüsü",
-      "specialBadges": "Özel Başarı Rozetleri"
-    },
-    "source": {
-      "vehiclePurchase": "Araç Satın Alma",
-      "vehicleSale": "Araç Satışı",
-      "offerMade": "Teklif Gönderme",
-      "offerAccepted": "Teklif Kabul Edildi",
-      "counterOfferSuccess": "Başarılı Karşı Teklif",
-      "dailyLogin": "Günlük Giriş",
-      "profitBonus": "Kâr Bonusu"
-    }
   }
 }

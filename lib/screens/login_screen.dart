@@ -11,7 +11,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (username.isEmpty) {
       setState(() {
-        _errorMessage = 'Lütfen kullanıcı adınızı girin';
+        _errorMessage = 'auth.usernameRequired'.tr();
         _isLoading = false;
       });
       return;
@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (password.isEmpty) {
       setState(() {
-        _errorMessage = 'Lütfen şifrenizi girin';
+        _errorMessage = 'auth.passwordRequired'.tr();
         _isLoading = false;
       });
       return;
@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else {
       setState(() {
-        _errorMessage = 'Kullanıcı adı veya şifre hatalı';
+        _errorMessage = 'auth.invalidCredentials'.tr();
         _isLoading = false;
       });
     }
@@ -128,10 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
 
                 // Başlık
-                const Text(
-                  'Cebinden',
+                Text(
+                  'app.name'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
                     color: Colors.deepPurple,
@@ -139,10 +139,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Sanal Araba Ticareti',
+                Text(
+                  'app.subtitle'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
                   ),
@@ -150,10 +150,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 50),
 
                 // Alt başlık
-                const Text(
-                  'Giriş Yap',
+                Text(
+                  'auth.login'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -165,8 +165,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _usernameController,
                   enabled: !_isLoading,
                   decoration: InputDecoration(
-                    labelText: 'Kullanıcı Adı',
-                    hintText: 'Kullanıcı adınızı girin',
+                    labelText: 'auth.username'.tr(),
+                    hintText: 'auth.enterUsername'.tr(),
                     prefixIcon: const Icon(Icons.person),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -193,8 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   enabled: !_isLoading,
                   obscureText: _obscurePassword,
                   decoration: InputDecoration(
-                    labelText: 'Şifre',
-                    hintText: 'Şifrenizi girin',
+                    labelText: 'auth.password'.tr(),
+                    hintText: 'auth.enterPassword'.tr(),
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -282,9 +282,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text(
-                            'Giriş Yap',
-                            style: TextStyle(
+                        : Text(
+                            'auth.login'.tr(),
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -354,9 +354,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Hesabın yok mu? ',
-                      style: TextStyle(
+                    Text(
+                      '${'auth.noAccount'.tr()} ',
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
                       ),
@@ -372,9 +372,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               );
                             },
-                      child: const Text(
-                        'Hemen kayıt ol',
-                        style: TextStyle(
+                      child: Text(
+                        'auth.register'.tr(),
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.deepPurple,
                           fontWeight: FontWeight.bold,

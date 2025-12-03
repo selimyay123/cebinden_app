@@ -283,8 +283,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                       const SizedBox(height: 4),
                       Text(
                         listingCount == 1 
-                          ? '1 ilan' 
-                          : '$listingCount ilan',
+                          ? '1 ${'misc.listing'.tr()}' 
+                          : '$listingCount ${'misc.listings'.tr()}',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey[600],

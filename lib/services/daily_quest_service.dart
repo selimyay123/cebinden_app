@@ -56,7 +56,7 @@ class DailyQuestService {
       quests.add(DailyQuest.create(
         userId: userId,
         type: QuestType.buyVehicle,
-        description: "Bugün 2 araç satın al",
+        description: "quests.descriptions.buyVehicle",
         targetCount: 2,
         rewardXP: 50,
         rewardMoney: 10000,
@@ -65,7 +65,7 @@ class DailyQuestService {
       quests.add(DailyQuest.create(
         userId: userId,
         type: QuestType.sellVehicle,
-        description: "Bugün 1 araç sat",
+        description: "quests.descriptions.sellVehicle",
         targetCount: 1,
         rewardXP: 50,
         rewardMoney: 15000,
@@ -76,7 +76,7 @@ class DailyQuestService {
     quests.add(DailyQuest.create(
       userId: userId,
       type: QuestType.makeOffer,
-      description: "Bugün 5 teklif gönder",
+      description: "quests.descriptions.makeOffer",
       targetCount: 5,
       rewardXP: 75,
       rewardMoney: 5000,
@@ -86,7 +86,7 @@ class DailyQuestService {
     quests.add(DailyQuest.create(
       userId: userId,
       type: QuestType.earnProfit,
-      description: "Bugün toplam 200.000 TL kâr et",
+      description: "quests.descriptions.earnProfit",
       targetCount: 200000, // Miktar olarak tutuyoruz
       rewardXP: 100,
       rewardMoney: 20000,

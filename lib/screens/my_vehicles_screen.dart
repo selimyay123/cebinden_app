@@ -145,9 +145,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Araç Limiti',
-                      style: TextStyle(
+                    Text(
+                      'misc.vehicleLimit'.tr(),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -311,8 +311,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                       const SizedBox(height: 4),
                       Text(
                         vehicleCount == 1 
-                          ? '1 araç' 
-                          : '$vehicleCount araç',
+                          ? '1 ${'misc.vehicle'.tr()}' 
+                          : '$vehicleCount ${'misc.vehicles'.tr()}',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey[600],

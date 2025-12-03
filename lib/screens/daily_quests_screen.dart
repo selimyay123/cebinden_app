@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/daily_quest_model.dart';
 import '../services/daily_quest_service.dart';
 import '../services/database_helper.dart';
+import '../services/localization_service.dart';
 
 class DailyQuestsScreen extends StatefulWidget {
   const DailyQuestsScreen({super.key});
@@ -49,7 +51,10 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Ödül Alındı! +${quest.rewardXP} XP, +${quest.rewardMoney.toStringAsFixed(0)} TL',
+              'quests.rewardClaimed'.trParams({
+                'xp': quest.rewardXP.toString(),
+                'money': quest.rewardMoney.toStringAsFixed(0),
+              }),
             ),
             backgroundColor: Colors.green,
           ),
@@ -59,7 +64,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ödül alınamadı.')),
+          SnackBar(content: Text('quests.claimFailed'.tr())),
         );
       }
     }
@@ -69,12 +74,12 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Günlük Görevler'),
+        title: Text('quests.title'.tr()),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _quests.isEmpty
-              ? const Center(child: Text('Bugün için görev bulunamadı.'))
+              ? Center(child: Text('quests.noQuests'.tr()))
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _quests.length,
@@ -104,8 +109,8 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    quest.description,
+                    child: Text(
+                    _getLocalizedDescription(quest),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -121,7 +126,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Ödülü Al'),
+                    child: Text('quests.claimReward'.tr()),
                   ),
               ],
             ),
@@ -172,5 +177,37 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
         ),
       ),
     );
+  }
+
+  String _getLocalizedDescription(DailyQuest quest) {
+    // Yeni sistem: Key ise çevir
+    if (quest.description.startsWith('quests.')) {
+      return quest.description.trParams({
+        'count': quest.targetCount.toString(),
+        'amount': _formatCurrency(quest.targetCount.toDouble()),
+      });
+    }
+
+    // Eski sistem: Hardcoded stringleri yakala ve çevir
+    if (quest.description.contains('araç satın al')) {
+      return 'quests.descriptions.buyVehicle'.trParams({'count': quest.targetCount.toString()});
+    }
+    if (quest.description.contains('araç sat')) {
+      return 'quests.descriptions.sellVehicle'.trParams({'count': quest.targetCount.toString()});
+    }
+    if (quest.description.contains('teklif gönder')) {
+      return 'quests.descriptions.makeOffer'.trParams({'count': quest.targetCount.toString()});
+    }
+    if (quest.description.contains('kâr et')) {
+      return 'quests.descriptions.earnProfit'.trParams({'amount': _formatCurrency(quest.targetCount.toDouble())});
+    }
+
+    // Hiçbiri değilse olduğu gibi göster
+    return quest.description;
+  }
+
+  String _formatCurrency(double amount) {
+    final formatter = NumberFormat('#,###', 'tr_TR');
+    return formatter.format(amount);
   }
 }

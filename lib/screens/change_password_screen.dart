@@ -47,7 +47,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     // Validations
     if (oldPassword.isEmpty) {
       setState(() {
-        _errorMessage = 'Lütfen mevcut şifrenizi girin';
+        _errorMessage = 'changePassword.enterOldPassword'.tr();
         _isLoading = false;
       });
       return;
@@ -55,7 +55,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (newPassword.isEmpty) {
       setState(() {
-        _errorMessage = 'Lütfen yeni şifrenizi girin';
+        _errorMessage = 'changePassword.enterNewPassword'.tr();
         _isLoading = false;
       });
       return;
@@ -63,7 +63,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (newPassword.length < 6) {
       setState(() {
-        _errorMessage = 'Şifre en az 6 karakter olmalıdır';
+        _errorMessage = 'auth.passwordMinLength'.tr();
         _isLoading = false;
       });
       return;
@@ -71,7 +71,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (newPassword != confirmPassword) {
       setState(() {
-        _errorMessage = 'Yeni şifreler eşleşmiyor';
+        _errorMessage = 'auth.passwordsDoNotMatch'.tr();
         _isLoading = false;
       });
       return;
@@ -79,7 +79,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (oldPassword == newPassword) {
       setState(() {
-        _errorMessage = 'Yeni şifre eskisiyle aynı olamaz';
+        _errorMessage = 'changePassword.sameAsOld'.tr();
         _isLoading = false;
       });
       return;
@@ -104,7 +104,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       Navigator.pop(context);
     } else {
       setState(() {
-        _errorMessage = 'Mevcut şifre hatalı';
+        _errorMessage = 'changePassword.wrongOldPassword'.tr();
         _isLoading = false;
       });
     }
@@ -135,10 +135,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               const SizedBox(height: 20),
 
               // Başlık
-              const Text(
-                'Şifre Değiştir',
+              Text(
+                'changePassword.title'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.deepPurple,
@@ -146,7 +146,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Güvenliğiniz için düzenli olarak şifrenizi değiştirin',
+                'changePassword.subtitle'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -184,7 +184,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 controller: _oldPasswordController,
                 obscureText: _obscureOldPassword,
                 decoration: InputDecoration(
-                  labelText: 'Mevcut Şifre',
+                  labelText: 'changePassword.currentPassword'.tr(),
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -214,7 +214,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 controller: _newPasswordController,
                 obscureText: _obscureNewPassword,
                 decoration: InputDecoration(
-                  labelText: 'Yeni Şifre',
+                  labelText: 'changePassword.newPassword'.tr(),
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -235,7 +235,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
                   ),
-                  helperText: 'En az 6 karakter',
+                  helperText: 'auth.passwordMinLength'.tr(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -245,7 +245,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 controller: _confirmPasswordController,
                 obscureText: _obscureConfirmPassword,
                 decoration: InputDecoration(
-                  labelText: 'Yeni Şifre (Tekrar)',
+                  labelText: 'changePassword.confirmNewPassword'.tr(),
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -291,9 +291,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text(
-                        'Şifreyi Değiştir',
-                        style: TextStyle(
+                    : Text(
+                        'changePassword.button'.tr(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -320,7 +320,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Güvenlik İpuçları:',
+                            'changePassword.securityTipsTitle'.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -329,9 +329,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '• En az 6 karakter kullanın\n'
-                            '• Büyük-küçük harf karışımı tercih edin\n'
-                            '• Rakam ve özel karakter ekleyin',
+                            'changePassword.securityTipsContent'.tr(),
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[700],

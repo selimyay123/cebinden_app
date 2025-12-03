@@ -70,10 +70,10 @@ class ProfileInfoScreen extends StatelessWidget {
               title: 'profile.personalInfo'.tr(),
               icon: Icons.person_outline,
               children: [
-                _buildInfoRow('Kullanıcı Adı', user.username),
-                _buildInfoRow('Cinsiyet', user.gender),
-                _buildInfoRow('Doğum Tarihi', _formatDate(user.birthDate)),
-                _buildInfoRow('Yaş', '${user.age} yaşında'),
+                _buildInfoRow('profile.username'.tr(), user.username),
+                _buildInfoRow('profile.gender'.tr(), user.gender == 'Erkek' ? 'gender.male'.tr() : 'gender.female'.tr()),
+                _buildInfoRow('profile.birthDate'.tr(), _formatDate(user.birthDate)),
+                _buildInfoRow('profile.age'.tr(), '${user.age} ${'profile.yearsOld'.tr()}'),
               ],
             ),
 
@@ -84,8 +84,8 @@ class ProfileInfoScreen extends StatelessWidget {
               title: 'profile.registrationInfo'.tr(),
               icon: Icons.calendar_today_outlined,
               children: [
-                _buildInfoRow('Kayıt Tarihi', _formatDate(user.registeredAt)),
-                _buildInfoRow('Üyelik Süresi', _getMembershipDuration()),
+                _buildInfoRow('profile.registrationDate'.tr(), _formatDate(user.registeredAt)),
+                _buildInfoRow('profile.membershipDuration'.tr(), _getMembershipDuration()),
               ],
             ),
           ],
@@ -176,11 +176,11 @@ class ProfileInfoScreen extends StatelessWidget {
   String _getMembershipDuration() {
     final duration = DateTime.now().difference(user.registeredAt);
     if (duration.inDays < 30) {
-      return '${duration.inDays} gün';
+      return '${duration.inDays} ${'misc.day'.tr()}';
     } else if (duration.inDays < 365) {
-      return '${(duration.inDays / 30).floor()} ay';
+      return '${(duration.inDays / 30).floor()} ${'misc.month'.tr()}';
     } else {
-      return '${(duration.inDays / 365).floor()} yıl';
+      return '${(duration.inDays / 365).floor()} ${'misc.year'.tr()}';
     }
   }
 }

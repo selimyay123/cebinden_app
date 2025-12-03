@@ -18,7 +18,7 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin {
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
   final LocalizationService _localizationService = LocalizationService();
@@ -91,7 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Oyun günü süresi $minutes dakika olarak ayarlandı'),
+          content: Text('settings.gameDayDurationUpdated'.trParams({'minutes': minutes.toString()})),
           backgroundColor: Colors.green,
         ),
       );
@@ -176,15 +176,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
+      builder: (context) => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
             Text(
-              'Teklifler oluşturuluyor...',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              'misc.generatingOffers'.tr(),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],
         ),
@@ -448,9 +448,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailing: DropdownButton<String>(
                   value: _selectedLanguage,
                   underline: const SizedBox(),
-                  items: const [
-                    DropdownMenuItem(value: 'tr', child: Text('Türkçe')),
-                    DropdownMenuItem(value: 'en', child: Text('English')),
+                  items: [
+                    DropdownMenuItem(value: 'tr', child: Text('settings.turkish'.tr())),
+                    DropdownMenuItem(value: 'en', child: Text('settings.english'.tr())),
                   ],
                   onChanged: _changeLanguage,
                 ),
@@ -475,19 +475,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // OYUN AYARLARI - Geçici olarak devre dışı
           _buildSection(
-            title: 'Oyun Ayarları',
+            title: 'settings.gameSettings'.tr(),
             children: [
               _buildListTile(
                 icon: Icons.access_time,
-                title: 'Oyun Günü Süresi',
+                title: 'settings.gameDayDuration'.tr(),
                 trailing: DropdownButton<int>(
                   value: _gameDayDuration,
                   underline: const SizedBox(),
-                  items: const [
-                    DropdownMenuItem(value: 2, child: Text('2 dk')),
-                    DropdownMenuItem(value: 5, child: Text('5 dk')),
-                    DropdownMenuItem(value: 10, child: Text('10 dk')),
-                    DropdownMenuItem(value: 15, child: Text('15 dk')),
+                  items: [
+                    DropdownMenuItem(value: 2, child: Text('2 ${'misc.minutes'.tr()}')),
+                    DropdownMenuItem(value: 5, child: Text('5 ${'misc.minutes'.tr()}')),
+                    DropdownMenuItem(value: 10, child: Text('10 ${'misc.minutes'.tr()}')),
+                    DropdownMenuItem(value: 15, child: Text('15 ${'misc.minutes'.tr()}')),
                   ],
                   onChanged: _changeGameDayDuration,
                 ),

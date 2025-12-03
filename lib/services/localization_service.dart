@@ -40,18 +40,14 @@ class LocalizationService {
       final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
       final languageCode = systemLocale.languageCode.toLowerCase();
       
-      
-      
-      // Desteklenen diller arasında mı kontrol et
-      if (supportedLanguages.contains(languageCode)) {
-        return languageCode;
+      // Eğer cihaz dili Türkçe ise Türkçe yap
+      if (languageCode == 'tr') {
+        return 'tr';
       }
       
-      // Desteklenmeyen diller için İngilizce döndür (evrensel)
-      
+      // Diğer tüm durumlarda (İngilizce veya başka diller) varsayılan olarak İngilizce yap
       return 'en';
     } catch (e) {
-      
       return 'en'; // Hata durumunda İngilizce
     }
   }

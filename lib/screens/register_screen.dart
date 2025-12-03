@@ -10,7 +10,7 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController = TextEditingController();
@@ -73,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Minimum uzunluk kontrolü
     if (username.length < 3) {
       setState(() {
-        _errorMessage = 'Username must be at least 3 characters'.tr();
+        _errorMessage = 'auth.usernameMinLength'.tr();
         _isLoading = false;
       });
       return;
@@ -82,7 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Maksimum uzunluk kontrolü
     if (username.length > 20) {
       setState(() {
-        _errorMessage = 'Username cannot exceed 20 characters'.tr();
+        _errorMessage = 'auth.usernameMaxLength'.tr();
         _isLoading = false;
       });
       return;
@@ -99,7 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (password.length < 6) {
       setState(() {
-        _errorMessage = 'Password must be at least 6 characters'.tr();
+        _errorMessage = 'auth.passwordMinLength'.tr();
         _isLoading = false;
       });
       return;
@@ -135,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final age = DateTime.now().year - _selectedBirthDate!.year;
     if (age < 13) {
       setState(() {
-        _errorMessage = 'You must be at least 13 years old'.tr();
+        _errorMessage = 'auth.ageRestriction'.tr();
         _isLoading = false;
       });
       return;
@@ -221,7 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 8),
 
                 Text(
-                  'Choose a username to start the game'.tr(),
+                  'auth.createAccountTitle'.tr(),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 14,

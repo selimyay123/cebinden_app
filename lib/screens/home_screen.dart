@@ -87,15 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         _loadCurrentUser();
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Yeni gün başladı! (Gün $newDay)'),
-            backgroundColor: Colors.blue,
-            duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
       }
     });
   }
@@ -753,7 +744,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Seviye ${_currentUser!.level}',
+                          '${'xp.level'.tr()} ${_currentUser!.level}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -1038,7 +1029,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // ),
                   const SizedBox(height: 8),
                   Text(
-                    'Reklam izleyerek para kazan!',
+                    'ads.watchAd'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey[800],
@@ -1175,7 +1166,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       {
         'icon': Icons.psychology, // Yetenekler ikonu
-        'label': 'Yetenekler',
+        'label': 'home.tasks'.tr(),
         'color': Colors.indigo,
         'badge': (_currentUser?.skillPoints ?? 0) > 0 ? (_currentUser!.skillPoints) : null,
         'onTap': () async {
@@ -1207,7 +1198,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       {
         'icon': Icons.local_taxi,
-        'label': 'Taksiye Çık',
+        'label': 'home.taxi'.tr(),
         'color': Colors.amber,
         'onTap': () async {
           // Taksi oyununa git
@@ -1867,10 +1858,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Text(
-                'Galeri Sahibi Olun',
-                style: TextStyle(
+                'home.galleryOwner'.tr(),
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1883,9 +1874,9 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Galeri satın alarak işletmenizi profesyonel seviyeye taşıyın ve yeni gelir kapıları açın.',
-                style: TextStyle(
+              Text(
+                'home.galleryDescription'.tr(),
+                style: const TextStyle(
                   fontSize: 15,
                   height: 1.5,
                   color: Colors.black87,
@@ -1894,9 +1885,9 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
               
               // Avantajlar
-              const Text(
-                'Galeri Avantajları',
-                style: TextStyle(
+              Text(
+                'home.galleryAdvantages'.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -1907,28 +1898,28 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildAdvantageItem(
                 icon: Icons.car_rental,
                 title: 'home.rentalService'.tr(),
-                description: 'Garajınızdaki araçları kiralayarak pasif gelir elde edin.',
+                description: 'home.advantage1Desc'.tr(),
               ),
               const SizedBox(height: 12),
               
               _buildAdvantageItem(
                 icon: Icons.trending_down,
                 title: 'home.opportunityPurchases'.tr(),
-                description: 'Acil nakit ihtiyacı olan müşterilerden piyasa değerinin altında araç satın alın.',
+                description: 'home.advantage2Desc'.tr(),
               ),
               const SizedBox(height: 12),
               
               _buildAdvantageItem(
                 icon: Icons.trending_up,
                 title: 'home.highProfitMargin'.tr(),
-                description: 'Profesyonel galeri olarak araçlarınızı daha yüksek fiyatlarla satın.',
+                description: 'home.advantage3Desc'.tr(),
               ),
               const SizedBox(height: 12),
               
               _buildAdvantageItem(
                 icon: Icons.workspace_premium,
                 title: 'home.prestigeReputation'.tr(),
-                description: 'Galeri statüsü ile daha fazla müşteri ve güven kazanın.',
+                description: 'home.advantage4Desc'.tr(),
               ),
               
               const SizedBox(height: 20),
@@ -1947,9 +1938,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Galeri Fiyatı:',
-                      style: TextStyle(
+                    Text(
+                      'home.galleryPrice'.tr(),
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -1977,9 +1968,9 @@ class _HomeScreenState extends State<HomeScreen> {
               foregroundColor: Colors.grey[600],
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            child: const Text(
-              'İptal',
-              style: TextStyle(
+            child: Text(
+              'common.cancel'.tr(),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -2008,9 +1999,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               elevation: 2,
             ),
-            child: const Text(
-              'Devam Et',
-              style: TextStyle(
+            child: Text(
+              'common.continue'.tr(),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -2130,7 +2121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Üyelik: ${_formatDate(_currentUser!.registeredAt)}',
+                    '${'home.membershipDate'.tr()}: ${_formatDate(_currentUser!.registeredAt)}',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[700],
@@ -2174,7 +2165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Icon(Icons.store, color: Colors.deepPurple),
                     const SizedBox(width: 8),
                     Text(
-                      'İlanlarım',
+                      'home.myListings'.tr(),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -2190,7 +2181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${_userListedVehicles.length} İlan',
+                    '${_userListedVehicles.length} ${'home.listingCount'.tr()}',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -2320,7 +2311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'Aktif',
+                    'common.active'.tr(),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -2330,7 +2321,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${vehicle.daysOwned} gün',
+                  '${vehicle.daysOwned} ${'misc.days'.tr()}',
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.grey[600],
@@ -2472,7 +2463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _buildDrawerItem(
                     icon: Icons.assignment,
-                    title: 'Günlük Görevler',
+                    title: 'quests.title'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(

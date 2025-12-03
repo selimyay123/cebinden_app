@@ -28,8 +28,7 @@ class ModelSelectionScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
-            title: Text('Marka Seçiniz'),
-            // title: Text('vehicles.selectModel'.tr()),
+            title: Text('vehicles.selectModel'.tr()),
             backgroundColor: categoryColor,
             foregroundColor: Colors.white,
             elevation: 0,
@@ -51,9 +50,7 @@ class ModelSelectionScreen extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        currentLanguage == 'tr'
-                            ? '$brandName markasının hangi modelini tercih edersiniz?'
-                            : 'Which $brandName model do you prefer?',
+                        'vehicles.whichModelPrefer'.trParams({'brand': brandName}),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[700],
@@ -155,9 +152,7 @@ class ModelSelectionScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        currentLanguage == 'tr'
-                            ? '$brandName markasının tüm modellerini görüntüle'
-                            : 'View all $brandName models',
+                        'vehicles.viewAllModelsOfBrand'.trParams({'brand': brandName}),
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.white.withOpacity(0.9),
@@ -290,238 +285,7 @@ class ModelSelectionScreen extends StatelessWidget {
   }
 
   String? _getModelDescription(String modelName, String currentLanguage) {
-    // Renauva modelleri için açıklamalar
-    if (brandName == 'Renauva') {
-      switch (modelName) {
-        case 'Slim':
-          return currentLanguage == 'tr'
-              ? 'Modern Hatchback, genç ve dinamik'
-              : 'Modern Hatchback, young and dynamic';
-        case 'Magna':
-          return currentLanguage == 'tr'
-              ? 'Premium Orta Sınıf, konforlu'
-              : 'Premium Mid-Size, comfortable';
-        case 'Flow':
-          return currentLanguage == 'tr'
-              ? 'Geniş Sedan, uzun yol konforu'
-              : 'Spacious Sedan, long-distance comfort';
-        case 'Signa':
-          return currentLanguage == 'tr'
-              ? 'Ekonomik Sedan, pratik kullanım'
-              : 'Economic Sedan, practical use';
-        case 'Tallion':
-          return currentLanguage == 'tr'
-              ? 'Yeni Nesil, modern teknoloji'
-              : 'New Generation, modern technology';
-      }
-    }
-    // Voltswagen modelleri için açıklamalar
-    else if (brandName == 'Voltswagen') {
-      switch (modelName) {
-        case 'Paso':
-          return currentLanguage == 'tr'
-              ? 'Premium Segment, lüks ve güç'
-              : 'Premium Segment, luxury and power';
-        case 'Tenis':
-          return currentLanguage == 'tr'
-              ? 'Kompakt Premium, yüksek talep'
-              : 'Compact Premium, high demand';
-        case 'Colo':
-          return currentLanguage == 'tr'
-              ? 'Premium Küçük, kaliteli ve pratik'
-              : 'Premium Small, quality and practical';
-        case 'Jago':
-          return currentLanguage == 'tr'
-              ? 'Geniş Sedan, aile dostu'
-              : 'Spacious Sedan, family-friendly';
-      }
-    }
-    // Fialto modelleri için açıklamalar
-    else if (brandName == 'Fialto') {
-      switch (modelName) {
-        case 'Agna':
-          return currentLanguage == 'tr'
-              ? 'Hacim Kralı, çok satan model'
-              : 'Volume King, best-selling model';
-        case 'Lagua':
-          return currentLanguage == 'tr'
-              ? 'Ekonomik Sedan, basit ve sağlam'
-              : 'Economic Sedan, simple and solid';
-        case 'Zorno':
-          return currentLanguage == 'tr'
-              ? 'Kompakt Hatchback, şehir aracı'
-              : 'Compact Hatchback, city car';
-      }
-    }
-    // Opexel modelleri için açıklamalar
-    else if (brandName == 'Opexel') {
-      switch (modelName) {
-        case 'Tasra':
-          return currentLanguage == 'tr'
-              ? 'Güvenilir Alman kalitesi, popüler'
-              : 'Reliable German quality, popular';
-        case 'Lorisa':
-          return currentLanguage == 'tr'
-              ? 'Kompakt, ekonomik ve güvenilir'
-              : 'Compact, economic and reliable';
-        case 'Mornitia':
-          return currentLanguage == 'tr'
-              ? 'Premium Segment, lüks donanım'
-              : 'Premium Segment, luxury equipment';
-      }
-    }
-    // Bavora modelleri için açıklamalar
-    else if (brandName == 'Bavora') {
-      switch (modelName) {
-        case 'C Serisi':
-          return currentLanguage == 'tr'
-              ? 'Popüler Premium, en çok satan'
-              : 'Popular Premium, best-selling';
-        case 'E Serisi':
-          return currentLanguage == 'tr'
-              ? 'Lüks Segment, en prestijli'
-              : 'Luxury Segment, most prestigious';
-        case 'A Serisi':
-          return currentLanguage == 'tr'
-              ? 'Kompakt Premium, genç ve dinamik'
-              : 'Compact Premium, young and dynamic';
-        case 'D Serisi':
-          return currentLanguage == 'tr'
-              ? 'Sportif Coupe, şık ve güçlü'
-              : 'Sporty Coupe, elegant and powerful';
-      }
-    }
-    // Fortran modelleri için açıklamalar
-    else if (brandName == 'Fortran') {
-      switch (modelName) {
-        case 'Odak':
-          return currentLanguage == 'tr'
-              ? 'C Segment lideri, sürüş keyfi'
-              : 'C Segment leader, driving pleasure';
-        case 'Vista':
-          return currentLanguage == 'tr'
-              ? 'Kompakt, ekonomik, dinamik'
-              : 'Compact, economic, dynamic';
-        case 'Avger':
-          return currentLanguage == 'tr'
-              ? 'Güçlü Pick-up, 4x4 arazi'
-              : 'Powerful Pick-up, 4x4 off-road';
-        case 'Tupa':
-          return currentLanguage == 'tr'
-              ? 'SUV konfor, geniş ve modern'
-              : 'SUV comfort, spacious and modern';
-      }
-    }
-    // Mercurion modelleri için açıklamalar
-    else if (brandName == 'Mercurion') {
-      switch (modelName) {
-        case '3 Serisi':
-          return currentLanguage == 'tr'
-              ? 'Premium konfor, klasik lüks'
-              : 'Premium comfort, classic luxury';
-        case '5 Serisi':
-          return currentLanguage == 'tr'
-              ? 'Üst düzey lüks, makam aracı'
-              : 'Top-level luxury, executive car';
-        case '1 Serisi':
-          return currentLanguage == 'tr'
-              ? 'Kompakt premium, MBUX teknoloji'
-              : 'Compact premium, MBUX technology';
-        case 'GJE':
-          return currentLanguage == 'tr'
-              ? '4 Kapı Coupe, sportif şık'
-              : '4-Door Coupe, sporty elegant';
-        case '8 Serisi':
-          return currentLanguage == 'tr'
-              ? 'Efsane arazi, ultra lüks'
-              : 'Legendary off-road, ultra luxury';
-      }
-    }
-    // Hyundaro modelleri için açıklamalar
-    else if (brandName == 'Hyundaro') {
-      switch (modelName) {
-        case 'A10':
-          return currentLanguage == 'tr'
-              ? 'Güvenilir, ekonomik hatchback'
-              : 'Reliable, economic hatchback';
-        case 'Tecent Red':
-          return currentLanguage == 'tr'
-              ? 'Güçlü dizel, ekonomik sedan'
-              : 'Powerful diesel, economic sedan';
-        case 'Tecent White':
-          return currentLanguage == 'tr'
-              ? 'Basit sağlam, ucuz onarım'
-              : 'Simple solid, cheap repair';
-        case 'A20':
-          return currentLanguage == 'tr'
-              ? 'Dengeli C segment, zengin donanım'
-              : 'Balanced C segment, rich equipment';
-        case 'Kascon':
-          return currentLanguage == 'tr'
-              ? 'Modern SUV, hibrit teknoloji'
-              : 'Modern SUV, hybrid technology';
-      }
-    }
-    // Toyoto modelleri için açıklamalar
-    else if (brandName == 'Toyoto') {
-      switch (modelName) {
-        case 'Airoko':
-          return currentLanguage == 'tr'
-              ? 'Efsane güvenilirlik, hibrit lider'
-              : 'Legendary reliability, hybrid leader';
-        case 'Lotus':
-          return currentLanguage == 'tr'
-              ? 'Güvenilir hatchback, hibrit mevcut'
-              : 'Reliable hatchback, hybrid available';
-        case 'Karma':
-          return currentLanguage == 'tr'
-              ? 'Kompakt pratik, hibrit teknoloji'
-              : 'Compact practical, hybrid technology';
-      }
-    }
-    // Audira modelleri için açıklamalar
-    else if (brandName == 'Audira') {
-      switch (modelName) {
-        case 'B3':
-          return currentLanguage == 'tr'
-              ? 'Premium kompakt, teknoloji lideri'
-              : 'Premium compact, technology leader';
-        case 'B4':
-          return currentLanguage == 'tr'
-              ? 'D segment konforu, prestij'
-              : 'D segment comfort, prestige';
-        case 'B6':
-          return currentLanguage == 'tr'
-              ? 'E segment lüks, üst düzey konfor'
-              : 'E segment luxury, top-level comfort';
-        case 'B5':
-          return currentLanguage == 'tr'
-              ? 'Sportif coupe, zarif tasarım'
-              : 'Sporty coupe, elegant design';
-      }
-    }
-    // Hondaro modelleri için açıklamalar
-    else if (brandName == 'Hondaro') {
-      switch (modelName) {
-        case 'Vice':
-          return currentLanguage == 'tr'
-              ? 'İkinci el kralı, CVT güvenilirlik'
-              : 'Used car king, CVT reliability';
-        case 'VHL':
-          return currentLanguage == 'tr'
-              ? 'SUV konforu, hibrit teknoloji'
-              : 'SUV comfort, hybrid technology';
-        case 'Kent':
-          return currentLanguage == 'tr'
-              ? 'Ekonomik sedan, yüksek güç'
-              : 'Economic sedan, high power';
-        case 'Caz':
-          return currentLanguage == 'tr'
-              ? 'Sihirli koltuk, hibrit mevcut'
-              : 'Magic seats, hybrid available';
-      }
-    }
-    return null;
+    return 'models.descriptions.$brandName.$modelName'.tr();
   }
 }
 

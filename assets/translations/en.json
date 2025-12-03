@@ -7,6 +7,7 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
+    "pleaseWait": "Please wait...",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
@@ -25,10 +26,15 @@
     "sort": "Sort",
     "refresh": "Refresh",
     "share": "Share",
-    "currency": "USD",
+    "currency": "TL",
     "continue": "Continue",
     "active": "Active",
     "dear": "Dear"
+  },
+  "errors": {
+    "balanceUpdateFailed": "Balance could not be updated",
+    "vehicleAddFailed": "Vehicle could not be added to your garage",
+    "errorWithDetail": "Error: {detail}"
   },
   "auth": {
     "login": "Login",
@@ -112,7 +118,8 @@
     "rentalService": "Vehicle Rental Service",
     "opportunityPurchases": "Opportunity Purchases",
     "highProfitMargin": "High Profit Margin",
-    "prestigeReputation": "Prestige & Reputation"
+    "prestigeReputation": "Prestige & Reputation",
+    "taxi": "Start Taxi"
   },
   "vehicles": {
     "title": "Vehicles",
@@ -130,7 +137,6 @@
     "benzinLpg": "Gasoline+LPG",
     "selectCategory": "Select Vehicle Category",
     "selectBrand": "Select Brand",
-    "selectModel": "Select Model",
     "noVehicles": "No Vehicles Found",
     "noVehiclesDesc": "No vehicles yet. Start buying now!",
     "purchasePrice": "Purchase Price",
@@ -178,6 +184,12 @@
     "filterMileage": "Mileage",
     "filterPrice": "Price",
     "filterYear": "Year",
+    "selectModel": "Select Model",
+    "whichModelPrefer": "Which {brand} model do you prefer?",
+    "viewAllModelsOfBrand": "View all {brand} models",
+    "sortBy": "Sort by:",
+    "sortPriceLowToHigh": "Price: Low to High",
+    "sortPriceHighToLow": "Price: High to Low",
     "fuelGasoline": "Gasoline",
     "fuelDiesel": "Diesel",
     "fuelHybrid": "Hybrid",
@@ -258,7 +270,8 @@
     "errorMessage": "An error occurred while purchasing the vehicle:",
     "tryAgain": "Please try again.",
     "makeOffer": "Make Offer",
-    "makeOfferComingSoon": "Make Offer feature will be available soon"
+    "makeOfferComingSoon": "Make Offer feature will be available soon",
+    "purchasingVehicle": "🚗 Purchasing Vehicle"
   },
   "sell": {
     "title": "List For Sale",
@@ -268,21 +281,36 @@
     "enterPrice": "Enter sale price",
     "enterDescription": "Enter description (optional)",
     "priceRequired": "Please enter a price",
-    "priceInvalid": "Invalid price",
+    "priceInvalid": "Enter a valid price",
     "descriptionPlaceholder": "Provide detailed information about the vehicle...",
     "listingSuccess": "✅ Your vehicle has been successfully listed for sale!",
-    "listingSuccessMessage": "Your vehicle has been listed for sale. You can track offers in My Offers section.",
+    "listingSuccessMessage": "Your vehicle has been listed for sale. You can track offers in the My Offers section.",
     "listingError": "❌ An error occurred while creating the listing.",
-    "listingErrorWithMessage": "❌ Error",
+    "listingErrorWithMessage": "Error creating listing",
     "removeListingConfirm": "Are you sure you want to remove this listing?",
-    "removeListing": "Remove Listing",
+    "removeListing": "Remove",
     "listingRemoved": "✅ Listing successfully removed!",
     "listForSaleButton": "List For Sale",
     "editListingComingSoon": "Listing edit feature coming soon...",
     "editButton": "Edit",
     "editListing": "Edit Listing",
     "listingUpdated": "✅ Listing successfully updated!",
-    "listingUpdateFailed": "❌ An error occurred while updating the listing"
+    "listingUpdateFailed": "❌ An error occurred while updating the listing",
+    "priceTooHigh": "⚠️ Price Too High! Buyers might not be interested.",
+    "priceHigh": "A Bit Expensive. Sales might be slow.",
+    "priceReasonable": "✅ Reasonable Price. Normal demand.",
+    "priceCheap": "🔥 Bargain! Your phone won't stop ringing.",
+    "skillBonus": "Skill Bonus: Suggested price increased by %{percent}!",
+    "creatingListing": "Creating Listing...",
+    "salePriceLabel": "Sale Price *",
+    "priceHint": "Ex: 350000",
+    "maxPriceHint": "Maximum: {price} TL (15% Profit Limit)",
+    "priceLimitExceeded": "Price cannot exceed 15% of purchase price!",
+    "suggestedPriceHint": "Suggested price: {price} TL (Purchase price + 10%)",
+    "descriptionLabel": "Listing Description *",
+    "descriptionHint": "Provide detailed information about your vehicle...",
+    "noVehicles": "No vehicles to sell!",
+    "noVehiclesDesc": "You can list vehicles from your garage for sale."
   },
   "offers": {
     "title": "My Offers",
@@ -369,7 +397,43 @@
     "counterOfferRangeError": "Your counter offer must be between your initial offer and the seller's counter offer",
     "newCounterOffer": "New Counter Offer",
     "purchaseCompleted": "Purchase completed! Vehicle added to your garage.",
-    "negotiationContinues": "Negotiation continues. You can track it in My Offers page."
+    "negotiationContinues": "Negotiation continues. You can track it in My Offers page.",
+    "offerAcceptedAndPurchased": "Offer accepted and vehicle purchased!"
+  },
+  "xp": {
+    "level": "Level {level}",
+    "levelUp": "Level Up!",
+    "rewards": "Rewards",
+    "awesome": "Awesome!",
+    "xpShort": "XP",
+    "toNextLevel": "To next level",
+    "progress": "Progress",
+    "gained": "Gained",
+    "congratulations": "Congratulations!",
+    "newLevel": "New Level",
+    "cashBonus": "Cash Bonus",
+    "goldBonus": "Gold Bonus",
+    "unlocked": "Unlocked",
+    "continue": "Continue",
+    "dailyLoginBonus": "Daily Login Bonus",
+    "consecutiveDays": "Consecutive Days",
+    "keepStreak": "Keep Your Streak!",
+    "unlock": {
+      "premiumVehicles": "Premium Vehicle Categories",
+      "advancedOffers": "Advanced Offer System",
+      "autoSellBot": "Auto-Sell Bot",
+      "vipStatus": "VIP Status",
+      "specialBadges": "Special Achievement Badges"
+    },
+    "source": {
+      "vehiclePurchase": "Vehicle Purchase",
+      "vehicleSale": "Vehicle Sale",
+      "offerMade": "Offer Made",
+      "offerAccepted": "Offer Accepted",
+      "dailyLogin": "Daily Login",
+      "questCompleted": "Quest Completed",
+      "achievement": "Achievement"
+    }
   },
   "listings": {
     "title": "My Listings",
@@ -434,7 +498,10 @@
     "restartRequired": "You may need to restart the app",
     "success": "Success",
     "error": "Error",
-    "ok": "OK"
+    "ok": "OK",
+    "gameSettings": "Game Settings",
+    "gameDayDuration": "Game Day Duration",
+    "gameDayDurationUpdated": "Game day duration set to {minutes} minutes"
   },
   "profile": {
     "title": "Profile Information",
@@ -448,20 +515,17 @@
     "currency": "Currency",
     "personalInfo": "Personal Information",
     "accountInfo": "Account Information",
-    "registrationInfo": "Registration Information"
+    "registrationInfo": "Registration Information",
+    "yearsOld": "years old",
+    "registrationDate": "Registration Date",
+    "membershipDuration": "Membership Duration"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female"
   },
   "changePassword": {
     "title": "Change Password",
-    "oldPassword": "Current Password",
-    "newPassword": "New Password",
-    "confirmNewPassword": "Confirm New Password",
-    "enterOldPassword": "Enter your current password",
-    "enterNewPassword": "Enter your new password",
-    "enterNewPasswordAgain": "Enter your new password again",
-    "oldPasswordRequired": "Please enter your current password",
-    "newPasswordRequired": "Please enter your new password",
-    "passwordsNotMatch": "New passwords do not match",
-    "incorrectOldPassword": "Incorrect current password",
     "passwordChanged": "Password changed successfully",
     "passwordChangedDesc": "You can now login with your new password",
     "changePasswordButton": "Change Password"
@@ -492,11 +556,52 @@
     "tasks": "Tasks",
     "settings": "Settings",
     "tasksComingSoon": "Tasks page coming soon...",
-    "rentComingSoon": "Vehicle rental page coming soon..."
+    "rentComingSoon": "Vehicle rental page coming soon...",
+    "vehicle": "vehicle",
+    "vehicles": "vehicles",
+    "listing": "listing",
+    "listings": "listings",
+    "vehicleLimit": "Vehicle Limit"
   },
   "myVehicles": {
     "buildCollection": "Build your collection by purchasing your first vehicle!",
+    "garageFull": "Garage Full!",
+    "garageLimitReached": "You have reached your garage limit.",
+    "expandGarageHint": "You need to expand your garage to buy new vehicles.",
+    "goToStore": "Go to Store",
+    "noVehiclesDesc": "You can list vehicles from your garage for sale.",
+    "vehicleFeatures": "Vehicle Features",
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "mileage": "Mileage",
+    "fuel": "Fuel",
+    "transmission": "Transmission",
+    "engine": "Engine",
+    "drive": "Drive",
+    "color": "Color",
+    "warranty": "Warranty",
+    "accidentRecord": "Accident Record",
+    "var": "Yes",
+    "yok": "No",
+    "purchasePrice": "Purchase Price",
+    "daysOwned": "Days Owned",
+    "listForSaleButton": "List For Sale",
     "alreadyListed": "This vehicle is already listed for sale!"
+  },
+  "quests": {
+    "title": "Daily Quests",
+    "noQuests": "No quests found for today.",
+    "rewardClaimed": "Reward Claimed! +{xp} XP, +{money} TL",
+    "claimFailed": "Failed to claim reward.",
+    "claimReward": "Claim Reward",
+    "descriptions": {
+      "buyVehicle": "Buy {count} vehicles today",
+      "sellVehicle": "Sell {count} vehicles today",
+      "makeOffer": "Send {count} offers today",
+      "earnProfit": "Earn {amount} TL profit today",
+      "login": "Login to the game"
+    }
   },
   "myListings": {
     "potential": "Potential",
@@ -516,9 +621,22 @@
     "days": "days",
     "hour": "hour",
     "minute": "minute",
+    "minutes": "minutes",
+    "month": "month",
+    "year": "year",
     "offers": "offers",
     "offer": "offer",
     "offersCreated": "offers created",
+    "noActiveOffers": "No Active Offers",
+    "noPendingOffersForBrand": "No pending offers for vehicles of this brand",
+    "rejectAll": "Reject All Offers",
+    "noIncomingOffers": "No Incoming Offers",
+    "noSentOffers": "No Sent Offers",
+    "noIncomingOffersDesc": "No offers received for your listings yet.",
+    "noSentOffersDesc": "You haven't sent any offers yet.",
+    "statusPending": "Pending",
+    "statusAccepted": "Accepted",
+    "statusRejected": "Rejected",
     "checkOffers": "You can check them in My Offers section",
     "generatingOffers": "Generating offers...",
     "errorGeneratingOffers": "An error occurred while generating offers",
@@ -528,6 +646,116 @@
     "sellVehicle": "Sell",
     "vehicleDetailComingSoon": "Vehicle detail page coming soon...",
     "sellFeatureComingSoon": "Sell vehicle feature coming soon..."
+  },
+  "expertise": {
+    "reportTitle": "Expertise Report",
+    "statusTitle": "Expertise Status",
+    "issueFound": "ISSUE FOUND!",
+    "clean": "CLEAN",
+    "disclaimer": "Vehicle information is based on seller declaration. You can perform expertise to learn the real condition.",
+    "performAction": "Perform Expertise (3,000 TL)",
+    "accidentRecord": "Accident Record",
+    "exists": "Yes",
+    "none": "No",
+    "mileage": "Mileage",
+    "partsCondition": "Parts Condition",
+    "partsClean": "Clean",
+    "partsIssue": "Parts Repaired/Replaced",
+    "declared": "Declared:",
+    "real": "Real:",
+    "verified": "Real: Verified",
+    "dialogTitle": "Perform Expertise",
+    "dialogMessage": "Do you want to perform expertise to learn the real condition of the vehicle?",
+    "fee": "Expertise Fee:",
+    "insufficientBalance": "Insufficient Balance!",
+    "confirmAndPay": "Confirm and Pay",
+    "issuesFoundMessage": "Hidden issues found in expertise! Price updated.",
+    "cleanMessage": "Vehicle is clean! Seller declaration verified."
+  },
+  "brands": {
+    "hints": {
+      "Audira": "German luxury performance",
+      "Bavora": "Bavarian engine",
+      "Fialto": "Italian practicality",
+      "Fortran": "American classic",
+      "Hyundaro": "Korean technology",
+      "Hondaro": "Japanese reliability",
+      "Mercurion": "German luxury",
+      "Opexel": "German practicality",
+      "Renauva": "French innovation",
+      "Toyoto": "Japanese perfection",
+      "Voltswagen": "The people's car"
+    }
+  },
+  "models": {
+    "descriptions": {
+      "Renauva": {
+        "Slim": "Modern Hatchback, young and dynamic",
+        "Magna": "Premium Mid-Size, comfortable",
+        "Flow": "Spacious Sedan, long-distance comfort",
+        "Signa": "Economic Sedan, practical use",
+        "Tallion": "New Generation, modern technology"
+      },
+      "Voltswagen": {
+        "Paso": "Premium Segment, luxury and power",
+        "Tenis": "Compact Premium, high demand",
+        "Colo": "Premium Small, quality and practical",
+        "Jago": "Spacious Sedan, family-friendly"
+      },
+      "Fialto": {
+        "Agna": "Volume King, best-selling model",
+        "Lagua": "Economic Sedan, simple and solid",
+        "Zorno": "Compact Hatchback, city car"
+      },
+      "Opexel": {
+        "Tasra": "Reliable German quality, popular",
+        "Lorisa": "Compact, economic and reliable",
+        "Mornitia": "Premium Segment, luxury equipment"
+      },
+      "Bavora": {
+        "C Serisi": "Popular Premium, best-selling",
+        "E Serisi": "Luxury Segment, most prestigious",
+        "A Serisi": "Compact Premium, young and dynamic",
+        "D Serisi": "Sporty Coupe, elegant and powerful"
+      },
+      "Fortran": {
+        "Odak": "C Segment leader, driving pleasure",
+        "Vista": "Compact, economic, dynamic",
+        "Avger": "Powerful Pick-up, 4x4 off-road",
+        "Tupa": "SUV comfort, spacious and modern"
+      },
+      "Mercurion": {
+        "3 Serisi": "Premium comfort, classic luxury",
+        "5 Serisi": "Top-level luxury, executive car",
+        "1 Serisi": "Compact premium, MBUX technology",
+        "GJE": "4-Door Coupe, sporty elegant",
+        "8 Serisi": "Legendary off-road, ultra luxury"
+      },
+      "Hyundaro": {
+        "A10": "Reliable, economic hatchback",
+        "Tecent Red": "Powerful diesel, economic sedan",
+        "Tecent White": "Simple solid, cheap repair",
+        "A20": "Balanced C segment, rich equipment",
+        "Kascon": "Modern SUV, hybrid technology"
+      },
+      "Toyoto": {
+        "Airoko": "Legendary reliability, hybrid leader",
+        "Lotus": "Reliable hatchback, hybrid available",
+        "Karma": "Compact practical, hybrid technology"
+      },
+      "Audira": {
+        "B3": "Premium compact, technology leader",
+        "B4": "D segment comfort, prestige",
+        "B6": "E segment luxury, top-level comfort",
+        "B5": "Sporty coupe, elegant design"
+      },
+      "Hondaro": {
+        "Vice": "Used car king, CVT reliability",
+        "VHL": "SUV comfort, hybrid technology",
+        "Kent": "Economic sedan, high power",
+        "Caz": "Magic seats, hybrid available"
+      }
+    }
   },
   "notifications": {
     "title": "Notifications",
@@ -586,7 +814,6 @@
     "remainingGold": "Remaining Gold",
     "convert": "Convert",
     "convertError": "An error occurred while converting gold",
-    "confirmConvert": "Confirm Transaction",
     "confirmConvertMessage": "Are you sure you want to proceed with this transaction?",
     "goldAmount": "Gold Amount",
     "confirmButton": "Confirm",
@@ -609,40 +836,5 @@
     "step4_desc": "Manage incoming and sent offers here.",
     "step5_title": "Balance 💵",
     "step5_desc": "Grow your money by trading. Good luck!"
-  },
-  "xp": {
-    "level": "Level",
-    "xpShort": "XP",
-    "toNextLevel": "To next level",
-    "progress": "Progress",
-    "gained": "Gained",
-    "levelUp": "LEVEL UP!",
-    "congratulations": "Congratulations!",
-    "newLevel": "New Level",
-    "rewards": "Rewards",
-    "cashBonus": "Cash Bonus",
-    "goldBonus": "Gold Bonus",
-    "unlocked": "Unlocked",
-    "awesome": "Awesome!",
-    "continue": "Continue",
-    "dailyLoginBonus": "Daily Login Bonus",
-    "consecutiveDays": "Consecutive Days",
-    "keepStreak": "Keep Your Streak!",
-    "unlock": {
-      "premiumVehicles": "Premium Vehicle Categories",
-      "advancedOffers": "Advanced Offer System",
-      "autoSellBot": "Auto-Sell Bot",
-      "vipStatus": "VIP Status",
-      "specialBadges": "Special Achievement Badges"
-    },
-    "source": {
-      "vehiclePurchase": "Vehicle Purchase",
-      "vehicleSale": "Vehicle Sale",
-      "offerMade": "Offer Made",
-      "offerAccepted": "Offer Accepted",
-      "counterOfferSuccess": "Successful Counter Offer",
-      "dailyLogin": "Daily Login",
-      "profitBonus": "Profit Bonus"
-    }
   }
 }

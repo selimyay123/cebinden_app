@@ -593,28 +593,28 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Garaj Dolu!'),
+          title: Text('myVehicles.garageFull'.tr()),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(Icons.garage, size: 64, color: Colors.orange),
               const SizedBox(height: 16),
               Text(
-                'Garaj limitine (${_currentUser!.garageLimit} araç) ulaştın.',
+                '${'myVehicles.garageLimitReached'.tr()} (${_currentUser!.garageLimit})',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Yeni araç almak için garajını genişletmelisin.',
+              Text(
+                'myVehicles.expandGarageHint'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Colors.grey),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Tamam'),
+              child: Text('common.ok'.tr()),
             ),
             ElevatedButton(
               onPressed: () {
@@ -624,7 +624,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 // Şimdilik basitçe kullanıcıya mağazaya gitmesini söyleyelim
                 // İleride direkt yönlendirme eklenebilir
               },
-              child: const Text('Mağazaya Git'),
+              child: Text('myVehicles.goToStore'.tr()),
             ),
           ],
         ),
@@ -668,9 +668,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ),
                 child: Column(
                   children: [
-                    const Text(
-                      '🚗 Araç Satın Alınıyor',
-                      style: TextStyle(
+                    Text(
+                      'purchase.purchasingVehicle'.tr(),
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.deepPurple,
@@ -689,7 +689,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Lütfen bekleyiniz...',
+                      'common.pleaseWait'.tr(),
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -722,7 +722,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       );
 
       if (!balanceUpdateSuccess) {
-        throw Exception('Bakiye güncellenemedi');
+        throw Exception('errors.balanceUpdateFailed'.tr());
       }
 
       // 2️⃣ Aracı tüm kullanıcıların favorilerinden kaldır (ilan satıldı)
@@ -756,7 +756,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           _currentUser!.id,
           {'balance': _currentUser!.balance},
         );
-        throw Exception('Araç garajınıza eklenemedi');
+        throw Exception('errors.vehicleAddFailed'.tr());
       }
 
       // 4️⃣ Kullanıcıyı güncelle
@@ -1006,7 +1006,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    _vehicle.isExpertiseDone ? 'Ekspertiz Raporu' : 'Ekspertiz Durumu',
+                    _vehicle.isExpertiseDone ? 'expertise.reportTitle'.tr() : 'expertise.statusTitle'.tr(),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -1025,7 +1025,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    hasIssues ? 'FARK BULUNDU!' : 'TEMİZ',
+                    hasIssues ? 'expertise.issueFound'.tr() : 'expertise.clean'.tr(),
                     style: TextStyle(
                       color: hasIssues ? Colors.red : Colors.green,
                       fontWeight: FontWeight.bold,
@@ -1037,9 +1037,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           ),
           const SizedBox(height: 16),
           if (!_vehicle.isExpertiseDone) ...[
-            const Text(
-              'Araç bilgileri satıcı beyanına dayanmaktadır. Ekspertiz yaptırarak gerçek durumu öğrenebilirsiniz.',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              'expertise.disclaimer'.tr(),
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -1047,7 +1047,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               child: ElevatedButton.icon(
                 onPressed: _currentUser != null ? _showExpertiseDialog : null,
                 icon: const Icon(Icons.search),
-                label: const Text('Ekspertize Sok (3.000 TL)'),
+                label: Text('expertise.performAction'.tr()),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
@@ -1058,21 +1058,21 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           ] else ...[
             // Rapor Detayları
             _buildExpertiseRow(
-              'Hasar Kaydı', 
-              _vehicle.declaredAccidentRecord ? 'Var' : 'Yok',
-              _vehicle.hasAccidentRecord ? 'Var' : 'Yok',
+              'expertise.accidentRecord'.tr(), 
+              _vehicle.declaredAccidentRecord ? 'expertise.exists'.tr() : 'expertise.none'.tr(),
+              _vehicle.hasAccidentRecord ? 'expertise.exists'.tr() : 'expertise.none'.tr(),
               isIssue: _vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord
             ),
             const Divider(),
             _buildExpertiseRow(
-              'Kilometre', 
+              'expertise.mileage'.tr(), 
               '${_formatNumber(_vehicle.declaredMileage)} km',
               '${_formatNumber(_vehicle.mileage)} km',
               isIssue: _vehicle.declaredMileage != _vehicle.mileage
             ),
             const Divider(),
             _buildExpertiseRow(
-              'Parça Durumu', 
+              'expertise.partsCondition'.tr(), 
               _checkPartsStatus(_vehicle.declaredPartConditions),
               _checkPartsStatus(_vehicle.partConditions),
               isIssue: _vehicle.declaredPartConditions.toString() != _vehicle.partConditions.toString()
@@ -1085,8 +1085,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
   String _checkPartsStatus(Map<String, String> parts) {
     final issueCount = parts.values.where((v) => v != 'orijinal').length;
-    if (issueCount == 0) return 'Hatasız';
-    return '$issueCount Parça İşlemli';
+    if (issueCount == 0) return 'expertise.partsClean'.tr();
+    return '$issueCount ${'expertise.partsIssue'.tr()}';
   }
 
   Widget _buildExpertiseRow(String label, String declared, String real, {required bool isIssue}) {
@@ -1103,11 +1103,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Beyan: $declared', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('${'expertise.declared'.tr()} $declared', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                 if (isIssue)
-                  Text('Gerçek: $real', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+                  Text('${'expertise.real'.tr()} $real', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
                 else
-                  const Text('Gerçek: Doğrulandı', style: TextStyle(color: Colors.green, fontSize: 13)),
+                  Text('expertise.verified'.tr(), style: const TextStyle(color: Colors.green, fontSize: 13)),
               ],
             ),
           ),
@@ -1129,17 +1129,17 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ekspertiz Yaptır'),
+        title: Text('expertise.dialogTitle'.tr()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Aracın gerçek durumunu öğrenmek için ekspertize sokmak ister misiniz?'),
+            Text('expertise.dialogMessage'.tr()),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Ekspertiz Ücreti:'),
+                Text('expertise.fee'.tr()),
                 Text(
                   '${_formatCurrency(cost)} TL',
                   style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
@@ -1150,7 +1150,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  'Yetersiz Bakiye!',
+                  'expertise.insufficientBalance'.tr(),
                   style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.bold),
                 ),
               ),
@@ -1159,7 +1159,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: canAfford 
@@ -1168,7 +1168,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     _performExpertise(cost);
                   }
                 : null,
-            child: const Text('Onayla ve Öde'),
+            child: Text('expertise.confirmAndPay'.tr()),
           ),
         ],
       ),
@@ -1219,18 +1219,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       // Fiyatı güncelle
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Ekspertiz sonucunda gizli kusurlar bulundu! Fiyat güncellendi.'),
+          SnackBar(
+            content: Text('expertise.issuesFoundMessage'.tr()),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 4),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Araç temiz! Satıcı beyanı doğrulandı.'),
+          SnackBar(
+            content: Text('expertise.cleanMessage'.tr()),
             backgroundColor: Colors.green,
           ),
         );
@@ -1488,7 +1488,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('dd MMMM yyyy', 'tr_TR').format(date);
+    return DateFormat('dd MMMM yyyy', LocalizationService().currentLanguage == 'tr' ? 'tr_TR' : 'en_US').format(date);
   }
 
   /// Teklif verme dialogunu göster
@@ -1926,7 +1926,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Tamam'),
+                      child: Text('common.ok'.tr()),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1970,7 +1970,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text('Kabul Et'),
+                    child: Text('common.accept'.tr()),
                   ),
                 ),
               ],
@@ -2000,8 +2000,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         if (mounted) {
           // Başarılı mesajı
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Teklif kabul edildi ve araç satın alındı!'),
+            SnackBar(
+              content: Text('offer.offerAcceptedAndPurchased'.tr()),
               backgroundColor: Colors.green,
             ),
           );
@@ -2025,7 +2025,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result['error'] ?? 'Bir hata oluştu'),
+              content: Text(result['error'] ?? 'common.error'.tr()),
               backgroundColor: Colors.red,
             ),
           );
@@ -2038,7 +2038,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Hata: $e'),
+            content: Text('errors.errorWithDetail'.trParams({'detail': e.toString()})),
             backgroundColor: Colors.red,
           ),
         );
@@ -2158,7 +2158,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              'Seviye ${result.newLevel}',
+              'xp.level'.trParams({'level': result.newLevel.toString()}),
               style: const TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,

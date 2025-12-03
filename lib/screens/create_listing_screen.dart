@@ -347,9 +347,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             if (price <= 0) {
               return 'Geçerli bir fiyat girin';
             }
-            if (price < 150000) {
-              return 'Minimum satış fiyatı 150.000 TL olmalıdır';
-            }
+            // Minimum limit removed
             if (price > maxPrice) {
               return 'Fiyat, alış fiyatının %15 fazlasını geçemez!';
             }

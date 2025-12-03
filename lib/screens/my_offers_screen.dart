@@ -180,12 +180,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               controller: _tabController!,
               children: [
                 // Gelen Teklifler - Marka Listesi
-                _incomingOffers.isEmpty
+                _incomingOffersByBrand.isEmpty
                     ? _buildEmptyState(isIncoming: true)
                     : _buildBrandList(isIncoming: true),
 
                 // Gönderilen Teklifler - Marka Listesi
-                _sentOffers.isEmpty
+                _sentOffersByBrand.isEmpty
                     ? _buildEmptyState(isIncoming: false)
                     : _buildBrandList(isIncoming: false),
               ],
@@ -317,8 +317,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       const SizedBox(height: 4),
                       Text(
                         offerCount == 1 
-                          ? '1 teklif' 
-                          : '$offerCount teklif',
+                          ? '1 ${'misc.offer'.tr()}' 
+                          : '$offerCount ${'misc.offers'.tr()}',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey[600],
@@ -364,7 +364,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('${widget.selectedBrand} Araçlarım'),
+        title: Text('${widget.selectedBrand} ${'myVehicles.myVehicles'.tr()}'),
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -383,7 +383,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Aktif Teklif Yok',
+                        'myVehicles.noActiveOffers'.tr(),
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -392,7 +392,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Bu markada bekleyen teklifi olan araç bulunmuyor',
+                        'myVehicles.noPendingOffersForBrand'.tr(),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[500],
@@ -437,7 +437,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       appBar: AppBar(
         title: Text(firstOffer != null 
           ? '${firstOffer.vehicleBrand} ${firstOffer.vehicleModel}'
-          : 'Teklifler'),
+          : 'myVehicles.offers'.tr()),
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -471,9 +471,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                               elevation: 2,
                             ),
                             icon: const Icon(Icons.cancel, size: 24),
-                            label: const Text(
-                              'Tüm Teklifleri Reddet',
-                              style: TextStyle(
+                            label: Text(
+                              'myVehicles.rejectAll'.tr(),
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -501,28 +501,28 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            isIncoming ? Icons.inbox_outlined : Icons.send_outlined,
-            size: 120,
+            Icons.local_offer_outlined, // Changed icon to match style
+            size: 80, // Adjusted size
             color: Colors.grey[300],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Text(
-            isIncoming ? 'offers.noIncoming'.tr() : 'offers.noSent'.tr(),
+            isIncoming ? 'myVehicles.noIncomingOffers'.tr() : 'myVehicles.noSentOffers'.tr(), // Hardcoded for now or use tr() if keys exist
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Colors.grey[700],
             ),
           ),
           const SizedBox(height: 8),
           Text(
             isIncoming
-                ? 'offers.noIncomingDesc'.tr()
-                : 'offers.noSentDesc'.tr(),
+                ? 'myVehicles.noIncomingOffersDesc'.tr()
+                : 'myVehicles.noSentOffersDesc'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
+              fontSize: 14,
+              color: Colors.grey[500],
             ),
           ),
         ],
@@ -613,7 +613,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${firstOffer.vehicleYear} Model',
+                          '${firstOffer.vehicleYear} ${'vehicles.model'.tr()}',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.grey[700],
@@ -654,9 +654,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatChip('Bekleyen', pendingOffers.length, Colors.orange),
-                  _buildStatChip('Kabul', acceptedOffers.length, Colors.green),
-                  _buildStatChip('Red', rejectedOffers.length, Colors.red),
+                  _buildStatChip('myVehicles.statusPending'.tr(), pendingOffers.length, Colors.orange),
+                  _buildStatChip('myVehicles.statusAccepted'.tr(), acceptedOffers.length, Colors.green),
+                  _buildStatChip('myVehicles.statusRejected'.tr(), rejectedOffers.length, Colors.red),
                 ],
               ),
             ),
