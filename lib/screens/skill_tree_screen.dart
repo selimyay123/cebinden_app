@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/skill_service.dart';
 import '../services/database_helper.dart';
+import '../services/localization_service.dart';
 
 class SkillTreeScreen extends StatefulWidget {
   const SkillTreeScreen({Key? key}) : super(key: key);
@@ -10,15 +11,26 @@ class SkillTreeScreen extends StatefulWidget {
   State<SkillTreeScreen> createState() => _SkillTreeScreenState();
 }
 
-class _SkillTreeScreenState extends State<SkillTreeScreen> {
+class _SkillTreeScreenState extends State<SkillTreeScreen> with TickerProviderStateMixin, LocalizationMixin {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   User? _currentUser;
   bool _isLoading = true;
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
     _loadUser();
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUser() async {
@@ -36,27 +48,84 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
     // Kontroller
     if (!SkillService.canUnlock(_currentUser!, skill.id)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bu yeteneği açamazsınız! (Yetersiz puan veya ön koşul)')),
+        SnackBar(
+          content: Text('skills.cannotUnlock'.tr()),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
-    // Onay kutusu
+    // Onay dialogu
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('${skill.name} Aç?'),
-        content: Text(
-          '${skill.description}\n\nBedel: ${skill.cost} Yetenek Puanı',
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Text(skill.emoji, style: const TextStyle(fontSize: 28)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                skill.nameKey.tr(),
+                style: const TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              skill.descKey.tr(),
+              style: const TextStyle(fontSize: 15),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: skill.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: skill.primaryColor.withOpacity(0.3)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'skills.cost'.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${skill.cost} SP',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('İptal'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('AÇ'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: skill.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('skills.unlock'.tr()),
           ),
         ],
       ),
@@ -81,8 +150,9 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${skill.name} açıldı! 🎉'),
+              content: Text('${skill.emoji} ${skill.nameKey.tr()} ${'skills.unlocked'.tr()}'),
               backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -90,7 +160,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hata: $e')),
+          SnackBar(content: Text('common.error'.tr())),
         );
       }
     }
@@ -103,29 +173,41 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
     }
 
     if (_currentUser == null) {
-      return const Scaffold(body: Center(child: Text('Kullanıcı bulunamadı')));
+      return Scaffold(body: Center(child: Text('common.error'.tr())));
     }
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Yetenek Ağacı'),
+        title: Text('skills.title'.tr()),
+        elevation: 0,
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.amber,
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFFD700), Color(0xFFFFE55C)],
+              ),
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.amber.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
-                const Icon(Icons.star, size: 16, color: Colors.black),
-                const SizedBox(width: 4),
+                const Icon(Icons.star, size: 18, color: Colors.black87),
+                const SizedBox(width: 6),
                 Text(
                   '${_currentUser!.skillPoints} SP',
                   style: const TextStyle(
-                    color: Colors.black,
+                    color: Colors.black87,
                     fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
               ],
@@ -136,96 +218,212 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildBranchSection('Tüccar (Trader)', 'trader', Colors.blue),
+            // Info card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.blue, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'skills.info'.tr(),
+                      style: const TextStyle(fontSize: 13, color: Colors.black87),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
             const SizedBox(height: 24),
-            _buildBranchSection('Uzman (Expert)', 'expert', Colors.purple),
-            const SizedBox(height: 24),
-            _buildBranchSection('Patron (Tycoon)', 'tycoon', Colors.green),
+            
+            // Skills grid
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              alignment: WrapAlignment.center,
+              children: SkillService.skills.map((skill) => _buildSkillCard(skill)).toList(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBranchSection(String title, String branchId, Color color) {
-    final branchSkills = SkillService.skills.where((s) => s.branch == branchId).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        const Divider(),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: branchSkills.map((skill) => _buildSkillNode(skill, color)).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSkillNode(Skill skill, Color color) {
+  Widget _buildSkillCard(Skill skill) {
     final isUnlocked = _currentUser!.unlockedSkills.contains(skill.id);
     final canUnlock = !isUnlocked && SkillService.canUnlock(_currentUser!, skill.id);
+    final isLocked = !isUnlocked && !canUnlock;
 
-    return GestureDetector(
-      onTap: () => isUnlocked ? null : _unlockSkill(skill),
-      child: Container(
-        width: 100,
-        height: 120,
-        decoration: BoxDecoration(
-          color: isUnlocked ? color : Colors.grey[200],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: canUnlock ? Colors.green : (isUnlocked ? color : Colors.grey),
-            width: canUnlock ? 3 : 1,
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) {
+        final pulseValue = canUnlock ? _pulseController.value : 0.0;
+        
+        return Transform.scale(
+          scale: 1.0 + (pulseValue * 0.05),
+          child: GestureDetector(
+            onTap: () => isUnlocked ? null : _unlockSkill(skill),
+            child: Container(
+              width: 170,
+              height: 220,
+              decoration: BoxDecoration(
+                gradient: isLocked
+                    ? LinearGradient(
+                        colors: [Colors.grey[300]!, Colors.grey[400]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : LinearGradient(
+                        colors: [skill.primaryColor, skill.secondaryColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: (canUnlock ? skill.primaryColor : Colors.grey).withOpacity(0.3),
+                    blurRadius: canUnlock ? 12 : 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: canUnlock
+                    ? Border.all(color: Colors.white, width: 3)
+                    : null,
+              ),
+              child: Stack(
+                children: [
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Emoji icon
+                        Text(
+                          skill.emoji,
+                          style: TextStyle(
+                            fontSize: 40,
+                            color: isLocked ? Colors.black38 : Colors.white,
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 12),
+                        
+                        // Name
+                        Text(
+                          skill.nameKey.tr(),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isLocked ? Colors.black54 : Colors.white,
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 8),
+                        
+                        // Description
+                        Text(
+                          skill.descKey.tr(),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: isLocked ? Colors.black45 : Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                        
+                        const Spacer(),
+                        
+                        // Cost or status
+                        if (!isUnlocked)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(isLocked ? 0.3 : 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  size: 14,
+                                  color: isLocked ? Colors.black45 : Colors.white,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${skill.cost} SP',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: isLocked ? Colors.black54 : Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        if (isUnlocked)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.check_circle, size: 16, color: Colors.white),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'skills.active'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Lock icon overlay
+                  if (isLocked)
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Icon(
+                        Icons.lock,
+                        color: Colors.black.withOpacity(0.3),
+                        size: 24,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
-          boxShadow: canUnlock
-              ? [BoxShadow(color: Colors.green.withOpacity(0.3), blurRadius: 8, spreadRadius: 2)]
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              skill.icon,
-              size: 32,
-              color: isUnlocked ? Colors.white : Colors.grey,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              skill.name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: isUnlocked ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 4),
-            if (!isUnlocked)
-              Text(
-                '${skill.cost} SP',
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: Colors.black54,
-                ),
-              ),
-            if (isUnlocked)
-              const Icon(Icons.check, size: 16, color: Colors.white70),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

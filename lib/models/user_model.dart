@@ -37,6 +37,12 @@ class User {
   final int skillPoints; // Harcanabilir yetenek puanı
   final List<String> unlockedSkills; // Açılan yeteneklerin ID listesi
 
+  // ========== GALERİ SİSTEMİ ==========
+  final bool ownsGallery; // Galeri sahibi mi?
+  final DateTime? galleryPurchaseDate; // Galeri satın alma tarihi
+  final double totalRentalIncome; // Toplam kiralama geliri
+  final double lastDailyRentalIncome; // Son günlük kiralama geliri
+
   User({
     required this.id,
     required this.username,
@@ -70,6 +76,11 @@ class User {
     // Yetenek Sistemi
     this.skillPoints = 0,
     this.unlockedSkills = const [],
+    // Galeri Sistemi
+    this.ownsGallery = false,
+    this.galleryPurchaseDate,
+    this.totalRentalIncome = 0.0,
+    this.lastDailyRentalIncome = 0.0,
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -189,6 +200,13 @@ class User {
       // Yetenek Sistemi - Migration Logic: Eğer skillPoints null ise ve level > 1 ise, puan ver.
       skillPoints: json['skillPoints'] as int? ?? ((json['level'] as int? ?? 1) - 1),
       unlockedSkills: (json['unlockedSkills'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      // Galeri Sistemi
+      ownsGallery: json['ownsGallery'] as bool? ?? false,
+      galleryPurchaseDate: json['galleryPurchaseDate'] != null 
+          ? DateTime.parse(json['galleryPurchaseDate']) 
+          : null,
+      totalRentalIncome: (json['totalRentalIncome'] as num?)?.toDouble() ?? 0.0,
+      lastDailyRentalIncome: (json['lastDailyRentalIncome'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -227,6 +245,11 @@ class User {
       // Yetenek Sistemi
       'skillPoints': skillPoints,
       'unlockedSkills': unlockedSkills,
+      // Galeri Sistemi
+      'ownsGallery': ownsGallery,
+      'galleryPurchaseDate': galleryPurchaseDate?.toIso8601String(),
+      'totalRentalIncome': totalRentalIncome,
+      'lastDailyRentalIncome': lastDailyRentalIncome,
     };
   }
 
@@ -261,6 +284,10 @@ class User {
     DateTime? lastDailyResetDate,
     int? skillPoints,
     List<String>? unlockedSkills,
+    bool? ownsGallery,
+    DateTime? galleryPurchaseDate,
+    double? totalRentalIncome,
+    double? lastDailyRentalIncome,
   }) {
     return User(
       id: id ?? this.id,
@@ -292,6 +319,10 @@ class User {
       lastDailyResetDate: lastDailyResetDate ?? this.lastDailyResetDate,
       skillPoints: skillPoints ?? this.skillPoints,
       unlockedSkills: unlockedSkills ?? this.unlockedSkills,
+      ownsGallery: ownsGallery ?? this.ownsGallery,
+      galleryPurchaseDate: galleryPurchaseDate ?? this.galleryPurchaseDate,
+      totalRentalIncome: totalRentalIncome ?? this.totalRentalIncome,
+      lastDailyRentalIncome: lastDailyRentalIncome ?? this.lastDailyRentalIncome,
     );
   }
 

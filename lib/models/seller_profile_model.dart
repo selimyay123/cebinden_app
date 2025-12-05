@@ -1,4 +1,5 @@
 import 'dart:math';
+import '../services/localization_service.dart';
 
 /// AI Satıcı tipleri
 enum SellerType {
@@ -134,13 +135,30 @@ class SellerProfile {
     );
   }
 
-  /// Teklifi değerlendir (🆕 ALL SYSTEMS: ZONE + FUZZY + PRICE BANDS + PATIENCE + RESERVE)
+  /// Teklifi değerlendir (🆕 ALL SYSTEMS: ZONE + FUZZY + PRICE BANDS + PATIENCE + RESERVE + SKILL)
   Map<String, dynamic> evaluateOffer({
     required double offerPrice,
     required double listingPrice,
     int currentRounds = 0, // Mevcut pazarlık turu
+    dynamic buyerUser, // 🆕 Alıcı kullanıcı (skill kontrolü için)
   }) {
     final random = Random();
+    
+    // 🆕 SKILL CHECK: Pazarlık Gücü yeteneği var mı?
+    double negotiationPowerBonus = 0.0;
+    if (buyerUser != null) {
+      // SkillService import edilmeli ama circular dependency olmaması için dynamic kullanıyoruz
+      try {
+        // Eğer user'ın negotiation_power skill'i varsa %15 bonus
+        if (buyerUser.unlockedSkills != null && 
+            (buyerUser.unlockedSkills as List).contains('negotiation_power')) {
+          negotiationPowerBonus = 0.15; // %15 daha iyi anlaşma
+        }
+      } catch (e) {
+        // Hata durumunda bonus yok
+      }
+    }
+    
     
     // 🆕 RESERVE PRICE: Satıcının kafasındaki gerçek minimum fiyat
     // Kullanıcı ilan fiyatını görür ama bot reserve price'a göre karar verir!
@@ -165,7 +183,8 @@ class SellerProfile {
     
     // 🆕 KRİTİK: Kabul eşiğini fiyat bandına göre YÜKSELT!
     // Pahalı araçlarda daha yüksek oran gerekli
-    final adjustedMinAcceptable = minAcceptableRatio + priceBandBonus;
+    // 🆕 SKILL BONUS: Pazarlık Gücü varsa eşiği düşür (alıcı lehine)
+    final adjustedMinAcceptable = (minAcceptableRatio + priceBandBonus) - negotiationPowerBonus;
     
     // 🆕 PATIENCE CHECK: Sabır tükendi mi?
     final isPatienceExhausted = currentRounds >= maxPatience;
@@ -269,13 +288,13 @@ class SellerProfile {
   // 🆕 HAKARET BÖLGESÖ MESAJLARI (Sert ve net)
   String _getInsultZoneMessage() {
     final messages = [
-      'Dalga mı geçiyorsunuz? Bu araç bu fiyata olmaz!',
-      'Kusura bakmayın ama bu fiyat kabul edilemez. Ciddi değilsiniz galiba.',
-      'Bu teklif beklentilerimin çok ama çok altında. Hayır.',
-      'Piyasayı hiç mi araştırmadınız? Bu fiyat komik kaçıyor.',
-      'Üzgünüm ama bu teklifle anlaşamayız. Çok düşük.',
-      'Bu fiyata satmam imkansız. Lütfen gerçekçi olun.',
-      'Araç değerinin çok altında bir teklif. Maalesef kabul edemem.',
+      'negotiation.insult.1'.tr(),
+      'negotiation.insult.2'.tr(),
+      'negotiation.insult.3'.tr(),
+      'negotiation.insult.4'.tr(),
+      'negotiation.insult.5'.tr(),
+      'negotiation.insult.6'.tr(),
+      'negotiation.insult.7'.tr(),
     ];
     return messages[Random().nextInt(messages.length)];
   }
@@ -283,33 +302,33 @@ class SellerProfile {
   // Eski normal red mesajları (artık kullanılmıyor ama bırakıyorum)
   String _getRejectMessage() {
     final messages = [
-      'Maalesef bu fiyat çok düşük. Başka teklifler bekliyorum.',
-      'Bu teklifi kabul edemem. Daha gerçekçi bir fiyat bekliyorum.',
-      'Araç bu fiyata uygun değil. Teşekkürler.',
-      'Fiyat beklentilerimin çok altında. Reddediyorum.',
-      'Bu teklif benim için uygun değil.',
+      'negotiation.reject.1'.tr(),
+      'negotiation.reject.2'.tr(),
+      'negotiation.reject.3'.tr(),
+      'negotiation.reject.4'.tr(),
+      'negotiation.reject.5'.tr(),
     ];
     return messages[Random().nextInt(messages.length)];
   }
 
   String _getCounterOfferMessage(double amount) {
     final messages = [
-      'Bu fiyata satamam ama ${_formatCurrency(amount)} TL\'ye anlaşabiliriz.',
-      'Biraz düşük kaldı. ${_formatCurrency(amount)} TL olursa tamam.',
-      'Karşı teklifim: ${_formatCurrency(amount)} TL. Kabul eder misiniz?',
-      'Arada bir yerde buluşalım: ${_formatCurrency(amount)} TL.',
-      'Size özel ${_formatCurrency(amount)} TL son fiyatım.',
+      'negotiation.counter.1'.trParams({'amount': _formatCurrency(amount)}),
+      'negotiation.counter.2'.trParams({'amount': _formatCurrency(amount)}),
+      'negotiation.counter.3'.trParams({'amount': _formatCurrency(amount)}),
+      'negotiation.counter.4'.trParams({'amount': _formatCurrency(amount)}),
+      'negotiation.counter.5'.trParams({'amount': _formatCurrency(amount)}),
     ];
     return messages[Random().nextInt(messages.length)];
   }
 
   String _getAcceptMessage() {
     final messages = [
-      'Teklifiniz uygun, kabul ediyorum!',
-      'Anlaştık! Teklifi kabul ediyorum.',
-      'Uygun bir fiyat, kabul.',
-      'Tamam, bu fiyata anlaşalım.',
-      'Teklifinizi kabul ediyorum. Teşekkürler!',
+      'negotiation.accept.1'.tr(),
+      'negotiation.accept.2'.tr(),
+      'negotiation.accept.3'.tr(),
+      'negotiation.accept.4'.tr(),
+      'negotiation.accept.5'.tr(),
     ];
     return messages[Random().nextInt(messages.length)];
   }
@@ -317,11 +336,11 @@ class SellerProfile {
   // 🆕 SON NAZLANMA MESAJLARI (İyi teklif ama biraz daha istiyor)
   String _getFinalBargainMessage(double finalAmount) {
     final messages = [
-      'Teklifiniz iyi ama ${_formatCurrency(finalAmount)} TL olursa hemen anlaşalım.',
-      'Bir tık daha artsanız ne dersiniz? ${_formatCurrency(finalAmount)} TL ideal olur.',
-      'Neredeyse anlaştık! ${_formatCurrency(finalAmount)} TL\'ye tamam derim.',
-      '${_formatCurrency(finalAmount)} TL son teklifim, bu fiyata hemen kapatalım.',
-      'Gerçekten satmak istiyorum ama ${_formatCurrency(finalAmount)} TL daha adil olur.',
+      'negotiation.finalBargain.1'.trParams({'amount': _formatCurrency(finalAmount)}),
+      'negotiation.finalBargain.2'.trParams({'amount': _formatCurrency(finalAmount)}),
+      'negotiation.finalBargain.3'.trParams({'amount': _formatCurrency(finalAmount)}),
+      'negotiation.finalBargain.4'.trParams({'amount': _formatCurrency(finalAmount)}),
+      'negotiation.finalBargain.5'.trParams({'amount': _formatCurrency(finalAmount)}),
     ];
     return messages[Random().nextInt(messages.length)];
   }
@@ -329,11 +348,11 @@ class SellerProfile {
   // 🆕 SABIR TÜKENDİ - KABUL MESAJLARI
   String _getPatienceExhaustedAcceptMessage() {
     final messages = [
-      'Tamam, yeterince konuştuk. Bu fiyata anlaşalım artık.',
-      'Peki, bu son teklifimi kabul ediyorum. Anlaşalım.',
-      'Uzadı bu iş. Bu fiyata tamam, anlaşalım.',
-      'Artık daha fazla pazarlık yapmak istemiyorum. Kabul ediyorum.',
-      'İyi, bu fiyata razıyım. Hadi bitirelim şu işi.',
+      'negotiation.patienceExhaustedAccept.1'.tr(),
+      'negotiation.patienceExhaustedAccept.2'.tr(),
+      'negotiation.patienceExhaustedAccept.3'.tr(),
+      'negotiation.patienceExhaustedAccept.4'.tr(),
+      'negotiation.patienceExhaustedAccept.5'.tr(),
     ];
     return messages[Random().nextInt(messages.length)];
   }
@@ -341,12 +360,12 @@ class SellerProfile {
   // 🆕 SABIR TÜKENDİ - RED MESAJLARI
   String _getPatienceExhaustedRejectMessage() {
     final messages = [
-      'Yeterince konuştuk, bu fiyata anlaşamıyoruz. Üzgünüm.',
-      'Çok uzattık, bu fiyat benim için uygun değil. Teşekkürler.',
-      'Daha fazla pazarlık yapmak istemiyorum. Bu fiyata olmaz.',
-      'Artık vazgeçiyorum. Bu fiyata satamam.',
-      'Son teklifim buydu. Bu fiyata anlaşamayız, başka alıcılar bekleyeceğim.',
-      'Sabrım tükendi açıkçası. Bu fiyata razı olamam. İyi günler.',
+      'negotiation.patienceExhaustedReject.1'.tr(),
+      'negotiation.patienceExhaustedReject.2'.tr(),
+      'negotiation.patienceExhaustedReject.3'.tr(),
+      'negotiation.patienceExhaustedReject.4'.tr(),
+      'negotiation.patienceExhaustedReject.5'.tr(),
+      'negotiation.patienceExhaustedReject.6'.tr(),
     ];
     return messages[Random().nextInt(messages.length)];
   }

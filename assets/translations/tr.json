@@ -29,12 +29,28 @@
     "currency": "₺",
     "continue": "Devam Et",
     "active": "Aktif",
-    "dear": "Sayın"
+    "dear": "Sayın",
+    "attention": "Dikkat!"
   },
   "errors": {
     "balanceUpdateFailed": "Bakiye güncellenemedi",
     "vehicleAddFailed": "Araç garajınıza eklenemedi",
     "errorWithDetail": "Hata: {detail}"
+  },
+  "taxiGame": {
+    "gameOver": "Yolculuk Bitti",
+    "totalEarnings": "Toplam Kazanç:",
+    "vehicleCount": "Araç: {count}",
+    "stackCount": "Deste: {count}",
+    "rewardDoubled": "Tebrikler! Kazancınız ikiye katlandı!",
+    "adNotReady": "Reklam hazır değil.",
+    "doubleEarnings": "2x Kazanç (Reklam İzle)",
+    "exit": "Çıkış",
+    "playAgain": "Tekrar Oyna",
+    "title": "TAKSİ GÖREVİ",
+    "collectMoney": "Para destelerini topla!",
+    "swipeToMove": "Kaydırmak için sürükle",
+    "start": "BAŞLA"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -67,6 +83,10 @@
     "passwordMinLength": "Şifre en az 6 karakter olmalıdır",
     "ageRestriction": "En az 13 yaşında olmalısınız",
     "createAccountTitle": "Oyuna başlamak için bir kullanıcı adı seçin"
+  },
+  "gender": {
+    "male": "Erkek",
+    "female": "Kadın"
   },
   "home": {
     "title": "Dashboard",
@@ -108,6 +128,12 @@
     "advantage4Desc": "Galeri statüsü ile daha fazla müşteri ve güven kazanın.",
     "galleryPrice": "Galeri Fiyatı",
     "galleryComingSoon": "Galeri satın alma özelliği yakında aktif olacak!",
+    "galleryPurchaseSuccess": "🎉 Tebrikler! Artık bir galeri sahibisiniz!",
+    "galleryInsufficientFunds": "Galeri satın almak için yeterli bakiyeniz yok. Gereken: 10,000,000 ₺",
+    "myGallery": "Galerim",
+    "galleryStatus": "Galeri Durumu",
+    "galleryPurchaseDate": "Satın Alma Tarihi",
+    "galleryBenefits": "Aktif Avantajlar",
     "tasksComingSoon": "Görevler sayfası yakında...",
     "rentComingSoon": "Araç kiralama sayfası yakında...",
     "listingCount": "İlan",
@@ -118,7 +144,8 @@
     "rentalService": "Araç Kiralama Hizmeti",
     "opportunityPurchases": "Fırsat Alımları",
     "highProfitMargin": "Yüksek Kar Marjı",
-    "prestigeReputation": "Prestij & İtibar"
+    "prestigeReputation": "Prestij & İtibar",
+    "taxi": "Taksi Başlat"
   },
   "vehicles": {
     "title": "Araçlar",
@@ -231,7 +258,7 @@
     "yes": "Var",
     "no": "Yok",
     "accidentRecord": "Ağır Hasar Kaydı",
-    "sellerNote": "Satıcının Notu",
+    "sellerNote": "Satıcı Notu",
     "funDisclaimer": "Bu ilan açıklaması eğlence amaçlıdır. Gerçek araç bilgileri için İlan Bilgileri sekmesini kontrol edin! 😄",
     "listingNo": "İlan No",
     "listingDate": "İlan Tarihi",
@@ -269,63 +296,7 @@
     "nowYours": "Artık bu araç sizin!",
     "errorMessage": "Araç satın alınırken bir hata oluştu:",
     "tryAgain": "Lütfen tekrar deneyin.",
-    "makeOffer": "Teklif Ver",
-    "makeOfferComingSoon": "Teklif Ver özelliği yakında eklenecek"
-  },
-  "sell": {
-    "title": "Satışa Çıkar",
-    "selectVehicle": "Satmak için araç seçin",
-    "noVehiclesToSell": "Satılabilecek Araç Yok",
-    "noVehiclesToSellDesc": "Satışa çıkarabileceğiniz araç bulunmuyor. Önce araç satın alın!",
-    "enterPrice": "Satış fiyatını girin",
-    "enterDescription": "Açıklama girin (opsiyonel)",
-    "descriptionPlaceholder": "Araç hakkında detaylı bilgi verin...",
-    "listingSuccess": "✅ Aracınız başarıyla satışa çıkarıldı!",
-    "listingSuccessMessage": "Aracınız satışa çıkarıldı. Tekliflerim bölümünden teklifleri takip edebilirsiniz.",
-    "listingError": "❌ İlan oluşturulurken bir hata oluştu.",
-    "listingErrorWithMessage": "İlan oluşturulurken hata",
-    "priceTooHigh": "⚠️ Fiyat Çok Yüksek! Alıcı çıkmayabilir.",
-    "priceHigh": "Biraz Pahalı. Satış yavaş olabilir.",
-    "priceReasonable": "✅ Makul Fiyat. Normal talep.",
-    "priceCheap": "🔥 Kelepir! Telefonun susmayacak.",
-    "skillBonus": "Yetenek Bonusu: Önerilen fiyat %{percent} artırıldı!",
-    "creatingListing": "İlan Oluşturuluyor...",
-    "salePriceLabel": "Satış Fiyatı *",
-    "priceHint": "Örn: 350000",
-    "maxPriceHint": "Maksimum: {price} TL (%15 Kâr Sınırı)",
-    "priceRequired": "Fiyat girmelisiniz",
-    "priceInvalid": "Geçerli bir fiyat girin",
-    "priceLimitExceeded": "Fiyat, alış fiyatının %15 fazlasını geçemez!",
-    "suggestedPriceHint": "Önerilen fiyat: {price} TL (Alış fiyatı + %10)",
-    "descriptionLabel": "İlan Açıklaması *",
-    "descriptionHint": "Aracınız hakkında detaylı bilgi verin...",
-    "noVehicles": "Satılacak araç yok!",
-    "noVehiclesDesc": "Garajınızdaki araçları satışa çıkarabilirsiniz.",
-    "vehicleFeatures": "Araç Özellikleri",
-    "brand": "Marka",
-    "model": "Model",
-    "year": "Yıl",
-    "mileage": "Kilometre",
-    "fuel": "Yakıt",
-    "transmission": "Vites",
-    "engine": "Motor",
-    "drive": "Çekiş",
-    "color": "Renk",
-    "warranty": "Garanti",
-    "accidentRecord": "Kaza Kaydı",
-    "var": "Var",
-    "yok": "Yok",
-    "purchasePrice": "Satın Alma Fiyatı",
-    "daysOwned": "Sahiplik Süresi",
-    "removeListingConfirm": "İlanı kaldırmak istediğinizden emin misiniz?",
-    "removeListing": "İlanı Kaldır",
-    "listingRemoved": "✅ İlan başarıyla kaldırıldı!",
-    "listForSaleButton": "Satışa Çıkar",
-    "editListingComingSoon": "İlan düzenleme özelliği yakında...",
-    "editButton": "Düzenle",
-    "editListing": "İlanı Düzenle",
-    "listingUpdated": "✅ İlan başarıyla güncellendi!",
-    "listingUpdateFailed": "❌ İlan güncellenirken bir hata oluştu"
+    "makeOffer": "Teklif Ver"
   },
   "offers": {
     "title": "Tekliflerim",
@@ -372,6 +343,11 @@
     "counterOfferSuccess": "✅ Karşı teklif gönderildi!",
     "counterOfferError": "❌ Karşı teklif gönderilirken bir hata oluştu",
     "buyerResponse": "Alıcının Yanıtı",
+    "rejectAllConfirm": "Bu araca gelen {count} adet bekleyen teklifi reddetmek istediğinize emin misiniz?",
+    "rejectAllWarning": "Reddedilen teklifler kalıcı olarak silinecektir.",
+    "rejectAllButton": "Tümünü Reddet",
+    "rejectAllSuccess": "{count} teklif başarıyla reddedildi ve silindi.",
+    "rejectAllPartialSuccess": "{count}/{total} teklif reddedildi.",
     "timeAgo": {
       "now": "Şimdi",
       "minutesAgo": "dakika önce",
@@ -414,6 +390,119 @@
     "purchaseCompleted": "Satın alma işlemi tamamlandı! Araç garajınıza eklendi.",
     "negotiationContinues": "Pazarlık devam ediyor. Tekliflerim sayfasından takip edebilirsiniz.",
     "offerAcceptedAndPurchased": "Teklif kabul edildi ve araç satın alındı!"
+  },
+  "aiBuyer": {
+    "messages": {
+      "bargainer": {
+        "1": "Bütçem biraz kısıtlı, bu fiyata anlaşabilir miyiz?",
+        "2": "Finansal durumum şu an çok iyi değil ama aracı çok beğendim.",
+        "3": "Son teklifim bu, daha fazlasını ödeyemem maalesef.",
+        "4": "Elimdeki bu kadar, lütfen kabul edin.",
+        "5": "Bu fiyat benim için en mantıklısı, değerlendirirseniz sevinirim."
+      },
+      "realistic": {
+        "1": "Piyasa değerine uygun bir teklif sunuyorum.",
+        "2": "Araştırmalarım sonucu adil bir fiyat belirledim.",
+        "3": "Hem sizin hem benim için uygun bir fiyat olduğunu düşünüyorum.",
+        "4": "Benzer araçların fiyatlarına baktım, bu fiyat makul.",
+        "5": "Gerçekçi bir teklif ile karşınızdayım."
+      },
+      "urgent": {
+        "1": "Acil ihtiyacım var, hemen anlaşabiliriz.",
+        "2": "Bugün içinde işlemi kapatmam gerekiyor.",
+        "3": "Çok acelem var, istediğiniz fiyatı veriyorum.",
+        "4": "İşim düştü bu şehre, hemen bir araca ihtiyacım var.",
+        "5": "Acil durumum var, lütfen kabul edin."
+      },
+      "generous": {
+        "1": "Tam aradığım araç, istediğiniz fiyatı veriyorum.",
+        "2": "Uzun süredir bu modeli arıyordum, fiyat sorun değil.",
+        "3": "Çok beğendim, istediğiniz ücreti ödemeye hazırım.",
+        "4": "Bu araç tam bana göre, paranız hazır.",
+        "5": "Kesinlikle almak istiyorum, fiyat konusunda esnek değilim."
+      }
+    }
+  },
+  "offerService": {
+    "responses": {
+      "acceptance": {
+        "1": "Harika! Anlaştık. Bu fiyata razıyım.",
+        "2": "Tamam, kabul ediyorum. Anlaşalım.",
+        "3": "Olur, bu fiyata tamam.",
+        "4": "İyi bir anlaşma. Kabul ediyorum.",
+        "5": "Peki, bu fiyata razıyım.",
+        "6": "Anlaştık! Kabul."
+      },
+      "rejection": {
+        "1": "Maalesef bu fiyata razı olamam. Teşekkürler.",
+        "2": "Düşündüm ama bu fiyat benim için uygun değil.",
+        "3": "Üzgünüm, bu teklife hayır diyorum.",
+        "4": "Bu fiyata anlaşamayız sanırım. Teşekkürler.",
+        "5": "Maalesef kabul edemem. Başka bir fiyat düşünebilir misiniz?",
+        "6": "Bu fiyat beklediğimden düşük. Teşekkürler ama olmaz."
+      },
+      "counter": {
+        "1": "Hmm, biraz düşündüm. {amount} TL yapsak?",
+        "2": "Bu fiyata zor. {amount} TL olursa anlaşabiliriz.",
+        "3": "{amount} TL'ye ne dersiniz? Orta bir yol bulalım.",
+        "4": "Peki, {amount} TL son teklifim.",
+        "5": "Bir adım atalım. {amount} TL olsa?"
+      }
+    }
+  },
+  "negotiation": {
+    "accept": {
+      "1": "Teklifiniz uygun, kabul ediyorum!",
+      "2": "Anlaştık! Teklifi kabul ediyorum.",
+      "3": "Uygun bir fiyat, kabul.",
+      "4": "Tamam, bu fiyata anlaşalım.",
+      "5": "Teklifinizi kabul ediyorum. Teşekkürler!"
+    },
+    "insult": {
+      "1": "Dalga mı geçiyorsunuz? Bu araç bu fiyata olmaz!",
+      "2": "Kusura bakmayın ama bu fiyat kabul edilemez. Ciddi değilsiniz galiba.",
+      "3": "Bu teklif beklentilerimin çok ama çok altında. Hayır.",
+      "4": "Piyasayı hiç mi araştırmadınız? Bu fiyat komik kaçıyor.",
+      "5": "Üzgünüm ama bu teklifle anlaşamayız. Çok düşük.",
+      "6": "Bu fiyata satmam imkansız. Lütfen gerçekçi olun.",
+      "7": "Araç değerinin çok altında bir teklif. Maalesef kabul edemem."
+    },
+    "reject": {
+      "1": "Maalesef bu fiyat çok düşük. Başka teklifler bekliyorum.",
+      "2": "Bu teklifi kabul edemem. Daha gerçekçi bir fiyat bekliyorum.",
+      "3": "Araç bu fiyata uygun değil. Teşekkürler.",
+      "4": "Fiyat beklentilerimin çok altında. Reddediyorum.",
+      "5": "Bu teklif benim için uygun değil."
+    },
+    "counter": {
+      "1": "Bu fiyata satamam ama {amount} TL'ye anlaşabiliriz.",
+      "2": "Biraz düşük kaldı. {amount} TL olursa tamam.",
+      "3": "Karşı teklifim: {amount} TL. Kabul eder misiniz?",
+      "4": "Arada bir yerde buluşalım: {amount} TL.",
+      "5": "Size özel {amount} TL son fiyatım."
+    },
+    "finalBargain": {
+      "1": "Teklifiniz iyi ama {amount} TL olursa hemen anlaşalım.",
+      "2": "Bir tık daha artsanız ne dersiniz? {amount} TL ideal olur.",
+      "3": "Neredeyse anlaştık! {amount} TL'ye tamam derim.",
+      "4": "{amount} TL son teklifim, bu fiyata hemen kapatalım.",
+      "5": "Gerçekten satmak istiyorum ama {amount} TL daha adil olur."
+    },
+    "patienceExhaustedAccept": {
+      "1": "Tamam, yeterince konuştuk. Bu fiyata anlaşalım artık.",
+      "2": "Peki, bu son teklifimi kabul ediyorum. Anlaşalım.",
+      "3": "Uzadı bu iş. Bu fiyata tamam, anlaşalım.",
+      "4": "Artık daha fazla pazarlık yapmak istemiyorum. Kabul ediyorum.",
+      "5": "İyi, bu fiyata razıyım. Hadi bitirelim şu işi."
+    },
+    "patienceExhaustedReject": {
+      "1": "Yeterince konuştuk, bu fiyata anlaşamıyoruz. Üzgünüm.",
+      "2": "Çok uzattık, bu fiyat benim için uygun değil. Teşekkürler.",
+      "3": "Daha fazla pazarlık yapmak istemiyorum. Bu fiyata olmaz.",
+      "4": "Artık vazgeçiyorum. Bu fiyata satamam.",
+      "5": "Son teklifim buydu. Bu fiyata anlaşamayız, başka alıcılar bekleyeceğim.",
+      "6": "Sabrım tükendi açıkçası. Bu fiyata razı olamam. İyi günler."
+    }
   },
   "xp": {
     "level": "Seviye {level}",
@@ -530,7 +619,10 @@
     "currency": "Para Birimi",
     "personalInfo": "Kişisel Bilgiler",
     "accountInfo": "Hesap Bilgileri",
-    "registrationInfo": "Kayıt Bilgileri"
+    "registrationInfo": "Kayıt Bilgileri",
+    "membershipDuration": "Üyelik Süresi",
+    "registrationDate": "Kayıt Tarihi",
+    "yearsOld": "yaşında"
   },
   "changePassword": {
     "title": "Şifre Değiştir",
@@ -594,7 +686,53 @@
     "garageLimitReached": "Garaj limitine ulaştın.",
     "expandGarageHint": "Yeni araç almak için garajını genişletmelisin.",
     "goToStore": "Mağazaya Git",
-    "alreadyListed": "Bu araç zaten satışta!"
+    "alreadyListed": "Bu araç zaten satışta!",
+    "vehicleFeatures": "Araç Özellikleri",
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Yıl",
+    "mileage": "Kilometre",
+    "fuel": "Yakıt",
+    "transmission": "Vites",
+    "engine": "Motor",
+    "drive": "Çekiş",
+    "color": "Renk",
+    "warranty": "Garanti",
+    "accidentRecord": "Kaza Kaydı",
+    "var": "Var",
+    "yok": "Yok",
+    "purchasePrice": "Satın Alma Fiyatı",
+    "daysOwned": "Sahiplik Süresi",
+    "listForSaleButton": "Satışa Çıkar",
+    "noVehiclesDesc": "Garajınızdaki araçları satışa çıkarabilirsiniz.",
+    "statusPending": "Bekleyen",
+    "statusAccepted": "Kabul",
+    "statusRejected": "Red",
+    "myVehicles": "Araçlarım",
+    "noActiveOffers": "Aktif Teklif Yok",
+    "noPendingOffersForBrand": "Bu markada bekleyen teklifi olan araç bulunmuyor",
+    "offers": "Teklifler",
+    "rejectAll": "Tüm Teklifleri Reddet",
+    "noIncomingOffers": "Gelen Teklif Yok",
+    "noSentOffers": "Gönderilen Teklif Yok",
+    "noIncomingOffersDesc": "Henüz ilanlarınıza gelen bir teklif yok.",
+    "noSentOffersDesc": "Henüz gönderdiğiniz bir teklif bulunmuyor.",
+    "potentialProfitLoss": "Potansiyel Kar/Zarar",
+    "listingScore": "İlan Skoru"
+  },
+  "quests": {
+    "title": "Günlük Görevler",
+    "noQuests": "Bugün için görev bulunamadı.",
+    "rewardClaimed": "Ödül Alındı! +{xp} XP, +{money} TL",
+    "claimFailed": "Ödül alınamadı.",
+    "claimReward": "Ödülü Al",
+    "descriptions": {
+      "buyVehicle": "Bugün {count} araç satın al",
+      "sellVehicle": "Bugün {count} araç sat",
+      "makeOffer": "Bugün {count} teklif gönder",
+      "earnProfit": "Bugün {amount} TL kar et",
+      "login": "Oyuna giriş yap"
+    }
   },
   "myListings": {
     "potential": "Potansiyel",
@@ -603,7 +741,9 @@
     "description": "İlan Açıklaması",
     "listed": "İlan",
     "removeConfirm": "ilanını kaldırmak istediğinize emin misiniz?",
-    "willStayInGarage": "Araç garajınızda kalmaya devam edecek."
+    "willStayInGarage": "Araç garajınızda kalmaya devam edecek.",
+    "maxPriceHint": "Maks: {price} TL (%15 Kâr)",
+    "profitLossStatus": "{status}: {amount} TL (%{percent})"
   },
   "misc": {
     "daysAgo": "gün önce",
@@ -612,6 +752,8 @@
     "justNow": "Az önce",
     "day": "gün",
     "days": "gün",
+    "listing": "ilan",
+    "listings": "ilan",
     "hour": "saat",
     "minute": "dakika",
     "minutes": "dakika",
@@ -633,12 +775,26 @@
     "checkOffers": "Tekliflerim bölümünden kontrol edebilirsiniz",
     "generatingOffers": "Teklifler oluşturuluyor...",
     "errorGeneratingOffers": "Teklifler oluşturulurken bir hata oluştu",
+    "profit": "Kar",
+    "loss": "Zarar",
+    "profitLossRatio": "Kar/Zarar Oranı:",
+    "purchasePrice": "Satın Alma Fiyatı:",
+    "acceptedStatus": "KABUL EDİLDİ ✓",
+    "rejectedStatus": "REDDEDİLDİ ✗",
+    "acceptOfferTitle": "Teklifi Kabul Et",
+    "ifYouAccept": "Bu teklifi kabul ederseniz:",
+    "balanceAdded": "• Bakiyenize {amount} TL eklenecek",
+    "acceptButton": "Kabul Et",
+    "noPendingToReject": "Reddedilecek bekleyen teklif yok.",
+    "listingPriceLabel": "İlan: {price}",
     "km": "km",
     "buyVehicleButton": "Araç Satın Al",
     "vehicleDetails": "Detaylar",
     "sellVehicle": "Sat",
     "vehicleDetailComingSoon": "Araç detay sayfası yakında...",
-    "sellFeatureComingSoon": "Araç satış özelliği yakında..."
+    "sellFeatureComingSoon": "Araç satış özelliği yakında...",
+    "vehicleLimit": "Araç Limiti",
+    "vehicle": "araç"
   },
   "expertise": {
     "reportTitle": "Ekspertiz Raporu",
@@ -665,6 +821,41 @@
     "issuesFoundMessage": "Ekspertiz sonucunda gizli kusurlar bulundu! Fiyat güncellendi.",
     "cleanMessage": "Araç temiz! Satıcı beyanı doğrulandı."
   },
+  "vehicleParts": {
+    "original": "Orijinal",
+    "localPainted": "Lokal Boyalı",
+    "painted": "Boyalı",
+    "replaced": "Değişen"
+  },
+  "colors": {
+    "Beyaz": "Beyaz",
+    "Siyah": "Siyah",
+    "Gri": "Gri",
+    "Kırmızı": "Kırmızı",
+    "Mavi": "Mavi",
+    "Gümüş": "Gümüş",
+    "Kahverengi": "Kahverengi",
+    "Yeşil": "Yeşil"
+  },
+  "vehicleAttributes": {
+    "Benzin": "Benzin",
+    "Benzin+LPG": "Benzin+LPG",
+    "Dizel": "Dizel",
+    "Hybrid": "Hybrid",
+    "LPG": "LPG",
+    "Elektrik": "Elektrik",
+    "Manuel": "Manuel",
+    "Otomatik": "Otomatik",
+    "Önden": "Önden",
+    "Arkadan": "Arkadan",
+    "4x4": "4x4",
+    "Sedan": "Sedan",
+    "Hatchback": "Hatchback",
+    "SUV": "SUV",
+    "Coupe": "Coupe",
+    "Station Wagon": "Station Wagon",
+    "MPV": "MPV"
+  },
   "brands": {
     "hints": {
       "Audira": "Alman lüks performansı",
@@ -678,6 +869,327 @@
       "Renauva": "Fransız inovasyonu",
       "Toyoto": "Japon mükemmelliği",
       "Voltswagen": "Halkın arabası"
+    }
+  },
+  "listingDescriptions": {
+    "base": {
+      "0": "Tek elden, bakımlı ve temiz kullanım.",
+      "1": "Hasarsız, bakımlı ve sorunsuz bir araç.",
+      "2": "Garaj arabası. Hep düzenli kullanılmış.",
+      "3": "Aileden satılık araç. Sorunsuz bir araçtır.",
+      "4": "Sıfır km'den beri tüm bakımları yapılmıştır.",
+      "5": "İkinci el ama sıfır gibi. Tramer kaydı temiz.",
+      "6": "Ekonomik ve güvenilir araç.",
+      "7": "Değişensiz, boyasız ve hasarsız araç."
+    },
+    "extra": {
+      "diesel": "Dizel motor çok verimli ve ekonomik.",
+      "lpg": "Fabrika çıkışlı LPG, yakıt tasarrufu garantili.",
+      "hybrid": "Hibrit teknoloji ile çevre dostu.",
+      "automatic": "Otomatik vites, konforlu sürüş.",
+      "manual": "Manuel vites, kontrol sizde.",
+      "cvt": "CVT şanzıman, sarsıntısız geçiş.",
+      "dsg": "Çift kavramalı şanzıman, hızlı vites geçişi.",
+      "4x4": "4x4 çekiş sistemi, her yol koşuluna uygun.",
+      "rwd": "Arkadan itiş, sportif sürüş keyfi.",
+      "fwd": "Önden çekiş, güvenli yol tutuş."
+    }
+  },
+  "modelDescriptions": {
+    "Renauva": {
+      "Slim": [
+        "Modern ve dinamik Hatchback.",
+        "Şehir içi kullanım için ideal.",
+        "Genç ve sporty tasarım."
+      ],
+      "Magna": [
+        "Konforlu ve geniş iç hacim.",
+        "Yol tutuşu mükemmel.",
+        "Aile arabası olarak çok uygun."
+      ],
+      "Flow": [
+        "Geniş bagaj hacmi ve konfor.",
+        "Uzun yol için ideal."
+      ],
+      "Signa": [
+        "Ekonomik ve pratik araç.",
+        "Yakıt tüketimi çok düşük."
+      ],
+      "Tallion": [
+        "Yeni nesil, modern teknoloji.",
+        "Aileniz için güvenli ve ekonomik."
+      ],
+      "cvt": "X-Tronic CVT otomatik vites, sürüş keyfi.",
+      "auto": "Easy-R otomatik vites, şehir içi rahat.",
+      "edc": "EDC çift kavrama, hızlı ve güvenli vites.",
+      "diesel": "1.5 dCi motor çok verimli ve ekonomik.",
+      "lpg": "Fabrika çıkışlı LPG, yakıt tasarrufu garantili.",
+      "hybrid": "Hibrit teknoloji ile çevre dostu."
+    },
+    "Voltswagen": {
+      "Paso": [
+        "Premium segment, lüks ve konfor.",
+        "Geniş iç hacim ve yüksek teknoloji.",
+        "Uzun yol için mükemmel seçim."
+      ],
+      "Tenis": [
+        "Kompakt ama ferah iç hacim.",
+        "Volkswagen kalitesi ve güvenilirliği.",
+        "Yüksek talep ve hızlı satış."
+      ],
+      "Colo": [
+        "Premium küçük araç segmenti.",
+        "Şehir içi kullanımda pratik.",
+        "Volkswagen prestiji uygun fiyata."
+      ],
+      "Jago": [
+        "Geniş bagajlı sedan.",
+        "Aile arabası olarak uygun."
+      ],
+      "tdi": "TDI motor, verimli ve güçlü.",
+      "dsg": "DSG çift kavrama otomatik şanzıman."
+    },
+    "Fialto": {
+      "Agna": [
+        "Geniş kasa seçenekleri, pratik araç.",
+        "Ticari ve aile kullanımı için ideal.",
+        "Yüksek hacim, hızlı satış."
+      ],
+      "Lagua": [
+        "Basit ve sağlam yapı.",
+        "Ekonomik sedan.",
+        "Yüksek kilometrede güvenilir."
+      ],
+      "Zorno": [
+        "Kompakt ve ekonomik.",
+        "Şehir içi ideal.",
+        "Düşük işletme maliyeti."
+      ],
+      "multijet": "Multijet dizel motor, verimli ve ekonomik.",
+      "hybrid": "Hibrit teknoloji ile yakıt tasarrufu.",
+      "dualogic": "Dualogic yarı otomatik vites.",
+      "auto": "Otomatik şanzıman, konforlu sürüş."
+    },
+    "Opexel": {
+      "Tasra": [
+        "Güvenilir Alman kalitesi.",
+        "Geniş kasa seçeneği, konforlu.",
+        "Hem sedan hem hatchback mevcut."
+      ],
+      "Lorisa": [
+        "Kompakt ve ekonomik.",
+        "Şehir içi kullanımda pratik.",
+        "Güvenilir otomatik şanzıman."
+      ],
+      "Mornitia": [
+        "Premium segment, lüks donanım.",
+        "Uzun yol konforu üst seviye.",
+        "Prestijli ve güvenilir."
+      ],
+      "cdti": "CDTI dizel motor, verimli ve güçlü.",
+      "easytronic": "Easytronic yarı otomatik vites.",
+      "auto": "Tork konvertörlü otomatik, güvenilir."
+    },
+    "Bavora": {
+      "C_Serisi": [
+        "Premium segment, yüksek prestij.",
+        "Arkadan itiş (RWD) sürüş keyfi.",
+        "M Sport paketi çok değerli."
+      ],
+      "E_Serisi": [
+        "Lüks segment, en prestijli model.",
+        "Geniş iç hacim ve konfor.",
+        "Elektronik donanım zengin."
+      ],
+      "A_Serisi": [
+        "Kompakt premium, şehir için ideal.",
+        "Genç ve dinamik karakter.",
+        "M Sport görsel paket popüler."
+      ],
+      "D_Serisi": [
+        "Sportif coupe, şık tasarım.",
+        "M Sport standart gibi.",
+        "Gran Coupe en popüler kasa."
+      ],
+      "diesel": "d motor, verimli ve güçlü dizel.",
+      "hybrid": "e motor, hibrit teknoloji, yüksek verim.",
+      "dct": "7 ileri DCT, çift kavramalı vites.",
+      "zf": "8 ileri Steptronic (ZF), en güvenilir otomatik.",
+      "rwd": "Arkadan çekişli (RWD), sportif karakter."
+    },
+    "Fortran": {
+      "Odak": [
+        "Sürüş keyfi üst seviye.",
+        "C segmentinin lideri, konforlu.",
+        "Hatchback/Sedan/SW kasa seçenekleri."
+      ],
+      "Vista": [
+        "Kompakt ve çevik, şehir aracı.",
+        "Ekonomik yakıt tüketimi.",
+        "Genç ve dinamik tasarım."
+      ],
+      "Avger": [
+        "Güçlü pick-up, arazi ve yük taşıma.",
+        "Çift kabin konforu.",
+        "Wildtrak donanım lüks seviye."
+      ],
+      "Tupa": [
+        "SUV konforu, geniş iç hacim.",
+        "Aileler için ideal araç.",
+        "Modern teknoloji ve güvenlik."
+      ],
+      "ecoblue": "EcoBlue dizel motor, verimli ve güçlü.",
+      "tdci": "TDCi dizel motor, ekonomik tüketim.",
+      "biturbo": "Bi-Turbo dizel motor, yüksek tork.",
+      "hybrid": "Hibrit teknoloji, çevre dostu ve verimli.",
+      "ecoboost": "EcoBoost turbo benzin, performans ve verim.",
+      "auto10": "10 ileri otomatik, en modern şanzıman.",
+      "auto8": "8 ileri tork konvertörlü otomatik, güvenilir.",
+      "powershift": "Powershift otomatik vites.",
+      "4x4": "4x4 dört çekiş, arazi performansı üst düzey."
+    },
+    "Mercurion": {
+      "3_Serisi": [
+        "Premium konfor, klasik lüks.",
+        "AMG Line sportif tasarım.",
+        "Yetkili servis geçmişi çok önemli."
+      ],
+      "5_Serisi": [
+        "Üst düzey lüks sedan.",
+        "Makam aracı prestiji.",
+        "Elektronik donanım zengin."
+      ],
+      "1_Serisi": [
+        "MBUX çift ekran teknoloji.",
+        "Kompakt premium, genç dinamik.",
+        "AMG Line görsel paket önemli."
+      ],
+      "GJE": [
+        "4 kapılı coupe, sportif tasarım.",
+        "Çerçevesiz camlar, şık detay.",
+        "Genç profesyonellere hitap eder."
+      ],
+      "8_Serisi": [
+        "Efsanevi arazi aracı.",
+        "G 63 AMG en güçlü versiyon.",
+        "3 diferansiyel kilidi, saf arazi yeteneği."
+      ],
+      "diesel": "d motor, verimli ve güçlü dizel.",
+      "hybrid": "e motor, hibrit teknoloji, yüksek performans.",
+      "dct": "7G-DCT çift kavramalı otomatik.",
+      "tronic": "7G/9G-Tronic, en güvenilir otomatik şanzıman.",
+      "4matic": "4MATIC dört çekiş, üç diferansiyel kilidi.",
+      "rwd": "Arkadan çekişli (RWD), premium karakter."
+    },
+    "Hyundaro": {
+      "A10": [
+        "Güvenilir ve ekonomik hatchback.",
+        "Geniş donanım seçenekleri.",
+        "Yedek parça ucuz ve kolay."
+      ],
+      "Tecent_Red": [
+        "Güçlü 1.6 CRDi dizel motor.",
+        "Ekonomik sedan, aile aracı.",
+        "Tork konvertörlü otomatik güvenilir."
+      ],
+      "Tecent_White": [
+        "Basit ve sağlam yapı.",
+        "Ucuz onarım maliyetleri.",
+        "Ekonomik günlük kullanım."
+      ],
+      "A20": [
+        "C segment dengeli araç.",
+        "Zengin standart donanım.",
+        "N-Line sportif paket popüler."
+      ],
+      "Kascon": [
+        "Modern SUV, radikal tasarım.",
+        "Hibrit teknoloji mevcut.",
+        "Geniş iç hacim, konforlu."
+      ],
+      "crdi": "CRDi dizel motor, güçlü ve verimli.",
+      "hybrid": "Hibrit teknoloji, yüksek verim ve düşük tüketim.",
+      "dct": "DCT çift kavramalı otomatik.",
+      "auto": "Tork konvertörlü otomatik, güvenilir."
+    },
+    "Toyoto": {
+      "Airoko": [
+        "Efsanevi güvenilirlik.",
+        "En az arıza çıkaran sedan.",
+        "Yüksek kilometrede bile değerli."
+      ],
+      "Lotus": [
+        "Güvenilir Toyota kalitesi.",
+        "Hatchback pratikliği.",
+        "Hibrit versiyon çok talep görür."
+      ],
+      "Karma": [
+        "Şehir içi kullanımda pratik.",
+        "Kompakt boyut, kolay park.",
+        "Hibrit teknoloji mevcut."
+      ],
+      "hybrid": "Hibrit teknoloji, yakıt ekonomisi çok yüksek.",
+      "diesel": "D-4D dizel motor, verimli.",
+      "cvt_hybrid": "CVT otomatik, hibrit sistemle mükemmel uyum.",
+      "mmt": "MMT yarı otomatik vites (dikkatli kullanım gerektirir).",
+      "cvt": "CVT otomatik, en güvenilir şanzıman."
+    },
+    "Audira": {
+      "B3": [
+        "Premium kompakt, yüksek kalite.",
+        "Sanal kokpit, modern teknoloji.",
+        "Sportif sürüş dinamikleri."
+      ],
+      "B4": [
+        "D segment konforu, prestij.",
+        "Yüksek malzeme kalitesi.",
+        "Uzun yol konforu üstün."
+      ],
+      "B6": [
+        "E segment lüks, üst düzey konfor.",
+        "Matrix LED, gelişmiş donanım.",
+        "Yönetici aracı, prestijli."
+      ],
+      "B5": [
+        "Sportif coupe tasarım.",
+        "Zarif akıcı hatlar, dikkat çekici.",
+        "Prestijli sportif sedan."
+      ],
+      "tdi_high": "TDI dizel, yüksek tork ve verim.",
+      "tdi": "TDI dizel, ekonomik ve güçlü.",
+      "quattro": "Quattro dört çekiş, maksimum güvenlik ve performans.",
+      "tiptronic": "Tiptronic otomatik, güvenilir şanzıman.",
+      "multitronic": "Multitronic CVT vites (bakım geçmişi önemli).",
+      "stronic_check": "S tronic otomatik (bakım geçmişi kontrol edilmeli).",
+      "stronic": "S tronic 7 ileri otomatik, sportif vites."
+    },
+    "Hondaro": {
+      "Vice": [
+        "İkinci el kralı, değerini korur.",
+        "Güvenilir Honda kalitesi.",
+        "Yüksek kilometrede bile sorunsuz."
+      ],
+      "VHL": [
+        "SUV segmentinde lider konfor.",
+        "Geniş iç mekan, aile aracı.",
+        "Honda güvenilirliği."
+      ],
+      "Kent": [
+        "Ekonomik sedan, Honda kalitesi.",
+        "Geniş iç hacim, konforlu.",
+        "Yüksek motor gücü (121 HP)."
+      ],
+      "Caz": [
+        "Sihirli koltuklar, yüksek tavan.",
+        "Kompakt ama geniş, pratik.",
+        "Şehir için ideal araç."
+      ],
+      "hybrid_vhl": "2.0 Hibrit, yakıt ekonomisi üstün.",
+      "hybrid_caz": "1.5 e:HEV hibrit, çok verimli.",
+      "lpg": "ECO fabrika çıkışlı LPG, düşük yakıt maliyeti.",
+      "awd": "AWD dört çekiş, maksimum güvenlik.",
+      "cvt": "CVT otomatik, en güvenilir şanzıman.",
+      "rs": "RS/Turbo performans versiyonu, sportif sürüş."
     }
   },
   "models": {
@@ -830,5 +1342,323 @@
     "step4_desc": "Gelen ve gönderdiğiniz teklifleri buradan yönetin.",
     "step5_title": "Bakiye 💵",
     "step5_desc": "Paranızı al-sat yaparak artırın. Bol şans!"
+  },
+  "seller_notes": {
+    "base": {
+      "singleOwner": "Tek elden, bakımlı ve temiz kullanım.",
+      "damageFree": "Hasarsız, bakımlı ve sorunsuz bir araç.",
+      "garageCar": "Garaj arabası. Hep düzenli kullanılmış.",
+      "familyCar": "Aileden satılık araç. Sorunsuz bir araçtır.",
+      "allMaintenanceDone": "Sıfır km'den beri tüm bakımları yapılmıştır.",
+      "likeNew": "İkinci el ama sıfır gibi. Tramer kaydı temiz.",
+      "economic": "Ekonomik ve güvenilir araç.",
+      "original": "Değişensiz, boyasız ve hasarsız araç."
+    },
+    "models": {
+      "Renauva_Slim": {
+        "1": "Modern ve dinamik Hatchback.",
+        "2": "Şehir içi kullanım için ideal.",
+        "3": "Genç ve sporty tasarım."
+      },
+      "Renauva_Magna": {
+        "1": "Konforlu ve geniş iç hacim.",
+        "2": "Yol tutuşu mükemmel.",
+        "3": "Aile arabası olarak çok uygun."
+      },
+      "Renauva_Flow": {
+        "1": "Geniş bagaj hacmi ve konfor.",
+        "2": "Uzun yol için ideal."
+      },
+      "Renauva_Signa": {
+        "1": "Ekonomik ve pratik araç.",
+        "2": "Yakıt tüketimi çok düşük."
+      },
+      "Renauva_Tallion": {
+        "1": "Yeni nesil, modern teknoloji.",
+        "2": "Aileniz için güvenli ve ekonomik."
+      },
+      "Voltswagen_Paso": {
+        "1": "Premium segment, lüks ve konfor.",
+        "2": "Geniş iç hacim ve yüksek teknoloji.",
+        "3": "Uzun yol için mükemmel seçim."
+      },
+      "Voltswagen_Tenis": {
+        "1": "Kompakt ama ferah iç hacim.",
+        "2": "Volkswagen kalitesi ve güvenilirliği.",
+        "3": "Yüksek talep ve hızlı satış."
+      },
+      "Voltswagen_Colo": {
+        "1": "Premium küçük araç segmenti.",
+        "2": "Şehir içi kullanımda pratik.",
+        "3": "Volkswagen prestiji uygun fiyata."
+      },
+      "Voltswagen_Jago": {
+        "1": "Geniş bagajlı sedan.",
+        "2": "Aile arabası olarak uygun."
+      },
+      "Fialto_Agna": {
+        "1": "Geniş kasa seçenekleri, pratik araç.",
+        "2": "Ticari ve aile kullanımı için ideal.",
+        "3": "Yüksek hacim, hızlı satış."
+      },
+      "Fialto_Lagua": {
+        "1": "Basit ve sağlam yapı.",
+        "2": "Ekonomik sedan.",
+        "3": "Yüksek kilometrede güvenilir."
+      },
+      "Fialto_Zorno": {
+        "1": "Kompakt ve ekonomik.",
+        "2": "Şehir içi ideal.",
+        "3": "Düşük işletme maliyeti."
+      },
+      "Opexel_Tasra": {
+        "1": "Güvenilir Alman kalitesi.",
+        "2": "Geniş kasa seçeneği, konforlu.",
+        "3": "Hem sedan hem hatchback mevcut."
+      },
+      "Opexel_Lorisa": {
+        "1": "Kompakt ve ekonomik.",
+        "2": "Şehir içi kullanımda pratik.",
+        "3": "Güvenilir otomatik şanzıman."
+      },
+      "Opexel_Mornitia": {
+        "1": "Premium segment, lüks donanım.",
+        "2": "Uzun yol konforu üst seviye.",
+        "3": "Prestijli ve güvenilir."
+      },
+      "Bavora_C_Serisi": {
+        "1": "Premium segment, yüksek prestij.",
+        "2": "Arkadan itiş (RWD) sürüş keyfi.",
+        "3": "M Sport paketi çok değerli."
+      },
+      "Bavora_E_Serisi": {
+        "1": "Lüks segment, en prestijli model.",
+        "2": "Geniş iç hacim ve konfor.",
+        "3": "Elektronik donanım zengin."
+      },
+      "Bavora_A_Serisi": {
+        "1": "Kompakt premium, şehir için ideal.",
+        "2": "Genç ve dinamik karakter.",
+        "3": "M Sport görsel paket popüler."
+      },
+      "Bavora_D_Serisi": {
+        "1": "Sportif coupe, şık tasarım.",
+        "2": "M Sport standart gibi.",
+        "3": "Gran Coupe en popüler kasa."
+      },
+      "Fortran_Odak": {
+        "1": "Sürüş keyfi üst seviye.",
+        "2": "C segmentinin lideri, konforlu.",
+        "3": "Hatchback/Sedan/SW kasa seçenekleri."
+      },
+      "Fortran_Vista": {
+        "1": "Kompakt ve çevik, şehir aracı.",
+        "2": "Ekonomik yakıt tüketimi.",
+        "3": "Genç ve dinamik tasarım."
+      },
+      "Fortran_Avger": {
+        "1": "Güçlü pick-up, arazi ve yük taşıma.",
+        "2": "Çift kabin konforu.",
+        "3": "Wildtrak donanım lüks seviye."
+      },
+      "Fortran_Tupa": {
+        "1": "SUV konforu, geniş iç hacim.",
+        "2": "Aileler için ideal araç.",
+        "3": "Modern teknoloji ve güvenlik."
+      },
+      "Mercurion_3_Serisi": {
+        "1": "Premium konfor, klasik lüks.",
+        "2": "AMG Line sportif tasarım.",
+        "3": "Yetkili servis geçmişi çok önemli."
+      },
+      "Mercurion_5_Serisi": {
+        "1": "Üst düzey lüks sedan.",
+        "2": "Makam aracı prestiji.",
+        "3": "Elektronik donanım zengin."
+      },
+      "Mercurion_1_Serisi": {
+        "1": "MBUX çift ekran teknoloji.",
+        "2": "Kompakt premium, genç dinamik.",
+        "3": "AMG Line görsel paket önemli."
+      },
+      "Mercurion_GJE": {
+        "1": "4 kapılı coupe, sportif tasarım.",
+        "2": "Çerçevesiz camlar, şık detay.",
+        "3": "Genç profesyonellere hitap eder."
+      },
+      "Mercurion_8_Serisi": {
+        "1": "Efsanevi arazi aracı.",
+        "2": "G 63 AMG en güçlü versiyon.",
+        "3": "3 diferansiyel kilidi, saf arazi yeteneği."
+      },
+      "Hyundaro_A10": {
+        "1": "Güvenilir ve ekonomik hatchback.",
+        "2": "Geniş donanım seçenekleri.",
+        "3": "Yedek parça ucuz ve kolay."
+      },
+      "Hyundaro_Tecent_Red": {
+        "1": "Güçlü 1.6 CRDi dizel motor.",
+        "2": "Ekonomik sedan, aile aracı.",
+        "3": "Tork konvertörlü otomatik güvenilir."
+      },
+      "Hyundaro_Tecent_White": {
+        "1": "Basit ve sağlam yapı.",
+        "2": "Ucuz onarım maliyetleri.",
+        "3": "Ekonomik günlük kullanım."
+      },
+      "Hyundaro_A20": {
+        "1": "C segment dengeli araç.",
+        "2": "Zengin standart donanım.",
+        "3": "N-Line sportif paket popüler."
+      },
+      "Hyundaro_Kascon": {
+        "1": "Modern SUV, radikal tasarım.",
+        "2": "Hibrit teknoloji mevcut.",
+        "3": "Geniş iç hacim, konforlu."
+      },
+      "Toyoto_Airoko": {
+        "1": "Efsanevi güvenilirlik.",
+        "2": "En az arıza çıkaran sedan.",
+        "3": "Yüksek kilometrede bile değerli."
+      },
+      "Toyoto_Lotus": {
+        "1": "Güvenilir Toyota kalitesi.",
+        "2": "Hatchback pratikliği.",
+        "3": "Hibrit versiyon çok talep görür."
+      },
+      "Toyoto_Karma": {
+        "1": "Şehir içi kullanımda pratik.",
+        "2": "Kompakt boyut, kolay park.",
+        "3": "Hibrit teknoloji mevcut."
+      },
+      "Audira_B3": {
+        "1": "Premium kompakt, yüksek kalite.",
+        "2": "Sanal kokpit, modern teknoloji.",
+        "3": "Sportif sürüş dinamikleri."
+      },
+      "Audira_B4": {
+        "1": "D segment konforu, prestij.",
+        "2": "Yüksek malzeme kalitesi.",
+        "3": "Uzun yol konforu üstün."
+      },
+      "Audira_B6": {
+        "1": "E segment lüks, üst düzey konfor.",
+        "2": "Matrix LED, gelişmiş donanım.",
+        "3": "Yönetici aracı, prestijli."
+      },
+      "Audira_B5": {
+        "1": "Sportif coupe tasarım.",
+        "2": "Zarif akıcı hatlar, dikkat çekici.",
+        "3": "Prestijli sportif sedan."
+      },
+      "Hondaro_Vice": {
+        "1": "İkinci el kralı, değerini korur.",
+        "2": "Güvenilir Honda kalitesi.",
+        "3": "Yüksek kilometrede bile sorunsuz."
+      },
+      "Hondaro_VHL": {
+        "1": "SUV segmentinde lider konfor.",
+        "2": "Geniş iç mekan, aile aracı.",
+        "3": "Honda güvenilirliği."
+      },
+      "Hondaro_Kent": {
+        "1": "Ekonomik sedan, Honda kalitesi.",
+        "2": "Geniş iç hacim, konforlu.",
+        "3": "Yüksek motor gücü (121 HP)."
+      },
+      "Hondaro_Caz": {
+        "1": "Sihirli koltuklar, yüksek tavan.",
+        "2": "Kompakt ama geniş, pratik.",
+        "3": "Şehir için ideal araç."
+      }
+    },
+    "fuel": {
+      "Renauva_Dizel": "1.5 dCi motor çok verimli ve ekonomik.",
+      "Renauva_BenzinLPG": "Fabrika çıkışlı LPG, yakıt tasarrufu garantili.",
+      "Renauva_Hybrid": "Hibrit teknoloji ile çevre dostu.",
+      "Voltswagen_Dizel": "TDI motor, verimli ve güçlü.",
+      "Fialto_Dizel": "Multijet dizel motor, verimli ve ekonomik.",
+      "Fialto_Hybrid": "Hibrit teknoloji ile yakıt tasarrufu.",
+      "Opexel_Dizel": "CDTI dizel motor, verimli ve güçlü.",
+      "Bavora_Dizel": "d motor, verimli ve güçlü dizel.",
+      "Bavora_Hybrid": "e motor, hibrit teknoloji, yüksek verim.",
+      "Fortran_EcoBlue": "EcoBlue dizel motor, verimli ve güçlü.",
+      "Fortran_TDCi": "TDCi dizel motor, ekonomik tüketim.",
+      "Fortran_BiTurbo": "Bi-Turbo dizel motor, yüksek tork.",
+      "Fortran_Hybrid": "Hibrit teknoloji, çevre dostu ve verimli.",
+      "Fortran_Benzin": "EcoBoost turbo benzin, performans ve verim.",
+      "Mercurion_Dizel": "d motor, verimli ve güçlü dizel.",
+      "Mercurion_Hybrid": "e motor, hibrit teknoloji, yüksek performans.",
+      "Hyundaro_Dizel": "CRDi dizel motor, güçlü ve verimli.",
+      "Hyundaro_Hybrid": "Hibrit teknoloji, yüksek verim ve düşük tüketim.",
+      "Toyoto_Hybrid": "Hibrit teknoloji, yakıt ekonomisi çok yüksek.",
+      "Toyoto_Dizel": "D-4D dizel motor, verimli.",
+      "Hondaro_Hybrid_20": "2.0 Hibrit, yakıt ekonomisi üstün.",
+      "Hondaro_Hybrid_15": "1.5 e:HEV hibrit, çok verimli.",
+      "Hondaro_BenzinLPG": "ECO fabrika çıkışlı LPG, düşük yakıt maliyeti."
+    },
+    "transmission": {
+      "Renauva_XTronic": "X-Tronic CVT otomatik vites, sürüş keyfi.",
+      "Renauva_EasyR": "Easy-R otomatik vites, şehir içi rahat.",
+      "Renauva_EDC": "EDC çift kavrama, hızlı ve güvenli vites.",
+      "Voltswagen_DSG": "DSG çift kavrama otomatik şanzıman.",
+      "Fialto_Dualogic": "Dualogic yarı otomatik vites.",
+      "Fialto_Auto": "Otomatik şanzıman, konforlu sürüş.",
+      "Opexel_Easytronic": "Easytronic yarı otomatik vites.",
+      "Opexel_Auto": "Tork konvertörlü otomatik, güvenilir.",
+      "Bavora_DCT": "7 ileri DCT, çift kavramalı vites.",
+      "Bavora_ZF": "8 ileri Steptronic (ZF), en güvenilir otomatik.",
+      "Fortran_10Auto": "10 ileri otomatik, en modern şanzıman.",
+      "Fortran_8Auto": "8 ileri tork konvertörlü otomatik, güvenilir.",
+      "Fortran_Powershift": "Powershift otomatik vites.",
+      "Mercurion_DCT": "7G-DCT çift kavramalı otomatik.",
+      "Mercurion_Tronic": "7G/9G-Tronic, en güvenilir otomatik şanzıman.",
+      "Hyundaro_DCT": "DCT çift kavramalı otomatik.",
+      "Hyundaro_Auto": "Tork konvertörlü otomatik, güvenilir.",
+      "Toyoto_CVT_Hybrid": "CVT otomatik, hibrit sistemle mükemmel uyum.",
+      "Toyoto_MMT": "MMT yarı otomatik vites (dikkatli kullanım gerektirir).",
+      "Toyoto_CVT": "CVT otomatik, en güvenilir şanzıman.",
+      "Audira_Tiptronic": "Tiptronic otomatik, güvenilir şanzıman.",
+      "Audira_Multitronic": "Multitronic CVT vites (bakım geçmişi önemli).",
+      "Audira_Stronic_Check": "S tronic otomatik (bakım geçmişi kontrol edilmeli).",
+      "Audira_Stronic": "S tronic 7 ileri otomatik, sportif vites.",
+      "Hondaro_CVT": "CVT otomatik, en güvenilir şanzıman."
+    },
+    "drive": {
+      "Bavora_RWD": "Arkadan çekişli (RWD), sportif karakter.",
+      "Fortran_4x4": "4x4 dört çekiş, arazi performansı üst düzey.",
+      "Mercurion_4MATIC": "4MATIC dört çekiş, üç diferansiyel kilidi.",
+      "Mercurion_RWD": "Arkadan çekişli (RWD), premium karakter.",
+      "Audira_Quattro": "Quattro dört çekiş, maksimum güvenlik ve performans.",
+      "Hondaro_AWD": "AWD dört çekiş, maksimum güvenlik."
+    },
+    "performance": {
+      "Hondaro_RS": "RS/Turbo performans versiyonu, sportif sürüş."
+    }
+  },
+  "skills": {
+    "title": "Yetenek Ağacı",
+    "info": "Level atladıkça yetenek puanı kazan ve özel yetenekleri aç!",
+    "cost": "Maliyet",
+    "unlock": "AÇ",
+    "unlocked": "açıldı!",
+    "active": "Aktif",
+    "cannotUnlock": "Bu yeteneği açamazsınız! Yetersiz puan.",
+    "negotiation": "Pazarlık Ustası",
+    "negotiationDesc": "Teklif yaparken %10 daha düşük fiyat öner",
+    "quickSale": "Hızlı Satış",
+    "quickSaleDesc": "Araçlarına %20 daha hızlı teklif gelir",
+    "marketAnalyst": "Piyasa Analisti",
+    "marketAnalystDesc": "Araç alırken gerçek değer gösterilir",
+    "reputation": "İtibar",
+    "reputationDesc": "Gelen teklifler %10 daha yüksek",
+    "garageExpansion": "Garaj Genişletme",
+    "garageExpansionDesc": "+2 araç kapasitesi",
+    "goldMiner": "Altın Madenci",
+    "goldMinerDesc": "Günlük görevlerden %50 daha fazla altın",
+    "fastLearner": "Hızlı Öğrenen",
+    "fastLearnerDesc": "Tüm işlemlerden %25 daha fazla XP kazan",
+    "negotiationPower": "Pazarlık Gücü",
+    "negotiationPowerDesc": "Müzakerede %15 daha fazla indirim yap"
   }
 }

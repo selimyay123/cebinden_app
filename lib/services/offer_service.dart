@@ -60,6 +60,15 @@ class OfferService {
   /// Belirli bir ilan için AI teklifleri oluştur
   Future<int> generateOffersForListing(UserVehicle listing) async {
     try {
+      // 🆕 LIMIT KONTROLÜ: Bir araç için maksimum 10 bekleyen teklif olabilir
+      final existingOffers = await _db.getOffersByVehicleId(listing.id);
+      final pendingCount = existingOffers.where((o) => o.isPending).length;
+      
+      if (pendingCount >= 10) {
+        debugPrint('⚠️ Offer limit reached for vehicle ${listing.id} ($pendingCount/10). No new offers generated.');
+        return 0;
+      }
+
       // Adil fiyatı hesapla
       double fairPrice = _calculateFairPrice(listing);
       
@@ -168,7 +177,7 @@ class OfferService {
   }
 
   /// Teklifi kabul et ve satışı gerçekleştir
-  Future<bool> acceptOffer(Offer offer) async {
+  Future<XPGainResult?> acceptOffer(Offer offer) async {
     try {
       
       
@@ -176,21 +185,21 @@ class OfferService {
       bool offerUpdated = await _db.updateOfferStatus(offer.offerId, OfferStatus.accepted);
       if (!offerUpdated) {
         
-        return false;
+        return null;
       }
       
       // 2. Aracı getir
       UserVehicle? vehicle = await _db.getUserVehicleById(offer.vehicleId);
       if (vehicle == null) {
         
-        return false;
+        return null;
       }
       
       // 3. Satıcıyı getir
       Map<String, dynamic>? sellerMap = await _db.getUserById(offer.sellerId);
       if (sellerMap == null) {
         
-        return false;
+        return null;
       }
       User seller = User.fromJson(sellerMap);
       
@@ -201,7 +210,7 @@ class OfferService {
         
         // Rollback teklif durumu
         await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
-        return false;
+        return null;
       }
       
       // 5. Aracı satıldı olarak işaretle
@@ -217,7 +226,7 @@ class OfferService {
         // Rollback
         await _db.updateUser(seller.id, {'balance': seller.balance - offer.offerPrice});
         await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
-        return false;
+        return null;
       }
       
       // 6. Diğer teklifleri reddet
@@ -232,7 +241,7 @@ class OfferService {
       
       // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu)
       final profit = offer.offerPrice - vehicle.purchasePrice;
-      await _xpService.onVehicleSale(offer.sellerId, profit);
+      final xpResult = await _xpService.onVehicleSale(offer.sellerId, profit);
       
       // 🎯 Günlük Görev Güncellemesi: Araç Satışı ve Kâr
       await _questService.updateProgress(offer.sellerId, QuestType.sellVehicle, 1);
@@ -240,10 +249,10 @@ class OfferService {
         await _questService.updateProgress(offer.sellerId, QuestType.earnProfit, profit.toInt());
       }
       
-      return true;
+      return xpResult;
     } catch (e) {
       
-      return false;
+      return null;
     }
   }
 
@@ -695,12 +704,12 @@ class OfferService {
   /// Kabul yanıtı üret
   String _generateAcceptanceResponse() {
     final responses = [
-      'Harika! Anlaştık. Bu fiyata razıyım.',
-      'Tamam, kabul ediyorum. Anlaşalım.',
-      'Olur, bu fiyata tamam.',
-      'İyi bir anlaşma. Kabul ediyorum.',
-      'Peki, bu fiyata razıyım.',
-      'Anlaştık! Kabul.',
+      'offerService.responses.acceptance.1',
+      'offerService.responses.acceptance.2',
+      'offerService.responses.acceptance.3',
+      'offerService.responses.acceptance.4',
+      'offerService.responses.acceptance.5',
+      'offerService.responses.acceptance.6',
     ];
     return responses[Random().nextInt(responses.length)];
   }
@@ -708,12 +717,12 @@ class OfferService {
   /// Red yanıtı üret
   String _generateRejectionResponse() {
     final responses = [
-      'Maalesef bu fiyata razı olamam. Teşekkürler.',
-      'Düşündüm ama bu fiyat benim için uygun değil.',
-      'Üzgünüm, bu teklife hayır diyorum.',
-      'Bu fiyata anlaşamayız sanırım. Teşekkürler.',
-      'Maalesef kabul edemem. Başka bir fiyat düşünebilir misiniz?',
-      'Bu fiyat beklediğimden düşük. Teşekkürler ama olmaz.',
+      'offerService.responses.rejection.1',
+      'offerService.responses.rejection.2',
+      'offerService.responses.rejection.3',
+      'offerService.responses.rejection.4',
+      'offerService.responses.rejection.5',
+      'offerService.responses.rejection.6',
     ];
     return responses[Random().nextInt(responses.length)];
   }
@@ -721,12 +730,16 @@ class OfferService {
   /// Karşı teklif yanıtı üret
   String _generateCounterOfferResponse(double counterAmount) {
     final responses = [
-      'Hmm, biraz düşündüm. ${_formatCurrency(counterAmount)} TL yapsak?',
-      'Bu fiyata zor. ${_formatCurrency(counterAmount)} TL olursa anlaşabiliriz.',
-      '${_formatCurrency(counterAmount)} TL\'ye ne dersiniz? Orta bir yol bulalım.',
-      'Peki, ${_formatCurrency(counterAmount)} TL son teklifim.',
-      'Bir adım atalım. ${_formatCurrency(counterAmount)} TL olsa?',
+      'offerService.responses.counter.1',
+      'offerService.responses.counter.2',
+      'offerService.responses.counter.3',
+      'offerService.responses.counter.4',
+      'offerService.responses.counter.5',
     ];
+    // Not: Parametre (counterAmount) burada kullanılmıyor çünkü çeviri tarafında .trParams ile eklenecek
+    // Ancak bu metod sadece key döndürüyor. Bu key'i kullanan yerin .trParams yapması lazım.
+    // BU NEDENLE: Bu metodun dönüş değerini kullanan yerleri güncellemeliyim.
+    // Şimdilik sadece key döndürelim, kullanan yerleri düzelteceğiz.
     return responses[Random().nextInt(responses.length)];
   }
 

@@ -200,103 +200,138 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> {
       builder: (context, setDialogState) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.flag, color: Colors.deepPurple),
-              SizedBox(width: 8),
-              Text('Yolculuk Bitti'),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Toplam Kazanç:',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              Text(
-                '$_moneyEarned TL',
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
+              const Icon(Icons.flag, color: Colors.deepPurple),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'taxiGame.gameOver'.tr(),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text('Araç: $_score', style: const TextStyle(fontSize: 16)),
-                  Text('Deste: $_coinsCollected', style: const TextStyle(fontSize: 16)),
-                ],
-              ),
             ],
           ),
-          actions: [
-            if (_moneyEarned > 0)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    await _adService.showRewardedAd(
-                      onRewarded: (reward) async {
-                        final userMap = await _db.getCurrentUser();
-                        if (userMap != null) {
-                          final user = User.fromJson(userMap);
-                          await _db.updateUser(user.id, {
-                            'balance': user.balance + _moneyEarned,
-                          });
-                        }
-                        
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Tebrikler! Kazancınız ikiye katlandı!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        }
-                      },
-                      onAdNotReady: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Reklam hazır değil.')),
-                        );
-                        _adService.loadRewardedAd();
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.play_circle_filled),
-                  label: const Text('2x Kazanç (Reklam İzle)'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'taxiGame.totalEarnings'.tr(),
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+                Text(
+                  '$_moneyEarned TL',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
                   ),
                 ),
-              ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Çıkış'),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'taxiGame.vehicleCount'.trParams({'count': '$_score'}),
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'taxiGame.stackCount'.trParams({'count': '$_coinsCollected'}),
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _startGame();
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-                  child: const Text('Tekrar Oyna'),
+                const SizedBox(height: 24),
+                if (_moneyEarned > 0) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await _adService.showRewardedAd(
+                          onRewarded: (reward) async {
+                            final userMap = await _db.getCurrentUser();
+                            if (userMap != null) {
+                              final user = User.fromJson(userMap);
+                              await _db.updateUser(user.id, {
+                                'balance': user.balance + _moneyEarned,
+                              });
+                            }
+                            
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('taxiGame.rewardDoubled'.tr()),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }
+                          },
+                          onAdNotReady: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('taxiGame.adNotReady'.tr())),
+                            );
+                            _adService.loadRewardedAd();
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.play_circle_filled),
+                      label: Text('taxiGame.doubleEarnings'.tr()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'taxiGame.exit'.tr(),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _startGame();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: Text(
+                          'taxiGame.playAgain'.tr(),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -568,9 +603,9 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> {
                     children: [
                       const Icon(Icons.local_taxi, size: 80, color: Colors.amber),
                       const SizedBox(height: 20),
-                      const Text(
-                        'TAKSİ GÖREVİ',
-                        style: TextStyle(
+                      Text(
+                        'taxiGame.title'.tr(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -578,13 +613,13 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'Para destelerini topla!',
-                        style: TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold),
+                      Text(
+                        'taxiGame.collectMoney'.tr(),
+                        style: const TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      const Text(
-                        'Kaydırmak için sürükle',
-                        style: TextStyle(color: Colors.white70, fontSize: 16),
+                      Text(
+                        'taxiGame.swipeToMove'.tr(),
+                        style: const TextStyle(color: Colors.white70, fontSize: 16),
                       ),
                       const SizedBox(height: 40),
                       ElevatedButton(
@@ -597,9 +632,9 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: const Text(
-                          'BAŞLA',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        child: Text(
+                          'taxiGame.start'.tr(),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],

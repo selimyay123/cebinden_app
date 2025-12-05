@@ -104,6 +104,7 @@ flutter:
   assets:
     - assets/images/car_brands/
     - assets/images/app_logo/
+    - assets/images/
     - assets/translations/
     - assets/animations/
 

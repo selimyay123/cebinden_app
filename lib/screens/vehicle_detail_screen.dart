@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:confetti/confetti.dart';
 import 'package:lottie/lottie.dart';
 import '../models/vehicle_model.dart';
 import '../models/user_model.dart';
@@ -15,9 +14,10 @@ import '../services/xp_service.dart';
 import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
-import '../services/skill_service.dart'; // Yetenek Servisi
+
 import '../services/market_refresh_service.dart'; // Market Servisi (Fiyat hesaplama için)
 import '../widgets/vehicle_top_view.dart';
+import '../widgets/level_up_dialog.dart';
 import 'my_offers_screen.dart';
 import 'my_vehicles_screen.dart';
 import 'package:intl/intl.dart';
@@ -37,7 +37,6 @@ class VehicleDetailScreen extends StatefulWidget {
 class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late ConfettiController _confettiController;
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
   final OfferService _offerService = OfferService();
@@ -47,6 +46,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   final MarketRefreshService _marketService = MarketRefreshService();
   User? _currentUser;
   bool _isFavorite = false;
+  bool _isLoading = false;
   late Vehicle _vehicle;
 
   @override
@@ -54,14 +54,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     super.initState();
     _vehicle = widget.vehicle;
     _tabController = TabController(length: 2, vsync: this);
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     _loadCurrentUser();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _confettiController.dispose();
     super.dispose();
   }
 
@@ -171,7 +169,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withOpacity(0.7),
+                              Colors.black.withValues(alpha: 0.7),
                               Colors.transparent,
                             ],
                           ),
@@ -222,7 +220,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.withOpacity(0.1),
+                          color: Colors.deepPurple.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -282,7 +280,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -340,26 +338,16 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         ),
       ),
         ),
-        // Confetti Overlay
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: false,
-            colors: const [
-              Colors.green,
-              Colors.blue,
-              Colors.pink,
-              Colors.orange,
-              Colors.purple,
-              Colors.red,
-              Colors.yellow,
-            ],
-            numberOfParticles: 30,
-            gravity: 0.3,
+        // Loading Indicator
+        if (_isLoading)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.deepOrange,
+              ),
+            ),
           ),
-        ),
       ],
     );
       },
@@ -489,7 +477,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               color: canAfford ? Colors.deepPurple : Colors.orange,
             ),
             const SizedBox(width: 8),
-            Text('purchase.confirm'.tr()),
+            Expanded(
+              child: Text('purchase.confirm'.tr()),
+            ),
           ],
         ),
         content: SingleChildScrollView(
@@ -528,7 +518,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
+                    color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.orange),
                   ),
@@ -636,7 +626,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => WillPopScope(
         onWillPop: () async => false, // Geri tuşunu devre dışı bırak
         child: Center(
@@ -645,59 +635,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             children: [
               // Dönen çekiç/tokmak animasyonu
               Lottie.asset(
-                'assets/animations/resolving_animation.json',
+                'assets/animations/buying_car.json',
                 width: 300,
                 height: 300,
                 repeat: false, // Sadece 1 kez oynat
               ),
-              const SizedBox(height: 40),
-              // Bilgi kutusu
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 40),
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.deepPurple.withOpacity(0.3),
-                      blurRadius: 20,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'purchase.purchasingVehicle'.tr(),
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${_vehicle.brand} ${_vehicle.model}',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'common.pleaseWait'.tr(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+
             ],
           ),
         ),
@@ -767,8 +710,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       
       // 5️⃣ Başarılı! Kutlama göster
       HapticFeedback.heavyImpact(); // Güçlü titreşim - satın alma anı
-      _confettiController.play();
-      
       // XP Animasyonu göster (confetti ile birlikte)
       if (xpResult.hasGain && mounted) {
         _showXPGainAnimationOverlay(xpResult);
@@ -792,7 +733,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -819,7 +760,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Text(
                   'purchase.congratulations'.tr(),
                   style: const TextStyle(
-                    fontSize: 28,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.deepPurple,
                   ),
@@ -846,7 +787,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -980,7 +921,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -1021,7 +962,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: hasIssues ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                    color: hasIssues ? Colors.red.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -1184,12 +1125,23 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     // 2. Animasyon göster (Opsiyonel, şimdilik loading)
     if (!mounted) return;
     showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-    
-    await Future.delayed(const Duration(seconds: 2)); // Simüle et
+    context: context,
+    barrierDismissible: false,
+    barrierColor: Colors.black.withValues(alpha: 0.8),
+    builder: (context) => WillPopScope(
+      onWillPop: () async => false,
+      child: Center(
+        child: Lottie.asset(
+          'assets/animations/ekspertiz_animasyon.json',
+          width: 300,
+          height: 300,
+          repeat: false,
+        ),
+      ),
+    ),
+  );
+  
+  await Future.delayed(const Duration(seconds: 3)); // Animasyon süresi
     
     if (!mounted) return;
     Navigator.pop(context); // Loading kapat
@@ -1319,7 +1271,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -1368,7 +1320,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -1404,9 +1356,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.1),
+                color: Colors.amber.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -1443,7 +1395,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -2008,7 +1960,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           
           // Konfetiyi patlat (opsiyonel ama hoş olur)
           // Konfetiyi patlat (opsiyonel ama hoş olur)
-          _confettiController.play();
           
           // Biraz bekle ve araçlarım sayfasına git
           await Future.delayed(const Duration(seconds: 1));
@@ -2057,7 +2008,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     
     entry = OverlayEntry(
       builder: (context) => Positioned(
-        top: MediaQuery.of(context).size.height * 0.4,
+        top: MediaQuery.of(context).padding.top + 10, // AppBar hizası
         left: 0,
         right: 0,
         child: TweenAnimationBuilder(
@@ -2081,20 +2032,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
-                      vertical: 16,
+                      vertical: 12,
                     ),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Colors.amber, Colors.orange],
                       ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.amber.withOpacity(0.6),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(30),
+                      // Gölge kaldırıldı
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -2129,99 +2074,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   
   /// Seviye atlama dialogu göster
   void _showLevelUpDialog(XPGainResult result) {
-    if (!mounted) return;
+    if (!mounted || result.rewards == null) return;
     
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.celebration,
-              size: 80,
-              color: Colors.amber,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '🎉 ${'xp.levelUp'.tr()} 🎉',
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.amber,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'xp.level'.trParams({'level': result.newLevel.toString()}),
-              style: const TextStyle(
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (result.rewards != null) ...[
-              const Divider(),
-              Text(
-                '${'xp.rewards'.tr()}:',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              if (result.rewards!.cashBonus > 0)
-                Text(
-                  '💰 ${_formatCurrency(result.rewards!.cashBonus)} ${'common.currency'.tr()}',
-                  style: const TextStyle(fontSize: 18, color: Colors.green),
-                ),
-              if (result.rewards!.goldBonus > 0)
-                Text(
-                  '⭐ ${result.rewards!.goldBonus.toStringAsFixed(2)} ${'store.gold'.tr()}',
-                  style: const TextStyle(fontSize: 18, color: Colors.amber),
-                ),
-              if (result.rewards!.unlocks.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                ...result.rewards!.unlocks.map((unlock) => 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
-                      '🔓 ${unlock.tr()}',
-                      style: const TextStyle(fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'xp.awesome'.tr(),
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-        actionsAlignment: MainAxisAlignment.center,
+      builder: (context) => LevelUpDialog(
+        reward: result.rewards!,
       ),
     );
   }

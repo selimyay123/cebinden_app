@@ -198,44 +198,44 @@ class AIBuyer {
 
   static String _getBargainerMessage(Random random) {
     final messages = [
-      'Bütçem biraz kısıtlı, bu fiyata anlaşabilir miyiz?',
-      'Finansal durumum şu an çok iyi değil ama aracı çok beğendim.',
-      'Son teklifim bu, daha fazlasını ödeyemem maalesef.',
-      'Elimdeki bu kadar, lütfen kabul edin.',
-      'Bu fiyat benim için en mantıklısı, değerlendirirseniz sevinirim.',
+      'aiBuyer.messages.bargainer.1',
+      'aiBuyer.messages.bargainer.2',
+      'aiBuyer.messages.bargainer.3',
+      'aiBuyer.messages.bargainer.4',
+      'aiBuyer.messages.bargainer.5',
     ];
     return messages[random.nextInt(messages.length)];
   }
 
   static String _getRealisticMessage(Random random) {
     final messages = [
-      'Piyasa değerine uygun bir teklif sunuyorum.',
-      'Araştırmalarım sonucu adil bir fiyat belirledim.',
-      'Hem sizin hem benim için uygun bir fiyat olduğunu düşünüyorum.',
-      'Benzer araçların fiyatlarına baktım, bu fiyat makul.',
-      'Gerçekçi bir teklif ile karşınızdayım.',
+      'aiBuyer.messages.realistic.1',
+      'aiBuyer.messages.realistic.2',
+      'aiBuyer.messages.realistic.3',
+      'aiBuyer.messages.realistic.4',
+      'aiBuyer.messages.realistic.5',
     ];
     return messages[random.nextInt(messages.length)];
   }
 
   static String _getUrgentMessage(Random random) {
     final messages = [
-      'Acil ihtiyacım var, hemen anlaşabiliriz.',
-      'Bugün içinde işlemi kapatmam gerekiyor.',
-      'Çok acelem var, istediğiniz fiyatı veriyorum.',
-      'İşim düştü bu şehre, hemen bir araca ihtiyacım var.',
-      'Acil durumum var, lütfen kabul edin.',
+      'aiBuyer.messages.urgent.1',
+      'aiBuyer.messages.urgent.2',
+      'aiBuyer.messages.urgent.3',
+      'aiBuyer.messages.urgent.4',
+      'aiBuyer.messages.urgent.5',
     ];
     return messages[random.nextInt(messages.length)];
   }
 
   static String _getGenerousMessage(Random random) {
     final messages = [
-      'Tam aradığım araç, istediğiniz fiyatı veriyorum.',
-      'Uzun süredir bu modeli arıyordum, fiyat sorun değil.',
-      'Çok beğendim, istediğiniz ücreti ödemeye hazırım.',
-      'Bu araç tam bana göre, paranız hazır.',
-      'Kesinlikle almak istiyorum, fiyat konusunda esnek değilim.',
+      'aiBuyer.messages.generous.1',
+      'aiBuyer.messages.generous.2',
+      'aiBuyer.messages.generous.3',
+      'aiBuyer.messages.generous.4',
+      'aiBuyer.messages.generous.5',
     ];
     return messages[random.nextInt(messages.length)];
   }

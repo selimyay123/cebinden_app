@@ -1085,7 +1085,9 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   ),
                   filled: true,
                   fillColor: Colors.grey[50],
-                  helperText: 'Max: ${_formatCurrency(maxPrice)} TL (%15 Kâr)',
+                  helperText: 'myListings.maxPriceHint'.trParams({
+                    'price': _formatCurrency(maxPrice),
+                  }),
                   helperStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                 ),
                 validator: (value) {
@@ -1097,10 +1099,10 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                     return 'vehicles.validPrice'.tr();
                   }
                   if (price < 150000) {
-                    return 'Min 150.000 TL olmalı';
+                    return 'Min 150.000 TL';
                   }
                   if (price > maxPrice) {
-                    return 'Max %15 kâr eklenebilir!';
+                    return 'Max %15';
                   }
                   return null;
                 },
@@ -1128,7 +1130,11 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${isProfit ? 'Kar' : 'Zarar'}: ${_formatCurrency(profit.abs())} TL (%${profitPercent.abs().toStringAsFixed(1)})',
+                          'myListings.profitLossStatus'.trParams({
+                            'status': isProfit ? 'myListings.profit'.tr() : 'myListings.loss'.tr(),
+                            'amount': _formatCurrency(profit.abs()),
+                            'percent': profitPercent.abs().toStringAsFixed(1),
+                          }),
                           style: TextStyle(
                             color: isProfit ? Colors.green[700] : Colors.red[700],
                             fontWeight: FontWeight.bold,

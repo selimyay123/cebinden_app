@@ -1,5 +1,6 @@
 import '../models/user_model.dart';
 import 'database_helper.dart';
+import 'skill_service.dart';
 
 /// XP kazanım kaynakları
 enum XPSource {
@@ -86,12 +87,10 @@ class XPService {
     if (userMap == null) return XPGainResult.empty();
     final user = User.fromJson(userMap);
     
-    // Yetenek Kontrolü: Hızlı Öğrenen (XP Booster)
-    // Her işlemden %10 daha fazla XP
-    int finalXP = xpAmount;
-    if (user.unlockedSkills.contains('xp_booster')) {
-      finalXP = (finalXP * 1.1).round();
-    }
+    // Yetenek Kontrolü: Hızlı Öğrenen
+    // %25 daha fazla XP kazanımı
+    final xpMultiplier = SkillService.getFastLearnerMultiplier(user);
+    int finalXP = (xpAmount * xpMultiplier).round();
     
     final oldLevel = user.level;
     final newXP = user.xp + finalXP;

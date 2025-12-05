@@ -10,6 +10,8 @@ import 'profile_info_screen.dart';
 import 'change_password_screen.dart';
 import 'about_screen.dart';
 import 'login_screen.dart';
+import '../widgets/level_up_dialog.dart';
+import '../services/xp_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -252,6 +254,42 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
     }
   }
 
+  Future<void> _addTestGold() async {
+    if (_currentUser == null) return;
+
+    try {
+      // 50 altın ekle
+      final newGold = _currentUser!.gold + 50;
+      await DatabaseHelper().updateUser(_currentUser!.id, {'gold': newGold});
+
+      // Kullanıcıyı yeniden yükle
+      _currentUser = await _authService.getCurrentUser();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ 50 altın eklendi! Toplam: ${_currentUser!.gold.toInt()} altın'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        
+        // Ayarları yeniden yükle
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Hata: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+
   Future<void> _clearDatabase() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -344,6 +382,24 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
         );
       }
     }
+  }
+
+  void _showTestLevelUp() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => LevelUpDialog(
+        reward: LevelUpReward(
+          level: 5,
+          cashBonus: 250000,
+          goldBonus: 10,
+          unlocks: [
+            'xp.unlock.premiumVehicles',
+            'xp.unlock.advancedOffers',
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -549,26 +605,40 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
             ],
           ),
 
-          // DEBUG (GELİŞTİRİCİ AYARLARI) - Geçici olarak devre dışı
-          // _buildSection(
-          //   title: 'settings.developer'.tr(),
-          //   children: [
-          //     _buildListTile(
-          //       icon: Icons.auto_awesome,
-          //       title: 'settings.generateOffers'.tr(),
-          //       subtitle: 'settings.generateOffersDesc'.tr(),
-          //       textColor: Colors.blue,
-          //       onTap: _generateTestOffers,
-          //     ),
-          //     _buildListTile(
-          //       icon: Icons.delete_sweep,
-          //       title: 'settings.clearDatabase'.tr(),
-          //       subtitle: 'settings.clearDatabaseDesc'.tr(),
-          //       textColor: Colors.orange,
-          //       onTap: _clearDatabase,
-          //     ),
-          //   ],
-          // ),
+          // DEBUG (GELİŞTİRİCİ AYARLARI)
+          _buildSection(
+            title: 'settings.developer'.tr(),
+            children: [
+              _buildListTile(
+                icon: Icons.auto_awesome,
+                title: 'settings.generateOffers'.tr(),
+                subtitle: 'settings.generateOffersDesc'.tr(),
+                textColor: Colors.blue,
+                onTap: _generateTestOffers,
+              ),
+              _buildListTile(
+                icon: Icons.star,
+                title: 'Test Level Up',
+                subtitle: 'Level up animasyonunu test et',
+                textColor: Colors.purple,
+                onTap: _showTestLevelUp,
+              ),
+              _buildListTile(
+                icon: Icons.monetization_on,
+                title: 'Add 50 Gold',
+                subtitle: 'Test için 50 altın ekle',
+                textColor: Colors.amber,
+                onTap: _addTestGold,
+              ),
+              _buildListTile(
+                icon: Icons.delete_sweep,
+                title: 'settings.clearDatabase'.tr(),
+                subtitle: 'settings.clearDatabaseDesc'.tr(),
+                textColor: Colors.orange,
+                onTap: _clearDatabase,
+              ),
+            ],
+          ),
 
           // Hesap İşlemleri
           _buildSection(

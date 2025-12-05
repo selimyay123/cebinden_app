@@ -151,6 +151,29 @@ class LocalizationService {
     
     return text;
   }
+
+  /// Liste çevirisi al (örn: "models.descriptions.Renauva.Slim")
+  List<String> translateList(String key) {
+    try {
+      List<String> keys = key.split('.');
+      dynamic value = _localizedStrings;
+      
+      for (String k in keys) {
+        if (value is Map<String, dynamic> && value.containsKey(k)) {
+          value = value[k];
+        } else {
+          return [];
+        }
+      }
+      
+      if (value is List) {
+        return value.map((e) => e.toString()).toList();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
 }
 
 /// Extension - Kolay kullanım için
@@ -163,6 +186,11 @@ extension LocalizationExtension on String {
   /// Parametreli çeviri (örn: "hello.message".trParams({'name': 'John'}))
   String trParams(Map<String, String> params) {
     return LocalizationService().translateWithParams(this, params);
+  }
+
+  /// Liste çevirisi (örn: "models.descriptions.Renauva.Slim".trList())
+  List<String> trList() {
+    return LocalizationService().translateList(this);
   }
 }
 
@@ -181,4 +209,3 @@ mixin LocalizationMixin<T extends StatefulWidget> on State<T> {
     }
   }
 }
-

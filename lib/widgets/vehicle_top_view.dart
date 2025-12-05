@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/localization_service.dart';
 
 /// Araç üstten bakış görseli
 /// Boyalı veya değişen parçaları gösterir
@@ -33,16 +34,15 @@ class VehicleTopView extends StatelessWidget {
   }
 
   Widget _buildLegend() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 12,
+      runSpacing: 8,
       children: [
-        _buildLegendItem('Orijinal', Colors.grey[400]!),
-        const SizedBox(width: 12),
-        _buildLegendItem('Lokal Boyalı', Colors.orange[200]!),
-        const SizedBox(width: 12),
-        _buildLegendItem('Boyalı', Colors.blue[300]!),
-        const SizedBox(width: 12),
-        _buildLegendItem('Değişen', Colors.red[300]!),
+        _buildLegendItem('vehicleParts.original'.tr(), Colors.grey[400]!),
+        _buildLegendItem('vehicleParts.localPainted'.tr(), Colors.orange[200]!),
+        _buildLegendItem('vehicleParts.painted'.tr(), Colors.blue[300]!),
+        _buildLegendItem('vehicleParts.replaced'.tr(), Colors.red[300]!),
       ],
     );
   }

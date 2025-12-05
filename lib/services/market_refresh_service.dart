@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../models/vehicle_model.dart';
+import 'localization_service.dart';
 import 'game_time_service.dart';
 import 'settings_helper.dart';
 
@@ -2397,530 +2398,130 @@ class MarketRefreshService {
   String _generateDescription({String? brand, String? model, String? fuelType, String? transmission, int? year, String? driveType, int? horsepower}) {
     // Temel açıklamalar
     final baseDescriptions = [
-      'Tek elden, bakımlı ve temiz kullanım.',
-      'Hasarsız, bakımlı ve sorunsuz bir araç.',
-      'Garaj arabası. Hep düzenli kullanılmış.',
-      'Aileden satılık araç. Sorunsuz bir araçtır.',
-      'Sıfır km\'den beri tüm bakımları yapılmıştır.',
-      'İkinci el ama sıfır gibi. Tramer kaydı temiz.',
-      'Ekonomik ve güvenilir araç.',
-      'Değişensiz, boyasız ve hasarsız araç.',
+      'listingDescriptions.base.0'.tr(),
+      'listingDescriptions.base.1'.tr(),
+      'listingDescriptions.base.2'.tr(),
+      'listingDescriptions.base.3'.tr(),
+      'listingDescriptions.base.4'.tr(),
+      'listingDescriptions.base.5'.tr(),
+      'listingDescriptions.base.6'.tr(),
+      'listingDescriptions.base.7'.tr(),
     ];
     
     // Model-spesifik ek açıklamalar
     final List<String> extraNotes = [];
     
+    // Model-spesifik ek açıklamalar (Otomatik Lookup)
+    if (brand != null && model != null) {
+      final normalizedModel = model.replaceAll(' ', '_');
+      extraNotes.addAll('modelDescriptions.$brand.$normalizedModel'.trList());
+    }
+    
+    // Marka-spesifik teknik detaylar (Yakıt, Vites vb.)
     if (brand == 'Renauva') {
-      if (model == 'Slim') {
-        extraNotes.addAll([
-          'Modern ve dinamik Hatchback.',
-          'Şehir içi kullanım için ideal.',
-          'Genç ve sporty tasarım.',
-        ]);
-      } else if (model == 'Magna') {
-        extraNotes.addAll([
-          'Konforlu ve geniş iç hacim.',
-          'Yol tutuşu mükemmel.',
-          'Aile arabası olarak çok uygun.',
-        ]);
-      } else if (model == 'Flow') {
-        extraNotes.addAll([
-          'Geniş bagaj hacmi ve konfor.',
-          'Uzun yol için ideal.',
-        ]);
-      } else if (model == 'Signa') {
-        extraNotes.addAll([
-          'Ekonomik ve pratik araç.',
-          'Yakıt tüketimi çok düşük.',
-        ]);
-      } else if (model == 'Tallion') {
-        extraNotes.addAll([
-          'Yeni nesil, modern teknoloji.',
-          'Aileniz için güvenli ve ekonomik.',
-        ]);
-      }
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Renauva.diesel'.tr());
+      else if (fuelType == 'Benzin+LPG') extraNotes.add('modelDescriptions.Renauva.lpg'.tr());
+      else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Renauva.hybrid'.tr());
       
-      // Yakıt tipi ek notları
-      if (fuelType == 'Dizel') {
-        extraNotes.add('1.5 dCi motor çok verimli ve ekonomik.');
-      } else if (fuelType == 'Benzin+LPG') {
-        extraNotes.add('Fabrika çıkışlı LPG, yakıt tasarrufu garantili.');
-      } else if (fuelType == 'Hybrid') {
-        extraNotes.add('Hibrit teknoloji ile çevre dostu.');
-      }
-      
-      // Vites tipi ek notları
       if (transmission == 'Otomatik') {
-        if (model == 'Tallion') {
-          extraNotes.add('X-Tronic CVT otomatik vites, sürüş keyfi.');
-        } else if (model == 'Signa') {
-          extraNotes.add('Easy-R otomatik vites, şehir içi rahat.');
-        } else {
-          extraNotes.add('EDC çift kavrama, hızlı ve güvenli vites.');
-        }
+        if (model == 'Tallion') extraNotes.add('modelDescriptions.Renauva.cvt'.tr());
+        else if (model == 'Signa') extraNotes.add('modelDescriptions.Renauva.auto'.tr());
+        else extraNotes.add('modelDescriptions.Renauva.edc'.tr());
       }
     } else if (brand == 'Voltswagen') {
-      if (model == 'Paso') {
-        extraNotes.addAll([
-          'Premium segment, lüks ve konfor.',
-          'Geniş iç hacim ve yüksek teknoloji.',
-          'Uzun yol için mükemmel seçim.',
-        ]);
-      } else if (model == 'Tenis') {
-        extraNotes.addAll([
-          'Kompakt ama ferah iç hacim.',
-          'Volkswagen kalitesi ve güvenilirliği.',
-          'Yüksek talep ve hızlı satış.',
-        ]);
-      } else if (model == 'Colo') {
-        extraNotes.addAll([
-          'Premium küçük araç segmenti.',
-          'Şehir içi kullanımda pratik.',
-          'Volkswagen prestiji uygun fiyata.',
-        ]);
-      } else if (model == 'Jago') {
-        extraNotes.addAll([
-          'Geniş bagajlı sedan.',
-          'Aile arabası olarak uygun.',
-        ]);
-      }
-      
-      // Yakıt tipi ek notları (Voltswagen)
-      if (fuelType == 'Dizel') {
-        extraNotes.add('TDI motor, verimli ve güçlü.');
-      }
-      
-      // Vites tipi ek notları (Voltswagen)
-      if (transmission == 'Otomatik') {
-        extraNotes.add('DSG çift kavrama otomatik şanzıman.');
-      }
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Voltswagen.tdi'.tr());
+      if (transmission == 'Otomatik') extraNotes.add('modelDescriptions.Voltswagen.dsg'.tr());
     } else if (brand == 'Fialto') {
-      if (model == 'Agna') {
-        extraNotes.addAll([
-          'Geniş kasa seçenekleri, pratik araç.',
-          'Ticari ve aile kullanımı için ideal.',
-          'Yüksek hacim, hızlı satış.',
-        ]);
-      } else if (model == 'Lagua') {
-        extraNotes.addAll([
-          'Basit ve sağlam yapı.',
-          'Ekonomik sedan.',
-          'Yüksek kilometrede güvenilir.',
-        ]);
-      } else if (model == 'Zorno') {
-        extraNotes.addAll([
-          'Kompakt ve ekonomik.',
-          'Şehir içi ideal.',
-          'Düşük işletme maliyeti.',
-        ]);
-      }
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Fialto.multijet'.tr());
+      else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Fialto.hybrid'.tr());
       
-      // Yakıt tipi ek notları (Fialto)
-      if (fuelType == 'Dizel') {
-        extraNotes.add('Multijet dizel motor, verimli ve ekonomik.');
-      } else if (fuelType == 'Hybrid') {
-        extraNotes.add('Hibrit teknoloji ile yakıt tasarrufu.');
-      }
-      
-      // Vites tipi ek notları (Fialto)
       if (transmission == 'Otomatik') {
-        if (model == 'Lagua' || model == 'Zorno') {
-          extraNotes.add('Dualogic yarı otomatik vites.');
-        } else {
-          extraNotes.add('Otomatik şanzıman, konforlu sürüş.');
-        }
+        if (model == 'Lagua' || model == 'Zorno') extraNotes.add('modelDescriptions.Fialto.dualogic'.tr());
+        else extraNotes.add('modelDescriptions.Fialto.auto'.tr());
       }
     } else if (brand == 'Opexel') {
-      if (model == 'Tasra') {
-        extraNotes.addAll([
-          'Güvenilir Alman kalitesi.',
-          'Geniş kasa seçeneği, konforlu.',
-          'Hem sedan hem hatchback mevcut.',
-        ]);
-      } else if (model == 'Lorisa') {
-        extraNotes.addAll([
-          'Kompakt ve ekonomik.',
-          'Şehir içi kullanımda pratik.',
-          'Güvenilir otomatik şanzıman.',
-        ]);
-      } else if (model == 'Mornitia') {
-        extraNotes.addAll([
-          'Premium segment, lüks donanım.',
-          'Uzun yol konforu üst seviye.',
-          'Prestijli ve güvenilir.',
-        ]);
-      }
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Opexel.cdti'.tr());
       
-      // Yakıt tipi ek notları (Opexel)
-      if (fuelType == 'Dizel') {
-        extraNotes.add('CDTI dizel motor, verimli ve güçlü.');
-      }
-      
-      // Vites tipi ek notları (Opexel)
       if (transmission == 'Otomatik') {
-        if (model == 'Lorisa' && year != null && year < 2020) {
-          extraNotes.add('Easytronic yarı otomatik vites.');
-        } else {
-          extraNotes.add('Tork konvertörlü otomatik, güvenilir.');
-        }
+        if (model == 'Lorisa' && year != null && year < 2020) extraNotes.add('modelDescriptions.Opexel.easytronic'.tr());
+        else extraNotes.add('modelDescriptions.Opexel.auto'.tr());
       }
     } else if (brand == 'Bavora') {
-      if (model == 'C Serisi') {
-        extraNotes.addAll([
-          'Premium segment, yüksek prestij.',
-          'Arkadan itiş (RWD) sürüş keyfi.',
-          'M Sport paketi çok değerli.',
-        ]);
-      } else if (model == 'E Serisi') {
-        extraNotes.addAll([
-          'Lüks segment, en prestijli model.',
-          'Geniş iç hacim ve konfor.',
-          'Elektronik donanım zengin.',
-        ]);
-      } else if (model == 'A Serisi') {
-        extraNotes.addAll([
-          'Kompakt premium, şehir için ideal.',
-          'Genç ve dinamik karakter.',
-          'M Sport görsel paket popüler.',
-        ]);
-      } else if (model == 'D Serisi') {
-        extraNotes.addAll([
-          'Sportif coupe, şık tasarım.',
-          'M Sport standart gibi.',
-          'Gran Coupe en popüler kasa.',
-        ]);
-      }
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Bavora.diesel'.tr());
+      else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Bavora.hybrid'.tr());
       
-      // Yakıt tipi ek notları (Bavora)
-      if (fuelType == 'Dizel') {
-        extraNotes.add('d motor, verimli ve güçlü dizel.');
-      } else if (fuelType == 'Hybrid') {
-        extraNotes.add('e motor, hibrit teknoloji, yüksek verim.');
-      }
-      
-      // Vites tipi ek notları (Bavora)
       if (transmission == 'Otomatik') {
-        if (model == 'A Serisi' && year != null && year >= 2020) {
-          extraNotes.add('7 ileri DCT, çift kavramalı vites.');
-        } else {
-          extraNotes.add('8 ileri Steptronic (ZF), en güvenilir otomatik.');
-        }
+        if (model == 'A Serisi' && year != null && year >= 2020) extraNotes.add('modelDescriptions.Bavora.dct'.tr());
+        else extraNotes.add('modelDescriptions.Bavora.zf'.tr());
       }
-      
-      // Çekiş sistemi notu (Bavora RWD)
-      extraNotes.add('Arkadan çekişli (RWD), sportif karakter.');
+      extraNotes.add('modelDescriptions.Bavora.rwd'.tr());
     } else if (brand == 'Fortran') {
-      if (model == 'Odak') {
-        extraNotes.addAll([
-          'Sürüş keyfi üst seviye.',
-          'C segmentinin lideri, konforlu.',
-          'Hatchback/Sedan/SW kasa seçenekleri.',
-        ]);
-      } else if (model == 'Vista') {
-        extraNotes.addAll([
-          'Kompakt ve çevik, şehir aracı.',
-          'Ekonomik yakıt tüketimi.',
-          'Genç ve dinamik tasarım.',
-        ]);
-      } else if (model == 'Avger') {
-        extraNotes.addAll([
-          'Güçlü pick-up, arazi ve yük taşıma.',
-          'Çift kabin konforu.',
-          'Wildtrak donanım lüks seviye.',
-        ]);
-      } else if (model == 'Tupa') {
-        extraNotes.addAll([
-          'SUV konforu, geniş iç hacim.',
-          'Aileler için ideal araç.',
-          'Modern teknoloji ve güvenlik.',
-        ]);
-      }
-      
-      // Yakıt tipi ek notları (Fortran)
       if (fuelType == 'Dizel') {
-        if (model == 'Odak' || model == 'Tupa') {
-          extraNotes.add('EcoBlue dizel motor, verimli ve güçlü.');
-        } else if (model == 'Vista') {
-          extraNotes.add('TDCi dizel motor, ekonomik tüketim.');
-        } else if (model == 'Avger') {
-          extraNotes.add('Bi-Turbo dizel motor, yüksek tork.');
-        }
-      } else if (fuelType == 'Hybrid') {
-        extraNotes.add('Hibrit teknoloji, çevre dostu ve verimli.');
-      } else if (fuelType == 'Benzin') {
-        extraNotes.add('EcoBoost turbo benzin, performans ve verim.');
-      }
+        if (model == 'Odak' || model == 'Tupa') extraNotes.add('modelDescriptions.Fortran.ecoblue'.tr());
+        else if (model == 'Vista') extraNotes.add('modelDescriptions.Fortran.tdci'.tr());
+        else if (model == 'Avger') extraNotes.add('modelDescriptions.Fortran.biturbo'.tr());
+      } else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Fortran.hybrid'.tr());
+      else if (fuelType == 'Benzin') extraNotes.add('modelDescriptions.Fortran.ecoboost'.tr());
       
-      // Vites tipi ek notları (Fortran)
       if (transmission == 'Otomatik') {
         if (year != null && year >= 2018) {
-          if (model == 'Avger') {
-            extraNotes.add('10 ileri otomatik, en modern şanzıman.');
-          } else {
-            extraNotes.add('8 ileri tork konvertörlü otomatik, güvenilir.');
-          }
+          if (model == 'Avger') extraNotes.add('modelDescriptions.Fortran.auto10'.tr());
+          else extraNotes.add('modelDescriptions.Fortran.auto8'.tr());
         } else {
-          extraNotes.add('Powershift otomatik vites.');
+          extraNotes.add('modelDescriptions.Fortran.powershift'.tr());
         }
       }
-      
-      // 4x4 notu (Avger, Tupa)
-      if (model == 'Avger') {
-        extraNotes.add('4x4 dört çekiş, arazi performansı üst düzey.');
-      } else if (model == 'Tupa') {
-        // AWD/FWD bilgisi eklenebilir
-      }
+      if (model == 'Avger') extraNotes.add('modelDescriptions.Fortran.4x4'.tr());
     } else if (brand == 'Mercurion') {
-      if (model == '3 Serisi') {
-        extraNotes.addAll([
-          'Premium konfor, klasik lüks.',
-          'AMG Line sportif tasarım.',
-          'Yetkili servis geçmişi çok önemli.',
-        ]);
-      } else if (model == '5 Serisi') {
-        extraNotes.addAll([
-          'Üst düzey lüks sedan.',
-          'Makam aracı prestiji.',
-          'Elektronik donanım zengin.',
-        ]);
-      } else if (model == '1 Serisi') {
-        extraNotes.addAll([
-          'MBUX çift ekran teknoloji.',
-          'Kompakt premium, genç dinamik.',
-          'AMG Line görsel paket önemli.',
-        ]);
-      } else if (model == 'GJE') {
-        extraNotes.addAll([
-          '4 kapılı coupe, sportif tasarım.',
-          'Çerçevesiz camlar, şık detay.',
-          'Genç profesyonellere hitap eder.',
-        ]);
-      } else if (model == '8 Serisi') {
-        extraNotes.addAll([
-          'Efsanevi arazi aracı.',
-          'G 63 AMG en güçlü versiyon.',
-          '3 diferansiyel kilidi, saf arazi yeteneği.',
-        ]);
-      }
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Mercurion.diesel'.tr());
+      else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Mercurion.hybrid'.tr());
       
-      // Yakıt tipi ek notları (Mercurion)
-      if (fuelType == 'Dizel') {
-        extraNotes.add('d motor, verimli ve güçlü dizel.');
-      } else if (fuelType == 'Hybrid') {
-        extraNotes.add('e motor, hibrit teknoloji, yüksek performans.');
-      }
-      
-      // Vites tipi ek notları (Mercurion)
       if (transmission == 'Otomatik') {
-        if (model == '1 Serisi' || model == 'GJE') {
-          extraNotes.add('7G-DCT çift kavramalı otomatik.');
-        } else {
-          extraNotes.add('7G/9G-Tronic, en güvenilir otomatik şanzıman.');
-        }
+        if (model == '1 Serisi' || model == 'GJE') extraNotes.add('modelDescriptions.Mercurion.dct'.tr());
+        else extraNotes.add('modelDescriptions.Mercurion.tronic'.tr());
       }
-      
-      // Çekiş sistemi notu (Mercurion)
-      if (model == '8 Serisi') {
-        extraNotes.add('4MATIC dört çekiş, üç diferansiyel kilidi.');
-      } else {
-        extraNotes.add('Arkadan çekişli (RWD), premium karakter.');
-      }
+      if (model == '8 Serisi') extraNotes.add('modelDescriptions.Mercurion.4matic'.tr());
+      else extraNotes.add('modelDescriptions.Mercurion.rwd'.tr());
     } else if (brand == 'Hyundaro') {
-      if (model == 'A10') {
-        extraNotes.addAll([
-          'Güvenilir ve ekonomik hatchback.',
-          'Geniş donanım seçenekleri.',
-          'Yedek parça ucuz ve kolay.',
-        ]);
-      } else if (model == 'Tecent Red') {
-        extraNotes.addAll([
-          'Güçlü 1.6 CRDi dizel motor.',
-          'Ekonomik sedan, aile aracı.',
-          'Tork konvertörlü otomatik güvenilir.',
-        ]);
-      } else if (model == 'Tecent White') {
-        extraNotes.addAll([
-          'Basit ve sağlam yapı.',
-          'Ucuz onarım maliyetleri.',
-          'Ekonomik günlük kullanım.',
-        ]);
-      } else if (model == 'A20') {
-        extraNotes.addAll([
-          'C segment dengeli araç.',
-          'Zengin standart donanım.',
-          'N-Line sportif paket popüler.',
-        ]);
-      } else if (model == 'Kascon') {
-        extraNotes.addAll([
-          'Modern SUV, radikal tasarım.',
-          'Hibrit teknoloji mevcut.',
-          'Geniş iç hacim, konforlu.',
-        ]);
-      }
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Hyundaro.crdi'.tr());
+      else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Hyundaro.hybrid'.tr());
       
-      // Yakıt tipi ek notları (Hyundaro)
-      if (fuelType == 'Dizel') {
-        extraNotes.add('CRDi dizel motor, güçlü ve verimli.');
-      } else if (fuelType == 'Hybrid') {
-        extraNotes.add('Hibrit teknoloji, yüksek verim ve düşük tüketim.');
-      }
-      
-      // Vites tipi ek notları (Hyundaro)
       if (transmission == 'Otomatik') {
-        if (year != null && year >= 2019) {
-          extraNotes.add('DCT çift kavramalı otomatik.');
-        } else {
-          extraNotes.add('Tork konvertörlü otomatik, güvenilir.');
-        }
+        if (year != null && year >= 2019) extraNotes.add('modelDescriptions.Hyundaro.dct'.tr());
+        else extraNotes.add('modelDescriptions.Hyundaro.auto'.tr());
       }
     } else if (brand == 'Toyoto') {
-      if (model == 'Airoko') {
-        extraNotes.addAll([
-          'Efsanevi güvenilirlik.',
-          'En az arıza çıkaran sedan.',
-          'Yüksek kilometrede bile değerli.',
-        ]);
-      } else if (model == 'Lotus') {
-        extraNotes.addAll([
-          'Güvenilir Toyota kalitesi.',
-          'Hatchback pratikliği.',
-          'Hibrit versiyon çok talep görür.',
-        ]);
-      } else if (model == 'Karma') {
-        extraNotes.addAll([
-          'Şehir içi kullanımda pratik.',
-          'Kompakt boyut, kolay park.',
-          'Hibrit teknoloji mevcut.',
-        ]);
-      }
+      if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Toyoto.hybrid'.tr());
+      else if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Toyoto.diesel'.tr());
       
-      // Yakıt tipi ek notları (Toyoto)
-      if (fuelType == 'Hybrid') {
-        extraNotes.add('Hibrit teknoloji, yakıt ekonomisi çok yüksek.');
-      } else if (fuelType == 'Dizel') {
-        extraNotes.add('D-4D dizel motor, verimli.');
-      }
-      
-      // Vites tipi ek notları (Toyoto)
       if (transmission == 'Otomatik') {
-        if (fuelType == 'Hybrid') {
-          extraNotes.add('CVT otomatik, hibrit sistemle mükemmel uyum.');
-        } else if (fuelType == 'Dizel' && year != null && year <= 2015) {
-          extraNotes.add('MMT yarı otomatik vites (dikkatli kullanım gerektirir).');
-        } else if (model == 'Karma' && year != null && year <= 2015) {
-          extraNotes.add('MMT yarı otomatik vites (dikkatli kullanım gerektirir).');
-        } else {
-          extraNotes.add('CVT otomatik, en güvenilir şanzıman.');
-        }
+        if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Toyoto.cvt_hybrid'.tr());
+        else if ((fuelType == 'Dizel' || model == 'Karma') && year != null && year <= 2015) extraNotes.add('modelDescriptions.Toyoto.mmt'.tr());
+        else extraNotes.add('modelDescriptions.Toyoto.cvt'.tr());
       }
     } else if (brand == 'Audira') {
-      if (model == 'B3') {
-        extraNotes.addAll([
-          'Premium kompakt, yüksek kalite.',
-          'Sanal kokpit, modern teknoloji.',
-          'Sportif sürüş dinamikleri.',
-        ]);
-      } else if (model == 'B4') {
-        extraNotes.addAll([
-          'D segment konforu, prestij.',
-          'Yüksek malzeme kalitesi.',
-          'Uzun yol konforu üstün.',
-        ]);
-      } else if (model == 'B6') {
-        extraNotes.addAll([
-          'E segment lüks, üst düzey konfor.',
-          'Matrix LED, gelişmiş donanım.',
-          'Yönetici aracı, prestijli.',
-        ]);
-      } else if (model == 'B5') {
-        extraNotes.addAll([
-          'Sportif coupe tasarım.',
-          'Zarif akıcı hatlar, dikkat çekici.',
-          'Prestijli sportif sedan.',
-        ]);
-      }
-      
-      // Yakıt tipi ek notları (Audira)
       if (fuelType == 'Dizel') {
-        if (model == 'B6') {
-          extraNotes.add('TDI dizel, yüksek tork ve verim.');
-        } else {
-          extraNotes.add('TDI dizel, ekonomik ve güçlü.');
-        }
+        if (model == 'B6') extraNotes.add('modelDescriptions.Audira.tdi_high'.tr());
+        else extraNotes.add('modelDescriptions.Audira.tdi'.tr());
       }
+      if (driveType == '4x4') extraNotes.add('modelDescriptions.Audira.quattro'.tr());
       
-      // Çekiş sistemi notu
-      if (driveType == '4x4') {
-        extraNotes.add('Quattro dört çekiş, maksimum güvenlik ve performans.');
-      }
-      
-      // Vites tipi ek notları (Audira)
-      if (transmission == 'Otomatik') {
-        if (year != null) {
-          final vehicleAge = 2025 - year;
-          if (driveType == '4x4' && vehicleAge >= 5) {
-            extraNotes.add('Tiptronic otomatik, güvenilir şanzıman.');
-          } else if (model == 'B4' && vehicleAge >= 8 && vehicleAge <= 12) {
-            extraNotes.add('Multitronic CVT vites (bakım geçmişi önemli).');
-          } else if (vehicleAge >= 5) {
-            extraNotes.add('S tronic otomatik (bakım geçmişi kontrol edilmeli).');
-          } else {
-            extraNotes.add('S tronic 7 ileri otomatik, sportif vites.');
-          }
-        }
+      if (transmission == 'Otomatik' && year != null) {
+        final vehicleAge = 2025 - year;
+        if (driveType == '4x4' && vehicleAge >= 5) extraNotes.add('modelDescriptions.Audira.tiptronic'.tr());
+        else if (model == 'B4' && vehicleAge >= 8 && vehicleAge <= 12) extraNotes.add('modelDescriptions.Audira.multitronic'.tr());
+        else if (vehicleAge >= 5) extraNotes.add('modelDescriptions.Audira.stronic_check'.tr());
+        else extraNotes.add('modelDescriptions.Audira.stronic'.tr());
       }
     } else if (brand == 'Hondaro') {
-      if (model == 'Vice') {
-        extraNotes.addAll([
-          'İkinci el kralı, değerini korur.',
-          'Güvenilir Honda kalitesi.',
-          'Yüksek kilometrede bile sorunsuz.',
-        ]);
-      } else if (model == 'VHL') {
-        extraNotes.addAll([
-          'SUV segmentinde lider konfor.',
-          'Geniş iç mekan, aile aracı.',
-          'Honda güvenilirliği.',
-        ]);
-      } else if (model == 'Kent') {
-        extraNotes.addAll([
-          'Ekonomik sedan, Honda kalitesi.',
-          'Geniş iç hacim, konforlu.',
-          'Yüksek motor gücü (121 HP).',
-        ]);
-      } else if (model == 'Caz') {
-        extraNotes.addAll([
-          'Sihirli koltuklar, yüksek tavan.',
-          'Kompakt ama geniş, pratik.',
-          'Şehir için ideal araç.',
-        ]);
-      }
-      
-      // Yakıt tipi ek notları (Hondaro)
       if (fuelType == 'Hybrid') {
-        if (model == 'VHL') {
-          extraNotes.add('2.0 Hibrit, yakıt ekonomisi üstün.');
-        } else if (model == 'Caz') {
-          extraNotes.add('1.5 e:HEV hibrit, çok verimli.');
-        }
-      } else if (fuelType == 'Benzin+LPG') {
-        extraNotes.add('ECO fabrika çıkışlı LPG, düşük yakıt maliyeti.');
-      }
+        if (model == 'VHL') extraNotes.add('modelDescriptions.Hondaro.hybrid_vhl'.tr());
+        else if (model == 'Caz') extraNotes.add('modelDescriptions.Hondaro.hybrid_caz'.tr());
+      } else if (fuelType == 'Benzin+LPG') extraNotes.add('modelDescriptions.Hondaro.lpg'.tr());
       
-      // Çekiş sistemi notu
-      if (driveType == '4x4') {
-        extraNotes.add('AWD dört çekiş, maksimum güvenlik.');
-      }
-      
-      // Vites tipi ek notları (Hondaro)
-      if (transmission == 'Otomatik') {
-        extraNotes.add('CVT otomatik, en güvenilir şanzıman.');
-      }
-      
-      // Performans versiyonu
-      if (model == 'Vice' && horsepower != null && horsepower >= 170) {
-        extraNotes.add('RS/Turbo performans versiyonu, sportif sürüş.');
-      }
+      if (driveType == '4x4') extraNotes.add('modelDescriptions.Hondaro.awd'.tr());
+      if (transmission == 'Otomatik') extraNotes.add('modelDescriptions.Hondaro.cvt'.tr());
+      if (model == 'Vice' && horsepower != null && horsepower >= 170) extraNotes.add('modelDescriptions.Hondaro.rs'.tr());
     }
     
     // Ana açıklama + ek notlar

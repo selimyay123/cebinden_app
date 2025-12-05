@@ -72,16 +72,16 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     
     setState(() {
       if (ratio > _maxTolerance) {
-        _priceFeedback = '⚠️ Fiyat Çok Yüksek! Alıcı çıkmayabilir.';
+        _priceFeedback = 'sell.priceTooHigh'.tr();
         _priceColor = Colors.red;
       } else if (ratio > 1.15) {
-        _priceFeedback = 'Biraz Pahalı. Satış yavaş olabilir.';
+        _priceFeedback = 'sell.priceHigh'.tr();
         _priceColor = Colors.orange;
       } else if (ratio > 1.05) {
-        _priceFeedback = '✅ Makul Fiyat. Normal talep.';
+        _priceFeedback = 'sell.priceFair'.tr();
         _priceColor = Colors.green;
       } else {
-        _priceFeedback = '🔥 Kelepir! Telefonun susmayacak.';
+        _priceFeedback = 'sell.priceCheap'.tr();
         _priceColor = Colors.blue;
       }
     });
@@ -111,7 +111,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Yetenek Bonusu: Önerilen fiyat %${((multiplier - 1) * 100).toStringAsFixed(0)} artırıldı!'),
+              content: Text('sell.skillBonus'.trParams({'percent': ((multiplier - 1) * 100).toStringAsFixed(0)})),
               backgroundColor: Colors.indigo,
               duration: const Duration(seconds: 3),
             ),
@@ -230,7 +230,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                         ),
                       )
                     : const Icon(Icons.check_circle),
-                label: Text(_isLoading ? 'İlan Oluşturuluyor...' : 'Satışa Çıkar'),
+                label: Text(_isLoading ? 'sell.creatingListing'.tr() : 'sell.listForSaleButton'.tr()),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
@@ -291,7 +291,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Satın Alma: ${_formatCurrency(widget.vehicle.purchasePrice)} TL',
+                    '${'sell.purchasePrice'.tr()}: ${_formatCurrency(widget.vehicle.purchasePrice)} TL',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],
@@ -312,9 +312,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Satış Fiyatı *',
-          style: TextStyle(
+        Text(
+          'sell.salePriceLabel'.tr(),
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -328,7 +328,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             CurrencyInputFormatter(),
           ],
           decoration: InputDecoration(
-            hintText: 'Örn: 350000',
+            hintText: 'sell.priceHint'.tr(),
             prefixText: '₺ ',
             suffixText: 'TL',
             border: OutlineInputBorder(
@@ -336,27 +336,27 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             ),
             filled: true,
             fillColor: Colors.grey[100],
-            helperText: 'Maksimum: ${_formatCurrency(maxPrice)} TL (%15 Kâr Sınırı)',
+            helperText: 'sell.maxPriceHint'.trParams({'price': _formatCurrency(maxPrice)}),
             helperStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Fiyat girmelisiniz';
+              return 'sell.priceRequired'.tr();
             }
             final price = CurrencyInputFormatter.parse(value);
             if (price <= 0) {
-              return 'Geçerli bir fiyat girin';
+              return 'sell.priceInvalid'.tr();
             }
             // Minimum limit removed
             if (price > maxPrice) {
-              return 'Fiyat, alış fiyatının %15 fazlasını geçemez!';
+              return 'sell.priceLimitExceeded'.tr();
             }
             return null;
           },
         ),
         const SizedBox(height: 8),
         Text(
-          'Önerilen fiyat: ${_formatCurrency(widget.vehicle.purchasePrice * 1.1)} TL (Alış fiyatı + %10)',
+          'sell.suggestedPriceHint'.trParams({'price': _formatCurrency(widget.vehicle.purchasePrice * 1.1)}),
           style: TextStyle(
             fontSize: 12,
             color: Colors.grey[600],
@@ -402,9 +402,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'İlan Açıklaması *',
-          style: TextStyle(
+        Text(
+          'sell.descriptionLabel'.tr(),
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -415,22 +415,13 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           maxLines: 5,
           maxLength: 500,
           decoration: InputDecoration(
-            hintText: 'Aracınız hakkında detaylı bilgi verin...',
+            hintText: 'sell.descriptionHint'.tr(),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
             filled: true,
             fillColor: Colors.grey[100],
           ),
-          // validator: (value) {
-          //   if (value == null || value.trim().isEmpty) {
-          //     return 'Açıklama girmelisiniz';
-          //   }
-          //   if (value.trim().length < 20) {
-          //     return 'Açıklama en az 20 karakter olmalı';
-          //   }
-          //   return null;RR
-          // },
         ),
       ],
     );
@@ -447,25 +438,25 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Araç Özellikleri',
-              style: TextStyle(
+            Text(
+              'sell.vehicleFeatures'.tr(),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
-            _buildDetailRow('Marka', widget.vehicle.brand),
-            _buildDetailRow('Model', widget.vehicle.model),
-            _buildDetailRow('Yıl', widget.vehicle.year.toString()),
-            _buildDetailRow('Kilometre', '${_formatNumber(widget.vehicle.mileage)} km'),
-            _buildDetailRow('Yakıt', widget.vehicle.fuelType),
-            _buildDetailRow('Vites', widget.vehicle.transmission),
-            _buildDetailRow('Motor', widget.vehicle.engineSize),
-            _buildDetailRow('Çekiş', widget.vehicle.driveType),
-            _buildDetailRow('Renk', widget.vehicle.color),
-            _buildDetailRow('Garanti', widget.vehicle.hasWarranty ? 'Var' : 'Yok'),
-            _buildDetailRow('Kaza Kaydı', widget.vehicle.hasAccidentRecord ? 'Var' : 'Yok'),
+            _buildDetailRow('sell.brand'.tr(), widget.vehicle.brand),
+            _buildDetailRow('sell.model'.tr(), widget.vehicle.model),
+            _buildDetailRow('sell.year'.tr(), widget.vehicle.year.toString()),
+            _buildDetailRow('sell.mileage'.tr(), '${_formatNumber(widget.vehicle.mileage)} km'),
+            _buildDetailRow('sell.fuel'.tr(), 'vehicleAttributes.${widget.vehicle.fuelType}'.tr()),
+            _buildDetailRow('sell.transmission'.tr(), 'vehicleAttributes.${widget.vehicle.transmission}'.tr()),
+            _buildDetailRow('sell.engine'.tr(), widget.vehicle.engineSize),
+            _buildDetailRow('sell.drive'.tr(), 'vehicleAttributes.${widget.vehicle.driveType}'.tr()),
+            _buildDetailRow('sell.color'.tr(), 'colors.${widget.vehicle.color}'.tr()),
+            _buildDetailRow('sell.warranty'.tr(), widget.vehicle.hasWarranty ? 'sell.var'.tr() : 'sell.yok'.tr()),
+            _buildDetailRow('sell.accidentRecord'.tr(), widget.vehicle.hasAccidentRecord ? 'sell.var'.tr() : 'sell.yok'.tr()),
           ],
         ),
       ),

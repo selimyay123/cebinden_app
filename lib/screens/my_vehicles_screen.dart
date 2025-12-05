@@ -312,7 +312,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                       Text(
                         vehicleCount == 1 
                           ? '1 ${'misc.vehicle'.tr()}' 
-                          : '$vehicleCount ${'misc.vehicles'.tr()}',
+                          : '$vehicleCount ${'misc.vehicle'.tr()}',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey[600],
@@ -699,7 +699,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('dd MMM yyyy', 'tr_TR').format(date);
+    final currentLang = LocalizationService().currentLanguage;
+    final locale = currentLang == 'tr' ? 'tr_TR' : 'en_US';
+    return DateFormat('dd MMM yyyy', locale).format(date);
   }
 
   void _showVehicleDetailsDialog(UserVehicle vehicle) {
@@ -806,19 +808,19 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                         _buildDetailRow(
                           Icons.color_lens,
                           'vehicles.color'.tr(),
-                          vehicle.color,
+                          'colors.${vehicle.color}'.tr(),
                           Colors.pink,
                         ),
                         _buildDetailRow(
                           Icons.local_gas_station,
                           'vehicles.fuelType'.tr(),
-                          vehicle.fuelType,
+                          'vehicleAttributes.${vehicle.fuelType}'.tr(),
                           Colors.orange,
                         ),
                         _buildDetailRow(
                           Icons.settings,
                           'vehicles.transmission'.tr(),
-                          vehicle.transmission,
+                          'vehicleAttributes.${vehicle.transmission}'.tr(),
                           Colors.teal,
                         ),
                         _buildDetailRow(
@@ -830,7 +832,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                         _buildDetailRow(
                           Icons.compare_arrows,
                           'vehicles.driveType'.tr(),
-                          vehicle.driveType,
+                          'vehicleAttributes.${vehicle.driveType}'.tr(),
                           Colors.indigo,
                         ),
                       ]),
@@ -855,7 +857,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                         ),
                         _buildDetailRow(
                           Icons.star,
-                          'İlan Skoru',
+                          'myVehicles.listingScore'.tr(),
                           '${vehicle.score}/100',
                           Colors.amber,
                         ),
@@ -882,7 +884,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                             ),
                           _buildDetailRow(
                             Icons.trending_up,
-                            'Potansiyel Kar/Zarar',
+                            'myVehicles.potentialProfitLoss'.tr(),
                             '${_formatCurrency((vehicle.listingPrice ?? 0) - vehicle.purchasePrice)} TL',
                             (vehicle.listingPrice ?? 0) >= vehicle.purchasePrice
                                 ? Colors.green

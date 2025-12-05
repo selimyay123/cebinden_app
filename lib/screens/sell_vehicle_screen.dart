@@ -87,7 +87,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Satılacak araç yok!',
+              'sell.noVehicles'.tr(),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -97,7 +97,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Garajınızdaki araçları satışa çıkarabilirsiniz.',
+              'sell.noVehiclesDesc'.tr(),
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey[600],
@@ -171,7 +171,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Satın Alma Fiyatı',
+                        'sell.purchasePrice'.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -193,7 +193,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Sahiplik Süresi',
+                      'sell.ownershipDuration'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -201,7 +201,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${vehicle.daysOwned} gün',
+                      '${vehicle.daysOwned} ${'sell.days'.tr()}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -213,12 +213,13 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                _buildInfoChip(Icons.local_gas_station, vehicle.fuelType),
-                _buildInfoChip(Icons.settings, vehicle.transmission),
-                _buildInfoChip(Icons.palette, vehicle.color),
+                _buildInfoChip(Icons.local_gas_station, 'vehicleAttributes.${vehicle.fuelType}'.tr()),
+                _buildInfoChip(Icons.settings, 'vehicleAttributes.${vehicle.transmission}'.tr()),
+                _buildInfoChip(Icons.palette, 'colors.${vehicle.color}'.tr()),
               ],
             ),
             const SizedBox(height: 16),

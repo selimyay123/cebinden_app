@@ -1,114 +1,138 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 
+/// Basitleştirilmiş Yetenek Modeli
 class Skill {
   final String id;
-  final String name;
-  final String description;
+  final String nameKey; // Localization key
+  final String descKey; // Localization key
   final int cost;
-  final IconData icon;
-  final String? parentId; // Bu yeteneği açmak için gereken üst yetenek
-  final String branch; // 'trader', 'expert', 'tycoon'
-
+  final String emoji; // Emoji icon
+  final Color primaryColor;
+  final Color secondaryColor;
+  final int maxLevel; // Maksimum seviye (1 = tek seviye)
+  
   const Skill({
     required this.id,
-    required this.name,
-    required this.description,
+    required this.nameKey,
+    required this.descKey,
     required this.cost,
-    required this.icon,
-    required this.branch,
-    this.parentId,
+    required this.emoji,
+    required this.primaryColor,
+    required this.secondaryColor,
+    this.maxLevel = 1,
   });
 }
 
 class SkillService {
   // ============================================================================
-  // YETENEK LİSTESİ (THE SKILL TREE)
+  // YENİ YETENEK LİSTESİ (6 Yetenek)
   // ============================================================================
   
   static const List<Skill> skills = [
-    // --- TÜCCAR (TRADER) DALI ---
-    Skill(
-      id: 'bargainer_1',
-      name: 'Sıkı Pazarlıkçı I',
-      description: 'Araç satın alırken %2 indirim sağlar.',
-      cost: 1,
-      icon: Icons.price_check,
-      branch: 'trader',
-    ),
-    Skill(
-      id: 'bargainer_2',
-      name: 'Sıkı Pazarlıkçı II',
-      description: 'Araç satın alırken %5 indirim sağlar.',
-      cost: 2,
-      icon: Icons.price_check,
-      branch: 'trader',
-      parentId: 'bargainer_1',
-    ),
-    Skill(
-      id: 'quick_flip',
-      name: 'Hızlı Satış',
-      description: 'İlana koyduğun araçlar %20 daha hızlı satılır.',
-      cost: 2,
-      icon: Icons.flash_on,
-      branch: 'trader',
-      parentId: 'bargainer_1',
-    ),
-    Skill(
-      id: 'charisma',
-      name: 'Ballı Dil',
-      description: 'Araç satarken %5 daha yüksek fiyata satarsın.',
-      cost: 3,
-      icon: Icons.record_voice_over,
-      branch: 'trader',
-      parentId: 'bargainer_2',
-    ),
-
-    // --- UZMAN (EXPERT) DALI ---
-    // NOT: Ekspertiz sistemi henüz olmadığı için bu dalı şimdilik boşaltıyoruz veya
-    // mevcut özelliklere (XP, İlan) odaklıyoruz.
+    // ============================================================================
+    // TAMAMEN ENTEGRE VE ÇALIŞAN YETENEKLER
+    // ============================================================================
     
+    // 1. İtibar - Gelen teklifler %10 daha yüksek
     Skill(
-      id: 'market_guru',
-      name: 'Piyasa Kurdu',
-      description: 'Araç satarken ilanların %50 daha fazla görüntülenir (Daha çok teklif gelir).',
+      id: 'reputation',
+      nameKey: 'skills.reputation',
+      descKey: 'skills.reputationDesc',
       cost: 1,
-      icon: Icons.trending_up,
-      branch: 'expert',
+      emoji: '🏆',
+      primaryColor: Color(0xFF9C27B0),
+      secondaryColor: Color(0xFFAB47BC),
     ),
+    
+    // 2. Garaj Genişletme - +2 araç kapasitesi
     Skill(
-      id: 'xp_booster',
-      name: 'Hızlı Öğrenen',
-      description: 'Her işlemden %10 daha fazla XP kazanırsın.',
-      cost: 2,
-      icon: Icons.school,
-      branch: 'expert',
-      parentId: 'market_guru',
+      id: 'garage_expansion',
+      nameKey: 'skills.garageExpansion',
+      descKey: 'skills.garageExpansionDesc',
+      cost: 3,
+      emoji: '🚗',
+      primaryColor: Color(0xFFE91E63),
+      secondaryColor: Color(0xFFF06292),
     ),
-
-    // --- PATRON (TYCOON) DALI ---
+    
+    // 3. Hızlı Öğrenen - Tüm işlemlerden %25 daha fazla XP
     Skill(
-      id: 'expansion_1',
-      name: 'Geniş Garaj I',
-      description: '+1 Araç Kapasitesi.',
+      id: 'fast_learner',
+      nameKey: 'skills.fastLearner',
+      descKey: 'skills.fastLearnerDesc',
       cost: 1,
-      icon: Icons.garage,
-      branch: 'tycoon',
+      emoji: '⚡',
+      primaryColor: Color(0xFF00BCD4),
+      secondaryColor: Color(0xFF26C6DA),
     ),
+    
+    // 4. Pazarlık Gücü - Müzakerede %15 daha fazla indirim
     Skill(
-      id: 'expansion_2',
-      name: 'Geniş Garaj II',
-      description: '+2 Araç Kapasitesi.',
+      id: 'negotiation_power',
+      nameKey: 'skills.negotiationPower',
+      descKey: 'skills.negotiationPowerDesc',
       cost: 2,
-      icon: Icons.garage,
-      branch: 'tycoon',
-      parentId: 'expansion_1',
+      emoji: '💪',
+      primaryColor: Color(0xFF4CAF50),
+      secondaryColor: Color(0xFF66BB6A),
     ),
-    // Pasif Gelir kaldırıldı (henüz yok)
+    
+    // ============================================================================
+    // HENÜZ ENTEGRE EDİLMEMİŞ YETENEKLER (YORUM SATIRINDA)
+    // ============================================================================
+    
+    /* ENTEGRASYON BEKLİYOR
+    
+    // Pazarlık Ustası - Teklif yaparken %10 daha düşük (KISMİ: sadece satın alma)
+    Skill(
+      id: 'negotiation',
+      nameKey: 'skills.negotiation',
+      descKey: 'skills.negotiationDesc',
+      cost: 2,
+      emoji: '💰',
+      primaryColor: Color(0xFF4CAF50),
+      secondaryColor: Color(0xFF66BB6A),
+    ),
+    
+    // Hızlı Satış - %20 daha hızlı teklif (ENTEGRE DEĞİL)
+    Skill(
+      id: 'quick_sale',
+      nameKey: 'skills.quickSale',
+      descKey: 'skills.quickSaleDesc',
+      cost: 2,
+      emoji: '⚡',
+      primaryColor: Color(0xFFFF9800),
+      secondaryColor: Color(0xFFFFB74D),
+    ),
+    
+    // Piyasa Analisti - Araç değeri gösterilir (ENTEGRE DEĞİL)
+    Skill(
+      id: 'market_analyst',
+      nameKey: 'skills.marketAnalyst',
+      descKey: 'skills.marketAnalystDesc',
+      cost: 2,
+      emoji: '🔍',
+      primaryColor: Color(0xFF2196F3),
+      secondaryColor: Color(0xFF42A5F5),
+    ),
+    
+    // Altın Madenci - Görevlerden %50 daha fazla altın (ENTEGRE DEĞİL)
+    Skill(
+      id: 'gold_miner',
+      nameKey: 'skills.goldMiner',
+      descKey: 'skills.goldMinerDesc',
+      cost: 2,
+      emoji: '💎',
+      primaryColor: Color(0xFFFFD700),
+      secondaryColor: Color(0xFFFFE55C),
+    ),
+    
+    */
   ];
 
   // ============================================================================
-  // MANTIK VE HESAPLAMALAR
+  // YARDIMCI METODLAR
   // ============================================================================
 
   /// Bir yeteneği ID'sine göre getir
@@ -131,64 +155,100 @@ class SkillService {
     // Puanı yetiyor mu?
     if (user.skillPoints < skill.cost) return false;
 
-    // Ön koşul (parent) var mı ve açık mı?
-    if (skill.parentId != null) {
-      if (!user.unlockedSkills.contains(skill.parentId)) return false;
-    }
-
     return true;
   }
 
-  /// Araç ALIM fiyatı çarpanını hesapla (Daha düşük = Daha iyi)
-  /// Örn: 0.95 dönerse %5 indirim var demektir.
-  static double getBuyingMultiplier(User user) {
-    double multiplier = 1.0;
-
-    if (user.unlockedSkills.contains('bargainer_1')) {
-      multiplier -= 0.02; // %2 indirim
-    }
-    if (user.unlockedSkills.contains('bargainer_2')) {
-      multiplier -= 0.05; // %5 indirim (Toplam %7 olabilir veya kümülatif)
-    }
-    // Basit toplama mantığı: %2 + %5 = %7 indirim -> 0.93
-    
-    return multiplier.clamp(0.1, 1.0); // En az %10 fiyatına alınabilir, bedava olamaz
+  /// Kullanıcının bir yeteneği olup olmadığını kontrol et
+  static bool hasSkill(User user, String skillId) {
+    return user.unlockedSkills.contains(skillId);
   }
 
-  /// Araç SATIŞ fiyatı çarpanını hesapla (Daha yüksek = Daha iyi)
-  /// Örn: 1.05 dönerse %5 daha pahalıya satılır.
-  static double getSellingMultiplier(User user) {
-    double multiplier = 1.0;
+  // ============================================================================
+  // YETENEK ETKİLERİ
+  // ============================================================================
 
-    if (user.unlockedSkills.contains('charisma')) {
-      multiplier += 0.05; // %5 daha pahalı
+  /// Pazarlık Ustası: Teklif yaparken indirim oranı
+  static double getNegotiationDiscount(User user) {
+    if (hasSkill(user, 'negotiation')) {
+      return 0.10; // %10 daha düşük teklif
     }
-
-    return multiplier;
+    return 0.0;
   }
-  
-  /// Garaj limiti bonusunu hesapla
+
+  /// Hızlı Satış: Teklif gelme hızı çarpanı
+  static double getOfferSpeedMultiplier(User user) {
+    if (hasSkill(user, 'quick_sale')) {
+      return 1.20; // %20 daha fazla teklif
+    }
+    return 1.0;
+  }
+
+  /// Piyasa Analisti: Araç değeri gösterilsin mi?
+  static bool canSeeMarketValue(User user) {
+    return hasSkill(user, 'market_analyst');
+  }
+
+  /// İtibar: Gelen tekliflere bonus
+  static double getReputationBonus(User user) {
+    if (hasSkill(user, 'reputation')) {
+      return 0.10; // %10 daha yüksek teklifler
+    }
+    return 0.0;
+  }
+
+  /// Garaj Genişletme: Ekstra kapasite
   static int getGarageLimitBonus(User user) {
-    int bonus = 0;
-    
-    if (user.unlockedSkills.contains('expansion_1')) {
-      bonus += 1;
+    if (hasSkill(user, 'garage_expansion')) {
+      return 2; // +2 araç
     }
-    if (user.unlockedSkills.contains('expansion_2')) {
-      bonus += 2;
-    }
-    
-    return bonus;
+    return 0;
   }
-  
-  /// Satış süresi çarpanı (Daha düşük = Daha hızlı)
-  static double getSalesSpeedMultiplier(User user) {
-    double multiplier = 1.0;
-    
-    if (user.unlockedSkills.contains('quick_flip')) {
-      multiplier *= 0.8; // %20 daha hızlı
+
+  /// Altın Madenci: Görev ödülü çarpanı
+  static double getGoldMinerMultiplier(User user) {
+    if (hasSkill(user, 'gold_miner')) {
+      return 1.50; // %50 daha fazla altın
     }
-    
-    return multiplier;
+    return 1.0;
+  }
+
+  /// Hızlı Öğrenen: XP kazanım çarpanı
+  static double getFastLearnerMultiplier(User user) {
+    if (hasSkill(user, 'fast_learner')) {
+      return 1.25; // %25 daha fazla XP
+    }
+    return 1.0;
+  }
+
+  /// Pazarlık Gücü: Müzakerede indirim bonusu
+  static double getNegotiationPowerBonus(User user) {
+    if (hasSkill(user, 'negotiation_power')) {
+      return 0.15; // %15 daha fazla indirim yapabilir
+    }
+    return 0.0;
+  }
+
+  // ============================================================================
+  // BACKWARD COMPATIBILITY (Eski sistem için)
+  // ============================================================================
+
+  /// Araç ALIM fiyatı çarpanını hesapla (Eski sistem uyumluluğu)
+  /// Şimdilik etkisiz, gelecekte "negotiation" skill'i ile entegre edilebilir
+  static double getBuyingMultiplier(User user) {
+    // Pazarlık Ustası varsa %10 indirim
+    if (hasSkill(user, 'negotiation')) {
+      return 0.90; // %10 indirim
+    }
+    return 1.0;
+  }
+
+  /// Araç SATIŞ fiyatı çarpanını hesapla (Eski sistem uyumluluğu)
+  /// İtibar skill'i ile entegre
+  static double getSellingMultiplier(User user) {
+    // İtibar varsa %10 daha yüksek
+    if (hasSkill(user, 'reputation')) {
+      return 1.10; // %10 daha yüksek
+    }
+    return 1.0;
   }
 }

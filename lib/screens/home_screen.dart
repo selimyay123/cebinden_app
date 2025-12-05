@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,10 +24,12 @@ import 'store_screen.dart';
 import 'daily_quests_screen.dart';
 import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
+import '../widgets/level_up_dialog.dart';
 import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
 import 'taxi_game_screen.dart';
 import 'skill_tree_screen.dart'; // Yetenek Ağacı Ekranı
+import '../services/rental_service.dart'; // Kiralama Servisi
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final DailyQuestService _questService = DailyQuestService();
   final DailyLoginService _loginService = DailyLoginService();
   final GameTimeService _gameTime = GameTimeService();
+  final RentalService _rentalService = RentalService();
   User? _currentUser;
   bool _isLoading = true;
   int _vehicleCount = 0;
@@ -57,6 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _sellVehicleButtonKey = GlobalKey();
   final GlobalKey _offersButtonKey = GlobalKey();
   final GlobalKey _balanceKey = GlobalKey();
+  
+  // Kiralama geliri animasyonu için
+  double _lastRentalIncome = 0.0;
+  bool _showRentalIncomeAnimation = false;
   
   // Tutorial aktif mi? (scroll'u engellemek için)
   bool _isTutorialActive = false;
@@ -80,8 +88,30 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Gün değiştiğinde çağrılır
-  void _onGameDayChanged(int oldDay, int newDay) {
+  void _onGameDayChanged(int oldDay, int newDay) async {
     if (!mounted) return;
+    
+    // Galeri sahibiyse kiralama geliri işle
+    if (_currentUser != null && _currentUser!.ownsGallery) {
+      final rentalIncome = await _rentalService.processDailyRental(_currentUser!.id);
+      
+      if (rentalIncome > 0 && mounted) {
+        // Kiralama geliri animasyonunu tetikle
+        setState(() {
+          _lastRentalIncome = rentalIncome;
+          _showRentalIncomeAnimation = true;
+        });
+        
+        // 3 saniye sonra animasyonu gizle
+        Future.delayed(const Duration(seconds: 3), () {
+          if (mounted) {
+            setState(() {
+              _showRentalIncomeAnimation = false;
+            });
+          }
+        });
+      }
+    }
     
     // Tekliflerin oluşması için biraz bekle ve yenile
     Future.delayed(const Duration(seconds: 2), () {
@@ -353,13 +383,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : RefreshIndicator(
-                  onRefresh: _loadCurrentUser,
-                  child: SingleChildScrollView(
-                    physics: _isTutorialActive 
-                        ? const NeverScrollableScrollPhysics() // Tutorial sırasında scroll kapalı
-                        : const AlwaysScrollableScrollPhysics(),
-                    child: Column(
+              : Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/home_bg.png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: RefreshIndicator(
+                    onRefresh: _loadCurrentUser,
+                    child: SingleChildScrollView(
+                      physics: _isTutorialActive 
+                          ? const NeverScrollableScrollPhysics() // Tutorial sırasında scroll kapalı
+                          : const AlwaysScrollableScrollPhysics(),
+                      child: Column(
                       children: [
                         // Profil ve Bakiye Kartı
                         _buildProfileCard(),
@@ -374,10 +411,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         
                         const SizedBox(height: 16),
                         
-                        // Galeri Satın Al
-                        // _buildBuyGalleryButton(),
+                        // Galeri Satın Al (sadece galeri sahibi değilse göster)
+                        if (_currentUser != null && !_currentUser!.ownsGallery)
+                          _buildBuyGalleryButton(),
                         
-                        // const SizedBox(height: 16),
+                        if (_currentUser != null && !_currentUser!.ownsGallery)
+                          const SizedBox(height: 16),
+                        
+                        // Galerim (sadece galeri sahibiyse göster)
+                        if (_currentUser != null && _currentUser!.ownsGallery)
+                          _buildMyGallerySection(),
+                        
+                        if (_currentUser != null && _currentUser!.ownsGallery)
+                          const SizedBox(height: 16),
                         
                         // İstatistikler
                         _buildStatistics(),
@@ -401,9 +447,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+                  ),
                 ),
         );
       },
+    );
+  }
+
+  // Glassmorphism Container Helper
+  Widget _buildGlassContainer({
+    required Widget child, 
+    EdgeInsetsGeometry? padding, 
+    EdgeInsetsGeometry? margin,
+    double borderRadius = 16,
+  }) {
+    return Container(
+      margin: margin,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(borderRadius),
+              border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: child,
+          ),
+        ),
+      ),
     );
   }
 
@@ -477,7 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 
                 const SizedBox(height: 12),
                 
-                // Toplam Para
+                // Toplam Para (Animasyonlu)
                 Text(
                   'home.balance'.tr(),
                   style: TextStyle(
@@ -487,14 +568,72 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  key: _balanceKey, // Tutorial için key
-                  '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      TweenAnimationBuilder<double>(
+                        key: _balanceKey, // Tutorial için key
+                        tween: Tween<double>(
+                          begin: _currentUser!.balance - (_showRentalIncomeAnimation ? _lastRentalIncome : 0),
+                          end: _currentUser!.balance,
+                        ),
+                        duration: const Duration(seconds: 2),
+                        curve: Curves.easeOut,
+                        builder: (context, value, child) {
+                          return Text(
+                            '${_formatCurrency(value)} ${'common.currency'.tr()}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          );
+                        },
+                      ),
+                      
+                      // Kiralama Geliri Göstergesi (Animasyonlu)
+                      if (_showRentalIncomeAnimation)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 500),
+                            builder: (context, value, child) {
+                              return Opacity(
+                                opacity: value,
+                                child: Transform.translate(
+                                  offset: Offset(0, 20 * (1 - value)), // Aşağıdan yukarı kayma
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withOpacity(0.9),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.car_rental, color: Colors.white, size: 14),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '+${_formatCurrency(_lastRentalIncome)}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 
@@ -694,20 +833,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildXPCard() {
     if (_currentUser == null) return const SizedBox.shrink();
     
-    return Container(
+    return _buildGlassContainer(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -849,19 +977,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           // XP Kartı (Tam genişlik)
-          Container(
+          _buildGlassContainer(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -999,19 +1116,8 @@ class _HomeScreenState extends State<HomeScreen> {
           InkWell(
             onTap: _watchRewardedAd,
             borderRadius: BorderRadius.circular(16),
-            child: Container(
+            child: _buildGlassContainer(
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -1283,19 +1389,8 @@ class _HomeScreenState extends State<HomeScreen> {
       key: key, // Key'i burada kullanıyoruz
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      child: Container(
+      child: _buildGlassContainer(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
         child: Column(
           children: [
             Stack(
@@ -1374,20 +1469,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // İstatistikler
   Widget _buildStatistics() {
-    return Container(
+    return _buildGlassContainer(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1835,6 +1919,450 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Galeri Satın Alma İşlemi
+  Future<void> _purchaseGallery() async {
+    const galleryPrice = 10000000.0; // 10 Milyon TL
+    
+    if (_currentUser == null) return;
+    
+    // Bakiye kontrolü
+    if (_currentUser!.balance < galleryPrice) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('home.galleryInsufficientFunds'.tr()),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+    
+    // Onay dialogu
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.store_mall_directory, color: Colors.green),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'home.buyGallery'.tr(),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'home.galleryPrice'.tr() + ': ${_formatCurrency(galleryPrice)} ₺\n\n' +
+          'common.continue'.tr() + '?',
+          style: const TextStyle(fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('common.continue'.tr()),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed != true) return;
+    
+    // Satın alma işlemi
+    final newBalance = _currentUser!.balance - galleryPrice;
+    final updatedUser = _currentUser!.copyWith(
+      balance: newBalance,
+      ownsGallery: true,
+      galleryPurchaseDate: DateTime.now(),
+    );
+    
+    await _db.updateUser(_currentUser!.id, updatedUser.toJson());
+    
+    // UI'ı güncelle
+    await _loadCurrentUser();
+    
+    if (!mounted) return;
+    
+    // Başarı mesajı
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.celebration, color: Colors.green, size: 32),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'home.galleryPurchaseSuccess'.tr(),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.store_mall_directory,
+              size: 80,
+              color: Colors.green,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'home.galleryDescription'.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 15),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 45),
+            ),
+            child: Text('common.ok'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Galerim Bölümü
+  Widget _buildMyGallerySection() {
+    if (_currentUser == null || !_currentUser!.ownsGallery) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.green.shade700, Colors.green.shade500],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Başlık
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.store_mall_directory,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'home.myGallery'.tr(),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'home.galleryStatus'.tr(),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.verified,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'common.active'.tr(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Satın alma tarihi
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: Colors.white.withValues(alpha: 0.9),
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'home.galleryPurchaseDate'.tr() + ': ',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 13,
+                  ),
+                ),
+                Text(
+                  _formatDate(_currentUser!.galleryPurchaseDate!),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Kiralama İstatistikleri
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                // Bugünkü kiralama geliri
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.today,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Son Kiralama Geliri:',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '${_formatCurrency(_currentUser!.lastDailyRentalIncome)} ₺',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Toplam kiralama geliri
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.account_balance_wallet,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Toplam Kiralama:',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '${_formatCurrency(_currentUser!.totalRentalIncome)} ₺',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Araç sayısı
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.directions_car,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Kiralanan Araç:',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '$_vehicleCount araç',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Avantajlar
+          Text(
+            'home.galleryBenefits'.tr(),
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          _buildGalleryBenefit(
+            icon: Icons.car_rental,
+            title: 'home.rentalService'.tr(),
+          ),
+          const SizedBox(height: 8),
+          
+          _buildGalleryBenefit(
+            icon: Icons.trending_down,
+            title: 'home.opportunityPurchases'.tr(),
+          ),
+          const SizedBox(height: 8),
+          
+          _buildGalleryBenefit(
+            icon: Icons.trending_up,
+            title: 'home.highProfitMargin'.tr(),
+          ),
+          const SizedBox(height: 8),
+          
+          _buildGalleryBenefit(
+            icon: Icons.workspace_premium,
+            title: 'home.prestigeReputation'.tr(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Galeri Avantaj Item
+  Widget _buildGalleryBenefit({
+    required IconData icon,
+    required String title,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: Colors.white.withValues(alpha: 0.9),
+          size: 18,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.95),
+              fontSize: 13,
+            ),
+          ),
+        ),
+        Icon(
+          Icons.check_circle,
+          color: Colors.white,
+          size: 16,
+        ),
+      ],
+    );
+  }
+
   // Galeri Bilgilendirme Dialog'u
   void _showGalleryInfoDialog() {
     showDialog(
@@ -1981,14 +2509,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // TODO: Galeri satın alma işlemi
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('home.galleryComingSoon'.tr()),
-                  backgroundColor: Colors.green,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              _purchaseGallery();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -2064,20 +2585,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Son Aktivite / Bilgilendirme
   Widget _buildRecentActivity() {
-    return Container(
+    return _buildGlassContainer(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -3161,103 +3671,17 @@ class _HomeScreenState extends State<HomeScreen> {
   
   /// Seviye atlama dialogu göster
   void _showLevelUpDialog(XPGainResult result) {
-    if (!mounted) return;
+    if (!mounted || result.rewards == null) return;
     
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Kutlama ikonu
-            const Icon(
-              Icons.celebration,
-              size: 80,
-              color: Colors.amber,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '🎉 ${'xp.levelUp'.tr()} 🎉',
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.amber,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Seviye ${result.newLevel}',
-              style: const TextStyle(
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (result.rewards != null) ...[
-              const Divider(),
-              Text(
-                '${'xp.rewards'.tr()}:',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              if (result.rewards!.cashBonus > 0)
-                Text(
-                  '💰 ${_formatCurrency(result.rewards!.cashBonus)} ${'common.currency'.tr()}',
-                  style: const TextStyle(fontSize: 18, color: Colors.green),
-                ),
-              if (result.rewards!.goldBonus > 0)
-                Text(
-                  '⭐ ${result.rewards!.goldBonus.toStringAsFixed(2)} ${'store.gold'.tr()}',
-                  style: const TextStyle(fontSize: 18, color: Colors.amber),
-                ),
-              if (result.rewards!.unlocks.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                ...result.rewards!.unlocks.map((unlock) => 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
-                      '🔓 ${unlock.tr()}',
-                      style: const TextStyle(fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ],
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'xp.awesome'.tr(),
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-        actionsAlignment: MainAxisAlignment.center,
+      builder: (context) => LevelUpDialog(
+        reward: result.rewards!,
       ),
     );
   }
+
   
   /// XP Kazandır (diğer entegrasyon noktaları için helper)
   Future<void> _awardXP(XPGainResult result) async {

@@ -29,7 +29,8 @@
     "currency": "TL",
     "continue": "Continue",
     "active": "Active",
-    "dear": "Dear"
+    "dear": "Dear",
+    "attention": "Attention!"
   },
   "errors": {
     "balanceUpdateFailed": "Balance could not be updated",
@@ -108,6 +109,12 @@
     "advantage4Desc": "Gain more customers and trust with gallery status.",
     "galleryPrice": "Gallery Price",
     "galleryComingSoon": "Gallery purchase feature will be available soon!",
+    "galleryPurchaseSuccess": "🎉 Congratulations! You are now a gallery owner!",
+    "galleryInsufficientFunds": "Insufficient balance to purchase gallery. Required: 10,000,000 ₺",
+    "myGallery": "My Gallery",
+    "galleryStatus": "Gallery Status",
+    "galleryPurchaseDate": "Purchase Date",
+    "galleryBenefits": "Active Benefits",
     "tasksComingSoon": "Tasks page coming soon...",
     "rentComingSoon": "Vehicle rental page coming soon...",
     "listingCount": "Listing",
@@ -232,7 +239,7 @@
     "yes": "Yes",
     "no": "No",
     "accidentRecord": "Accident Record",
-    "sellerNote": "Seller's Note",
+    "sellerNote": "Seller Note",
     "funDisclaimer": "This listing description is for entertainment purposes. Check the Listing Information tab for real vehicle details! 😄",
     "listingNo": "Listing No",
     "listingDate": "Listing Date",
@@ -274,43 +281,53 @@
     "purchasingVehicle": "🚗 Purchasing Vehicle"
   },
   "sell": {
-    "title": "List For Sale",
-    "selectVehicle": "Select a vehicle to sell",
-    "noVehiclesToSell": "No Vehicles To Sell",
-    "noVehiclesToSellDesc": "You don't have any vehicles to sell. Buy a vehicle first!",
-    "enterPrice": "Enter sale price",
-    "enterDescription": "Enter description (optional)",
-    "priceRequired": "Please enter a price",
-    "priceInvalid": "Enter a valid price",
-    "descriptionPlaceholder": "Provide detailed information about the vehicle...",
-    "listingSuccess": "✅ Your vehicle has been successfully listed for sale!",
-    "listingSuccessMessage": "Your vehicle has been listed for sale. You can track offers in the My Offers section.",
-    "listingError": "❌ An error occurred while creating the listing.",
-    "listingErrorWithMessage": "Error creating listing",
-    "removeListingConfirm": "Are you sure you want to remove this listing?",
-    "removeListing": "Remove",
-    "listingRemoved": "✅ Listing successfully removed!",
-    "listForSaleButton": "List For Sale",
-    "editListingComingSoon": "Listing edit feature coming soon...",
-    "editButton": "Edit",
-    "editListing": "Edit Listing",
-    "listingUpdated": "✅ Listing successfully updated!",
-    "listingUpdateFailed": "❌ An error occurred while updating the listing",
-    "priceTooHigh": "⚠️ Price Too High! Buyers might not be interested.",
-    "priceHigh": "A Bit Expensive. Sales might be slow.",
-    "priceReasonable": "✅ Reasonable Price. Normal demand.",
-    "priceCheap": "🔥 Bargain! Your phone won't stop ringing.",
-    "skillBonus": "Skill Bonus: Suggested price increased by %{percent}!",
+    "title": "Sell Vehicle",
+    "listForSaleButton": "List for Sale",
+    "noVehicles": "No vehicles to sell!",
+    "noVehiclesDesc": "You can list vehicles from your garage for sale.",
+    "purchasePrice": "Purchase Price",
+    "ownershipDuration": "Ownership Duration",
+    "days": "days",
+    "listingSuccess": "Listing created successfully!",
+    "listingError": "Failed to create listing",
+    "listingErrorWithMessage": "Error",
     "creatingListing": "Creating Listing...",
     "salePriceLabel": "Sale Price *",
     "priceHint": "Ex: 350000",
     "maxPriceHint": "Maximum: {price} TL (15% Profit Limit)",
     "priceLimitExceeded": "Price cannot exceed 15% of purchase price!",
+    "priceRequired": "Price is required",
+    "priceInvalid": "Enter a valid price",
     "suggestedPriceHint": "Suggested price: {price} TL (Purchase price + 10%)",
+    "priceTooHigh": "⚠️ Price Too High! Buyers may not appear.",
+    "priceHigh": "A Bit Expensive. Sales might be slow.",
+    "priceFair": "✅ Fair Price. Normal demand.",
+    "priceCheap": "🔥 Bargain! Your phone won't stop ringing.",
+    "skillBonus": "Skill Bonus: Suggested price increased by {percent}%!",
     "descriptionLabel": "Listing Description *",
     "descriptionHint": "Provide detailed information about your vehicle...",
-    "noVehicles": "No vehicles to sell!",
-    "noVehiclesDesc": "You can list vehicles from your garage for sale."
+    "vehicleFeatures": "Vehicle Features",
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "mileage": "Mileage",
+    "fuel": "Fuel",
+    "transmission": "Gear",
+    "engine": "Engine",
+    "drive": "Traction",
+    "color": "Color",
+    "warranty": "Warranty",
+    "accidentRecord": "Accident Record",
+    "var": "Yes",
+    "yok": "No",
+    "removeListingConfirm": "Are you sure you want to remove the listing?",
+    "removeListing": "Remove",
+    "listingRemoved": "✅ Listing removed successfully!",
+    "editListingComingSoon": "Edit listing feature coming soon...",
+    "editButton": "Edit",
+    "editListing": "Edit Listing",
+    "listingUpdated": "✅ Listing updated successfully!",
+    "listingUpdateFailed": "❌ Error updating listing"
   },
   "offers": {
     "title": "My Offers",
@@ -357,6 +374,11 @@
     "counterOfferSuccess": "✅ Counter offer sent!",
     "counterOfferError": "❌ An error occurred while sending counter offer",
     "buyerResponse": "Buyer's Response",
+    "rejectAllConfirm": "Are you sure you want to reject {count} pending offers for this vehicle?",
+    "rejectAllWarning": "Rejected offers will be permanently deleted.",
+    "rejectAllButton": "Reject All",
+    "rejectAllSuccess": "{count} offers successfully rejected and deleted.",
+    "rejectAllPartialSuccess": "{count}/{total} offers rejected.",
     "timeAgo": {
       "now": "Now",
       "minutesAgo": "minutes ago",
@@ -399,6 +421,134 @@
     "purchaseCompleted": "Purchase completed! Vehicle added to your garage.",
     "negotiationContinues": "Negotiation continues. You can track it in My Offers page.",
     "offerAcceptedAndPurchased": "Offer accepted and vehicle purchased!"
+  },
+  "aiBuyer": {
+    "messages": {
+      "bargainer": {
+        "1": "My budget is a bit tight, can we agree on this price?",
+        "2": "My financial situation is not great right now but I really liked the car.",
+        "3": "This is my final offer, unfortunately I cannot pay more.",
+        "4": "This is all I have, please accept.",
+        "5": "This price makes the most sense for me, I would appreciate if you consider it."
+      },
+      "realistic": {
+        "1": "I am offering a price in line with market value.",
+        "2": "I determined a fair price as a result of my research.",
+        "3": "I think it is a suitable price for both you and me.",
+        "4": "I checked the prices of similar vehicles, this price is reasonable.",
+        "5": "I am here with a realistic offer."
+      },
+      "urgent": {
+        "1": "I need it urgently, we can agree immediately.",
+        "2": "I need to close the deal today.",
+        "3": "I am in a hurry, I am giving the price you want.",
+        "4": "I came to this city for work, I need a car immediately.",
+        "5": "I have an emergency, please accept."
+      },
+      "generous": {
+        "1": "Exactly the car I was looking for, I am giving the price you want.",
+        "2": "I have been looking for this model for a long time, price is not an issue.",
+        "3": "I liked it very much, I am ready to pay the fee you want.",
+        "4": "This car is just for me, your money is ready.",
+        "5": "I definitely want to buy it, I am not flexible about the price."
+      }
+    }
+  },
+  "offerService": {
+    "responses": {
+      "acceptance": {
+        "1": "Great! Deal. I agree to this price.",
+        "2": "Okay, I accept. Let's make a deal.",
+        "3": "Alright, this price is fine.",
+        "4": "Good deal. I accept.",
+        "5": "Okay, I agree to this price.",
+        "6": "Deal! Accepted."
+      },
+      "rejection": {
+        "1": "Unfortunately I cannot agree to this price. Thanks.",
+        "2": "I thought about it but this price is not suitable for me.",
+        "3": "Sorry, I say no to this offer.",
+        "4": "I guess we can't agree on this price. Thanks.",
+        "5": "Unfortunately I cannot accept. Can you consider another price?",
+        "6": "This price is lower than I expected. Thanks but no."
+      },
+      "counter": {
+        "1": "Hmm, I thought a bit. How about {amount} TL?",
+        "2": "Hard at this price. If it is {amount} TL we can agree.",
+        "3": "How about {amount} TL? Let's find a middle ground.",
+        "4": "Okay, {amount} TL is my final offer.",
+        "5": "Let's take a step. What if it is {amount} TL?"
+      }
+    }
+  },
+  "taxiGame": {
+    "gameOver": "Journey Over",
+    "totalEarnings": "Total Earnings:",
+    "vehicleCount": "Vehicle: {count}",
+    "stackCount": "Stack: {count}",
+    "rewardDoubled": "Congratulations! Your earnings doubled!",
+    "adNotReady": "Ad not ready.",
+    "doubleEarnings": "2x Earnings (Watch Ad)",
+    "exit": "Exit",
+    "playAgain": "Play Again",
+    "title": "TAXI MISSION",
+    "collectMoney": "Collect money stacks!",
+    "swipeToMove": "Swipe to move",
+    "start": "START"
+  },
+  "negotiation": {
+    "accept": {
+      "1": "Your offer is suitable, I accept!",
+      "2": "Agreed! I accept the offer.",
+      "3": "Suitable price, accepted.",
+      "4": "Okay, let's agree on this price.",
+      "5": "I accept your offer. Thank you!"
+    },
+    "insult": {
+      "1": "Are you kidding? This car cannot be this price!",
+      "2": "Sorry but this price is unacceptable. You must not be serious.",
+      "3": "This offer is way below my expectations. No.",
+      "4": "Did you not research the market at all? This price is funny.",
+      "5": "Sorry but we cannot agree with this offer. Too low.",
+      "6": "Impossible to sell at this price. Please be realistic.",
+      "7": "An offer way below vehicle value. Unfortunately I cannot accept."
+    },
+    "reject": {
+      "1": "Unfortunately this price is too low. Waiting for other offers.",
+      "2": "I cannot accept this offer. Expecting a more realistic price.",
+      "3": "Vehicle is not suitable for this price. Thanks.",
+      "4": "Price is way below my expectations. Rejecting.",
+      "5": "This offer is not suitable for me."
+    },
+    "counter": {
+      "1": "I cannot sell at this price but we can agree on {amount} TL.",
+      "2": "A bit low. If it is {amount} TL it's okay.",
+      "3": "My counter offer: {amount} TL. Do you accept?",
+      "4": "Let's meet in the middle: {amount} TL.",
+      "5": "Special for you {amount} TL is my final price."
+    },
+    "finalBargain": {
+      "1": "Your offer is good but if it is {amount} TL let's agree immediately.",
+      "2": "How about increasing a bit more? {amount} TL would be ideal.",
+      "3": "Almost agreed! I say okay to {amount} TL.",
+      "4": "{amount} TL is my final offer, let's close this immediately.",
+      "5": "I really want to sell but {amount} TL would be fairer."
+    },
+    "patienceExhaustedAccept": {
+      "1": "Okay, we talked enough. Let's agree on this price.",
+      "2": "Alright, I accept this final offer. Let's agree.",
+      "3": "This took too long. Okay to this price, let's agree.",
+      "4": "I don't want to bargain anymore. I accept.",
+      "5": "Fine, I am okay with this price. Let's finish this."
+    },
+    "patienceExhaustedReject": {
+      "1": "We talked enough, we cannot agree on this price. Sorry.",
+      "2": "We stretched it too much, this price is not suitable for me. Thanks.",
+      "3": "I don't want to bargain anymore. Not possible at this price.",
+      "4": "I am giving up. Cannot sell at this price.",
+      "5": "This was my final offer. We cannot agree at this price, I will wait for other buyers.",
+      "6": "My patience ran out frankly. Cannot agree to this price. Good day."
+    }
   },
   "xp": {
     "level": "Level {level}",
@@ -464,7 +614,7 @@
     "darkModeDesc": "Activate night mode",
     "darkModeComingSoon": "Dark mode feature will be available soon",
     "language": "Language",
-    "languageFull": "Language / Dil",
+    "languageFull": "Language",
     "currency": "₺",
     "currencyUpdated": "Currency updated",
     "notifications": "Notifications",
@@ -528,7 +678,17 @@
     "title": "Change Password",
     "passwordChanged": "Password changed successfully",
     "passwordChangedDesc": "You can now login with your new password",
-    "changePasswordButton": "Change Password"
+    "changePasswordButton": "Change Password",
+    "oldPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "enterOldPassword": "Enter your current password",
+    "enterNewPassword": "Enter your new password",
+    "enterNewPasswordAgain": "Enter your new password again",
+    "oldPasswordRequired": "Please enter your current password",
+    "newPasswordRequired": "Please enter your new password",
+    "passwordsNotMatch": "New passwords do not match",
+    "incorrectOldPassword": "Current password is incorrect"
   },
   "about": {
     "title": "About",
@@ -545,7 +705,14 @@
     "aboutApp": "About Application",
     "features": "Features",
     "contactTitle": "Contact",
-    "developerTitle": "Developer"
+    "developerTitle": "Developer",
+    "contactContent": "For feedback, suggestions or questions:\n\n📧 Email: info@cebinden.com\n🌐 Web: www.cebinden.com\n📱 Instagram: @cebindenapp",
+    "developerContent": "This application is developed with Flutter.\n\n© 2024 Cebinden\nAll rights reserved.",
+    "disclaimer": "This is a game/simulation app. No real vehicle trading involves. All transactions are virtual and for entertainment purposes.",
+    "web": "Web",
+    "email": "Email",
+    "instagram": "Instagram",
+    "featuresList": "✓ Various vehicle brands and models\n✓ Detailed filtering system\n✓ Funny and entertaining listing descriptions\n✓ Profit/loss tracking\n✓ Customizable settings\n✓ Dark mode support (soon)\n✓ Multi-currency support"
   },
   "drawer": {
     "dashboard": "Dashboard",
@@ -587,7 +754,21 @@
     "purchasePrice": "Purchase Price",
     "daysOwned": "Days Owned",
     "listForSaleButton": "List For Sale",
-    "alreadyListed": "This vehicle is already listed for sale!"
+    "alreadyListed": "This vehicle is already listed for sale!",
+    "statusPending": "Pending",
+    "statusAccepted": "Accepted",
+    "statusRejected": "Rejected",
+    "myVehicles": "My Vehicles",
+    "noActiveOffers": "No Active Offers",
+    "noPendingOffersForBrand": "No pending offers for vehicles of this brand",
+    "offers": "Offers",
+    "rejectAll": "Reject All Offers",
+    "noIncomingOffers": "No Incoming Offers",
+    "noSentOffers": "No Sent Offers",
+    "noIncomingOffersDesc": "No offers received for your listings yet.",
+    "noSentOffersDesc": "You haven't sent any offers yet.",
+    "potentialProfitLoss": "Potential Profit/Loss",
+    "listingScore": "Listing Score"
   },
   "quests": {
     "title": "Daily Quests",
@@ -610,7 +791,9 @@
     "description": "Listing Description",
     "listed": "Listed",
     "removeConfirm": "are you sure you want to remove the listing?",
-    "willStayInGarage": "The vehicle will remain in your garage."
+    "willStayInGarage": "The vehicle will remain in your garage.",
+    "maxPriceHint": "Max: {price} TL (15% Profit)",
+    "profitLossStatus": "{status}: {amount} TL (%{percent})"
   },
   "misc": {
     "daysAgo": "days ago",
@@ -619,6 +802,8 @@
     "justNow": "Just now",
     "day": "day",
     "days": "days",
+    "listing": "listing",
+    "listings": "listings",
     "hour": "hour",
     "minute": "minute",
     "minutes": "minutes",
@@ -640,12 +825,26 @@
     "checkOffers": "You can check them in My Offers section",
     "generatingOffers": "Generating offers...",
     "errorGeneratingOffers": "An error occurred while generating offers",
+    "profit": "Profit",
+    "loss": "Loss",
+    "profitLossRatio": "Profit/Loss Ratio:",
+    "purchasePrice": "Purchase Price:",
+    "acceptedStatus": "ACCEPTED ✓",
+    "rejectedStatus": "REJECTED ✗",
+    "acceptOfferTitle": "Accept Offer",
+    "ifYouAccept": "If you accept this offer:",
+    "balanceAdded": "• {amount} TL will be added to your balance",
+    "acceptButton": "Accept",
+    "noPendingToReject": "No pending offers to reject.",
+    "listingPriceLabel": "Listing: {price}",
     "km": "km",
     "buyVehicleButton": "Buy Vehicle",
     "vehicleDetails": "Details",
     "sellVehicle": "Sell",
     "vehicleDetailComingSoon": "Vehicle detail page coming soon...",
-    "sellFeatureComingSoon": "Sell vehicle feature coming soon..."
+    "sellFeatureComingSoon": "Sell vehicle feature coming soon...",
+    "vehicleLimit": "Vehicle Limit",
+    "vehicle": "vehicle"
   },
   "expertise": {
     "reportTitle": "Expertise Report",
@@ -672,6 +871,41 @@
     "issuesFoundMessage": "Hidden issues found in expertise! Price updated.",
     "cleanMessage": "Vehicle is clean! Seller declaration verified."
   },
+  "vehicleParts": {
+    "original": "Original",
+    "localPainted": "Local Painted",
+    "painted": "Painted",
+    "replaced": "Replaced"
+  },
+  "colors": {
+    "Beyaz": "White",
+    "Siyah": "Black",
+    "Gri": "Gray",
+    "Kırmızı": "Red",
+    "Mavi": "Blue",
+    "Gümüş": "Silver",
+    "Kahverengi": "Brown",
+    "Yeşil": "Green"
+  },
+  "vehicleAttributes": {
+    "Benzin": "Gasoline",
+    "Benzin+LPG": "Gasoline+LPG",
+    "Dizel": "Diesel",
+    "Hybrid": "Hybrid",
+    "LPG": "LPG",
+    "Elektrik": "Electric",
+    "Manuel": "Manual",
+    "Otomatik": "Automatic",
+    "Önden": "FWD",
+    "Arkadan": "RWD",
+    "4x4": "4x4",
+    "Sedan": "Sedan",
+    "Hatchback": "Hatchback",
+    "SUV": "SUV",
+    "Coupe": "Coupe",
+    "Station Wagon": "Station Wagon",
+    "MPV": "MPV"
+  },
   "brands": {
     "hints": {
       "Audira": "German luxury performance",
@@ -685,6 +919,327 @@
       "Renauva": "French innovation",
       "Toyoto": "Japanese perfection",
       "Voltswagen": "The people's car"
+    }
+  },
+  "listingDescriptions": {
+    "base": {
+      "0": "Single owner, well-maintained and clean usage.",
+      "1": "Damage-free, well-maintained and trouble-free vehicle.",
+      "2": "Garage car. Always used regularly.",
+      "3": "Vehicle for sale from family. It is a trouble-free vehicle.",
+      "4": "All maintenance has been done since zero km.",
+      "5": "Second hand but like new. Tramer record is clean.",
+      "6": "Economic and reliable vehicle.",
+      "7": "Unchanged, unpainted and damage-free vehicle."
+    },
+    "extra": {
+      "diesel": "Diesel engine, efficient and powerful.",
+      "lpg": "Factory LPG, fuel saving guaranteed.",
+      "hybrid": "Hybrid technology, eco-friendly.",
+      "automatic": "Automatic transmission, comfortable drive.",
+      "manual": "Manual transmission, you are in control.",
+      "cvt": "CVT transmission, smooth transition.",
+      "dsg": "Dual clutch transmission, fast gear shift.",
+      "4x4": "4x4 drive system, suitable for all road conditions.",
+      "rwd": "Rear wheel drive, sporty driving pleasure.",
+      "fwd": "Front wheel drive, safe handling."
+    }
+  },
+  "modelDescriptions": {
+    "Renauva": {
+      "Slim": [
+        "Modern and dynamic Hatchback.",
+        "Ideal for city use.",
+        "Young and sporty design."
+      ],
+      "Magna": [
+        "Comfortable and spacious interior.",
+        "Excellent handling.",
+        "Very suitable as a family car."
+      ],
+      "Flow": [
+        "Large luggage capacity and comfort.",
+        "Ideal for long trips."
+      ],
+      "Signa": [
+        "Economic and practical vehicle.",
+        "Very low fuel consumption."
+      ],
+      "Tallion": [
+        "New generation, modern technology.",
+        "Safe and economic for your family."
+      ],
+      "cvt": "X-Tronic CVT automatic transmission, driving pleasure.",
+      "auto": "Easy-R automatic transmission, comfortable in city.",
+      "edc": "EDC dual clutch, fast and safe gear shift.",
+      "diesel": "1.5 dCi engine very efficient and economic.",
+      "lpg": "Factory LPG, fuel saving guaranteed.",
+      "hybrid": "Hybrid technology, eco-friendly."
+    },
+    "Voltswagen": {
+      "Paso": [
+        "Premium segment, luxury and comfort.",
+        "Spacious interior and high technology.",
+        "Perfect choice for long trips."
+      ],
+      "Tenis": [
+        "Compact but spacious interior.",
+        "Volkswagen quality and reliability.",
+        "High demand and fast sale."
+      ],
+      "Colo": [
+        "Premium small car segment.",
+        "Practical in city use.",
+        "Volkswagen prestige at affordable price."
+      ],
+      "Jago": [
+        "Sedan with large luggage.",
+        "Suitable as family car."
+      ],
+      "tdi": "TDI engine, efficient and powerful.",
+      "dsg": "DSG dual clutch automatic transmission."
+    },
+    "Fialto": {
+      "Agna": [
+        "Wide body options, practical vehicle.",
+        "Ideal for commercial and family use.",
+        "High volume, fast sale."
+      ],
+      "Lagua": [
+        "Simple and robust structure.",
+        "Economic sedan.",
+        "Reliable at high mileage."
+      ],
+      "Zorno": [
+        "Compact and economic.",
+        "Ideal for city.",
+        "Low operating cost."
+      ],
+      "multijet": "Multijet diesel engine, efficient and economic.",
+      "hybrid": "Hybrid technology, fuel saving.",
+      "dualogic": "Dualogic semi-automatic transmission.",
+      "auto": "Automatic transmission, comfortable drive."
+    },
+    "Opexel": {
+      "Tasra": [
+        "Reliable German quality.",
+        "Wide body option, comfortable.",
+        "Both sedan and hatchback available."
+      ],
+      "Lorisa": [
+        "Compact and economic.",
+        "Practical in city use.",
+        "Reliable automatic transmission."
+      ],
+      "Mornitia": [
+        "Premium segment, luxury equipment.",
+        "Long trip comfort top level.",
+        "Prestigious and reliable."
+      ],
+      "cdti": "CDTI diesel engine, efficient and powerful.",
+      "easytronic": "Easytronic semi-automatic transmission.",
+      "auto": "Torque converter automatic, reliable."
+    },
+    "Bavora": {
+      "C_Serisi": [
+        "Premium segment, high prestige.",
+        "Rear wheel drive (RWD) driving pleasure.",
+        "M Sport package very valuable."
+      ],
+      "E_Serisi": [
+        "Luxury segment, most prestigious model.",
+        "Spacious interior and comfort.",
+        "Rich electronic equipment."
+      ],
+      "A_Serisi": [
+        "Compact premium, ideal for city.",
+        "Young and dynamic character.",
+        "M Sport visual package popular."
+      ],
+      "D_Serisi": [
+        "Sporty coupe, stylish design.",
+        "M Sport like standard.",
+        "Gran Coupe most popular body."
+      ],
+      "diesel": "d engine, efficient and powerful diesel.",
+      "hybrid": "e engine, hybrid technology, high efficiency.",
+      "dct": "7 speed DCT, dual clutch transmission.",
+      "zf": "8 speed Steptronic (ZF), most reliable automatic.",
+      "rwd": "Rear wheel drive (RWD), sporty character."
+    },
+    "Fortran": {
+      "Odak": [
+        "Driving pleasure top level.",
+        "Leader of C segment, comfortable.",
+        "Hatchback/Sedan/SW body options."
+      ],
+      "Vista": [
+        "Compact and agile, city car.",
+        "Economic fuel consumption.",
+        "Young and dynamic design."
+      ],
+      "Avger": [
+        "Powerful pick-up, off-road and load carrying.",
+        "Double cab comfort.",
+        "Wildtrak equipment luxury level."
+      ],
+      "Tupa": [
+        "SUV comfort, spacious interior.",
+        "Ideal vehicle for families.",
+        "Modern technology and security."
+      ],
+      "ecoblue": "EcoBlue diesel engine, efficient and powerful.",
+      "tdci": "TDCi diesel engine, economic consumption.",
+      "biturbo": "Bi-Turbo diesel engine, high torque.",
+      "hybrid": "Hybrid technology, eco-friendly and efficient.",
+      "ecoboost": "EcoBoost turbo petrol, performance and efficiency.",
+      "auto10": "10 speed automatic, most modern transmission.",
+      "auto8": "8 speed torque converter automatic, reliable.",
+      "powershift": "Powershift automatic transmission.",
+      "4x4": "4x4 four wheel drive, off-road performance top level."
+    },
+    "Mercurion": {
+      "3_Serisi": [
+        "Premium comfort, classic luxury.",
+        "AMG Line sporty design.",
+        "Authorized service history very important."
+      ],
+      "5_Serisi": [
+        "Top level luxury sedan.",
+        "Executive car prestige.",
+        "Rich electronic equipment."
+      ],
+      "1_Serisi": [
+        "MBUX dual screen technology.",
+        "Compact premium, young dynamic.",
+        "AMG Line visual package important."
+      ],
+      "GJE": [
+        "4 door coupe, sporty design.",
+        "Frameless windows, stylish detail.",
+        "Appeals to young professionals."
+      ],
+      "8_Serisi": [
+        "Legendary off-road vehicle.",
+        "G 63 AMG most powerful version.",
+        "3 differential locks, pure off-road capability."
+      ],
+      "diesel": "d engine, efficient and powerful diesel.",
+      "hybrid": "e engine, hybrid technology, high performance.",
+      "dct": "7G-DCT dual clutch automatic.",
+      "tronic": "7G/9G-Tronic, most reliable automatic transmission.",
+      "4matic": "4MATIC four wheel drive, three differential locks.",
+      "rwd": "Rear wheel drive (RWD), premium character."
+    },
+    "Hyundaro": {
+      "A10": [
+        "Reliable and economic hatchback.",
+        "Wide equipment options.",
+        "Spare parts cheap and easy."
+      ],
+      "Tecent_Red": [
+        "Powerful 1.6 CRDi diesel engine.",
+        "Economic sedan, family car.",
+        "Torque converter automatic reliable."
+      ],
+      "Tecent_White": [
+        "Simple and robust structure.",
+        "Cheap repair costs.",
+        "Economic daily use."
+      ],
+      "A20": [
+        "C segment balanced vehicle.",
+        "Rich standard equipment.",
+        "N-Line sporty package popular."
+      ],
+      "Kascon": [
+        "Modern SUV, radical design.",
+        "Hybrid technology available.",
+        "Spacious interior, comfortable."
+      ],
+      "crdi": "CRDi diesel engine, powerful and efficient.",
+      "hybrid": "Hybrid technology, high efficiency and low consumption.",
+      "dct": "DCT dual clutch automatic.",
+      "auto": "Torque converter automatic, reliable."
+    },
+    "Toyoto": {
+      "Airoko": [
+        "Legendary reliability.",
+        "Sedan with least breakdown.",
+        "Valuable even at high mileage."
+      ],
+      "Lotus": [
+        "Reliable Toyota quality.",
+        "Hatchback practicality.",
+        "Hybrid version sees high demand."
+      ],
+      "Karma": [
+        "Practical in city use.",
+        "Compact size, easy park.",
+        "Hybrid technology available."
+      ],
+      "hybrid": "Hybrid technology, fuel economy very high.",
+      "diesel": "D-4D diesel engine, efficient.",
+      "cvt_hybrid": "CVT automatic, perfect match with hybrid system.",
+      "mmt": "MMT semi-automatic transmission (requires careful use).",
+      "cvt": "CVT automatic, most reliable transmission."
+    },
+    "Audira": {
+      "B3": [
+        "Premium compact, high quality.",
+        "Virtual cockpit, modern technology.",
+        "Sporty driving dynamics."
+      ],
+      "B4": [
+        "D segment comfort, prestige.",
+        "High material quality.",
+        "Long trip comfort superior."
+      ],
+      "B6": [
+        "E segment luxury, top level comfort.",
+        "Matrix LED, advanced equipment.",
+        "Executive car, prestigious."
+      ],
+      "B5": [
+        "Sporty coupe design.",
+        "Elegant flowing lines, remarkable.",
+        "Prestigious sporty sedan."
+      ],
+      "tdi_high": "TDI diesel, high torque and efficiency.",
+      "tdi": "TDI diesel, economic and powerful.",
+      "quattro": "Quattro four wheel drive, maximum safety and performance.",
+      "tiptronic": "Tiptronic automatic, reliable transmission.",
+      "multitronic": "Multitronic CVT gear (maintenance history important).",
+      "stronic_check": "S tronic automatic (maintenance history should be checked).",
+      "stronic": "S tronic 7 speed automatic, sporty gear."
+    },
+    "Hondaro": {
+      "Vice": [
+        "Second hand king, keeps value.",
+        "Reliable Honda quality.",
+        "Trouble-free even at high mileage."
+      ],
+      "VHL": [
+        "Leader comfort in SUV segment.",
+        "Spacious interior, family car.",
+        "Honda reliability."
+      ],
+      "Kent": [
+        "Economic sedan, Honda quality.",
+        "Spacious interior, comfortable.",
+        "High engine power (121 HP)."
+      ],
+      "Caz": [
+        "Magic seats, high roof.",
+        "Compact but spacious, practical.",
+        "Ideal vehicle for city."
+      ],
+      "hybrid_vhl": "2.0 Hybrid, fuel economy superior.",
+      "hybrid_caz": "1.5 e:HEV hybrid, very efficient.",
+      "lpg": "ECO factory LPG, low fuel cost.",
+      "awd": "AWD four wheel drive, maximum safety.",
+      "cvt": "CVT automatic, most reliable transmission.",
+      "rs": "RS/Turbo performance version, sporty drive."
     }
   },
   "models": {
@@ -798,6 +1353,7 @@
     "bonus": "Bonus",
     "gameCurrency": "Game Currency",
     "realMoney": "Real Money",
+    "confirmConvert": "Confirm Conversion",
     "convertGoldTitle": "Convert Gold to Game Currency",
     "convertGoldDesc": "Convert your gold to in-game currency",
     "exchangeRate": "Exchange Rate",
@@ -836,5 +1392,330 @@
     "step4_desc": "Manage incoming and sent offers here.",
     "step5_title": "Balance 💵",
     "step5_desc": "Grow your money by trading. Good luck!"
+  },
+  "seller_notes": {
+    "base": {
+      "singleOwner": "Single owner, well-maintained and clean use.",
+      "damageFree": "Damage-free, well-maintained and trouble-free vehicle.",
+      "garageCar": "Garage car. Always used regularly.",
+      "familyCar": "Vehicle for sale from family. It is a trouble-free vehicle.",
+      "allMaintenanceDone": "All maintenance has been done since 0 km.",
+      "likeNew": "Second hand but like new. Clean history.",
+      "economic": "Economic and reliable vehicle.",
+      "original": "Original, unpainted and damage-free vehicle."
+    },
+    "models": {
+      "Renauva_Slim": {
+        "1": "Modern and dynamic Hatchback.",
+        "2": "Ideal for city use.",
+        "3": "Young and sporty design."
+      },
+      "Renauva_Magna": {
+        "1": "Comfortable and spacious interior.",
+        "2": "Excellent road holding.",
+        "3": "Very suitable as a family car."
+      },
+      "Renauva_Flow": {
+        "1": "Large luggage volume and comfort.",
+        "2": "Ideal for long roads."
+      },
+      "Renauva_Signa": {
+        "1": "Economic and practical vehicle.",
+        "2": "Very low fuel consumption."
+      },
+      "Renauva_Tallion": {
+        "1": "New generation, modern technology.",
+        "2": "Safe and economic for your family."
+      },
+      "generous": {
+        "1": "Exactly the car I was looking for, I am giving the price you want.",
+        "2": "I have been looking for this model for a long time, price is not an issue.",
+        "3": "I liked it very much, I am ready to pay the fee you want.",
+        "4": "This car is just for me, your money is ready.",
+        "5": "I definitely want to buy it, I am not flexible about the price."
+      },
+      "Voltswagen_Paso": {
+        "1": "Premium segment, luxury and comfort.",
+        "2": "Spacious interior and high technology.",
+        "3": "Perfect choice for long roads."
+      },
+      "Voltswagen_Tenis": {
+        "1": "Compact but spacious interior.",
+        "2": "Volkswagen quality and reliability.",
+        "3": "High demand and fast sale."
+      },
+      "Voltswagen_Colo": {
+        "1": "Premium small vehicle segment.",
+        "2": "Practical for city use.",
+        "3": "Volkswagen prestige at an affordable price."
+      },
+      "Voltswagen_Jago": {
+        "1": "Sedan with large luggage.",
+        "2": "Suitable as a family car."
+      },
+      "Fialto_Agna": {
+        "1": "Wide body options, practical vehicle.",
+        "2": "Ideal for commercial and family use.",
+        "3": "High volume, fast sale."
+      },
+      "Fialto_Lagua": {
+        "1": "Simple and robust structure.",
+        "2": "Economic sedan.",
+        "3": "Reliable at high mileage."
+      },
+      "Fialto_Zorno": {
+        "1": "Compact and economic.",
+        "2": "Ideal for city.",
+        "3": "Low operating cost."
+      },
+      "Opexel_Tasra": {
+        "1": "Reliable German quality.",
+        "2": "Wide body option, comfortable.",
+        "3": "Both sedan and hatchback available."
+      },
+      "Opexel_Lorisa": {
+        "1": "Compact and economic.",
+        "2": "Practical for city use.",
+        "3": "Reliable automatic transmission."
+      },
+      "Opexel_Mornitia": {
+        "1": "Premium segment, luxury equipment.",
+        "2": "Long road comfort is top level.",
+        "3": "Prestigious and reliable."
+      },
+      "Bavora_C_Serisi": {
+        "1": "Premium segment, high prestige.",
+        "2": "Rear wheel drive (RWD) driving pleasure.",
+        "3": "M Sport package is very valuable."
+      },
+      "Bavora_E_Serisi": {
+        "1": "Luxury segment, the most prestigious model.",
+        "2": "Spacious interior volume and comfort.",
+        "3": "Rich electronic equipment."
+      },
+      "Bavora_A_Serisi": {
+        "1": "Compact premium, ideal for city.",
+        "2": "Young and dynamic character.",
+        "3": "M Sport visual package is popular."
+      },
+      "Bavora_D_Serisi": {
+        "1": "Sporty coupe, stylish design.",
+        "2": "M Sport is like standard.",
+        "3": "Gran Coupe is the most popular body."
+      },
+      "Fortran_Odak": {
+        "1": "Driving pleasure is top level.",
+        "2": "Leader of C segment, comfortable.",
+        "3": "Hatchback/Sedan/SW body options."
+      },
+      "Fortran_Vista": {
+        "1": "Compact and agile, city car.",
+        "2": "Economic fuel consumption.",
+        "3": "Young and dynamic design."
+      },
+      "Fortran_Avger": {
+        "1": "Powerful pick-up, off-road and load carrying.",
+        "2": "Double cabin comfort.",
+        "3": "Wildtrak equipment luxury level."
+      },
+      "Fortran_Tupa": {
+        "1": "SUV comfort, spacious interior volume.",
+        "2": "Ideal vehicle for families.",
+        "3": "Modern technology and safety."
+      },
+      "Mercurion_3_Serisi": {
+        "1": "Premium comfort, classic luxury.",
+        "2": "AMG Line sporty design.",
+        "3": "Authorized service history is very important."
+      },
+      "Mercurion_5_Serisi": {
+        "1": "Top level luxury sedan.",
+        "2": "Official vehicle prestige.",
+        "3": "Rich electronic equipment."
+      },
+      "Mercurion_1_Serisi": {
+        "1": "MBUX dual screen technology.",
+        "2": "Compact premium, young dynamic.",
+        "3": "AMG Line visual package is important."
+      },
+      "Mercurion_GJE": {
+        "1": "4-door coupe, sporty design.",
+        "2": "Frameless windows, stylish detail.",
+        "3": "Appeals to young professionals."
+      },
+      "Mercurion_8_Serisi": {
+        "1": "Legendary off-road vehicle.",
+        "2": "G 63 AMG is the most powerful version.",
+        "3": "3 differential locks, pure off-road capability."
+      },
+      "Hyundaro_A10": {
+        "1": "Reliable and economic hatchback.",
+        "2": "Wide equipment options.",
+        "3": "Spare parts are cheap and easy."
+      },
+      "Hyundaro_Tecent_Red": {
+        "1": "Powerful 1.6 CRDi diesel engine.",
+        "2": "Economic sedan, family car.",
+        "3": "Torque converter automatic reliable."
+      },
+      "Hyundaro_Tecent_White": {
+        "1": "Simple and robust structure.",
+        "2": "Cheap repair costs.",
+        "3": "Economic daily use."
+      },
+      "Hyundaro_A20": {
+        "1": "C segment balanced vehicle.",
+        "2": "Rich standard equipment.",
+        "3": "N-Line sporty package is popular."
+      },
+      "Hyundaro_Kascon": {
+        "1": "Modern SUV, radical design.",
+        "2": "Hybrid technology available.",
+        "3": "Spacious interior volume, comfortable."
+      },
+      "Toyoto_Airoko": {
+        "1": "Legendary reliability.",
+        "2": "Sedan with least breakdown.",
+        "3": "Valuable even at high mileage."
+      },
+      "Toyoto_Lotus": {
+        "1": "Reliable Toyota quality.",
+        "2": "Hatchback practicality.",
+        "3": "Hybrid version is in high demand."
+      },
+      "Toyoto_Karma": {
+        "1": "Practical in city use.",
+        "2": "Compact size, easy parking.",
+        "3": "Hybrid technology available."
+      },
+      "Audira_B3": {
+        "1": "Premium compact, high quality.",
+        "2": "Virtual cockpit, modern technology.",
+        "3": "Sporty driving dynamics."
+      },
+      "Audira_B4": {
+        "1": "D segment comfort, prestige.",
+        "2": "High material quality.",
+        "3": "Long road comfort is superior."
+      },
+      "Audira_B6": {
+        "1": "E segment luxury, top level comfort.",
+        "2": "Matrix LED, advanced equipment.",
+        "3": "Executive vehicle, prestigious."
+      },
+      "Audira_B5": {
+        "1": "Sporty coupe design.",
+        "2": "Elegant flowing lines, remarkable.",
+        "3": "Prestigious sporty sedan."
+      },
+      "Hondaro_Vice": {
+        "1": "Second hand king, preserves value.",
+        "2": "Reliable Honda quality.",
+        "3": "Trouble-free even at high mileage."
+      },
+      "Hondaro_VHL": {
+        "1": "Leader comfort in SUV segment.",
+        "2": "Spacious interior, family car.",
+        "3": "Honda reliability."
+      },
+      "Hondaro_Kent": {
+        "1": "Economic sedan, Honda quality.",
+        "2": "Spacious interior volume, comfortable.",
+        "3": "High engine power (121 HP)."
+      },
+      "Hondaro_Caz": {
+        "1": "Magic seats, high ceiling.",
+        "2": "Compact but spacious, practical.",
+        "3": "Ideal vehicle for city."
+      }
+    },
+    "fuel": {
+      "Renauva_Dizel": "1.5 dCi engine is very efficient and economic.",
+      "Renauva_BenzinLPG": "Factory LPG, fuel saving guaranteed.",
+      "Renauva_Hybrid": "Eco-friendly with hybrid technology.",
+      "Voltswagen_Dizel": "TDI engine, efficient and powerful.",
+      "Fialto_Dizel": "Multijet diesel engine, efficient and economic.",
+      "Fialto_Hybrid": "Fuel saving with hybrid technology.",
+      "Opexel_Dizel": "CDTI diesel engine, efficient and powerful.",
+      "Bavora_Dizel": "d engine, efficient and powerful diesel.",
+      "Bavora_Hybrid": "e engine, hybrid technology, high efficiency.",
+      "Fortran_EcoBlue": "EcoBlue diesel engine, efficient and powerful.",
+      "Fortran_TDCi": "TDCi diesel engine, economic consumption.",
+      "Fortran_BiTurbo": "Bi-Turbo diesel engine, high torque.",
+      "Fortran_Hybrid": "Hybrid technology, eco-friendly and efficient.",
+      "Fortran_Benzin": "EcoBoost turbo petrol, performance and efficiency.",
+      "Mercurion_Dizel": "d engine, efficient and powerful diesel.",
+      "Mercurion_Hybrid": "e engine, hybrid technology, high performance.",
+      "Hyundaro_Dizel": "CRDi diesel engine, powerful and efficient.",
+      "Hyundaro_Hybrid": "Hybrid technology, high efficiency and low consumption.",
+      "Toyoto_Hybrid": "Hybrid technology, fuel economy is very high.",
+      "Toyoto_Dizel": "D-4D diesel engine, efficient.",
+      "Hondaro_Hybrid_20": "2.0 Hybrid, fuel economy is superior.",
+      "Hondaro_Hybrid_15": "1.5 e:HEV hybrid, very efficient.",
+      "Hondaro_BenzinLPG": "ECO factory LPG, low fuel cost."
+    },
+    "transmission": {
+      "Renauva_XTronic": "X-Tronic CVT automatic gear, driving pleasure.",
+      "Renauva_EasyR": "Easy-R automatic gear, comfortable in city.",
+      "Renauva_EDC": "EDC dual clutch, fast and safe gear.",
+      "Voltswagen_DSG": "DSG dual clutch automatic transmission.",
+      "Fialto_Dualogic": "Dualogic semi-automatic gear.",
+      "Fialto_Auto": "Automatic transmission, comfortable driving.",
+      "Opexel_Easytronic": "Easytronic semi-automatic gear.",
+      "Opexel_Auto": "Torque converter automatic, reliable.",
+      "Bavora_DCT": "7 speed DCT, dual clutch gear.",
+      "Bavora_ZF": "8 speed Steptronic (ZF), most reliable automatic.",
+      "Fortran_10Auto": "10 speed automatic, most modern transmission.",
+      "Fortran_8Auto": "8 speed torque converter automatic, reliable.",
+      "Fortran_Powershift": "Powershift automatic gear.",
+      "Mercurion_DCT": "7G-DCT dual clutch automatic.",
+      "Mercurion_Tronic": "7G/9G-Tronic, most reliable automatic transmission.",
+      "Hyundaro_DCT": "DCT dual clutch automatic.",
+      "Hyundaro_Auto": "Torque converter automatic, reliable.",
+      "Toyoto_CVT_Hybrid": "CVT automatic, perfect match with hybrid system.",
+      "Toyoto_MMT": "MMT semi-automatic gear (requires careful use).",
+      "Toyoto_CVT": "CVT automatic, most reliable transmission.",
+      "Audira_Tiptronic": "Tiptronic automatic, reliable transmission.",
+      "Audira_Multitronic": "Multitronic CVT gear (maintenance history important).",
+      "Audira_Stronic_Check": "S tronic automatic (maintenance history should be checked).",
+      "Audira_Stronic": "S tronic 7 speed automatic, sporty gear.",
+      "Hondaro_CVT": "CVT automatic, most reliable transmission."
+    },
+    "drive": {
+      "Bavora_RWD": "Rear wheel drive (RWD), sporty character.",
+      "Fortran_4x4": "4x4 four wheel drive, off-road performance top level.",
+      "Mercurion_4MATIC": "4MATIC four wheel drive, three differential locks.",
+      "Mercurion_RWD": "Rear wheel drive (RWD), premium character.",
+      "Audira_Quattro": "Quattro four wheel drive, maximum safety and performance.",
+      "Hondaro_AWD": "AWD all wheel drive, maximum safety."
+    },
+    "performance": {
+      "Hondaro_RS": "RS/Turbo performance version, sporty driving."
+    }
+  },
+  "skills": {
+    "title": "Skill Tree",
+    "info": "Earn skill points as you level up and unlock special abilities!",
+    "cost": "Cost",
+    "unlock": "UNLOCK",
+    "unlocked": "unlocked!",
+    "active": "Active",
+    "cannotUnlock": "Cannot unlock this skill! Insufficient points.",
+    "negotiation": "Master Negotiator",
+    "negotiationDesc": "Make offers 10% lower",
+    "quickSale": "Quick Sale",
+    "quickSaleDesc": "Receive 20% more offers on your vehicles",
+    "marketAnalyst": "Market Analyst",
+    "marketAnalystDesc": "See real value when buying vehicles",
+    "reputation": "Reputation",
+    "reputationDesc": "Receive 10% higher offers",
+    "garageExpansion": "Garage Expansion",
+    "garageExpansionDesc": "+2 vehicle capacity",
+    "goldMiner": "Gold Miner",
+    "goldMinerDesc": "Earn 50% more gold from daily quests",
+    "fastLearner": "Fast Learner",
+    "fastLearnerDesc": "Earn 25% more XP from all actions",
+    "negotiationPower": "Negotiation Power",
+    "negotiationPowerDesc": "Get 15% better deals in negotiations"
   }
 }

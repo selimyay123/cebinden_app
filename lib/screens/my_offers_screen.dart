@@ -4,10 +4,12 @@ import 'package:intl/intl.dart';
 import '../models/offer_model.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
+import '../widgets/level_up_dialog.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../services/offer_service.dart';
 import '../services/localization_service.dart';
+import '../services/xp_service.dart';
 import '../utils/brand_colors.dart';
 import '../services/market_refresh_service.dart'; // Araç detayları için
 import '../models/vehicle_model.dart'; // Vehicle modeli için
@@ -581,20 +583,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   // Araç Resmi
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      firstOffer.vehicleImageUrl,
-                      width: 100,
-                      height: 75,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 100,
-                          height: 75,
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.directions_car, size: 40, color: Colors.grey),
-                        );
-                      },
-                    ),
+                    child: _buildVehicleImage(firstOffer.vehicleImageUrl, 100, 75),
                   ),
                   const SizedBox(width: 16),
                   // Araç Bilgisi
@@ -654,9 +643,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildStatChip('myVehicles.statusPending'.tr(), pendingOffers.length, Colors.orange),
-                  _buildStatChip('myVehicles.statusAccepted'.tr(), acceptedOffers.length, Colors.green),
-                  _buildStatChip('myVehicles.statusRejected'.tr(), rejectedOffers.length, Colors.red),
+                  Expanded(child: _buildStatChip('myVehicles.statusPending'.tr(), pendingOffers.length, Colors.orange)),
+                  Expanded(child: _buildStatChip('myVehicles.statusAccepted'.tr(), acceptedOffers.length, Colors.green)),
+                  Expanded(child: _buildStatChip('myVehicles.statusRejected'.tr(), rejectedOffers.length, Colors.red)),
                 ],
               ),
             ),
@@ -687,20 +676,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             // Araç Resmi
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                offer.vehicleImageUrl,
-                width: 120,
-                height: 90,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 120,
-                    height: 90,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.directions_car, size: 50, color: Colors.grey),
-                  );
-                },
-              ),
+              child: _buildVehicleImage(offer.vehicleImageUrl, 120, 90),
             ),
             const SizedBox(width: 16),
             // Araç Bilgisi
@@ -747,7 +723,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       ],
                     ),
                     child: Text(
-                      'İlan: ${_formatCurrency(offer.listingPrice)}',
+                      'misc.listingPriceLabel'.trParams({
+                        'price': _formatCurrency(offer.listingPrice),
+                      }),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -789,6 +767,32 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildVehicleImage(String imageUrl, double width, double height) {
+    if (imageUrl.isEmpty || !imageUrl.startsWith('http')) {
+      return Container(
+        width: width,
+        height: height,
+        color: Colors.grey[300],
+        child: Icon(Icons.directions_car, size: width * 0.4, color: Colors.grey),
+      );
+    }
+
+    return Image.network(
+      imageUrl,
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: width,
+          height: height,
+          color: Colors.grey[300],
+          child: Icon(Icons.directions_car, size: width * 0.4, color: Colors.grey),
+        );
+      },
     );
   }
 
@@ -937,7 +941,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            profitLoss >= 0 ? 'Kar' : 'Zarar',
+                            profitLoss >= 0 ? 'misc.profit'.tr() : 'misc.loss'.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -961,7 +965,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Kar/Zarar Oranı:',
+                        'misc.profitLossRatio'.tr(),
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey[700],
@@ -982,7 +986,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Satın Alma Fiyatı:',
+                        'misc.purchasePrice'.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -1022,7 +1026,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      offer.message!,
+                      offer.message!.tr(),
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[700],
@@ -1105,7 +1109,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                offer.status == OfferStatus.accepted ? 'KABUL EDİLDİ ✓' : 'REDDEDİLDİ ✗',
+                offer.status == OfferStatus.accepted ? 'misc.acceptedStatus'.tr() : 'misc.rejectedStatus'.tr(),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
@@ -1148,13 +1152,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final diff = now.difference(date);
 
     if (diff.inDays > 0) {
-      return '${diff.inDays} gün önce';
+      return '${diff.inDays} ${'misc.daysAgo'.tr()}';
     } else if (diff.inHours > 0) {
-      return '${diff.inHours} saat önce';
+      return '${diff.inHours} ${'misc.hoursAgo'.tr()}';
     } else if (diff.inMinutes > 0) {
-      return '${diff.inMinutes} dakika önce';
+      return '${diff.inMinutes} ${'misc.minutesAgo'.tr()}';
     } else {
-      return 'Şimdi';
+      return 'misc.justNow'.tr();
     }
   }
 
@@ -1166,7 +1170,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('dd MMMM yyyy', 'tr_TR').format(date);
+    final currentLang = LocalizationService().currentLanguage;
+    final locale = currentLang == 'tr' ? 'tr_TR' : 'en_US';
+    return DateFormat('dd MMMM yyyy', locale).format(date);
   }
 
   Future<void> _handleAcceptOffer(Offer offer) async {
@@ -1174,7 +1180,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Teklifi Kabul Et'),
+        title: Text('misc.acceptOfferTitle'.tr()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1205,12 +1211,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     ],
                   ),
                   const Divider(),
-                  const Text(
-                    'Bu teklifi kabul ederseniz:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    'misc.ifYouAccept'.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text('• Bakiyenize ${_formatCurrency(offer.offerPrice)} ₺ eklenecek'),
+                  Text('misc.balanceAdded'.trParams({'amount': _formatCurrency(offer.offerPrice)})),
                   Text('offers.vehicleSold'.tr()),
                   Text('offers.otherOffersRejected'.tr()),
                 ],
@@ -1226,7 +1232,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text('Kabul Et'),
+            child: Text('misc.acceptButton'.tr()),
           ),
         ],
       ),
@@ -1243,12 +1249,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       );
 
       // Teklifi kabul et
-      bool success = await _offerService.acceptOffer(offer);
+      final xpResult = await _offerService.acceptOffer(offer);
 
       if (mounted) {
         Navigator.pop(context); // Loading'i kapat
 
-        if (success) {
+        if (xpResult != null) {
           // Başarı mesajı
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -1256,6 +1262,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               backgroundColor: Colors.green,
             ),
           );
+
+          // Level up varsa dialog göster
+          if (xpResult.leveledUp) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => LevelUpDialog(
+                reward: xpResult.rewards!,
+              ),
+            );
+          }
 
           // Listeyi yenile
           await _loadOffers();
@@ -1330,21 +1347,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             // Araç bilgileri
             Row(
               children: [
-                if (offer.vehicleImageUrl.isNotEmpty)
+                if (offer.vehicleImageUrl.isNotEmpty)                  // Araç Resmi
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      offer.vehicleImageUrl,
-                      width: 80,
-                      height: 60,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        width: 80,
-                        height: 60,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.directions_car),
-                      ),
-                    ),
+                    child: _buildVehicleImage(offer.vehicleImageUrl, 100, 75),
                   ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -1558,7 +1564,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        offer.sellerResponse!,
+                        _getLocalizedSellerResponse(offer),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[800],
@@ -1586,6 +1592,25 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
   }
 
+  String _getLocalizedSellerResponse(Offer offer) {
+    if (offer.sellerResponse == null) return '';
+    
+    // Eğer response bir key ise (nokta içeriyorsa basit bir kontrol)
+    if (offer.sellerResponse!.contains('offerService.responses')) {
+      // Eğer counter offer ise parametre ekle
+      if (offer.sellerResponse!.contains('counter')) {
+        return offer.sellerResponse!.trParams({
+          'amount': _formatCurrency(offer.counterOfferAmount ?? 0),
+        });
+      }
+      // Diğer durumlar için direkt çevir
+      return offer.sellerResponse!.tr();
+    }
+    
+    // Eski/hardcoded mesajlar için direkt döndür
+    return offer.sellerResponse!;
+  }
+
   // Tüm bekleyen teklifleri reddet (YENİ)
   Future<void> _rejectAllOffers(List<Offer> offers) async {
     // Sadece bekleyen teklifleri filtrele
@@ -1593,8 +1618,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     
     if (pendingOffers.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Reddedilecek bekleyen teklif yok.'),
+        SnackBar(
+          content: Text('misc.noPendingToReject'.tr()),
           backgroundColor: Colors.orange,
         ),
       );
@@ -1606,15 +1631,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       context: context,
       builder: (context) => AlertDialog(
         title: Row(
-          children: const [
-            Icon(Icons.warning, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Dikkat!'),
+          children: [
+            const Icon(Icons.warning, color: Colors.red),
+            const SizedBox(width: 8),
+            Text('common.attention'.tr()),
           ],
         ),
         content: Text(
-          'Bu araca gelen ${pendingOffers.length} adet bekleyen teklifi reddetmek istediğinize emin misiniz?\n\n'
-          'Reddedilen teklifler kalıcı olarak silinecektir.',
+          '${'offers.rejectAllConfirm'.trParams({'count': pendingOffers.length.toString()})}\n\n${'offers.rejectAllWarning'.tr()}',
           style: const TextStyle(fontSize: 15),
         ),
         actions: [
@@ -1628,7 +1652,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Tümünü Reddet'),
+            child: Text('offers.rejectAllButton'.tr()),
           ),
         ],
       ),
@@ -1647,14 +1671,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         if (successCount == pendingOffers.length) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('✅ ${successCount} teklif başarıyla reddedildi ve silindi.'),
+              content: Text('✅ ${'offers.rejectAllSuccess'.trParams({'count': successCount.toString()})}'),
               backgroundColor: Colors.green,
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('⚠️ ${successCount}/${pendingOffers.length} teklif reddedildi.'),
+              content: Text('⚠️ ${'offers.rejectAllPartialSuccess'.trParams({'count': successCount.toString(), 'total': pendingOffers.length.toString()})}'),
               backgroundColor: Colors.orange,
             ),
           );
