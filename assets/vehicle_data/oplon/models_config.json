@@ -1,5 +1,5 @@
 {
-  "brand": "Opexel",
+  "brand": "Oplon",
   "spawnRate": 0.089,
   "description": "Alman pratikliği, güvenilir tork konvertörlü otomatik, DSG'den daha az riskli",
   "models": [
@@ -11,14 +11,25 @@
       "basePriceTL": 1700000,
       "priceRange": "1350000-1700000",
       "bodyTypes": {
-        "2010-2018": ["Hatchback", "Sedan"],
-        "2019-2025": ["Hatchback"]
+        "2010-2018": [
+          "Hatchback",
+          "Sedan"
+        ],
+        "2019-2025": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Manuel (6 ileri) + Tork Konvertörlü (DSG'den GÜVENİLİR!)"
       },
       "driveType": "Önden",
@@ -44,14 +55,24 @@
       "basePriceTL": 1200000,
       "priceRange": "950000-1200000",
       "bodyTypes": {
-        "2010-2019": ["Hatchback"],
-        "2020-2025": ["Hatchback"]
+        "2010-2019": [
+          "Hatchback"
+        ],
+        "2020-2025": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Manuel (5-6 ileri) + Easytronic (ESKİ - RİSKLİ!) / Tork (YENİ - GÜVENİLİR!)"
       },
       "driveType": "Önden",
@@ -76,13 +97,22 @@
       "basePriceTL": 2000000,
       "priceRange": "1600000-2000000",
       "bodyTypes": {
-        "2010-2025": ["Sedan", "Station Wagon"]
+        "2010-2025": [
+          "Sedan",
+          "Station Wagon"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Manuel (6 ileri) + Tork Konvertörlü (PASO ALTERNATİFİ - DSG'den GÜVENİLİR!)"
       },
       "driveType": "Önden",
@@ -156,4 +186,3 @@
     ]
   }
 }
-

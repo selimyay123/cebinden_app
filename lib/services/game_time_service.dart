@@ -55,10 +55,7 @@ class GameTimeService with WidgetsBindingObserver {
       }
     });
     
-    debugPrint('🕐 GameTimeService initialized');
-    debugPrint('   Total Played: $_totalPlayedMinutes minutes');
-    debugPrint('   Current Day: ${currentGameDay.value}');
-    debugPrint('   Current Hour: ${currentGameHour.value}');
+
   }
   
   /// Ayarları yükle
@@ -102,8 +99,7 @@ class GameTimeService with WidgetsBindingObserver {
       final oldDay = currentGameDay.value;
       currentGameDay.value = newGameDay;
       
-      debugPrint('📅 Yeni oyun günü: $newGameDay (Eski: $oldDay)');
-      debugPrint('   Total Active Time: $totalMinutes minutes');
+
       
       // Gün değişim callback'lerini çağır
       for (final callback in _dayChangeCallbacks) {
@@ -122,11 +118,11 @@ class GameTimeService with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // Uygulama açıldı - oturumu başlat
-      debugPrint('🎮 App resumed - starting session');
+
       _startSession();
     } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
       // Uygulama kapandı veya arka plana alındı - oturumu durdur
-      debugPrint('⏸️ App paused - stopping session');
+
       _pauseSession();
     }
   }
@@ -136,7 +132,7 @@ class GameTimeService with WidgetsBindingObserver {
     if (!_isAppActive) {
       _isAppActive = true;
       _sessionStartTime = DateTime.now();
-      debugPrint('🎮 Oyun oturumu başladı');
+
     }
   }
   
@@ -152,9 +148,7 @@ class GameTimeService with WidgetsBindingObserver {
         // Kaydet
         SettingsHelper.setTotalPlayedMinutes(_totalPlayedMinutes);
         
-        debugPrint('⏸️ Oyun oturumu durdu');
-        debugPrint('   Session: $sessionMinutes minutes');
-        debugPrint('   Total: $_totalPlayedMinutes minutes');
+
       }
       
       _isAppActive = false;
@@ -212,7 +206,7 @@ class GameTimeService with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _updateTimer?.cancel();
     _dayChangeCallbacks.clear();
-    debugPrint('🔄 GameTimeService disposed');
+
   }
   
   /// Oyunu sıfırla (yeni oyun için)
@@ -224,7 +218,7 @@ class GameTimeService with WidgetsBindingObserver {
     currentGameHour.value = 0;
     _startSession(); // Yeni oturumu başlat
     _updateCurrentTime();
-    debugPrint('🔄 Oyun zamanı sıfırlandı');
+
   }
   
   /// Toplam oyun süresini al (formatlanmış)

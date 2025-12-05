@@ -869,7 +869,8 @@
     "insufficientBalance": "Insufficient Balance!",
     "confirmAndPay": "Confirm and Pay",
     "issuesFoundMessage": "Hidden issues found in expertise! Price updated.",
-    "cleanMessage": "Vehicle is clean! Seller declaration verified."
+    "cleanMessage": "Vehicle is clean! Seller declaration verified.",
+    "value": "Expertise Value"
   },
   "vehicleParts": {
     "original": "Original",
@@ -912,13 +913,13 @@
       "Bavora": "Bavarian engine",
       "Fialto": "Italian practicality",
       "Fortran": "American classic",
-      "Hyundaro": "Korean technology",
-      "Hondaro": "Japanese reliability",
+      "Hundar": "Korean technology",
+      "Hanto": "Japanese reliability",
       "Mercurion": "German luxury",
-      "Opexel": "German practicality",
+      "Oplon": "German practicality",
       "Renauva": "French innovation",
-      "Toyoto": "Japanese perfection",
-      "Voltswagen": "The people's car"
+      "Koyoro": "Japanese perfection",
+      "Volkstar": "The people's car"
     }
   },
   "listingDescriptions": {
@@ -976,7 +977,7 @@
       "lpg": "Factory LPG, fuel saving guaranteed.",
       "hybrid": "Hybrid technology, eco-friendly."
     },
-    "Voltswagen": {
+    "Volkstar": {
       "Paso": [
         "Premium segment, luxury and comfort.",
         "Spacious interior and high technology.",
@@ -1020,7 +1021,7 @@
       "dualogic": "Dualogic semi-automatic transmission.",
       "auto": "Automatic transmission, comfortable drive."
     },
-    "Opexel": {
+    "Oplon": {
       "Tasra": [
         "Reliable German quality.",
         "Wide body option, comfortable.",
@@ -1131,7 +1132,7 @@
       "4matic": "4MATIC four wheel drive, three differential locks.",
       "rwd": "Rear wheel drive (RWD), premium character."
     },
-    "Hyundaro": {
+    "Hundar": {
       "A10": [
         "Reliable and economic hatchback.",
         "Wide equipment options.",
@@ -1162,7 +1163,7 @@
       "dct": "DCT dual clutch automatic.",
       "auto": "Torque converter automatic, reliable."
     },
-    "Toyoto": {
+    "Koyoro": {
       "Airoko": [
         "Legendary reliability.",
         "Sedan with least breakdown.",
@@ -1213,7 +1214,7 @@
       "stronic_check": "S tronic automatic (maintenance history should be checked).",
       "stronic": "S tronic 7 speed automatic, sporty gear."
     },
-    "Hondaro": {
+    "Hanto": {
       "Vice": [
         "Second hand king, keeps value.",
         "Reliable Honda quality.",
@@ -1223,11 +1224,6 @@
         "Leader comfort in SUV segment.",
         "Spacious interior, family car.",
         "Honda reliability."
-      ],
-      "Kent": [
-        "Economic sedan, Honda quality.",
-        "Spacious interior, comfortable.",
-        "High engine power (121 HP)."
       ],
       "Caz": [
         "Magic seats, high roof.",
@@ -1251,7 +1247,7 @@
         "Signa": "Economic Sedan, practical use",
         "Tallion": "New Generation, modern technology"
       },
-      "Voltswagen": {
+      "Volkstar": {
         "Paso": "Premium Segment, luxury and power",
         "Tenis": "Compact Premium, high demand",
         "Colo": "Premium Small, quality and practical",
@@ -1262,7 +1258,7 @@
         "Lagua": "Economic Sedan, simple and solid",
         "Zorno": "Compact Hatchback, city car"
       },
-      "Opexel": {
+      "Oplon": {
         "Tasra": "Reliable German quality, popular",
         "Lorisa": "Compact, economic and reliable",
         "Mornitia": "Premium Segment, luxury equipment"
@@ -1286,14 +1282,14 @@
         "GJE": "4-Door Coupe, sporty elegant",
         "8 Serisi": "Legendary off-road, ultra luxury"
       },
-      "Hyundaro": {
+      "Hundar": {
         "A10": "Reliable, economic hatchback",
         "Tecent Red": "Powerful diesel, economic sedan",
         "Tecent White": "Simple solid, cheap repair",
         "A20": "Balanced C segment, rich equipment",
         "Kascon": "Modern SUV, hybrid technology"
       },
-      "Toyoto": {
+      "Koyoro": {
         "Airoko": "Legendary reliability, hybrid leader",
         "Lotus": "Reliable hatchback, hybrid available",
         "Karma": "Compact practical, hybrid technology"
@@ -1304,7 +1300,7 @@
         "B6": "E segment luxury, top-level comfort",
         "B5": "Sporty coupe, elegant design"
       },
-      "Hondaro": {
+      "Hanto": {
         "Vice": "Used car king, CVT reliability",
         "VHL": "SUV comfort, hybrid technology",
         "Kent": "Economic sedan, high power",
@@ -1434,22 +1430,22 @@
         "4": "This car is just for me, your money is ready.",
         "5": "I definitely want to buy it, I am not flexible about the price."
       },
-      "Voltswagen_Paso": {
+      "Volkstar_Paso": {
         "1": "Premium segment, luxury and comfort.",
         "2": "Spacious interior and high technology.",
         "3": "Perfect choice for long roads."
       },
-      "Voltswagen_Tenis": {
+      "Volkstar_Tenis": {
         "1": "Compact but spacious interior.",
         "2": "Volkswagen quality and reliability.",
         "3": "High demand and fast sale."
       },
-      "Voltswagen_Colo": {
+      "Volkstar_Colo": {
         "1": "Premium small vehicle segment.",
         "2": "Practical for city use.",
         "3": "Volkswagen prestige at an affordable price."
       },
-      "Voltswagen_Jago": {
+      "Volkstar_Jago": {
         "1": "Sedan with large luggage.",
         "2": "Suitable as a family car."
       },
@@ -1468,17 +1464,17 @@
         "2": "Ideal for city.",
         "3": "Low operating cost."
       },
-      "Opexel_Tasra": {
+      "Oplon_Tasra": {
         "1": "Reliable German quality.",
         "2": "Wide body option, comfortable.",
         "3": "Both sedan and hatchback available."
       },
-      "Opexel_Lorisa": {
+      "Oplon_Lorisa": {
         "1": "Compact and economic.",
         "2": "Practical for city use.",
         "3": "Reliable automatic transmission."
       },
-      "Opexel_Mornitia": {
+      "Oplon_Mornitia": {
         "1": "Premium segment, luxury equipment.",
         "2": "Long road comfort is top level.",
         "3": "Prestigious and reliable."
@@ -1548,42 +1544,42 @@
         "2": "G 63 AMG is the most powerful version.",
         "3": "3 differential locks, pure off-road capability."
       },
-      "Hyundaro_A10": {
+      "Hundar_A10": {
         "1": "Reliable and economic hatchback.",
         "2": "Wide equipment options.",
         "3": "Spare parts are cheap and easy."
       },
-      "Hyundaro_Tecent_Red": {
+      "Hundar_Tecent Red": {
         "1": "Powerful 1.6 CRDi diesel engine.",
         "2": "Economic sedan, family car.",
         "3": "Torque converter automatic reliable."
       },
-      "Hyundaro_Tecent_White": {
+      "Hundar_Tecent White": {
         "1": "Simple and robust structure.",
         "2": "Cheap repair costs.",
         "3": "Economic daily use."
       },
-      "Hyundaro_A20": {
+      "Hundar_A20": {
         "1": "C segment balanced vehicle.",
         "2": "Rich standard equipment.",
         "3": "N-Line sporty package is popular."
       },
-      "Hyundaro_Kascon": {
+      "Hundar_Kascon": {
         "1": "Modern SUV, radical design.",
         "2": "Hybrid technology available.",
         "3": "Spacious interior volume, comfortable."
       },
-      "Toyoto_Airoko": {
+      "Koyoro_Airoko": {
         "1": "Legendary reliability.",
         "2": "Sedan with least breakdown.",
         "3": "Valuable even at high mileage."
       },
-      "Toyoto_Lotus": {
+      "Koyoro_Lotus": {
         "1": "Reliable Toyota quality.",
         "2": "Hatchback practicality.",
         "3": "Hybrid version is in high demand."
       },
-      "Toyoto_Karma": {
+      "Koyoro_Karma": {
         "1": "Practical in city use.",
         "2": "Compact size, easy parking.",
         "3": "Hybrid technology available."
@@ -1608,22 +1604,17 @@
         "2": "Elegant flowing lines, remarkable.",
         "3": "Prestigious sporty sedan."
       },
-      "Hondaro_Vice": {
+      "Hanto_Vice": {
         "1": "Second hand king, preserves value.",
         "2": "Reliable Honda quality.",
         "3": "Trouble-free even at high mileage."
       },
-      "Hondaro_VHL": {
+      "Hanto_VHL": {
         "1": "Leader comfort in SUV segment.",
         "2": "Spacious interior, family car.",
         "3": "Honda reliability."
       },
-      "Hondaro_Kent": {
-        "1": "Economic sedan, Honda quality.",
-        "2": "Spacious interior volume, comfortable.",
-        "3": "High engine power (121 HP)."
-      },
-      "Hondaro_Caz": {
+      "Hanto_Caz": {
         "1": "Magic seats, high ceiling.",
         "2": "Compact but spacious, practical.",
         "3": "Ideal vehicle for city."
@@ -1633,10 +1624,10 @@
       "Renauva_Dizel": "1.5 dCi engine is very efficient and economic.",
       "Renauva_BenzinLPG": "Factory LPG, fuel saving guaranteed.",
       "Renauva_Hybrid": "Eco-friendly with hybrid technology.",
-      "Voltswagen_Dizel": "TDI engine, efficient and powerful.",
+      "Volkstar_Dizel": "TDI engine, efficient and powerful.",
       "Fialto_Dizel": "Multijet diesel engine, efficient and economic.",
       "Fialto_Hybrid": "Fuel saving with hybrid technology.",
-      "Opexel_Dizel": "CDTI diesel engine, efficient and powerful.",
+      "Oplon_CDTI": "CDTI diesel engine, efficient and long lasting.",
       "Bavora_Dizel": "d engine, efficient and powerful diesel.",
       "Bavora_Hybrid": "e engine, hybrid technology, high efficiency.",
       "Fortran_EcoBlue": "EcoBlue diesel engine, efficient and powerful.",
@@ -1646,23 +1637,23 @@
       "Fortran_Benzin": "EcoBoost turbo petrol, performance and efficiency.",
       "Mercurion_Dizel": "d engine, efficient and powerful diesel.",
       "Mercurion_Hybrid": "e engine, hybrid technology, high performance.",
-      "Hyundaro_Dizel": "CRDi diesel engine, powerful and efficient.",
-      "Hyundaro_Hybrid": "Hybrid technology, high efficiency and low consumption.",
-      "Toyoto_Hybrid": "Hybrid technology, fuel economy is very high.",
-      "Toyoto_Dizel": "D-4D diesel engine, efficient.",
-      "Hondaro_Hybrid_20": "2.0 Hybrid, fuel economy is superior.",
-      "Hondaro_Hybrid_15": "1.5 e:HEV hybrid, very efficient.",
-      "Hondaro_BenzinLPG": "ECO factory LPG, low fuel cost."
+      "Hundar_CRDi": "CRDi diesel engine, powerful and economic.",
+      "Hundar_Hybrid": "Hybrid technology, high efficiency and low consumption.",
+      "Koyoro_Hybrid": "Hybrid technology, fuel economy is very high.",
+      "Koyoro_Dizel": "D-4D diesel engine, efficient.",
+      "Hanto_Hybrid_20": "2.0 Hybrid, fuel economy is superior.",
+      "Hanto_Hybrid_15": "1.5 e:HEV hybrid, very efficient.",
+      "Hanto_BenzinLPG": "ECO factory LPG, low fuel cost."
     },
     "transmission": {
       "Renauva_XTronic": "X-Tronic CVT automatic gear, driving pleasure.",
       "Renauva_EasyR": "Easy-R automatic gear, comfortable in city.",
       "Renauva_EDC": "EDC dual clutch, fast and safe gear.",
-      "Voltswagen_DSG": "DSG dual clutch automatic transmission.",
+      "Volkstar_DSG": "DSG dual clutch automatic transmission.",
       "Fialto_Dualogic": "Dualogic semi-automatic gear.",
       "Fialto_Auto": "Automatic transmission, comfortable driving.",
-      "Opexel_Easytronic": "Easytronic semi-automatic gear.",
-      "Opexel_Auto": "Torque converter automatic, reliable.",
+      "Oplon_Easytronic": "Easytronic semi-automatic (gear shifts noticeable).",
+      "Oplon_Auto": "Full automatic transmission, comfortable and trouble-free.",
       "Bavora_DCT": "7 speed DCT, dual clutch gear.",
       "Bavora_ZF": "8 speed Steptronic (ZF), most reliable automatic.",
       "Fortran_10Auto": "10 speed automatic, most modern transmission.",
@@ -1670,16 +1661,16 @@
       "Fortran_Powershift": "Powershift automatic gear.",
       "Mercurion_DCT": "7G-DCT dual clutch automatic.",
       "Mercurion_Tronic": "7G/9G-Tronic, most reliable automatic transmission.",
-      "Hyundaro_DCT": "DCT dual clutch automatic.",
-      "Hyundaro_Auto": "Torque converter automatic, reliable.",
-      "Toyoto_CVT_Hybrid": "CVT automatic, perfect match with hybrid system.",
-      "Toyoto_MMT": "MMT semi-automatic gear (requires careful use).",
-      "Toyoto_CVT": "CVT automatic, most reliable transmission.",
+      "Hundar_DCT": "DCT dual clutch automatic, fast gear shift.",
+      "Hundar_Auto": "Torque converter full automatic, trouble-free.",
+      "Koyoro_CVT_Hybrid": "CVT automatic, perfect match with hybrid system.",
+      "Koyoro_MMT": "MMT semi-automatic gear (requires careful use).",
+      "Koyoro_CVT": "CVT automatic, most reliable transmission.",
       "Audira_Tiptronic": "Tiptronic automatic, reliable transmission.",
       "Audira_Multitronic": "Multitronic CVT gear (maintenance history important).",
       "Audira_Stronic_Check": "S tronic automatic (maintenance history should be checked).",
       "Audira_Stronic": "S tronic 7 speed automatic, sporty gear.",
-      "Hondaro_CVT": "CVT automatic, most reliable transmission."
+      "Hanto_CVT": "CVT automatic, most reliable transmission."
     },
     "drive": {
       "Bavora_RWD": "Rear wheel drive (RWD), sporty character.",
@@ -1687,10 +1678,10 @@
       "Mercurion_4MATIC": "4MATIC four wheel drive, three differential locks.",
       "Mercurion_RWD": "Rear wheel drive (RWD), premium character.",
       "Audira_Quattro": "Quattro four wheel drive, maximum safety and performance.",
-      "Hondaro_AWD": "AWD all wheel drive, maximum safety."
+      "Hanto_AWD": "AWD all wheel drive, maximum safety."
     },
     "performance": {
-      "Hondaro_RS": "RS/Turbo performance version, sporty driving."
+      "Hanto_RS": "RS/Turbo performance version, sporty driving."
     }
   },
   "skills": {

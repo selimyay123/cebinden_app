@@ -29,7 +29,7 @@ class FavoriteService {
       await _favoritesBox.flush();
       return true;
     } catch (e) {
-      print('Favori eklerken hata: $e');
+
       return false;
     }
   }
@@ -42,7 +42,7 @@ class FavoriteService {
       await _favoritesBox.flush();
       return true;
     } catch (e) {
-      print('Favori kaldırırken hata: $e');
+
       return false;
     }
   }
@@ -53,7 +53,7 @@ class FavoriteService {
       final key = '${userId}_$vehicleId';
       return _favoritesBox.containsKey(key);
     } catch (e) {
-      print('Favori kontrolünde hata: $e');
+
       return false;
     }
   }
@@ -81,7 +81,7 @@ class FavoriteService {
               favorites.add(storedVehicle);
             }
           } catch (e) {
-            print('Favori vehicle parse hatası: $e');
+
           }
         }
       }
@@ -91,7 +91,7 @@ class FavoriteService {
       
       return favorites;
     } catch (e) {
-      print('Favorileri getirirken hata: $e');
+
       return [];
     }
   }
@@ -107,7 +107,7 @@ class FavoriteService {
       }
       return count;
     } catch (e) {
-      print('Favori sayısı alırken hata: $e');
+
       return 0;
     }
   }
@@ -131,9 +131,9 @@ class FavoriteService {
       }
       
       await _favoritesBox.flush();
-      print('İlan $vehicleId tüm favorilerden kaldırıldı (${keysToRemove.length} kullanıcı)');
+
     } catch (e) {
-      print('İlanı favorilerden kaldırırken hata: $e');
+
     }
   }
 
@@ -154,7 +154,7 @@ class FavoriteService {
       
       await _favoritesBox.flush();
     } catch (e) {
-      print('Favorileri temizlerken hata: $e');
+
     }
   }
 }

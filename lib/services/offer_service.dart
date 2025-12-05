@@ -28,17 +28,17 @@ class OfferService {
 
   /// Servisi başlat ve günlük teklif sistemini aktifleştir
   Future<void> initialize() async {
-    debugPrint('💼 OfferService initializing...');
+
     
     // Gün değişim listener'ı ekle
     _gameTime.addDayChangeListener(_onDayChange);
     
-    debugPrint('✅ OfferService initialized - Daily offer generation active');
+
   }
 
   /// Gün değişiminde otomatik çağrılır
   void _onDayChange(int oldDay, int newDay) {
-    debugPrint('💰 Daily offer generation triggered (Day $oldDay → $newDay)');
+
     _generateDailyOffersAsync();
   }
 
@@ -46,9 +46,9 @@ class OfferService {
   Future<void> _generateDailyOffersAsync() async {
     try {
       final offersCreated = await generateDailyOffers();
-      debugPrint('✅ Daily offers generated: $offersCreated new offers');
+
     } catch (e) {
-      debugPrint('❌ Error generating daily offers: $e');
+
     }
   }
 
@@ -65,7 +65,7 @@ class OfferService {
       final pendingCount = existingOffers.where((o) => o.isPending).length;
       
       if (pendingCount >= 10) {
-        debugPrint('⚠️ Offer limit reached for vehicle ${listing.id} ($pendingCount/10). No new offers generated.');
+
         return 0;
       }
 
@@ -264,7 +264,7 @@ class OfferService {
       
       return success;
     } catch (e) {
-      debugPrint('❌ Error rejecting offer: $e');
+
       return false;
     }
   }
@@ -845,10 +845,16 @@ class OfferService {
     
     double baseFMV = vehicle.purchasePrice * fluctuation;
     
-    // NOT: Skor etkisi (scoreMultiplier) kaldırıldı çünkü purchasePrice zaten aracın kondisyonunu yansıtıyor.
-    // Tekrar skor cezası uygulamak, düşük kondisyonlu araçların asla kârla satılamamasına neden oluyor.
+    // SKOR ETKİSİ: Yüksek skorlu (F/P) araçlar daha değerlidir
+    // Score 50 (nötr) -> 1.0x
+    // Score 100 (mükemmel) -> 1.25x
+    // Score 0 (kötü) -> 0.75x
+    double scoreMultiplier = 1.0 + ((vehicle.score - 50) / 200.0);
     
-    return baseFMV;
+    // Çarpanı sınırla (0.8x - 1.3x arası)
+    scoreMultiplier = scoreMultiplier.clamp(0.8, 1.3);
+    
+    return baseFMV * scoreMultiplier;
   }
 
   /// Günlük alıcı sayısını hesapla
@@ -857,6 +863,14 @@ class OfferService {
     
     // Base: 4-10 arası alıcı (biraz artırıldı)
     int baseCount = 4 + random.nextInt(7);
+    
+    // SKOR ETKİSİ: Yüksek skorlu araçlar daha çok ilgi çeker
+    if (listing.score > 60) {
+      // Her 10 puan için +1 alıcı (max +4)
+      int bonusBuyers = ((listing.score - 60) / 10).floor();
+      baseCount += bonusBuyers;
+
+    }
     
     // Yetenek Kontrolü: Piyasa Kurdu (Market Guru)
     // İlanlar %50 daha fazla görüntülenir -> %50 daha fazla alıcı
@@ -898,7 +912,7 @@ class OfferService {
     
     if (priceRatio > maxTolerance) {
       // Fiyat çok yüksek! Kimse ilgilenmez.
-      debugPrint('🚫 Price too high! Ratio: $priceRatio > Tolerance: $maxTolerance');
+
       return 0;
     } else if (priceRatio > 1.15) {
       // Biraz pahalı (%15-%30 arası) -> Alıcı sayısı ciddi düşer

@@ -26,17 +26,17 @@ class MarketRefreshService {
   // Marka spawn oranları (gerçek piyasa verisi)
   final Map<String, double> _brandSpawnRates = {
     'Renauva': 0.179,      // %17.9
-    'Voltswagen': 0.144,   // %14.4
+    'Volkstar': 0.144,   // %14.4
     'Fialto': 0.108,       // %10.8
-    'Opexel': 0.089,       // %8.9
+    'Oplon': 0.089,       // %8.9
     'Bavora': 0.077,       // %7.7
     'Fortran': 0.070,      // %7.0
     'Mercurion': 0.064,    // %6.4
-    'Hyundaro': 0.058,     // %5.8
-    'Toyoto': 0.055,       // %5.5
+    'Hundar': 0.058,     // %5.8
+    'Koyoro': 0.055,       // %5.5
     'Audira': 0.044,       // %4.4
     'Peugot': 0.042,       // %4.2
-    'Hondaro': 0.037,      // %3.7
+    'Hanto': 0.037,      // %3.7
     'Skodra': 0.034,       // %3.4
     'Citronix': 0.030,     // %3.0
   };
@@ -50,7 +50,7 @@ class MarketRefreshService {
       'Signa': 0.1150,     // Symbol - %11.50
       'Tallion': 0.0273,   // Taliant - %2.73
     },
-    'Voltswagen': {
+    'Volkstar': {
       'Paso': 0.40,        //  - %40
       'Tenis': 0.25,       // Golf - %25
       'Colo': 0.22,        // Polo - %22
@@ -61,7 +61,7 @@ class MarketRefreshService {
       'Lagua': 0.2280,     // Linea - %22.80
       'Zorno': 0.0572,     // Punto - %5.72
     },
-    'Opexel': {
+    'Oplon': {
       'Tasra': 0.55,       // Astra - %55
       'Lorisa': 0.323,     // Corsa - %32.3
       'Mornitia': 0.127,   // Insignia - %12.7
@@ -85,14 +85,14 @@ class MarketRefreshService {
       'GJE': 0.0998,       // CLA - %9.98
       '8 Serisi': 0.0926,  // G-Class - %9.26
     },
-    'Hyundaro': {
+    'Hundar': {
       'A10': 0.5215,       // i20 - %52.15
       'Tecent Red': 0.1925, // Accent Blue - %19.25
       'Tecent White': 0.1095, // Accent Era - %10.95
       'A20': 0.0995,       // i30 - %9.95
       'Kascon': 0.0769,    // Tucson - %7.69
     },
-    'Toyoto': {
+    'Koyoro': {
       'Airoko': 0.8193,    // Corolla - %81.93
       'Lotus': 0.1165,     // Auris - %11.65
       'Karma': 0.0643,     // Yaris - %6.43
@@ -103,36 +103,34 @@ class MarketRefreshService {
       'B6': 0.2087,        // A6 - %20.87
       'B5': 0.1033,        // A5 - %10.33
     },
-    'Hondaro': {
-      'Vice': 0.8046,      // Civic - %80.46
-      'VHL': 0.1034,       // CR-V - %10.34
-      'Kent': 0.0575,      // City - %5.75
-      'Caz': 0.0345,       // Jazz - %3.45
+    'Hanto': {
+      'Vice': 0.85,        // Civic - %85
+      'VHL': 0.11,         // CR-V - %11
+      'Caz': 0.04,         // Jazz - %4
     },
     // Diğer markalar için varsayılan olarak eşit dağılım kullanılacak
     'Peugot': {},
-    'Hondaro': {},
+    'Hanto': {},
     'Skodra': {},
     'Citronix': {},
     'Fialto': {},
-    'Opexel': {},
+    'Oplon': {},
   };
   
   // Marka-model eşleşmeleri (geriye dönük uyumluluk için)
   final Map<String, List<String>> _modelsByBrand = {
     'Renauva': ['Slim', 'Magna', 'Flow', 'Signa', 'Tallion'],
-    'Voltswagen': ['Paso', 'Tenis', 'Colo', 'Jago'],
+    'Volkstar': ['Paso', 'Tenis', 'Colo', 'Jago'],
     'Fialto': ['Agna', 'Lagua', 'Zorno'],
-    'Opexel': ['Tasra', 'Lorisa', 'Mornitia'],
+    'Oplon': ['Tasra', 'Lorisa', 'Mornitia'],
     'Bavora': ['C Serisi', 'E Serisi', 'A Serisi', 'D Serisi'],
     'Fortran': ['Odak', 'Vista', 'Avger', 'Tupa'],
     'Mercurion': ['3 Serisi', '5 Serisi', '1 Serisi', 'GJE', '8 Serisi'],
-    'Hyundaro': ['A10', 'Tecent Red', 'Tecent White', 'A20', 'Kascon'],
-    'Toyoto': ['Airoko', 'Lotus', 'Karma'],
+    'Hundar': ['A10', 'Tecent Red', 'Tecent White', 'A20', 'Kascon'],
+    'Koyoro': ['Airoko', 'Lotus', 'Karma'],
     'Audira': ['B3', 'B4', 'B6', 'B5'],
-    'Hondaro': ['Vice', 'VHL', 'Kent', 'Caz'],
+    'Hanto': ['Vice', 'VHL', 'Caz'],
     'Peugot': ['208', '308', '3008', '5008', '2008'],
-    'Hondaro': ['Civic', 'Accord', 'CR-V', 'Jazz', 'HR-V'],
     'Skodra': ['Fabia', 'Octavia', 'Superb', 'Karoq', 'Kodiaq'],
     'Citronix': ['C3', 'C4', 'C5 Aircross', 'Berlingo', 'C-Elysée'],
   };
@@ -164,7 +162,7 @@ class MarketRefreshService {
       'Signa': 875000.0,    // Symbol (2016-2020 Joy/Touch Plus) - ₺750.000-₺875.000 tavan
       'Tallion': 1050000.0, // Taliant (2024-2025 Touch Plus) - ₺900.000-₺1.050.000 tavan
     },
-    'Voltswagen': {
+    'Volkstar': {
       'Paso': 2200000.0,    // Passat B8/B8.5 (Highline, R-Line) - ₺1.800.000-₺2.200.000 tavan
       'Tenis': 1800000.0,   // Golf VIII (R-Line, Highline) - ₺1.400.000-₺1.800.000 tavan
       'Colo': 1300000.0,    // Polo (Comfortline/Highline) - ₺1.050.000-₺1.300.000 tavan
@@ -175,7 +173,7 @@ class MarketRefreshService {
       'Lagua': 650000.0,    // Linea (Üretim durdu, 2014-2015 Emotion Plus) - ₺500.000-₺650.000 tavan
       'Zorno': 580000.0,    // Punto (Üretim durdu, 2014-2015 Lounge) - ₺450.000-₺580.000 tavan
     },
-    'Opexel': {
+    'Oplon': {
       'Tasra': 1700000.0,   // Astra L (Ultimate, Elegance) - ₺1.350.000-₺1.700.000 tavan
       'Lorisa': 1200000.0,  // Corsa F (Ultimate, Elegance) - ₺950.000-₺1.200.000 tavan
       'Mornitia': 2000000.0, // Insignia B (Ultimate, Excellence) - ₺1.600.000-₺2.000.000 tavan
@@ -199,14 +197,14 @@ class MarketRefreshService {
       'GJE': 3000000.0,       // CLA C118 (AMG Line, 4 Kapı Coupe) - ₺2.400.000-₺3.000.000 tavan
       '8 Serisi': 25000000.0, // G-Class (G 63 AMG) - ₺15.000.000-₺25.000.000+ tavan - OYUNUN EN PAHALI ARACI!
     },
-    'Hyundaro': {
+    'Hundar': {
       'A10': 1100000.0,        // i20 III (Style Plus, Elite) - ₺900.000-₺1.100.000 tavan
       'Tecent Red': 700000.0,  // Accent Blue (Mode Plus, Dizel Oto) - ₺550.000-₺700.000 tavan
       'Tecent White': 520000.0, // Accent Era (Team, Dizel Oto) - ₺400.000-₺520.000 tavan
       'A20': 1600000.0,        // i30 III (Elite, N-Line) - ₺1.250.000-₺1.600.000 tavan
       'Kascon': 2500000.0,     // Tucson NX4 (Elite Plus, Hibrit) - ₺1.800.000-₺2.500.000 tavan
     },
-    'Toyoto': {
+    'Koyoro': {
       'Airoko': 2000000.0,     // Corolla E210 (Passion, Flame X-Pack, Hibrit) - ₺1.550.000-₺2.000.000 tavan
       'Lotus': 950000.0,       // Auris (Premium, Elegant, Hibrit) - ₺750.000-₺950.000 tavan
       'Karma': 1300000.0,      // Yaris XP210 (Passion, Hibrit) - ₺1.000.000-₺1.300.000 tavan
@@ -217,10 +215,9 @@ class MarketRefreshService {
       'B6': 5200000.0,         // A6 C8 (S Line, Exclusive, Quattro 3.0 V6) 2023-2025 - ₺4.000.000-₺5.200.000 tavan
       'B5': 4000000.0,         // A5 B9 (S Line, Sportback, Quattro) 2023-2025 - ₺3.000.000-₺4.000.000 tavan
     },
-    'Hondaro': {
+    'Hanto': {
       'Vice': 1850000.0,       // Civic FL (Executive, RS, Turbo) - ₺1.500.000-₺1.850.000 tavan
       'VHL': 2700000.0,        // CR-V 6. nesil (Executive, Hibrit, AWD) - ₺2.000.000-₺2.700.000 tavan
-      'Kent': 1100000.0,       // City (Executive, CVT) - ₺950.000-₺1.100.000 tavan
       'Caz': 1450000.0,        // Jazz 4. nesil (Executive, Hibrit) - ₺1.200.000-₺1.450.000 tavan
     },
     // Diğer markalar eklenecek
@@ -336,8 +333,8 @@ class MarketRefreshService {
       'horsepower': {'min': 65, 'max': 90}, // 65-90 HP (Ekonomik B segment)
     },
     
-    // VOLTSWAGEN PASO (Passat) - %40 spawn
-    'Voltswagen_Paso': {
+    // VOLKSTAR PASO (Passat) - %40 spawn
+    'Volkstar_Paso': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -356,8 +353,8 @@ class MarketRefreshService {
       'horsepower': {'min': 120, 'max': 240}, // 120-240 HP (Premium segment)
     },
     
-    // VOLTSWAGEN TENIS (Golf) - %25 spawn
-    'Voltswagen_Tenis': {
+    // VOLKSTAR TENIS (Golf) - %25 spawn
+    'Volkstar_Tenis': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -376,8 +373,8 @@ class MarketRefreshService {
       'horsepower': {'min': 90, 'max': 150}, // 90-150 HP (GTI/R versiyonları hariç)
     },
     
-    // VOLTSWAGEN COLO (Polo) - %22 spawn
-    'Voltswagen_Colo': {
+    // VOLKSTAR COLO (Polo) - %22 spawn
+    'Volkstar_Colo': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -396,8 +393,8 @@ class MarketRefreshService {
       'horsepower': {'min': 75, 'max': 115}, // 75-115 HP (Premium küçük segment)
     },
     
-    // VOLTSWAGEN JAGO (Jetta) - %13 spawn
-    'Voltswagen_Jago': {
+    // VOLKSTAR JAGO (Jetta) - %13 spawn
+    'Volkstar_Jago': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -477,8 +474,8 @@ class MarketRefreshService {
       'horsepower': {'min': 77, 'max': 95}, // 77-95 HP (En küçük segment)
     },
     
-    // OPEXEL TASRA (Astra) - %55 spawn
-    'Opexel_Tasra': {
+    // OPLON TASRA (Astra) - %55 spawn
+    'Oplon_Tasra': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -498,8 +495,8 @@ class MarketRefreshService {
       'horsepower': {'min': 110, 'max': 160}, // 110-160 HP
     },
     
-    // OPEXEL LORISA (Corsa) - %32.3 spawn
-    'Opexel_Lorisa': {
+    // OPLON LORISA (Corsa) - %32.3 spawn
+    'Oplon_Lorisa': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -519,8 +516,8 @@ class MarketRefreshService {
       'horsepower': {'min': 75, 'max': 130}, // 75-130 HP
     },
     
-    // OPEXEL MORNITIA (Insignia) - %12.7 spawn
-    'Opexel_Mornitia': {
+    // OPLON MORNITIA (Insignia) - %12.7 spawn
+    'Oplon_Mornitia': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -800,8 +797,8 @@ class MarketRefreshService {
       'horsepower': {'min': 245, 'max': 585}, // 245-585 HP (OYUNUN EN GÜÇLÜ ARACI!)
     },
     
-    // HYUNDARO A10 (i20) - %52.15 spawn
-    'Hyundaro_A10': {
+    // HUNDAR A10 (i20) - %52.15 spawn
+    'Hundar_A10': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -820,8 +817,8 @@ class MarketRefreshService {
       'horsepower': {'min': 75, 'max': 120}, // 75-120 HP
     },
     
-    // HYUNDARO TECENT RED (Accent Blue) - %19.25 spawn
-    'Hyundaro_Tecent Red': {
+    // HUNDAR TECENT RED (Accent Blue) - %19.25 spawn
+    'Hundar_Tecent Red': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -840,8 +837,8 @@ class MarketRefreshService {
       'horsepower': {'min': 109, 'max': 136}, // 109-136 HP
     },
     
-    // HYUNDARO TECENT WHITE (Accent Era) - %10.95 spawn
-    'Hyundaro_Tecent White': {
+    // HUNDAR TECENT WHITE (Accent Era) - %10.95 spawn
+    'Hundar_Tecent White': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -860,8 +857,8 @@ class MarketRefreshService {
       'horsepower': {'min': 97, 'max': 110}, // 97-110 HP
     },
     
-    // HYUNDARO A20 (i30) - %9.95 spawn
-    'Hyundaro_A20': {
+    // HUNDAR A20 (i30) - %9.95 spawn
+    'Hundar_A20': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -880,8 +877,8 @@ class MarketRefreshService {
       'horsepower': {'min': 120, 'max': 140}, // 120-140 HP
     },
     
-    // HYUNDARO KASCON (Tucson) - %7.69 spawn
-    'Hyundaro_Kascon': {
+    // HUNDAR KASCON (Tucson) - %7.69 spawn
+    'Hundar_Kascon': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -900,8 +897,8 @@ class MarketRefreshService {
       'horsepower': {'min': 136, 'max': 230}, // 136-230 HP (Hibrit en yüksek)
     },
     
-    // TOYOTO AIROKO (Corolla) - %81.93 spawn
-    'Toyoto_Airoko': {
+    // KOYORO AIROKO (Corolla) - %81.93 spawn
+    'Koyoro_Airoko': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -920,8 +917,8 @@ class MarketRefreshService {
       'horsepower': {'min': 124, 'max': 140}, // 124-140 HP
     },
     
-    // TOYOTO LOTUS (Auris) - %11.65 spawn
-    'Toyoto_Lotus': {
+    // KOYORO LOTUS (Auris) - %11.65 spawn
+    'Koyoro_Lotus': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -940,8 +937,8 @@ class MarketRefreshService {
       'horsepower': {'min': 90, 'max': 136}, // 90-136 HP
     },
     
-    // TOYOTO KARMA (Yaris) - %6.43 spawn
-    'Toyoto_Karma': {
+    // KOYORO KARMA (Yaris) - %6.43 spawn
+    'Koyoro_Karma': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -1040,8 +1037,8 @@ class MarketRefreshService {
       'horsepower': {'min': 190, 'max': 252}, // 190-252 HP
     },
     
-    // HONDARO VICE (Civic) - %80.46 spawn
-    'Hondaro_Vice': {
+    // HANTO VICE (Civic) - %80.46 spawn
+    'Hanto_Vice': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -1060,8 +1057,8 @@ class MarketRefreshService {
       'horsepower': {'min': 125, 'max': 182}, // 125-182 HP (RS Turbo tavan)
     },
     
-    // HONDARO VHL (CR-V) - %10.34 spawn
-    'Hondaro_VHL': {
+    // HANTO VHL (CR-V) - %10.34 spawn
+    'Hanto_VHL': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -1080,28 +1077,10 @@ class MarketRefreshService {
       'horsepower': {'min': 155, 'max': 193}, // 155-193 HP
     },
     
-    // HONDARO KENT (City) - %5.75 spawn
-    'Hondaro_Kent': {
-      'bodyTypes': {
-        'rule': 'year_based',
-        'ranges': [
-          {'years': [2010, 2025], 'types': ['Sedan']}, // 4 kapı - tek kasa
-        ],
-      },
-      'fuelTypes': {
-        'rule': 'year_based',
-        'ranges': [
-          {'years': [2010, 2025], 'types': ['Benzin', 'Benzin+LPG']}, // i-VTEC
-        ],
-      },
-      'transmissions': ['Otomatik'], // CVT (GÜVENİLİR!) - Manuel yok
-      'driveType': 'Önden', // FWD - Standart
-      'engineSize': {'min': 1.5, 'max': 1.5}, // 1.5 i-VTEC
-      'horsepower': {'min': 121, 'max': 121}, // 121 HP sabit
-    },
+
     
-    // HONDARO CAZ (Jazz) - %3.45 spawn
-    'Hondaro_Caz': {
+    // HANTO CAZ (Jazz) - %3.45 spawn
+    'Hanto_Caz': {
       'bodyTypes': {
         'rule': 'year_based',
         'ranges': [
@@ -1123,7 +1102,7 @@ class MarketRefreshService {
 
   /// Servisi başlat
   Future<void> initialize() async {
-    debugPrint('🏪 MarketRefreshService initializing...');
+
     
     // İlk pazar oluştur
     await _generateInitialMarket();
@@ -1131,19 +1110,19 @@ class MarketRefreshService {
     // Gün değişim listener'ı ekle
     _gameTime.addDayChangeListener(_onDayChange);
     
-    debugPrint('✅ MarketRefreshService initialized with ${_activeListings.length} listings');
+
   }
 
   /// Gün değişiminde çağrılır
   void _onDayChange(int oldDay, int newDay) {
-    debugPrint('📅 Market refresh triggered (Day $oldDay → $newDay)');
+
     _refreshMarket();
   }
 
   /// İlk pazarı oluştur (700-1200 ilan)
   Future<void> _generateInitialMarket() async {
     final totalListings = 700 + _random.nextInt(501); // 700-1200
-    debugPrint('🏗️ Generating initial market: $totalListings listings');
+
     
     _activeListings.clear();
     
@@ -1158,7 +1137,7 @@ class MarketRefreshService {
       }
     }
     
-    debugPrint('✅ Initial market generated: ${_activeListings.length} listings');
+
   }
 
   /// Pazarı yenile (günlük)
@@ -1171,7 +1150,7 @@ class MarketRefreshService {
     }).toList();
     
     if (expiredListings.isNotEmpty) {
-      debugPrint('🗑️ Removing ${expiredListings.length} expired listings');
+
       _activeListings.removeWhere((listing) => expiredListings.contains(listing));
     }
     
@@ -1181,11 +1160,11 @@ class MarketRefreshService {
     // 3) Yeni ilanlar oluştur (kaybolan ilan sayısı kadar)
     final newListingsNeeded = expiredListings.length;
     if (newListingsNeeded > 0) {
-      debugPrint('➕ Generating $newListingsNeeded new listings');
+
       _generateNewListings(newListingsNeeded);
     }
     
-    debugPrint('✅ Market refreshed. Total listings: ${_activeListings.length}');
+
   }
 
   /// Pazar çalkantısını güncelle
@@ -1194,7 +1173,7 @@ class MarketRefreshService {
     if (_isMarketShakeActive) {
       _marketShakeDaysRemaining--;
       if (_marketShakeDaysRemaining <= 0) {
-        debugPrint('🔄 Market shake ended. Returning to normal.');
+
         _isMarketShakeActive = false;
         _marketShakeAdjustments.clear();
       }
@@ -1202,7 +1181,7 @@ class MarketRefreshService {
     
     // Yeni çalkantı başlatma kontrolü (%10 ihtimal)
     if (!_isMarketShakeActive && _random.nextDouble() < 0.10) {
-      debugPrint('⚠️ Market shake started!');
+
       _isMarketShakeActive = true;
       _marketShakeDaysRemaining = 1 + _random.nextInt(2); // 1-2 gün
       
@@ -1212,7 +1191,7 @@ class MarketRefreshService {
         _marketShakeAdjustments[brand] = adjustment;
       }
       
-      debugPrint('   Duration: $_marketShakeDaysRemaining days');
+
     }
   }
 
@@ -1514,7 +1493,7 @@ class MarketRefreshService {
     final currentYear = DateTime.now().year;
     
     // Premium markalar ve pick-up'lar için daha eski araçlar (fiyat gerçekçiliği)
-    final isPremium = brand == 'Voltswagen' || brand == 'Bavora' || brand == 'Mercurion' || brand == 'Audira' || brand == 'Opexel';
+    final isPremium = brand == 'Volkstar' || brand == 'Bavora' || brand == 'Mercurion' || brand == 'Audira' || brand == 'Oplon';
     final isUltraLux = brand == 'Mercurion' && model == '8 Serisi'; // G-Class ultra lüks
     final isPickupOrSUV = (brand == 'Fortran' && (model == 'Avger' || model == 'Tupa'));
     
@@ -1606,7 +1585,7 @@ class MarketRefreshService {
         // Symbol: Ekonomik segment, orta düzey değer kaybı
         yearFactor *= 0.95; // %5 değer kaybı
       }
-    } else if (brand == 'Voltswagen') {
+    } else if (brand == 'Volkstar') {
       if (model == 'Jago') {
         // Jetta: Üretimi durmuş (2018), değer kaybı hızlı
         yearFactor *= 0.90; // Ekstra %10 değer kaybı
@@ -1625,7 +1604,7 @@ class MarketRefreshService {
         // Egea: Yüksek hacim, rekabet nedeniyle orta değer koruması
         yearFactor *= 0.97; // %3 değer kaybı
       }
-    } else if (brand == 'Opexel') {
+    } else if (brand == 'Oplon') {
       if (model == 'Mornitia') {
         // Insignia: Premium segment, iyi değer koruması
         yearFactor *= 1.02; // %2 daha iyi değer koruması
@@ -1683,7 +1662,7 @@ class MarketRefreshService {
         // A-Class: Kompakt premium, iyi değer koruması
         yearFactor *= 1.05; // %5 daha iyi
       }
-    } else if (brand == 'Hyundaro') {
+    } else if (brand == 'Hundar') {
       if (model == 'Kascon') {
         // Tucson: SUV segment, iyi değer koruması
         yearFactor *= 1.04; // %4 daha iyi
@@ -1700,7 +1679,7 @@ class MarketRefreshService {
         // Accent Era: Çok eski, hızlı değer kaybı
         yearFactor *= 0.88; // %12 değer kaybı (taksi/filo riski)
       }
-    } else if (brand == 'Toyoto') {
+    } else if (brand == 'Koyoro') {
       // Maksimum güvenilirlik ve değer koruması
       if (model == 'Airoko') {
         // Corolla: EN AZ değer kaybı - efsanevi güvenilirlik
@@ -1727,7 +1706,7 @@ class MarketRefreshService {
         // A5: Sportif premium ama DSG riski
         yearFactor *= 0.93; // %7 değer kaybı (DSG riski + niş segment)
       }
-    } else if (brand == 'Hondaro') {
+    } else if (brand == 'Hanto') {
       // İkinci el kralı - Corolla benzeri değer koruması
       if (model == 'Vice') {
         // Civic: EN AZ değer kaybeden sedanlardan - ikinci el kralı
@@ -1735,9 +1714,6 @@ class MarketRefreshService {
       } else if (model == 'VHL') {
         // CR-V: SUV segmentinde en az değer kaybeden
         yearFactor *= 1.07; // %7 daha iyi
-      } else if (model == 'Kent') {
-        // City: Honda güvenilirliği
-        yearFactor *= 1.05; // %5 daha iyi
       } else if (model == 'Caz') {
         // Jazz: Sihirli koltuk - niş ama değerli
         yearFactor *= 1.06; // %6 daha iyi
@@ -1763,7 +1739,7 @@ class MarketRefreshService {
     }
     
     // Tecent White (Accent Era) taksi/filo geçmişi riski
-    if (brand == 'Hyundaro' && model == 'Tecent White' && mileage > 200000) {
+    if (brand == 'Hundar' && model == 'Tecent White' && mileage > 200000) {
       kmFactor *= 0.90; // Yüksek km Accent Era taksi riski - ekstra %10 değer kaybı
     }
     
@@ -1800,9 +1776,9 @@ class MarketRefreshService {
         // Taliant Fabrika LPG: Yüksek talep
         fuelFactor *= 1.10; // Ekstra %10 değer
       }
-    } else if (brand == 'Voltswagen') {
+    } else if (brand == 'Volkstar') {
       if (fuelType == 'Dizel') {
-        // TDI motorlar Voltswagen'de çok popüler
+        // TDI motorlar Volkstar'da çok popüler
         if (model == 'Paso' || model == 'Tenis') {
           fuelFactor *= 1.12; // Paso/Tenis TDI çok değerli
         } else if (model == 'Jago') {
@@ -1824,9 +1800,9 @@ class MarketRefreshService {
         // Yüksek kilometreli Agna: Ticari filo / taksi riski
         fuelFactor *= 0.93; // %7 değer düşüşü (ağır kullanım riski)
       }
-    } else if (brand == 'Opexel') {
+    } else if (brand == 'Oplon') {
       if (fuelType == 'Dizel') {
-        // CDTI Dizel motorlar Opexel'de çok popüler ve verimli
+        // CDTI Dizel motorlar Oplon'da çok popüler ve verimli
         if (model == 'Tasra') {
           fuelFactor *= 1.12; // Tasra 1.6 CDTI çok talep görüyor
         } else if (model == 'Lorisa') {
@@ -1898,7 +1874,7 @@ class MarketRefreshService {
           fuelFactor *= 1.20; // G 500 / G 63 AMG benzin king
         }
       }
-    } else if (brand == 'Toyoto') {
+    } else if (brand == 'Koyoro') {
       if (fuelType == 'Hybrid') {
         // Hibrit teknolojisi - Toyota'nın ana gücü
         if (model == 'Airoko') {
@@ -1917,7 +1893,7 @@ class MarketRefreshService {
         // LPG uyumu
         fuelFactor *= 0.97; // LPG dönüşüm -%3 değer
       }
-    } else if (brand == 'Hondaro') {
+    } else if (brand == 'Hanto') {
       if (fuelType == 'Hybrid') {
         // Hibrit teknolojisi - Honda'nın güçlü yönü
         if (model == 'VHL') {
@@ -1929,8 +1905,6 @@ class MarketRefreshService {
         // ECO (FABRİKA ÇIKIŞLI LPG) - Honda'nın özel avantajı
         if (model == 'Vice') {
           fuelFactor *= 1.11; // Civic ECO fabrika LPG - yüksek talep (+%11 değer)
-        } else if (model == 'Kent') {
-          fuelFactor *= 1.09; // City LPG uyumu (+%9 değer)
         } else if (model == 'Caz') {
           fuelFactor *= 1.08; // Jazz LPG uyumu (+%8 değer)
         }
@@ -1948,7 +1922,7 @@ class MarketRefreshService {
           fuelFactor *= 1.14; // A3 TDI verimli (+%14 değer)
         }
       }
-    } else if (brand == 'Hyundaro') {
+    } else if (brand == 'Hundar') {
       if (fuelType == 'Dizel') {
         // CRDi Dizel motorlar güçlü ve verimli
         if (model == 'Tecent Red') {
@@ -1994,8 +1968,8 @@ class MarketRefreshService {
           transFactor = 1.06; // %6 daha değerli (eski nesil riski)
         }
       }
-      // MODEL-SPESİFİK VİTES DEĞERİ (Voltswagen için - DSG RİSKİ!)
-      else if (brand == 'Voltswagen') {
+      // MODEL-SPESİFİK VİTES DEĞERİ (Volkstar için - DSG RİSKİ!)
+      else if (brand == 'Volkstar') {
         // DSG (Çift Kavrama) - Yüksek talep AMA yüksek arıza riski
         final vehicleAge = 2025 - year;
         
@@ -2042,8 +2016,8 @@ class MarketRefreshService {
           transFactor = 1.06; // %6 daha değerli (DSG kadar prestijli değil)
         }
       }
-      // MODEL-SPESİFİK VİTES DEĞERİ (Opexel için - TORK KONVERTÖRLÜ GÜVENİLİRLİK!)
-      else if (brand == 'Opexel') {
+      // MODEL-SPESİFİK VİTES DEĞERİ (Oplon için - TORK KONVERTÖRLÜ GÜVENİLİRLİK!)
+      else if (brand == 'Oplon') {
         final vehicleAge = 2025 - year;
         
         if (model == 'Lorisa') {
@@ -2146,8 +2120,8 @@ class MarketRefreshService {
           }
         }
       }
-      // MODEL-SPESİFİK VİTES DEĞERİ (Hyundaro için - TORK KONVERTÖRLÜ GÜVENİLİRLİK!)
-      else if (brand == 'Hyundaro') {
+      // MODEL-SPESİFİK VİTES DEĞERİ (Hundar için - TORK KONVERTÖRLÜ GÜVENİLİRLİK!)
+      else if (brand == 'Hundar') {
         final vehicleAge = 2025 - year;
         
         if (model == 'Tecent White' || model == 'Tecent Red') {
@@ -2177,8 +2151,8 @@ class MarketRefreshService {
           }
         }
       }
-      // MODEL-SPESİFİK VİTES DEĞERİ (Toyoto için - CVT GÜVENİLİRLİĞİ!)
-      else if (brand == 'Toyoto') {
+      // MODEL-SPESİFİK VİTES DEĞERİ (Koyoro için - CVT GÜVENİLİRLİĞİ!)
+      else if (brand == 'Koyoro') {
         final vehicleAge = 2025 - year;
         
         if (model == 'Airoko') {
@@ -2264,8 +2238,8 @@ class MarketRefreshService {
           }
         }
       }
-      // MODEL-SPESİFİK VİTES DEĞERİ (Hondaro için - CVT GÜVENİLİRLİĞİ!)
-      else if (brand == 'Hondaro') {
+      // MODEL-SPESİFİK VİTES DEĞERİ (Hanto için - CVT GÜVENİLİRLİĞİ!)
+      else if (brand == 'Hanto') {
         final vehicleAge = 2025 - year;
         
         // AWD kontrolü (CR-V için)
@@ -2288,9 +2262,6 @@ class MarketRefreshService {
           if (hasAWD) {
             transFactor *= 1.14; // AWD dört çekiş prestij + performans (+%14 ekstra)
           }
-        } else if (model == 'Kent') {
-          // City: CVT - GÜVENİLİR!
-          transFactor = 1.12; // CVT güvenilirlik bonusu
         } else if (model == 'Caz') {
           // Jazz: CVT - ÇOK GÜVENİLİR!
           transFactor = 1.13; // CVT güvenilirlik bonusu
@@ -2358,10 +2329,7 @@ class MarketRefreshService {
       }
     }
     
-    // Hondaro Kent yüksek güç avantajı (121 HP sabit)
-    if (brand == 'Hondaro' && model == 'Kent') {
-      trimFactor *= 1.05; // Egea/Taliant'tan yüksek güç (121 HP) (+%5)
-    }
+
     
     // GENEL HESAPLAMA
     double finalPrice = basePrice * yearFactor * kmFactor * fuelFactor * transFactor * accidentFactor * sellerFactor * trimFactor;
@@ -2428,9 +2396,9 @@ class MarketRefreshService {
         else if (model == 'Signa') extraNotes.add('modelDescriptions.Renauva.auto'.tr());
         else extraNotes.add('modelDescriptions.Renauva.edc'.tr());
       }
-    } else if (brand == 'Voltswagen') {
-      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Voltswagen.tdi'.tr());
-      if (transmission == 'Otomatik') extraNotes.add('modelDescriptions.Voltswagen.dsg'.tr());
+    } else if (brand == 'Volkstar') {
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Volkstar.tdi'.tr());
+      if (transmission == 'Otomatik') extraNotes.add('modelDescriptions.Volkstar.dsg'.tr());
     } else if (brand == 'Fialto') {
       if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Fialto.multijet'.tr());
       else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Fialto.hybrid'.tr());
@@ -2439,12 +2407,12 @@ class MarketRefreshService {
         if (model == 'Lagua' || model == 'Zorno') extraNotes.add('modelDescriptions.Fialto.dualogic'.tr());
         else extraNotes.add('modelDescriptions.Fialto.auto'.tr());
       }
-    } else if (brand == 'Opexel') {
-      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Opexel.cdti'.tr());
+    } else if (brand == 'Oplon') {
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Oplon.cdti'.tr());
       
       if (transmission == 'Otomatik') {
-        if (model == 'Lorisa' && year != null && year < 2020) extraNotes.add('modelDescriptions.Opexel.easytronic'.tr());
-        else extraNotes.add('modelDescriptions.Opexel.auto'.tr());
+        if (model == 'Lorisa' && year != null && year < 2020) extraNotes.add('modelDescriptions.Oplon.easytronic'.tr());
+        else extraNotes.add('modelDescriptions.Oplon.auto'.tr());
       }
     } else if (brand == 'Bavora') {
       if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Bavora.diesel'.tr());
@@ -2482,22 +2450,22 @@ class MarketRefreshService {
       }
       if (model == '8 Serisi') extraNotes.add('modelDescriptions.Mercurion.4matic'.tr());
       else extraNotes.add('modelDescriptions.Mercurion.rwd'.tr());
-    } else if (brand == 'Hyundaro') {
-      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Hyundaro.crdi'.tr());
-      else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Hyundaro.hybrid'.tr());
+    } else if (brand == 'Hundar') {
+      if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Hundar.crdi'.tr());
+      else if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Hundar.hybrid'.tr());
       
       if (transmission == 'Otomatik') {
-        if (year != null && year >= 2019) extraNotes.add('modelDescriptions.Hyundaro.dct'.tr());
-        else extraNotes.add('modelDescriptions.Hyundaro.auto'.tr());
+        if (year != null && year >= 2019) extraNotes.add('modelDescriptions.Hundar.dct'.tr());
+        else extraNotes.add('modelDescriptions.Hundar.auto'.tr());
       }
-    } else if (brand == 'Toyoto') {
-      if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Toyoto.hybrid'.tr());
-      else if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Toyoto.diesel'.tr());
+    } else if (brand == 'Koyoro') {
+      if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Koyoro.hybrid'.tr());
+      else if (fuelType == 'Dizel') extraNotes.add('modelDescriptions.Koyoro.diesel'.tr());
       
       if (transmission == 'Otomatik') {
-        if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Toyoto.cvt_hybrid'.tr());
-        else if ((fuelType == 'Dizel' || model == 'Karma') && year != null && year <= 2015) extraNotes.add('modelDescriptions.Toyoto.mmt'.tr());
-        else extraNotes.add('modelDescriptions.Toyoto.cvt'.tr());
+        if (fuelType == 'Hybrid') extraNotes.add('modelDescriptions.Koyoro.cvt_hybrid'.tr());
+        else if ((fuelType == 'Dizel' || model == 'Karma') && year != null && year <= 2015) extraNotes.add('modelDescriptions.Koyoro.mmt'.tr());
+        else extraNotes.add('modelDescriptions.Koyoro.cvt'.tr());
       }
     } else if (brand == 'Audira') {
       if (fuelType == 'Dizel') {
@@ -2513,15 +2481,15 @@ class MarketRefreshService {
         else if (vehicleAge >= 5) extraNotes.add('modelDescriptions.Audira.stronic_check'.tr());
         else extraNotes.add('modelDescriptions.Audira.stronic'.tr());
       }
-    } else if (brand == 'Hondaro') {
+    } else if (brand == 'Hanto') {
       if (fuelType == 'Hybrid') {
-        if (model == 'VHL') extraNotes.add('modelDescriptions.Hondaro.hybrid_vhl'.tr());
-        else if (model == 'Caz') extraNotes.add('modelDescriptions.Hondaro.hybrid_caz'.tr());
-      } else if (fuelType == 'Benzin+LPG') extraNotes.add('modelDescriptions.Hondaro.lpg'.tr());
+        if (model == 'VHL') extraNotes.add('modelDescriptions.Hanto.hybrid_vhl'.tr());
+        else if (model == 'Caz') extraNotes.add('modelDescriptions.Hanto.hybrid_caz'.tr());
+      } else if (fuelType == 'Benzin+LPG') extraNotes.add('modelDescriptions.Hanto.lpg'.tr());
       
-      if (driveType == '4x4') extraNotes.add('modelDescriptions.Hondaro.awd'.tr());
-      if (transmission == 'Otomatik') extraNotes.add('modelDescriptions.Hondaro.cvt'.tr());
-      if (model == 'Vice' && horsepower != null && horsepower >= 170) extraNotes.add('modelDescriptions.Hondaro.rs'.tr());
+      if (driveType == '4x4') extraNotes.add('modelDescriptions.Hanto.awd'.tr());
+      if (transmission == 'Otomatik') extraNotes.add('modelDescriptions.Hanto.cvt'.tr());
+      if (model == 'Vice' && horsepower != null && horsepower >= 170) extraNotes.add('modelDescriptions.Hanto.rs'.tr());
     }
     
     // Ana açıklama + ek notlar

@@ -1,5 +1,5 @@
 {
-  "brand": "Voltswagen",
+  "brand": "Volkstar",
   "spawnRate": 0.144,
   "description": "Alman mühendislik üstünlüğü, DSG teknolojisi ve premium kalite",
   "models": [
@@ -11,13 +11,22 @@
       "basePriceTL": 2200000,
       "priceRange": "1800000-2200000",
       "bodyTypes": {
-        "2010-2025": ["Sedan", "Station Wagon"]
+        "2010-2025": [
+          "Sedan",
+          "Station Wagon"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Manuel (6-7 ileri) + DSG (Çift Kavrama - YÜKSEK RİSK!)"
       },
       "driveType": "Önden",
@@ -40,13 +49,21 @@
       "basePriceTL": 1800000,
       "priceRange": "1400000-1800000",
       "bodyTypes": {
-        "2010-2025": ["Hatchback"]
+        "2010-2025": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Manuel (6-7 ileri) + DSG (Çift Kavrama - ORTA RİSK)"
       },
       "driveType": "Önden",
@@ -70,13 +87,21 @@
       "basePriceTL": 1300000,
       "priceRange": "1050000-1300000",
       "bodyTypes": {
-        "2010-2025": ["Hatchback"]
+        "2010-2025": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Manuel (5 ileri) + DSG (Küçük motor - DÜŞÜK RİSK)"
       },
       "driveType": "Önden",
@@ -99,13 +124,21 @@
       "basePriceTL": 1150000,
       "priceRange": "950000-1150000",
       "bodyTypes": {
-        "2010-2025": ["Sedan"]
+        "2010-2025": [
+          "Sedan"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Manuel (6-7 ileri) + DSG (ESKİ NESIL - ÇOK YÜKSEK RİSK!)"
       },
       "driveType": "Önden",
@@ -158,4 +191,3 @@
     ]
   }
 }
-

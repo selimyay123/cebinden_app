@@ -12,13 +12,23 @@
       "basePriceTL": 1500000,
       "priceRange": "1200000-1500000",
       "bodyTypes": {
-        "2010-2025": ["Hatchback", "Sedan", "Station Wagon"]
+        "2010-2025": [
+          "Hatchback",
+          "Sedan",
+          "Station Wagon"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Powershift (ESKİ - RİSKLİ!) / 8 İleri Tork Konvertörlü (YENİ - GÜVENİLİR)"
       },
       "driveType": "Önden (FWD)",
@@ -49,13 +59,21 @@
       "basePriceTL": 1150000,
       "priceRange": "900000-1150000",
       "bodyTypes": {
-        "2010-2025": ["Hatchback"]
+        "2010-2025": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Powershift (ESKİ - RİSKLİ!) / Tam Otomatik/7 İleri DCT (YENİ)"
       },
       "driveType": "Önden (FWD)",
@@ -86,13 +104,20 @@
       "basePriceTL": 4500000,
       "priceRange": "2500000-4500000",
       "bodyTypes": {
-        "2010-2025": ["Pick-up"]
+        "2010-2025": [
+          "Pick-up"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Dizel"]
+        "2010-2025": [
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "6 İleri Manuel/Otomatik, 10 İleri Otomatik (YENİ - GÜVENİLİR)"
       },
       "driveType": "4x4",
@@ -126,13 +151,22 @@
       "basePriceTL": 2000000,
       "priceRange": "1500000-2000000",
       "bodyTypes": {
-        "2010-2025": ["SUV"]
+        "2010-2025": [
+          "SUV"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel", "Hybrid"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel",
+          "Hybrid"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Powershift (ESKİ - RİSKLİ!) / 8 İleri Tork Konvertörlü (YENİ - GÜVENİLİR)"
       },
       "driveType": "Önden (FWD) / 4x4 (AWD)",
@@ -167,7 +201,7 @@
     "transmissionRisk": {
       "Powershift_2016_Öncesi": "DSG GİBİ YÜKSEK ARIZA RİSKİ - manuel'den %12 düşük - onarım kar fırsatı",
       "Powershift_2016_2018": "Orta risk - manuel'den %8 düşük - dikkatli al",
-      "8_İleri_Tork_2018+": "GÜVENİLİR - Opexel gibi - DSG riskinden kaçanlar - yüksek talep",
+      "8_İleri_Tork_2018+": "GÜVENİLİR - Oplon gibi - DSG riskinden kaçanlar - yüksek talep",
       "10_İleri_Avger": "En modern şanzıman - pick-up segmentinde prestij"
     },
     "bodyTypeValues": {
@@ -220,7 +254,7 @@
     },
     "criticalFactors": [
       "POWERSHIFT RİSKİ = Odak/Vista/Tupa eski nesil DSG GİBİ (2016 öncesi %12 düşük)",
-      "2018+ Yeni 8 ileri = GÜVENİLİR (Opexel seviyesi)",
+      "2018+ Yeni 8 ileri = GÜVENİLİR (Oplon seviyesi)",
       "Powershift onarımı = Ana kar fırsatı (düşük al, tamir et, yüksek sat)",
       "Sedan (Odak) = Türkiye'de en hızlı satış",
       "ST-Line donanım = Genç kitle yüksek premium (Odak/Vista)",
@@ -234,4 +268,3 @@
     ]
   }
 }
-

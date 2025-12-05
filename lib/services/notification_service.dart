@@ -169,13 +169,13 @@ class NotificationService {
         // Son sıfırlama zamanını güncelle
         await SettingsHelper.setLastNotificationReset(now);
         
-        debugPrint('✅ Bildirimler 24 saatlik süreden sonra sıfırlandı.');
+
       } else {
         final hoursRemaining = 24 - now.difference(lastReset).inHours;
-        debugPrint('ℹ️ Bildirimler sıfırlanmadı. Kalan süre: $hoursRemaining saat');
+
       }
     } catch (e) {
-      debugPrint('❌ Bildirim sıfırlama kontrolü başarısız: $e');
+
     }
   }
 }

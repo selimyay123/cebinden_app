@@ -819,7 +819,8 @@
     "insufficientBalance": "Yetersiz Bakiye!",
     "confirmAndPay": "Onayla ve Öde",
     "issuesFoundMessage": "Ekspertiz sonucunda gizli kusurlar bulundu! Fiyat güncellendi.",
-    "cleanMessage": "Araç temiz! Satıcı beyanı doğrulandı."
+    "cleanMessage": "Araç temiz! Satıcı beyanı doğrulandı.",
+    "value": "Ekspertiz Değeri"
   },
   "vehicleParts": {
     "original": "Orijinal",
@@ -862,13 +863,13 @@
       "Bavora": "Bavyera motoru",
       "Fialto": "İtalyan pratikliği",
       "Fortran": "Amerikan klasiği",
-      "Hyundaro": "Kore teknolojisi",
-      "Hondaro": "Japon güvenilirliği",
+      "Hundar": "Kore teknolojisi",
+      "Hanto": "Japon güvenilirliği",
       "Mercurion": "Alman lüksü",
-      "Opexel": "Alman pratikliği",
+      "Oplon": "Alman pratikliği",
       "Renauva": "Fransız inovasyonu",
-      "Toyoto": "Japon mükemmelliği",
-      "Voltswagen": "Halkın arabası"
+      "Koyoro": "Japon mükemmelliği",
+      "Volkstar": "Halkın arabası"
     }
   },
   "listingDescriptions": {
@@ -926,7 +927,7 @@
       "lpg": "Fabrika çıkışlı LPG, yakıt tasarrufu garantili.",
       "hybrid": "Hibrit teknoloji ile çevre dostu."
     },
-    "Voltswagen": {
+    "Volkstar": {
       "Paso": [
         "Premium segment, lüks ve konfor.",
         "Geniş iç hacim ve yüksek teknoloji.",
@@ -970,7 +971,7 @@
       "dualogic": "Dualogic yarı otomatik vites.",
       "auto": "Otomatik şanzıman, konforlu sürüş."
     },
-    "Opexel": {
+    "Oplon": {
       "Tasra": [
         "Güvenilir Alman kalitesi.",
         "Geniş kasa seçeneği, konforlu.",
@@ -1081,7 +1082,7 @@
       "4matic": "4MATIC dört çekiş, üç diferansiyel kilidi.",
       "rwd": "Arkadan çekişli (RWD), premium karakter."
     },
-    "Hyundaro": {
+    "Hundar": {
       "A10": [
         "Güvenilir ve ekonomik hatchback.",
         "Geniş donanım seçenekleri.",
@@ -1112,7 +1113,7 @@
       "dct": "DCT çift kavramalı otomatik.",
       "auto": "Tork konvertörlü otomatik, güvenilir."
     },
-    "Toyoto": {
+    "Koyoro": {
       "Airoko": [
         "Efsanevi güvenilirlik.",
         "En az arıza çıkaran sedan.",
@@ -1163,7 +1164,7 @@
       "stronic_check": "S tronic otomatik (bakım geçmişi kontrol edilmeli).",
       "stronic": "S tronic 7 ileri otomatik, sportif vites."
     },
-    "Hondaro": {
+    "Hanto": {
       "Vice": [
         "İkinci el kralı, değerini korur.",
         "Güvenilir Honda kalitesi.",
@@ -1173,11 +1174,6 @@
         "SUV segmentinde lider konfor.",
         "Geniş iç mekan, aile aracı.",
         "Honda güvenilirliği."
-      ],
-      "Kent": [
-        "Ekonomik sedan, Honda kalitesi.",
-        "Geniş iç hacim, konforlu.",
-        "Yüksek motor gücü (121 HP)."
       ],
       "Caz": [
         "Sihirli koltuklar, yüksek tavan.",
@@ -1201,7 +1197,7 @@
         "Signa": "Ekonomik Sedan, pratik kullanım",
         "Tallion": "Yeni Nesil, modern teknoloji"
       },
-      "Voltswagen": {
+      "Volkstar": {
         "Paso": "Premium Segment, lüks ve güç",
         "Tenis": "Kompakt Premium, yüksek talep",
         "Colo": "Premium Küçük, kaliteli ve pratik",
@@ -1212,7 +1208,7 @@
         "Lagua": "Ekonomik Sedan, basit ve sağlam",
         "Zorno": "Kompakt Hatchback, şehir aracı"
       },
-      "Opexel": {
+      "Oplon": {
         "Tasra": "Güvenilir Alman kalitesi, popüler",
         "Lorisa": "Kompakt, ekonomik ve güvenilir",
         "Mornitia": "Premium Segment, lüks donanım"
@@ -1236,14 +1232,14 @@
         "GJE": "4 Kapı Coupe, sportif şık",
         "8 Serisi": "Efsane arazi, ultra lüks"
       },
-      "Hyundaro": {
+      "Hundar": {
         "A10": "Güvenilir, ekonomik hatchback",
         "Tecent Red": "Güçlü dizel, ekonomik sedan",
         "Tecent White": "Basit sağlam, ucuz onarım",
         "A20": "Dengeli C segment, zengin donanım",
         "Kascon": "Modern SUV, hibrit teknoloji"
       },
-      "Toyoto": {
+      "Koyoro": {
         "Airoko": "Efsane güvenilirlik, hibrit lider",
         "Lotus": "Güvenilir hatchback, hibrit mevcut",
         "Karma": "Kompakt pratik, hibrit teknoloji"
@@ -1254,10 +1250,9 @@
         "B6": "E segment lüks, üst düzey konfor",
         "B5": "Sportif coupe, zarif tasarım"
       },
-      "Hondaro": {
+      "Hanto": {
         "Vice": "İkinci el kralı, CVT güvenilirlik",
         "VHL": "SUV konforu, hibrit teknoloji",
-        "Kent": "Ekonomik sedan, yüksek güç",
         "Caz": "Sihirli koltuk, hibrit mevcut"
       }
     }
@@ -1377,22 +1372,22 @@
         "1": "Yeni nesil, modern teknoloji.",
         "2": "Aileniz için güvenli ve ekonomik."
       },
-      "Voltswagen_Paso": {
+      "Volkstar_Paso": {
         "1": "Premium segment, lüks ve konfor.",
         "2": "Geniş iç hacim ve yüksek teknoloji.",
         "3": "Uzun yol için mükemmel seçim."
       },
-      "Voltswagen_Tenis": {
+      "Volkstar_Tenis": {
         "1": "Kompakt ama ferah iç hacim.",
         "2": "Volkswagen kalitesi ve güvenilirliği.",
         "3": "Yüksek talep ve hızlı satış."
       },
-      "Voltswagen_Colo": {
+      "Volkstar_Colo": {
         "1": "Premium küçük araç segmenti.",
         "2": "Şehir içi kullanımda pratik.",
         "3": "Volkswagen prestiji uygun fiyata."
       },
-      "Voltswagen_Jago": {
+      "Volkstar_Jago": {
         "1": "Geniş bagajlı sedan.",
         "2": "Aile arabası olarak uygun."
       },
@@ -1411,17 +1406,17 @@
         "2": "Şehir içi ideal.",
         "3": "Düşük işletme maliyeti."
       },
-      "Opexel_Tasra": {
+      "Oplon_Tasra": {
         "1": "Güvenilir Alman kalitesi.",
         "2": "Geniş kasa seçeneği, konforlu.",
         "3": "Hem sedan hem hatchback mevcut."
       },
-      "Opexel_Lorisa": {
+      "Oplon_Lorisa": {
         "1": "Kompakt ve ekonomik.",
         "2": "Şehir içi kullanımda pratik.",
         "3": "Güvenilir otomatik şanzıman."
       },
-      "Opexel_Mornitia": {
+      "Oplon_Mornitia": {
         "1": "Premium segment, lüks donanım.",
         "2": "Uzun yol konforu üst seviye.",
         "3": "Prestijli ve güvenilir."
@@ -1491,42 +1486,42 @@
         "2": "G 63 AMG en güçlü versiyon.",
         "3": "3 diferansiyel kilidi, saf arazi yeteneği."
       },
-      "Hyundaro_A10": {
+      "Hundar_A10": {
         "1": "Güvenilir ve ekonomik hatchback.",
         "2": "Geniş donanım seçenekleri.",
         "3": "Yedek parça ucuz ve kolay."
       },
-      "Hyundaro_Tecent_Red": {
+      "Hundar_Tecent Red": {
         "1": "Güçlü 1.6 CRDi dizel motor.",
         "2": "Ekonomik sedan, aile aracı.",
         "3": "Tork konvertörlü otomatik güvenilir."
       },
-      "Hyundaro_Tecent_White": {
+      "Hundar_Tecent White": {
         "1": "Basit ve sağlam yapı.",
         "2": "Ucuz onarım maliyetleri.",
         "3": "Ekonomik günlük kullanım."
       },
-      "Hyundaro_A20": {
+      "Hundar_A20": {
         "1": "C segment dengeli araç.",
         "2": "Zengin standart donanım.",
         "3": "N-Line sportif paket popüler."
       },
-      "Hyundaro_Kascon": {
+      "Hundar_Kascon": {
         "1": "Modern SUV, radikal tasarım.",
         "2": "Hibrit teknoloji mevcut.",
         "3": "Geniş iç hacim, konforlu."
       },
-      "Toyoto_Airoko": {
+      "Koyoro_Airoko": {
         "1": "Efsanevi güvenilirlik.",
         "2": "En az arıza çıkaran sedan.",
         "3": "Yüksek kilometrede bile değerli."
       },
-      "Toyoto_Lotus": {
+      "Koyoro_Lotus": {
         "1": "Güvenilir Toyota kalitesi.",
         "2": "Hatchback pratikliği.",
         "3": "Hibrit versiyon çok talep görür."
       },
-      "Toyoto_Karma": {
+      "Koyoro_Karma": {
         "1": "Şehir içi kullanımda pratik.",
         "2": "Kompakt boyut, kolay park.",
         "3": "Hibrit teknoloji mevcut."
@@ -1551,22 +1546,17 @@
         "2": "Zarif akıcı hatlar, dikkat çekici.",
         "3": "Prestijli sportif sedan."
       },
-      "Hondaro_Vice": {
+      "Hanto_Vice": {
         "1": "İkinci el kralı, değerini korur.",
         "2": "Güvenilir Honda kalitesi.",
         "3": "Yüksek kilometrede bile sorunsuz."
       },
-      "Hondaro_VHL": {
+      "Hanto_VHL": {
         "1": "SUV segmentinde lider konfor.",
         "2": "Geniş iç mekan, aile aracı.",
         "3": "Honda güvenilirliği."
       },
-      "Hondaro_Kent": {
-        "1": "Ekonomik sedan, Honda kalitesi.",
-        "2": "Geniş iç hacim, konforlu.",
-        "3": "Yüksek motor gücü (121 HP)."
-      },
-      "Hondaro_Caz": {
+      "Hanto_Caz": {
         "1": "Sihirli koltuklar, yüksek tavan.",
         "2": "Kompakt ama geniş, pratik.",
         "3": "Şehir için ideal araç."
@@ -1576,10 +1566,10 @@
       "Renauva_Dizel": "1.5 dCi motor çok verimli ve ekonomik.",
       "Renauva_BenzinLPG": "Fabrika çıkışlı LPG, yakıt tasarrufu garantili.",
       "Renauva_Hybrid": "Hibrit teknoloji ile çevre dostu.",
-      "Voltswagen_Dizel": "TDI motor, verimli ve güçlü.",
+      "Volkstar_Dizel": "TDI motor, verimli ve güçlü.",
       "Fialto_Dizel": "Multijet dizel motor, verimli ve ekonomik.",
       "Fialto_Hybrid": "Hibrit teknoloji ile yakıt tasarrufu.",
-      "Opexel_Dizel": "CDTI dizel motor, verimli ve güçlü.",
+      "Oplon_CDTI": "CDTI dizel motor, verimli ve uzun ömürlü.",
       "Bavora_Dizel": "d motor, verimli ve güçlü dizel.",
       "Bavora_Hybrid": "e motor, hibrit teknoloji, yüksek verim.",
       "Fortran_EcoBlue": "EcoBlue dizel motor, verimli ve güçlü.",
@@ -1589,23 +1579,23 @@
       "Fortran_Benzin": "EcoBoost turbo benzin, performans ve verim.",
       "Mercurion_Dizel": "d motor, verimli ve güçlü dizel.",
       "Mercurion_Hybrid": "e motor, hibrit teknoloji, yüksek performans.",
-      "Hyundaro_Dizel": "CRDi dizel motor, güçlü ve verimli.",
-      "Hyundaro_Hybrid": "Hibrit teknoloji, yüksek verim ve düşük tüketim.",
-      "Toyoto_Hybrid": "Hibrit teknoloji, yakıt ekonomisi çok yüksek.",
-      "Toyoto_Dizel": "D-4D dizel motor, verimli.",
-      "Hondaro_Hybrid_20": "2.0 Hibrit, yakıt ekonomisi üstün.",
-      "Hondaro_Hybrid_15": "1.5 e:HEV hibrit, çok verimli.",
-      "Hondaro_BenzinLPG": "ECO fabrika çıkışlı LPG, düşük yakıt maliyeti."
+      "Hundar_CRDi": "CRDi dizel motor, güçlü ve ekonomik.",
+      "Hundar_Hybrid": "Hibrit teknoloji, yüksek verim ve düşük tüketim.",
+      "Koyoro_Hybrid": "Hibrit teknoloji, yakıt ekonomisi çok yüksek.",
+      "Koyoro_Dizel": "D-4D dizel motor, verimli.",
+      "Hanto_Hybrid_20": "2.0 Hibrit, yakıt ekonomisi üstün.",
+      "Hanto_Hybrid_15": "1.5 e:HEV hibrit, çok verimli.",
+      "Hanto_BenzinLPG": "ECO fabrika çıkışlı LPG, düşük yakıt maliyeti."
     },
     "transmission": {
       "Renauva_XTronic": "X-Tronic CVT otomatik vites, sürüş keyfi.",
       "Renauva_EasyR": "Easy-R otomatik vites, şehir içi rahat.",
       "Renauva_EDC": "EDC çift kavrama, hızlı ve güvenli vites.",
-      "Voltswagen_DSG": "DSG çift kavrama otomatik şanzıman.",
+      "Volkstar_DSG": "DSG çift kavrama otomatik şanzıman.",
       "Fialto_Dualogic": "Dualogic yarı otomatik vites.",
       "Fialto_Auto": "Otomatik şanzıman, konforlu sürüş.",
-      "Opexel_Easytronic": "Easytronic yarı otomatik vites.",
-      "Opexel_Auto": "Tork konvertörlü otomatik, güvenilir.",
+      "Oplon_Easytronic": "Easytronic yarı otomatik (vites geçişleri hissedilir).",
+      "Oplon_Auto": "Tam otomatik şanzıman, konforlu ve sorunsuz.",
       "Bavora_DCT": "7 ileri DCT, çift kavramalı vites.",
       "Bavora_ZF": "8 ileri Steptronic (ZF), en güvenilir otomatik.",
       "Fortran_10Auto": "10 ileri otomatik, en modern şanzıman.",
@@ -1613,16 +1603,16 @@
       "Fortran_Powershift": "Powershift otomatik vites.",
       "Mercurion_DCT": "7G-DCT çift kavramalı otomatik.",
       "Mercurion_Tronic": "7G/9G-Tronic, en güvenilir otomatik şanzıman.",
-      "Hyundaro_DCT": "DCT çift kavramalı otomatik.",
-      "Hyundaro_Auto": "Tork konvertörlü otomatik, güvenilir.",
-      "Toyoto_CVT_Hybrid": "CVT otomatik, hibrit sistemle mükemmel uyum.",
-      "Toyoto_MMT": "MMT yarı otomatik vites (dikkatli kullanım gerektirir).",
-      "Toyoto_CVT": "CVT otomatik, en güvenilir şanzıman.",
+      "Hundar_DCT": "DCT çift kavramalı otomatik, hızlı vites geçişi.",
+      "Hundar_Auto": "Tork konvertörlü tam otomatik, sorunsuz.",
+      "Koyoro_CVT_Hybrid": "CVT otomatik, hibrit sistemle mükemmel uyum.",
+      "Koyoro_MMT": "MMT yarı otomatik vites (dikkatli kullanım gerektirir).",
+      "Koyoro_CVT": "CVT otomatik, en güvenilir şanzıman.",
       "Audira_Tiptronic": "Tiptronic otomatik, güvenilir şanzıman.",
       "Audira_Multitronic": "Multitronic CVT vites (bakım geçmişi önemli).",
       "Audira_Stronic_Check": "S tronic otomatik (bakım geçmişi kontrol edilmeli).",
       "Audira_Stronic": "S tronic 7 ileri otomatik, sportif vites.",
-      "Hondaro_CVT": "CVT otomatik, en güvenilir şanzıman."
+      "Hanto_CVT": "CVT otomatik, en güvenilir şanzıman."
     },
     "drive": {
       "Bavora_RWD": "Arkadan çekişli (RWD), sportif karakter.",
@@ -1630,10 +1620,10 @@
       "Mercurion_4MATIC": "4MATIC dört çekiş, üç diferansiyel kilidi.",
       "Mercurion_RWD": "Arkadan çekişli (RWD), premium karakter.",
       "Audira_Quattro": "Quattro dört çekiş, maksimum güvenlik ve performans.",
-      "Hondaro_AWD": "AWD dört çekiş, maksimum güvenlik."
+      "Hanto_AWD": "AWD dört çekiş, maksimum güvenlik."
     },
     "performance": {
-      "Hondaro_RS": "RS/Turbo performans versiyonu, sportif sürüş."
+      "Hanto_RS": "RS/Turbo performans versiyonu, sportif sürüş."
     }
   },
   "skills": {

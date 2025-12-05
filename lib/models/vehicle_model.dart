@@ -2,7 +2,7 @@ import 'package:uuid/uuid.dart';
 
 class Vehicle {
   final String id;
-  final String brand; // Marka (örn: BMV, Toyoto)
+  final String brand; // Marka (örn: BMV, Koyoro)
   final String model; // Model (örn: 320i, Camry)
   final int year; // Model yılı
   final int mileage; // Kilometre

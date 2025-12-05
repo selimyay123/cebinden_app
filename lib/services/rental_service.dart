@@ -33,7 +33,7 @@ class RentalService {
 
       return totalRental;
     } catch (e) {
-      print('RentalService.calculateDailyRentalIncome Error: $e');
+
       return 0.0;
     }
   }
@@ -68,7 +68,7 @@ class RentalService {
 
       return rentalIncome;
     } catch (e) {
-      print('RentalService.processDailyRental Error: $e');
+
       return 0.0;
     }
   }
@@ -106,7 +106,7 @@ class RentalService {
         'projectedDaily': projectedDaily,
       };
     } catch (e) {
-      print('RentalService.getRentalStats Error: $e');
+
       return {
         'vehicleCount': 0,
         'lastDailyIncome': 0.0,

@@ -1,5 +1,5 @@
 {
-  "brand": "Toyoto",
+  "brand": "Koyoro",
   "spawnRate": 0.089,
   "description": "Güvenilirlik şampiyonu, CVT mükemmelliği, hibrit teknoloji lideri, maksimum değer koruması",
   "models": [
@@ -12,13 +12,23 @@
       "basePriceTL": 2000000,
       "priceRange": "1550000-2000000",
       "bodyTypes": {
-        "2010-2025": ["Sedan", "Hatchback"]
+        "2010-2025": [
+          "Sedan",
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Hybrid", "Benzin+LPG"]
+        "2010-2025": [
+          "Benzin",
+          "Hybrid",
+          "Benzin+LPG"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "CVT (ÇOK GÜVENİLİR!) - HİÇ MMT YOK"
       },
       "driveType": "Önden (FWD)",
@@ -53,13 +63,23 @@
       "basePriceTL": 950000,
       "priceRange": "750000-950000",
       "bodyTypes": {
-        "2010-2018": ["Hatchback"]
+        "2010-2018": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2018": ["Benzin", "Dizel", "Hybrid", "Benzin+LPG"]
+        "2010-2018": [
+          "Benzin",
+          "Dizel",
+          "Hybrid",
+          "Benzin+LPG"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "CVT (GÜVENİLİR) + MMT (YARI OTOMATİK - RİSKLİ!)"
       },
       "driveType": "Önden (FWD)",
@@ -92,13 +112,21 @@
       "basePriceTL": 1300000,
       "priceRange": "1000000-1300000",
       "bodyTypes": {
-        "2010-2025": ["Hatchback"]
+        "2010-2025": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Hybrid"]
+        "2010-2025": [
+          "Benzin",
+          "Hybrid"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "CVT (GÜVENİLİR) + MMT (ESKİ - YARI OTOMATİK - RİSKLİ!)"
       },
       "driveType": "Önden (FWD)",
@@ -186,4 +214,3 @@
     ]
   }
 }
-

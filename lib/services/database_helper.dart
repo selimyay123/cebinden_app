@@ -414,7 +414,7 @@ class DatabaseHelper {
       
       return true;
     } catch (e) {
-      print('DatabaseHelper.addOffer Error: $e');
+
       return false;
     }
   }

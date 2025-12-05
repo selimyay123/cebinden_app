@@ -57,14 +57,14 @@ class BrandSelectionScreen extends StatelessWidget {
         'imagePath': 'assets/images/car_brands/forde.jpeg',
       },
       {
-        'name': 'Hyundaro', // Hyundai
+        'name': 'Hundar', // Hyundai
         'originalHint': 'Kore teknolojisi',
         'color': Colors.grey[700]!,
         'icon': 'H',
         'imagePath': 'assets/images/car_brands/hyunday.jpeg',
       },
       {
-        'name': 'Hondaro',
+        'name': 'Hanto',
         'originalHint': 'Japon güvenilirliği',
         'color': Colors.red[700]!,
         'icon': 'H',
@@ -78,7 +78,7 @@ class BrandSelectionScreen extends StatelessWidget {
         'imagePath': 'assets/images/car_brands/mercedez.jpeg',
       },
       {
-        'name': 'Opexel', // Opel
+        'name': 'Oplon', // Opel
         'originalHint': 'Alman pratikliği',
         'color': Colors.yellow[700]!,
         'icon': 'O',
@@ -106,14 +106,14 @@ class BrandSelectionScreen extends StatelessWidget {
       //   'imagePath': 'assets/images/car_brands/skodai.jpeg',
       // },
       {
-        'name': 'Toyoto', // Toyota
+        'name': 'Koyoro', // Toyota
         'originalHint': 'Japon mükemmelliği',
         'color': Colors.red[600]!,
         'icon': 'T',
-        'imagePath': 'assets/images/car_brands/toyoto.jpeg',
+        'imagePath': 'assets/images/car_brands/koyoro.jpeg',
       },
       {
-        'name': 'Voltswagen', // Volkswagen
+        'name': 'Volkstar', // Volkswagen
         'originalHint': 'Halkın arabası',
         'color': Colors.blue[700]!,
         'icon': 'V',

@@ -1,5 +1,5 @@
 {
-  "brand": "Hyundaro",
+  "brand": "Hundar",
   "spawnRate": 0.089,
   "description": "Güvenilirlik odaklı, tork konvertörlü avantaj, yüksek hacim ticareti, yerli üretim",
   "models": [
@@ -12,13 +12,22 @@
       "basePriceTL": 1100000,
       "priceRange": "900000-1100000",
       "bodyTypes": {
-        "2010-2025": ["Hatchback"]
+        "2010-2025": [
+          "Hatchback"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel", "Benzin+LPG"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel",
+          "Benzin+LPG"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Tork Konvertörlü (ESKİ - GÜVENİLİR!) / DCT (YENİ - ORTA RİSK)"
       },
       "driveType": "Önden (FWD)",
@@ -47,13 +56,22 @@
       "basePriceTL": 700000,
       "priceRange": "550000-700000",
       "bodyTypes": {
-        "2010-2018": ["Sedan"]
+        "2010-2018": [
+          "Sedan"
+        ]
       },
       "fuelTypes": {
-        "2010-2018": ["Benzin", "Dizel", "Benzin+LPG"]
+        "2010-2018": [
+          "Benzin",
+          "Dizel",
+          "Benzin+LPG"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Tork Konvertörlü (ÇOK GÜVENİLİR!)"
       },
       "driveType": "Önden (FWD)",
@@ -84,13 +102,22 @@
       "basePriceTL": 520000,
       "priceRange": "400000-520000",
       "bodyTypes": {
-        "2010-2012": ["Sedan"]
+        "2010-2012": [
+          "Sedan"
+        ]
       },
       "fuelTypes": {
-        "2010-2012": ["Benzin", "Dizel", "Benzin+LPG"]
+        "2010-2012": [
+          "Benzin",
+          "Dizel",
+          "Benzin+LPG"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Tork Konvertörlü (GÜVENİLİR - ESKİ NESİL)"
       },
       "driveType": "Önden (FWD)",
@@ -124,13 +151,22 @@
       "basePriceTL": 1600000,
       "priceRange": "1250000-1600000",
       "bodyTypes": {
-        "2010-2025": ["Hatchback", "Station Wagon"]
+        "2010-2025": [
+          "Hatchback",
+          "Station Wagon"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Tork Konvertörlü (ESKİ - GÜVENİLİR) / DCT (YENİ - ORTA RİSK)"
       },
       "driveType": "Önden (FWD)",
@@ -163,13 +199,22 @@
       "basePriceTL": 2500000,
       "priceRange": "1800000-2500000",
       "bodyTypes": {
-        "2010-2025": ["SUV"]
+        "2010-2025": [
+          "SUV"
+        ]
       },
       "fuelTypes": {
-        "2010-2025": ["Benzin", "Dizel", "Hybrid"]
+        "2010-2025": [
+          "Benzin",
+          "Dizel",
+          "Hybrid"
+        ]
       },
       "transmissions": {
-        "types": ["Manuel", "Otomatik"],
+        "types": [
+          "Manuel",
+          "Otomatik"
+        ],
         "notes": "Tork Konvertörlü (ESKİ - GÜVENİLİR) / DCT (YENİ - ORTA RİSK)"
       },
       "driveType": "Önden (FWD) / 4x4 (AWD)",
@@ -262,7 +307,7 @@
       "Kascon": "HİBRİT ARA! En yüksek talep - 4x4 niş prim - Elite Plus/N-Line donanım - Panoramik tavan/deri değerli"
     },
     "criticalFactors": [
-      "TORK KONVERTÖRLÜ GÜVENİLİRLİK = Hyundaro ana avantajı (Tecent White/Red +%11)",
+      "TORK KONVERTÖRLÜ GÜVENİLİRLİK = Hundar ana avantajı (Tecent White/Red +%11)",
       "Tecent White taksi/filo riski = 200k+ km ekstra %10 değer kaybı",
       "Tecent White hurda segment = Küçük bütçe ticareti - ucuz onarım avantajı",
       "DCT orta risk = A10/A20/Kascon yeni nesil - Powershift'ten iyi, tork'tan az (+%4-7)",
@@ -277,4 +322,3 @@
     ]
   }
 }
-

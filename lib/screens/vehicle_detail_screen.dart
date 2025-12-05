@@ -390,24 +390,37 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // 1. Ekspertiz öncesi fiyat (Eğer düştüyse)
-        if (priceDropped)
+        // 1. İlan Fiyatı (Ekspertiz düşüşü varsa)
+        if (priceDropped) ...[
+          Text(
+            'offer.listingPrice'.tr(),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          ),
           Text(
             '${_formatCurrency(_vehicle.declaredPrice)} TL',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               decoration: TextDecoration.lineThrough,
-              color: Colors.red[300],
+              decorationColor: Colors.red,
+              decorationThickness: 2,
+              color: Colors.grey[500],
               fontWeight: FontWeight.bold,
             ),
           ),
-          
-        // 2. Güncel Liste Fiyatı (Eğer yetenek indirimi varsa çizili, yoksa normal)
+          const SizedBox(height: 4),
+        ],
+
+        // 2. Ara Fiyat (Ekspertiz sonrası, yetenek indirimi öncesi)
         if (hasSkillDiscount) ...[
+          if (priceDropped)
+            Text(
+              'expertise.value'.tr(),
+              style: TextStyle(fontSize: 12, color: Colors.green[700], fontWeight: FontWeight.bold),
+            ),
           Text(
             '${_formatCurrency(_vehicle.price)} TL',
             style: TextStyle(
-              fontSize: priceDropped ? 14 : 16, // Eğer üstte çizili varsa bunu da küçük yap
+              fontSize: priceDropped ? 16 : 18,
               decoration: TextDecoration.lineThrough,
               color: Colors.grey[600],
             ),
@@ -442,13 +455,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             ],
           ),
         ] else ...[
-          // Sadece ekspertiz indirimi var, yetenek indirimi yok
+          // Sadece ekspertiz indirimi var
+          if (priceDropped)
+            Text(
+              'expertise.value'.tr(),
+              style: TextStyle(fontSize: 12, color: Colors.green[700], fontWeight: FontWeight.bold),
+            ),
           Text(
             '${_formatCurrency(_vehicle.price)} TL',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.green, // Fiyat düştüğü için yeşil
+              color: priceDropped ? Colors.green : Colors.deepPurple,
             ),
           ),
         ],
