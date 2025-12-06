@@ -26,98 +26,77 @@ class BrandSelectionScreen extends StatelessWidget {
         'originalHint': 'Alman lüks performansı',
         'color': Colors.grey[800]!,
         'icon': 'A',
-        'imagePath': 'assets/images/car_brands/audix.jpeg',
+        'imagePath': 'assets/images/brands/audira.png',
       },
       {
         'name': 'Bavora', // BMW
         'originalHint': 'Bavyera motoru',
         'color': Colors.blue[700]!,
         'icon': 'B',
-        'imagePath': 'assets/images/car_brands/bmv.jpeg',
+        'imagePath': 'assets/images/brands/bavora.png',
       },
-      // {
-      //   'name': 'Citronix', // Citroen
-      //   'originalHint': 'Fransız konforu',
-      //   'color': Colors.red[400]!,
-      //   'icon': 'C',
-      //   'imagePath': 'assets/images/car_brands/alfio.jpeg',
-      // },
       {
         'name': 'Fialto', // Fiat
         'originalHint': 'İtalyan pratikliği',
         'color': Colors.red[600]!,
         'icon': 'F',
-        'imagePath': 'assets/images/car_brands/fait.jpeg',
+        'imagePath': 'assets/images/brands/fialto.png',
       }, 
       {
         'name': 'Fortran', // Ford
         'originalHint': 'Amerikan klasiği',
         'color': Colors.blue[900]!,
         'icon': 'F',
-        'imagePath': 'assets/images/car_brands/forde.jpeg',
+        'imagePath': 'assets/images/brands/fortran.png',
       },
       {
         'name': 'Hundar', // Hyundai
         'originalHint': 'Kore teknolojisi',
         'color': Colors.grey[700]!,
         'icon': 'H',
-        'imagePath': 'assets/images/car_brands/hyunday.jpeg',
+        'imagePath': 'assets/images/brands/hundar.png',
       },
       {
         'name': 'Hanto',
         'originalHint': 'Japon güvenilirliği',
         'color': Colors.red[700]!,
         'icon': 'H',
-        'imagePath': 'assets/images/car_brands/hondia.jpeg',
+        'imagePath': 'assets/images/brands/hanto.png',
       },
       {
         'name': 'Mercurion', // Mercedes
         'originalHint': 'Alman lüksü',
         'color': Colors.grey[600]!,
         'icon': 'M',
-        'imagePath': 'assets/images/car_brands/mercedez.jpeg',
+        'imagePath': 'assets/images/brands/mercurion.png',
       },
       {
         'name': 'Oplon', // Opel
         'originalHint': 'Alman pratikliği',
         'color': Colors.yellow[700]!,
         'icon': 'O',
-        'imagePath': 'assets/images/car_brands/opex.jpeg',
+        'imagePath': 'assets/images/brands/oplon.png',
       },
-      // {
-      //   'name': 'Peugot', // Peugeot
-      //   'originalHint': 'Fransız zarafeti',
-      //   'color': Colors.blue[800]!,
-      //   'icon': 'P',
-      //   'imagePath': 'assets/images/car_brands/pejo.jpeg',
-      // },
       {
         'name': 'Renauva', // Renault
         'originalHint': 'Fransız inovasyonu',
         'color': Colors.yellow[800]!,
         'icon': 'R',
-        'imagePath': 'assets/images/car_brands/renol.jpeg',
+        'imagePath': 'assets/images/brands/renauva.png',
       },
-      // {
-      //   'name': 'Skodra', // Škoda
-      //   'originalHint': 'Çek değeri',
-      //   'color': Colors.green[700]!,
-      //   'icon': 'Š',
-      //   'imagePath': 'assets/images/car_brands/skodai.jpeg',
-      // },
       {
         'name': 'Koyoro', // Toyota
         'originalHint': 'Japon mükemmelliği',
         'color': Colors.red[600]!,
         'icon': 'T',
-        'imagePath': 'assets/images/car_brands/koyoro.jpeg',
+        'imagePath': 'assets/images/brands/koyoro.png',
       },
       {
         'name': 'Volkstar', // Volkswagen
         'originalHint': 'Halkın arabası',
         'color': Colors.blue[700]!,
         'icon': 'V',
-        'imagePath': 'assets/images/car_brands/volksvan.jpeg',
+        'imagePath': 'assets/images/brands/volkstar.png',
       },
     ];
 
@@ -318,49 +297,57 @@ class BrandSelectionScreen extends StatelessWidget {
               children: [
                 // Marka Logosu
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 54, // Increased slightly to accommodate border
+                  height: 54,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: color.withOpacity(0.3),
-                      width: 2,
-                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: imagePath != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(
-                            imagePath,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              // Resim yüklenemezse harf göster
-                              return Center(
-                                child: Text(
-                                  icon,
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: color,
+                  padding: const EdgeInsets.all(3), // Border width
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(9), // Inner radius
+                    ),
+                    child: imagePath != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(9),
+                            child: Image.asset(
+                              imagePath,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Resim yüklenemezse harf göster
+                                return Center(
+                                  child: Text(
+                                    icon,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: color,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      : Center(
-                          child: Text(
-                            icon,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: color,
+                                );
+                              },
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              icon,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: color,
+                              ),
                             ),
                           ),
-                        ),
+                  ),
                 ),
                 const SizedBox(width: 16),
                 

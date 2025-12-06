@@ -1894,7 +1894,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               Row(
                 children: [
                   Expanded(
-                    child: TextButton(
+                    child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text('common.ok'.tr()),
                     ),
@@ -1940,7 +1940,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: Text('common.accept'.tr()),
+                    child: Text('offers.accept'.tr()),
                   ),
                 ),
               ],

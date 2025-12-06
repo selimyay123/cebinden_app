@@ -77,6 +77,7 @@ dependencies:
   # Tutorial sistemi
   tutorial_coach_mark: ^1.2.11
   animations: ^2.1.1
+  in_app_purchase: ^3.2.3
 
 dev_dependencies:
   flutter_test:
@@ -102,7 +103,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/car_brands/
+    - assets/images/brands/
     - assets/images/app_logo/
     - assets/images/
     - assets/translations/

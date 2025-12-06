@@ -29,6 +29,7 @@ import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
 import 'taxi_game_screen.dart';
 import 'skill_tree_screen.dart'; // Yetenek Ağacı Ekranı
+import 'package:lottie/lottie.dart';
 import '../services/rental_service.dart'; // Kiralama Servisi
 
 class HomeScreen extends StatefulWidget {
@@ -499,8 +500,8 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.deepPurple, Colors.deepPurple.shade700],
-          begin: Alignment.topLeft,
+          colors: [Colors.deepPurple, Colors.deepPurple.shade400],
+          begin: Alignment.topCenter,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
@@ -718,10 +719,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.stars,
-                            color: Colors.amber,
-                            size: 18,
+                          Lottie.asset(
+                            'assets/animations/gold.json',
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.contain,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -752,12 +754,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 6,
+                          horizontal: 18,
+                          vertical: 13,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.amber,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -1325,7 +1327,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //   'onTap': () {
       //     // TODO: Araç kiralama sayfası
       //     ScaffoldMessenger.of(context).showSnackBar(
-      //       const SnackBar(
+      //       const (
       //         content: Text('Araç kiralama sayfası yakında...'),
       //         duration: Duration(seconds: 2),
       //       ),
@@ -3576,14 +3578,14 @@ class _HomeScreenState extends State<HomeScreen> {
             await _questService.updateProgress(_currentUser!.id, QuestType.login, 1);
             
             // Basit bir snackbar veya animasyon
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Günlük ödül alındı! 🎉'),
-                  backgroundColor: Colors.amber,
-                ),
-              );
-            }
+            // if (mounted) {
+            //   ScaffoldMessenger.of(context).showSnackBar(
+            //     const SnackBar(
+            //       content: Text('Günlük ödül alındı! 🎉'),
+            //       backgroundColor: Colors.amber,
+            //     ),
+            //   );
+            // }
           },
         ),
       );

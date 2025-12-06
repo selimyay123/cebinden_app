@@ -1908,10 +1908,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Karşı Teklifi Reddet'),
+        title: Text('offers.rejectCounterOfferTitle'.tr()),
         content: Text(
-          '${offer.vehicleBrand} ${offer.vehicleModel} için gelen karşı teklifi reddetmek istediğinize emin misiniz?\n\n'
-          'Reddedilen teklif kalıcı olarak silinecektir.',
+          'offers.rejectCounterOfferMessage'.trParams({
+            'brand': offer.vehicleBrand,
+            'model': offer.vehicleModel,
+          }),
         ),
         actions: [
           TextButton(
@@ -1921,7 +1923,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Reddet ve Sil'),
+            child: Text('offers.rejectAndDelete'.tr()),
           ),
         ],
       ),

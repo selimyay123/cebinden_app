@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
@@ -308,18 +309,11 @@ class _StoreScreenState extends State<StoreScreen> {
                     Container(
                       width: 60,
                       height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.amber.shade400, Colors.amber.shade600],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.stars,
-                        color: Colors.white,
-                        size: 32,
+                      child: Lottie.asset(
+                        'assets/animations/gold.json',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(width: 16),

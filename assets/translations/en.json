@@ -379,6 +379,9 @@
     "rejectAllButton": "Reject All",
     "rejectAllSuccess": "{count} offers successfully rejected and deleted.",
     "rejectAllPartialSuccess": "{count}/{total} offers rejected.",
+    "rejectCounterOfferTitle": "Reject Counter Offer",
+    "rejectCounterOfferMessage": "Are you sure you want to reject the counter offer for {brand} {model}?\n\nRejected offer will be permanently deleted.",
+    "rejectAndDelete": "Reject and Delete",
     "timeAgo": {
       "now": "Now",
       "minutesAgo": "minutes ago",

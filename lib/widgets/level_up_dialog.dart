@@ -126,10 +126,27 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                       
                     // Gold Reward
                     if (widget.reward.goldBonus > 0)
-                      _buildRewardItem(
-                        Icons.stars,
-                        '${widget.reward.goldBonus} Gold',
-                        Colors.amber,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Lottie.asset(
+                              'assets/animations/gold.json',
+                              width: 32,
+                              height: 32,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${widget.reward.goldBonus} Gold',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       
                     // Unlocks
