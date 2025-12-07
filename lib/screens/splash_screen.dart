@@ -71,43 +71,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Logo veya uygulama ikonu
-            Image.asset(
-              'assets/images/app_logo/cebinden_no_bg.png',
-              height: 180,
-              width: 180,
+      backgroundColor: Colors.black, // Intro resmi ile uyumlu olması için siyah yapıldı, gerekirse değiştirilebilir
+      body: Stack(
+        children: [
+          Center(
+            child: Image.asset(
+              'assets/images/cebinden_intro.jpeg',
               fit: BoxFit.contain,
             ),
-            const SizedBox(height: 20),
-            // Uygulama adı
-            Text(
-              'app.name'.tr(),
-              style: const TextStyle(
-                fontSize: 42,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+          ),
+          const Positioned(
+            bottom: 50,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              'app.subtitle'.tr(),
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.white70,
-              ),
-            ),
-            const SizedBox(height: 40),
-            // Yükleniyor göstergesi
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
