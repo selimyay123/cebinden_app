@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../models/user_model.dart';
+import 'home_screen.dart';
 
 class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
@@ -43,6 +44,17 @@ class _StoreScreenState extends State<StoreScreen> {
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
             title: Text('store.title'.tr()),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
             elevation: 0,
@@ -611,8 +623,11 @@ class _StoreScreenState extends State<StoreScreen> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  behavior: SnackBarBehavior.floating,
                   content: Text('store.paymentSystemComingSoon'.tr()),
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.orange.withOpacity(0.8),
                 ),
               );
             },
@@ -682,9 +697,12 @@ class _StoreScreenState extends State<StoreScreen> {
                 
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      behavior: SnackBarBehavior.floating,
                       content: Text('Garaj başarıyla genişletildi! 🎉'),
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.green.withOpacity(0.8),
                     ),
                   );
                 }
@@ -692,8 +710,11 @@ class _StoreScreenState extends State<StoreScreen> {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
                     content: Text('store.insufficientGold'.tr()),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Colors.red.withOpacity(0.8),
                   ),
                 );
               }

@@ -7,6 +7,7 @@ import '../services/localization_service.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
 import '../models/user_model.dart';
 import '../utils/currency_input_formatter.dart';
+import 'home_screen.dart';
 
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
@@ -111,8 +112,11 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('sell.skillBonus'.trParams({'percent': ((multiplier - 1) * 100).toStringAsFixed(0)})),
-              backgroundColor: Colors.indigo,
+              backgroundColor: Colors.indigo.withOpacity(0.8),
               duration: const Duration(seconds: 3),
             ),
           );
@@ -153,8 +157,11 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         // Başarı mesajı
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('sell.listingSuccess'.tr()),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.withOpacity(0.8),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -162,8 +169,11 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('sell.listingError'.tr()),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.withOpacity(0.8),
           ),
         );
       }
@@ -171,8 +181,11 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
           content: Text('${'sell.listingErrorWithMessage'.tr()}: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.red.withOpacity(0.8),
         ),
       );
     } finally {
@@ -189,6 +202,17 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('sell.title'.tr()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
         elevation: 0,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,

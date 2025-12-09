@@ -285,8 +285,11 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
+                                  elevation: 8,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  behavior: SnackBarBehavior.floating,
                                   content: Text('taxiGame.rewardDoubled'.tr()),
-                                  backgroundColor: Colors.green,
+                                  backgroundColor: Colors.green.withOpacity(0.8),
                                 ),
                               );
                               Navigator.pop(context);
@@ -295,7 +298,13 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                           },
                           onAdNotReady: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('taxiGame.adNotReady'.tr())),
+                              SnackBar(
+                                elevation: 8,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                behavior: SnackBarBehavior.floating,
+                                content: Text('taxiGame.adNotReady'.tr()),
+                                backgroundColor: Colors.grey.withOpacity(0.8),
+                              ),
                             );
                             _adService.loadRewardedAd();
                           },

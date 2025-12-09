@@ -3,6 +3,7 @@ import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
 import '../models/vehicle_model.dart';
 import 'vehicle_detail_screen.dart';
+import 'home_screen.dart';
 
 class VehicleListScreen extends StatefulWidget {
   final String categoryName;
@@ -137,6 +138,17 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text(widget.categoryName),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
         backgroundColor: widget.categoryColor,
         foregroundColor: Colors.white,
         elevation: 0,

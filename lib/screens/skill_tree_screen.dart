@@ -3,6 +3,7 @@ import '../models/user_model.dart';
 import '../services/skill_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import 'home_screen.dart';
 
 class SkillTreeScreen extends StatefulWidget {
   const SkillTreeScreen({Key? key}) : super(key: key);
@@ -49,8 +50,11 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with TickerProviderSt
     if (!SkillService.canUnlock(_currentUser!, skill.id)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
           content: Text('skills.cannotUnlock'.tr()),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.red.withOpacity(0.8),
         ),
       );
       return;
@@ -150,8 +154,11 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with TickerProviderSt
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('${skill.emoji} ${skill.nameKey.tr()} ${'skills.unlocked'.tr()}'),
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.green.withOpacity(0.8),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -160,7 +167,13 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with TickerProviderSt
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('common.error'.tr())),
+          SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red.withOpacity(0.8),
+            content: Text('common.error'.tr()),
+          ),
         );
       }
     }
@@ -182,6 +195,15 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with TickerProviderSt
         title: Text('skills.title'.tr()),
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

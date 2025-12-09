@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
 import 'model_selection_screen.dart';
+import 'home_screen.dart';
 
 class BrandSelectionScreen extends StatelessWidget {
   final String categoryName;
@@ -21,152 +22,161 @@ class BrandSelectionScreen extends StatelessWidget {
       builder: (context, currentLanguage, child) {
         // Simülasyon araç markaları (telif riski olmayan isimler)
         final brands = [
-      {
-        'name': 'Audira', // Audi
-        'originalHint': 'Alman lüks performansı',
-        'color': Colors.grey[800]!,
-        'icon': 'A',
-        'imagePath': 'assets/images/brands/audira.png',
-      },
-      {
-        'name': 'Bavora', // BMW
-        'originalHint': 'Bavyera motoru',
-        'color': Colors.blue[700]!,
-        'icon': 'B',
-        'imagePath': 'assets/images/brands/bavora.png',
-      },
-      {
-        'name': 'Fialto', // Fiat
-        'originalHint': 'İtalyan pratikliği',
-        'color': Colors.red[600]!,
-        'icon': 'F',
-        'imagePath': 'assets/images/brands/fialto.png',
-      }, 
-      {
-        'name': 'Fortran', // Ford
-        'originalHint': 'Amerikan klasiği',
-        'color': Colors.blue[900]!,
-        'icon': 'F',
-        'imagePath': 'assets/images/brands/fortran.png',
-      },
-      {
-        'name': 'Hundar', // Hyundai
-        'originalHint': 'Kore teknolojisi',
-        'color': Colors.grey[700]!,
-        'icon': 'H',
-        'imagePath': 'assets/images/brands/hundar.png',
-      },
-      {
-        'name': 'Hanto',
-        'originalHint': 'Japon güvenilirliği',
-        'color': Colors.red[700]!,
-        'icon': 'H',
-        'imagePath': 'assets/images/brands/hanto.png',
-      },
-      {
-        'name': 'Mercurion', // Mercedes
-        'originalHint': 'Alman lüksü',
-        'color': Colors.grey[600]!,
-        'icon': 'M',
-        'imagePath': 'assets/images/brands/mercurion.png',
-      },
-      {
-        'name': 'Oplon', // Opel
-        'originalHint': 'Alman pratikliği',
-        'color': Colors.yellow[700]!,
-        'icon': 'O',
-        'imagePath': 'assets/images/brands/oplon.png',
-      },
-      {
-        'name': 'Renauva', // Renault
-        'originalHint': 'Fransız inovasyonu',
-        'color': Colors.yellow[800]!,
-        'icon': 'R',
-        'imagePath': 'assets/images/brands/renauva.png',
-      },
-      {
-        'name': 'Koyoro', // Toyota
-        'originalHint': 'Japon mükemmelliği',
-        'color': Colors.red[600]!,
-        'icon': 'T',
-        'imagePath': 'assets/images/brands/koyoro.png',
-      },
-      {
-        'name': 'Volkstar', // Volkswagen
-        'originalHint': 'Halkın arabası',
-        'color': Colors.blue[700]!,
-        'icon': 'V',
-        'imagePath': 'assets/images/brands/volkstar.png',
-      },
-    ];
+          {
+            'name': 'Audira', // Audi
+            'originalHint': 'Alman lüks performansı',
+            'color': Colors.grey[800]!,
+            'icon': 'A',
+            'imagePath': 'assets/images/brands/audira.png',
+          },
+          {
+            'name': 'Bavora', // BMW
+            'originalHint': 'Bavyera motoru',
+            'color': Colors.blue[700]!,
+            'icon': 'B',
+            'imagePath': 'assets/images/brands/bavora.png',
+          },
+          {
+            'name': 'Fialto', // Fiat
+            'originalHint': 'İtalyan pratikliği',
+            'color': Colors.red[600]!,
+            'icon': 'F',
+            'imagePath': 'assets/images/brands/fialto.png',
+          },
+          {
+            'name': 'Fortran', // Ford
+            'originalHint': 'Amerikan klasiği',
+            'color': Colors.blue[900]!,
+            'icon': 'F',
+            'imagePath': 'assets/images/brands/fortran.png',
+          },
+          {
+            'name': 'Hundar', // Hyundai
+            'originalHint': 'Kore teknolojisi',
+            'color': Colors.grey[700]!,
+            'icon': 'H',
+            'imagePath': 'assets/images/brands/hundar.png',
+          },
+          {
+            'name': 'Hanto',
+            'originalHint': 'Japon güvenilirliği',
+            'color': Colors.red[700]!,
+            'icon': 'H',
+            'imagePath': 'assets/images/brands/hanto.png',
+          },
+          {
+            'name': 'Mercurion', // Mercedes
+            'originalHint': 'Alman lüksü',
+            'color': Colors.grey[600]!,
+            'icon': 'M',
+            'imagePath': 'assets/images/brands/mercurion.png',
+          },
+          {
+            'name': 'Oplon', // Opel
+            'originalHint': 'Alman pratikliği',
+            'color': Colors.yellow[700]!,
+            'icon': 'O',
+            'imagePath': 'assets/images/brands/oplon.png',
+          },
+          {
+            'name': 'Renauva', // Renault
+            'originalHint': 'Fransız inovasyonu',
+            'color': Colors.yellow[800]!,
+            'icon': 'R',
+            'imagePath': 'assets/images/brands/renauva.png',
+          },
+          {
+            'name': 'Koyoro', // Toyota
+            'originalHint': 'Japon mükemmelliği',
+            'color': Colors.red[600]!,
+            'icon': 'T',
+            'imagePath': 'assets/images/brands/koyoro.png',
+          },
+          {
+            'name': 'Volkstar', // Volkswagen
+            'originalHint': 'Halkın arabası',
+            'color': Colors.blue[700]!,
+            'icon': 'V',
+            'imagePath': 'assets/images/brands/volkstar.png',
+          },
+        ];
 
-    // Alfabetik sırala
-    brands.sort((a, b) => (a['name'] as String).compareTo(b['name'] as String));
+        // Alfabetik sırala
+        brands.sort(
+          (a, b) => (a['name'] as String).compareTo(b['name'] as String),
+        );
 
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text('vehicles.selectBrand'.tr()),
-        backgroundColor: categoryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          // Bilgilendirme Banner
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            color: categoryColor.withOpacity(0.1),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  color: categoryColor,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    '${'vehicles.categoryInfoAuto'.tr()} $categoryName',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w500,
+        return Scaffold(
+          backgroundColor: Colors.grey[100],
+          appBar: AppBar(
+            title: Text('vehicles.selectBrand'.tr()),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
+            backgroundColor: categoryColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: Column(
+            children: [
+              // Bilgilendirme Banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                color: categoryColor.withOpacity(0.1),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: categoryColor, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '${'vehicles.categoryInfoAuto'.tr()} $categoryName',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              // Marka Listesi
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: brands.length + 1, // +1 for "Tüm Modeller"
+                  itemBuilder: (context, index) {
+                    // İlk item "Tüm Modeller"
+                    if (index == 0) {
+                      return _buildAllBrandsCard(context);
+                    }
+
+                    // Diğer markalar
+                    final brand = brands[index - 1];
+                    return _buildBrandCard(
+                      context,
+                      name: brand['name'] as String,
+                      hint: 'brands.hints.${brand['name']}'.tr(),
+                      color: brand['color'] as Color,
+                      icon: brand['icon'] as String,
+                      imagePath: brand['imagePath'] as String?,
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-          
-          // Marka Listesi
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: brands.length + 1, // +1 for "Tüm Modeller"
-              itemBuilder: (context, index) {
-                // İlk item "Tüm Modeller"
-                if (index == 0) {
-                  return _buildAllBrandsCard(context);
-                }
-                
-                // Diğer markalar
-                final brand = brands[index - 1];
-                return _buildBrandCard(
-                  context,
-                  name: brand['name'] as String,
-                  hint: 'brands.hints.${brand['name']}'.tr(),
-                  color: brand['color'] as Color,
-                  icon: brand['icon'] as String,
-                  imagePath: brand['imagePath'] as String?,
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+        );
       },
     );
   }
@@ -192,7 +202,7 @@ class BrandSelectionScreen extends StatelessWidget {
                 ),
               ),
             );
-            
+
             // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
             if (purchased == true && context.mounted) {
               Navigator.pop(context, true);
@@ -211,11 +221,7 @@ class BrandSelectionScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    Icons.apps,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                  child: Icon(Icons.apps, color: Colors.white, size: 32),
                 ),
                 const SizedBox(width: 16),
                 // Text
@@ -243,11 +249,7 @@ class BrandSelectionScreen extends StatelessWidget {
                   ),
                 ),
                 // Arrow
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white,
-                  size: 18,
-                ),
+                Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
               ],
             ),
           ),
@@ -284,7 +286,7 @@ class BrandSelectionScreen extends StatelessWidget {
                 ),
               ),
             );
-            
+
             // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
             if (purchased == true && context.mounted) {
               Navigator.pop(context, true);
@@ -350,7 +352,7 @@ class BrandSelectionScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                
+
                 // Marka Bilgileri
                 Expanded(
                   child: Column(
@@ -367,15 +369,12 @@ class BrandSelectionScreen extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         hint,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),
                     ],
                   ),
                 ),
-                
+
                 // Ok İkonu
                 Icon(
                   Icons.arrow_forward_ios,
@@ -390,4 +389,3 @@ class BrandSelectionScreen extends StatelessWidget {
     );
   }
 }
-

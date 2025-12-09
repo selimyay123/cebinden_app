@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -252,8 +253,11 @@ class _HomeScreenState extends State<HomeScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('ads.notReady'.tr()),
-              backgroundColor: Colors.orange,
+              backgroundColor: Colors.orange.withOpacity(0.8),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -310,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
-            title: Text('home.title'.tr()),
+            // title: Text('CEBİNDEN'),
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
             elevation: 0,
@@ -471,7 +475,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withOpacity(0.5),
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
               boxShadow: [
@@ -500,14 +504,14 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.deepPurple, Colors.deepPurple.shade400],
+          colors: [Colors.deepPurple.withOpacity(0.6), Colors.deepPurple.shade400.withOpacity(0.6)],
           begin: Alignment.topCenter,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.deepPurple.withOpacity(0.3),
+            color: Colors.deepPurple.withOpacity(0.5),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -1114,58 +1118,150 @@ class _HomeScreenState extends State<HomeScreen> {
           
           const SizedBox(height: 12),
           
-          // Reklam İzle Butonu (Tam genişlik)
+          // Yeni Tasarım Reklam Kartı
+          _buildWatchAdCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWatchAdCard() {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      height: 80,
+      child: Stack(
+        children: [
+          // Ana Kart
           InkWell(
             onTap: _watchRewardedAd,
-            borderRadius: BorderRadius.circular(16),
-            child: _buildGlassContainer(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Container(
-                  //   padding: const EdgeInsets.all(10),
-                  //   decoration: BoxDecoration(
-                  //     color: Colors.amber.withOpacity(0.1),
-                  //     shape: BoxShape.circle,
-                  //   ),
-                  //   child: const Icon(
-                  //     Icons.play_circle_filled,
-                  //     color: Colors.amber,
-                  //     size: 26,
-                  //   ),
-                  // ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'ads.watchAd'.tr(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey[800],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      '5000 TL',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.deepPurple.withOpacity(0.5),
+                    Colors.deepPurple.withOpacity(0.5),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.deepPurple.withOpacity(0.4),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
+              ),
+              child: Row(
+                children: [
+                  // Sol Taraf - Altınlar ve Play Butonu
+                  SizedBox(
+                    width: 80,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Altın Animasyonu
+                        // Lottie.asset(
+                        //   'assets/animations/gold.json',
+                        //   width: 60,
+                        //   height: 60,
+                        //   fit: BoxFit.contain,
+                        // ),
+                        // Play İkonu Overlay
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: const FaIcon(
+                            FontAwesomeIcons.play,
+                            size: 14,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Orta Kısım - Yazılar
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'common.ads.clickToWin'.tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'ads.watchAd'.tr().toUpperCase(), // İZLE VE KAZAN
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Sağ Taraf - Kilit İkonu (Görseldeki gibi)
+                  // Padding(
+                  //   padding: const EdgeInsets.only(right: 20),
+                  //   child: FaIcon(
+                  //     FontAwesomeIcons.lockOpen, // veya lock
+                  //     color: Colors.amber.shade400,
+                  //     size: 24,
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+          ),
+          
+          // FREE Badge (Sağ Üst Köşe)
+          Positioned(
+            top: 10,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Text(
+                'FREE',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -1802,7 +1898,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.green.shade700, Colors.green.shade500],
+                colors: [Colors.green.withOpacity(0.8), Colors.green.withOpacity(0.8)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -1835,84 +1931,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child:                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'home.buyGallery'.tr(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'home.buyGallery'.tr(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              maxLines: 2, // Allow wrapping
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'home.professionalBusiness'.tr(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white.withOpacity(0.9),
-                              fontWeight: FontWeight.w500,
+                            const SizedBox(height: 4),
+                            Text(
+                              'home.professionalBusiness'.tr(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.9),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
                 
-                const SizedBox(width: 12),
+                const SizedBox(width: 8), // Reduced spacing
                 
                 // Sağ taraf - Fiyat
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${_formatCurrency(galleryPrice)}',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green.shade700,
-                            ),
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            'TL',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.green.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                  ],
-                ),
+                
               ],
             ),
           ),
@@ -2468,16 +2521,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'home.galleryPrice'.tr(),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                    Expanded(
+                      child: Text(
+                        'home.galleryPrice'.tr(),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
-                      '${_formatCurrency(10000000.0)} ₺',
+                      'home.galleryPriceValue'.tr(),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

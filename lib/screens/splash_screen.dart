@@ -74,20 +74,15 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Colors.black, // Intro resmi ile uyumlu olması için siyah yapıldı, gerekirse değiştirilebilir
       body: Stack(
         children: [
-          Center(
-            child: Image.asset(
+          Image.asset(
               'assets/images/cebinden_intro.jpeg',
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
             ),
-          ),
-          const Positioned(
-            bottom: 50,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+          const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           ),
         ],

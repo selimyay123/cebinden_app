@@ -15,6 +15,9 @@
     "close": "Kapat",
     "back": "Geri",
     "next": "İleri",
+    "ads": {
+      "clickToWin": "5000 TL kazanmak için tıkla"
+    },
     "done": "Tamamla",
     "loading": "Yükleniyor...",
     "error": "Hata",
@@ -127,6 +130,7 @@
     "advantage4Title": "Prestij & İtibar",
     "advantage4Desc": "Galeri statüsü ile daha fazla müşteri ve güven kazanın.",
     "galleryPrice": "Galeri Fiyatı",
+    "galleryPriceValue": "10 Milyon TL",
     "galleryComingSoon": "Galeri satın alma özelliği yakında aktif olacak!",
     "galleryPurchaseSuccess": "🎉 Tebrikler! Artık bir galeri sahibisiniz!",
     "galleryInsufficientFunds": "Galeri satın almak için yeterli bakiyeniz yok. Gereken: 10,000,000 ₺",
@@ -1343,7 +1347,7 @@
   },
   "store": {
     "title": "Mağaza",
-    "buyGold": "Altın Satın Al",
+    "buyGold": "Altın Al",
     "convertGold": "Altın Bozdur",
     "yourGold": "Altınınız",
     "gold": "Altın",

@@ -4,6 +4,7 @@ import '../models/daily_quest_model.dart';
 import '../services/daily_quest_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import 'home_screen.dart';
 
 class DailyQuestsScreen extends StatefulWidget {
   const DailyQuestsScreen({super.key});
@@ -50,13 +51,16 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text(
               'quests.rewardClaimed'.trParams({
                 'xp': quest.rewardXP.toString(),
                 'money': quest.rewardMoney.toStringAsFixed(0),
               }),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.withOpacity(0.8),
           ),
         );
         _loadQuests(); // Listeyi yenile
@@ -64,7 +68,13 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('quests.claimFailed'.tr())),
+          SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red.withOpacity(0.8),
+            content: Text('quests.claimFailed'.tr()),
+          ),
         );
       }
     }
@@ -75,6 +85,17 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('quests.title'.tr()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

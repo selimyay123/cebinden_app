@@ -8,6 +8,7 @@ import '../utils/brand_colors.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
+import 'home_screen.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
@@ -76,6 +77,17 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
             title: Text(widget.selectedBrand != null 
               ? widget.selectedBrand! 
               : 'home.myVehicles'.tr()),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
             elevation: 0,

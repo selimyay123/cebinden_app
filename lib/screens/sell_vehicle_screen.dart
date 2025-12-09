@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
+import 'home_screen.dart';
 
 class SellVehicleScreen extends StatefulWidget {
   const SellVehicleScreen({super.key});
@@ -51,6 +52,17 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('sell.title'.tr()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
         elevation: 0,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,

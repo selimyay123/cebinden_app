@@ -14,6 +14,7 @@ import '../utils/brand_colors.dart';
 import '../services/market_refresh_service.dart'; // Araç detayları için
 import '../models/vehicle_model.dart'; // Vehicle modeli için
 import 'dart:math'; // Random için
+import 'home_screen.dart';
 
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
@@ -156,6 +157,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('offers.title'.tr()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -367,6 +379,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('${widget.selectedBrand} ${'myVehicles.myVehicles'.tr()}'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -440,6 +463,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         title: Text(firstOffer != null 
           ? '${firstOffer.vehicleBrand} ${firstOffer.vehicleModel}'
           : 'myVehicles.offers'.tr()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -1258,8 +1292,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           // Başarı mesajı
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptSuccess'.tr()),
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.green.withOpacity(0.8),
             ),
           );
 
@@ -1292,8 +1329,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           // Hata mesajı
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptError'.tr()),
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.red.withOpacity(0.8),
             ),
           );
         }

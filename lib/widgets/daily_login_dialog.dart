@@ -35,7 +35,13 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
         // Reklam izlenmedi veya yüklenemedi
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Reklam yüklenemedi, normal ödül alınıyor.')),
+            SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.grey[800]!.withOpacity(0.8),
+              content: const Text('Reklam yüklenemedi, normal ödül alınıyor.'),
+            ),
           );
         }
         // Normal ödül devam etsin mi? Kullanıcıya sorulabilir ama şimdilik normal ödülü verelim
@@ -52,7 +58,13 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
         widget.onClaim(); // Callback'i çağır (örn: konfeti patlat)
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ödül alınırken bir hata oluştu.')),
+          SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red.withOpacity(0.8),
+            content: const Text('Ödül alınırken bir hata oluştu.'),
+          ),
         );
       }
     }

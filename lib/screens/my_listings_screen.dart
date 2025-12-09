@@ -9,6 +9,7 @@ import '../services/localization_service.dart';
 import '../utils/brand_colors.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
+import 'home_screen.dart';
 
 class MyListingsScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın ilanlarını göster
@@ -102,6 +103,17 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             backgroundColor: Colors.grey[100],
             appBar: AppBar(
               title: Text(widget.selectedBrand!),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.home),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
               elevation: 0,
               backgroundColor: Colors.deepPurple,
               foregroundColor: Colors.white,
@@ -117,6 +129,17 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
           backgroundColor: Colors.grey[100],
           appBar: AppBar(
             title: Text('listings.title'.tr()),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
             elevation: 0,
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
@@ -482,8 +505,11 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
+                              elevation: 8,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              behavior: SnackBarBehavior.floating,
                               content: Text('favorites.removedFromFavorites'.tr()),
-                              backgroundColor: Colors.orange,
+                              backgroundColor: Colors.orange.withOpacity(0.8),
                             ),
                           );
                         }

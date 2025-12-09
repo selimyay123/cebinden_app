@@ -12,6 +12,7 @@ import 'about_screen.dart';
 import 'login_screen.dart';
 import '../widgets/level_up_dialog.dart';
 import '../services/xp_service.dart';
+import 'home_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -93,8 +94,11 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
           content: Text('settings.gameDayDurationUpdated'.trParams({'minutes': minutes.toString()})),
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.green.withOpacity(0.8),
         ),
       );
     }
@@ -114,8 +118,11 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       // Başarı mesajı
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
           content: Text('settings.languageChanged'.tr()),
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.green.withOpacity(0.8),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -127,7 +134,11 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
           content: Text('settings.darkModeComingSoon'.tr()),
+          backgroundColor: Colors.grey.withOpacity(0.8),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -146,7 +157,13 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       setState(() => _selectedCurrency = currency);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('settings.currencyUpdated'.tr())),
+          SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            content: Text('settings.currencyUpdated'.tr()),
+            backgroundColor: Colors.grey.withOpacity(0.8),
+          ),
         );
       }
     }
@@ -268,8 +285,11 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('✅ 50 altın eklendi! Toplam: ${_currentUser!.gold.toInt()} altın'),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.withOpacity(0.8),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -281,8 +301,11 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('❌ Hata: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.withOpacity(0.8),
           ),
         );
       }
@@ -417,6 +440,17 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
         return Scaffold(
           appBar: AppBar(
             title: Text('settings.title'.tr()),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
+            ],
             elevation: 0,
           ),
       body: ListView(

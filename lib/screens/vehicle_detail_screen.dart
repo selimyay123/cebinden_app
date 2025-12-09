@@ -21,6 +21,7 @@ import '../widgets/level_up_dialog.dart';
 import 'my_offers_screen.dart';
 import 'my_vehicles_screen.dart';
 import 'package:intl/intl.dart';
+import 'home_screen.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
   final Vehicle vehicle;
@@ -89,8 +90,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('favorites.removedFromFavorites'.tr()),
-              backgroundColor: Colors.orange,
+              backgroundColor: Colors.orange.withOpacity(0.8),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -106,8 +110,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              behavior: SnackBarBehavior.floating,
               content: Text('favorites.addedToFavorites'.tr()),
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.green.withOpacity(0.8),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -132,6 +141,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             pinned: true,
             backgroundColor: Colors.deepPurple,
             actions: [
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+              ),
               // Favori Butonu
               if (_currentUser != null)
                 IconButton(
@@ -1190,8 +1208,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('expertise.issuesFoundMessage'.tr()),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.withOpacity(0.8),
             duration: const Duration(seconds: 4),
           ),
         );
@@ -1200,8 +1221,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('expertise.cleanMessage'.tr()),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.withOpacity(0.8),
           ),
         );
       }
@@ -1370,31 +1394,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 color: Colors.grey[800],
               ),
             ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.amber.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.lightbulb_outline, color: Colors.amber[700], size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'vehicles.funDisclaimer'.tr(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[700],
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+
           ],
         ),
       ),
@@ -1559,7 +1559,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               final offerText = offerController.text.trim();
               if (offerText.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('offer.enterAmountError'.tr())),
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.enterAmountError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
                 );
                 return;
               }
@@ -1569,14 +1575,26 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               final offerAmount = double.tryParse(cleanedText);
               if (offerAmount == null || offerAmount <= 0) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('offer.invalidAmountError'.tr())),
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.invalidAmountError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
                 );
                 return;
               }
 
               if (offerAmount >= _vehicle.price) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('offer.offerTooHighError'.tr())),
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.offerTooHighError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
                 );
                 return;
               }
