@@ -28,6 +28,9 @@ class UserVehicle {
   final String? listingDescription; // İlan açıklaması
   final DateTime? listedDate; // Satışa çıkarıldığı tarih
   
+  // Kiralama bilgisi
+  final bool isRented; // Araç kirada mı?
+
   // Opsiyonel: Kullanıcı aracı sattığında
   final bool isSold;
   final double? salePrice;
@@ -56,6 +59,7 @@ class UserVehicle {
     this.listingPrice,
     this.listingDescription,
     this.listedDate,
+    this.isRented = false,
     this.isSold = false,
     this.salePrice,
     this.saleDate,
@@ -99,6 +103,7 @@ class UserVehicle {
       hasAccidentRecord: hasAccidentRecord,
       imageUrl: imageUrl,
       score: score,
+      isRented: false,
     );
   }
 
@@ -127,6 +132,7 @@ class UserVehicle {
       listingPrice: json['listingPrice'] != null ? (json['listingPrice'] as num).toDouble() : null,
       listingDescription: json['listingDescription'] as String?,
       listedDate: json['listedDate'] != null ? DateTime.parse(json['listedDate'] as String) : null,
+      isRented: json['isRented'] as bool? ?? false,
       isSold: json['isSold'] as bool? ?? false,
       salePrice: json['salePrice'] != null ? (json['salePrice'] as num).toDouble() : null,
       saleDate: json['saleDate'] != null ? DateTime.parse(json['saleDate'] as String) : null,
@@ -158,6 +164,7 @@ class UserVehicle {
       'listingPrice': listingPrice,
       'listingDescription': listingDescription,
       'listedDate': listedDate?.toIso8601String(),
+      'isRented': isRented,
       'isSold': isSold,
       'salePrice': salePrice,
       'saleDate': saleDate?.toIso8601String(),
@@ -223,6 +230,7 @@ class UserVehicle {
       isSold: isSold,
       salePrice: salePrice,
       saleDate: saleDate,
+      isRented: false, // Satışa çıkınca kiralama biter (veya kontrol edilir)
     );
   }
 
@@ -257,6 +265,41 @@ class UserVehicle {
       isSold: true,
       salePrice: salePrice,
       saleDate: saleDate,
+      isRented: false, // Satılınca kiralama biter
+    );
+  }
+
+  // Kiralama durumu değişikliği için kopyalama
+  UserVehicle copyWithRent({
+    required bool isRented,
+  }) {
+    return UserVehicle(
+      id: id,
+      userId: userId,
+      vehicleId: vehicleId,
+      brand: brand,
+      model: model,
+      year: year,
+      mileage: mileage,
+      purchasePrice: purchasePrice,
+      purchaseDate: purchaseDate,
+      color: color,
+      fuelType: fuelType,
+      transmission: transmission,
+      engineSize: engineSize,
+      driveType: driveType,
+      hasWarranty: hasWarranty,
+      hasAccidentRecord: hasAccidentRecord,
+      imageUrl: imageUrl,
+      score: score,
+      isListedForSale: isListedForSale,
+      listingPrice: listingPrice,
+      listingDescription: listingDescription,
+      listedDate: listedDate,
+      isSold: isSold,
+      salePrice: salePrice,
+      saleDate: saleDate,
+      isRented: isRented,
     );
   }
 }

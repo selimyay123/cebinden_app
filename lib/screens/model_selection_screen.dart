@@ -261,7 +261,7 @@ class ModelSelectionScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        modelName,
+                        modelName.replaceAll('Serisi', 'vehicles.series'.tr()),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

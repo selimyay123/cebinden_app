@@ -73,7 +73,7 @@ class CebindenApp extends StatelessWidget {
               brightness: Brightness.light,
             ),
             useMaterial3: true,
-            fontFamily: GoogleFonts.poppins().fontFamily,
+            fontFamily: 'Telegraf',
             appBarTheme: const AppBarTheme(
               centerTitle: true,
               elevation: 0,

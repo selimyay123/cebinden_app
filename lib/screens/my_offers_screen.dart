@@ -1527,7 +1527,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '${_formatCurrency(offer.counterOfferAmount!)} TL',
+                                '${_formatCurrency(offer.counterOfferAmount!)} ${'common.currency'.tr()}',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -1742,8 +1742,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Teklifi Reddet'),
-        content: Text('${offer.buyerName} ${_formatCurrency(offer.offerPrice)} TL ${'offers.rejectConfirmMessage'.tr()}\n\nReddedilen teklif kalıcı olarak silinecektir.'),
+        title: Text('offer.rejectTitle'.tr()),
+        content: Text('${offer.buyerName} ${_formatCurrency(offer.offerPrice)} ${'common.currency'.tr()} ${'offers.rejectConfirmMessage'.tr()}\n\n${'offer.rejectWarning'.tr()}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -1752,7 +1752,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Reddet ve Sil'),
+            child: Text('offer.rejectAndDelete'.tr()),
           ),
         ],
       ),
@@ -1764,9 +1764,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       if (mounted) {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Teklif reddedildi ve silindi.'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
+              content: Text('✅ ${'offer.rejectSuccess'.tr()}'),
+              backgroundColor: Colors.green.withOpacity(0.8),
+                            duration: const Duration(seconds: 3),
+
             ),
           );
 
@@ -1806,7 +1811,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           children: [
             const Icon(Icons.check_circle, color: Colors.green),
             const SizedBox(width: 8),
-            const Text('Karşı Teklifi Kabul Et'),
+            Text('offer.acceptCounterTitle'.tr()),
           ],
         ),
         content: Column(
@@ -1814,7 +1819,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${offer.vehicleBrand} ${offer.vehicleModel} için karşı teklifi kabul etmek istediğinize emin misiniz?',
+              'offer.acceptCounterConfirmMessage'.trParams({
+                'brand': offer.vehicleBrand,
+                'model': offer.vehicleModel,
+              }),
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
@@ -1829,9 +1837,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Teklifiniz:', style: TextStyle(color: Colors.grey[600])),
+                      Text('offer.yourOfferLabel'.tr(), style: TextStyle(color: Colors.grey[600])),
                       Text(
-                        '${_formatCurrency(offer.offerPrice)} TL',
+                        '${_formatCurrency(offer.offerPrice)} ${'common.currency'.tr()}',
                         style: const TextStyle(
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -1842,12 +1850,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Karşı Teklif:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      Text(
+                        'offer.counterOfferLabel'.tr(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        '${_formatCurrency(offer.counterOfferAmount!)} TL',
+                        '${_formatCurrency(offer.counterOfferAmount!)} ${'common.currency'.tr()}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -1861,11 +1869,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             ),
             const SizedBox(height: 12),
             Text(
-              '• Araç garajınıza eklenecek',
+              'offer.garageInfo'.tr(),
               style: TextStyle(fontSize: 13, color: Colors.grey[600]),
             ),
             Text(
-              '• Bakiyenizden ${_formatCurrency(offer.counterOfferAmount!)} TL düşecek',
+              'offer.balanceInfo'.trParams({'amount': _formatCurrency(offer.counterOfferAmount!)}),
               style: TextStyle(fontSize: 13, color: Colors.grey[600]),
             ),
           ],
@@ -1881,7 +1889,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Kabul Et'),
+            child: Text('offer.acceptButton'.tr()),
           ),
         ],
       ),
@@ -1911,9 +1919,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       if (mounted) {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Karşı teklif kabul edildi! Araç garajınıza eklendi.'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
+              content: Text('✅ ${'offer.counterOfferAcceptedSuccess'.tr()}'),
+              backgroundColor: Colors.green.withOpacity(0.8),
+              duration: const Duration(seconds: 3),
             ),
           );
 
@@ -1975,9 +1987,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       if (mounted) {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Karşı teklif reddedildi ve silindi.'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
+              content: Text('✅ ${'offer.counterOfferRejectedSuccess'.tr()}'),
+              backgroundColor: Colors.green.withOpacity(0.8),
+              duration: const Duration(seconds: 3),
             ),
           );
 
@@ -2084,7 +2100,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 decoration: InputDecoration(
                   labelText: 'offer.yourCounterOffer'.tr(),
                   hintText: '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} TL',
-                  suffixText: 'TL',
+                  suffixText: 'common.currency'.tr(),
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.money),
                   helperText: 'offer.counterOfferRange'.tr(),
@@ -2256,7 +2272,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              response,
+              response.startsWith('offerService.') 
+                  ? (decision == 'counter' && newCounterOffer != null
+                      ? response.trParams({'amount': _formatCurrency(newCounterOffer)})
+                      : response.tr())
+                  : response,
               style: const TextStyle(fontSize: 16),
             ),
             if (newCounterOffer != null) ...[
@@ -2433,7 +2453,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              response,
+              response.startsWith('offerService.') 
+                  ? (decision == 'counter' && newCounterOffer != null
+                      ? response.trParams({'amount': _formatCurrency(newCounterOffer)})
+                      : response.tr())
+                  : response,
               style: const TextStyle(fontSize: 16),
             ),
             if (newCounterOffer != null) ...[
@@ -2477,8 +2501,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       decision == 'accept' 
                           ? 'offers.acceptSuccess'.tr()
                           : decision == 'reject'
-                              ? 'Alıcı teklifinizi reddetti. Başka bir teklif bekleyebilirsiniz.'
-                              : 'Pazarlık devam ediyor. Alıcının yeni teklifini yukarıda görebilirsiniz.',
+                              ? 'offer.buyerRejectedMessage'.tr()
+                              : 'offer.negotiationContinueMessage'.tr(),
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.blue[900],
@@ -2749,10 +2773,10 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> {
                 decoration: InputDecoration(
                   labelText: 'offers.yourCounterOffer'.tr(),
                   hintText: '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} TL',
-                  suffixText: 'TL',
+                  suffixText: 'common.currency'.tr(),
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.money),
-                  helperText: 'Alıcının teklifi ile ilan fiyatı arasında bir değer girin',
+                  helperText: 'offer.counterOfferInputHelper'.tr(),
                   helperMaxLines: 2,
                 ),
                 validator: (value) {
@@ -2792,7 +2816,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${isProfit ? 'Kar' : 'Zarar'}: ${_formatCurrency(profit.abs())} TL (%${profitPercent!.abs().toStringAsFixed(1)})',
+                          '${isProfit ? 'offer.profit'.tr() : 'offer.loss'.tr()}: ${_formatCurrency(profit.abs())} ${'common.currency'.tr()} (%${profitPercent!.abs().toStringAsFixed(1)})',
                           style: TextStyle(
                             color: isProfit ? Colors.green[700] : Colors.red[700],
                             fontWeight: FontWeight.bold,

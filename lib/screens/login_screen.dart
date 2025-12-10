@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -325,18 +326,10 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                       ),
                       backgroundColor: Colors.white,
                     ),
-                    icon: Image.asset(
-                      'assets/images/google_logo.png',
-                      height: 24,
-                      width: 24,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Eğer Google logo bulunamazsa, varsayılan icon göster
-                        return const Icon(
-                          Icons.g_mobiledata,
-                          size: 32,
-                          color: Color(0xFF4285F4),
-                        );
-                      },
+                    icon: const FaIcon(
+                      FontAwesomeIcons.google,
+                      color: Color(0xFFDB4437), // Google Red
+                      size: 24,
                     ),
                     label: Text(
                       'login.googleSignIn'.tr(),

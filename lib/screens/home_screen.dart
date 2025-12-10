@@ -2118,7 +2118,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.green.shade700, Colors.green.shade500],
+          colors: [Colors.green.shade700.withOpacity(0.8), Colors.green.shade500.withOpacity(0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -2203,186 +2203,217 @@ class _HomeScreenState extends State<HomeScreen> {
           
           const SizedBox(height: 20),
           
-          // Satın alma tarihi
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: Colors.white.withValues(alpha: 0.9),
-                  size: 16,
+          // Kiraya Ver Butonu
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _showRentOutDialog,
+              icon: const Icon(Icons.key),
+              label: Text('gallery.rentOut'.tr()),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.green.shade700,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'home.galleryPurchaseDate'.tr() + ': ',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 13,
-                  ),
-                ),
-                Text(
-                  _formatDate(_currentUser!.galleryPurchaseDate!),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+                elevation: 0,
+              ),
             ),
           ),
           
           const SizedBox(height: 16),
           
-          // Kiralama İstatistikleri
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                // Bugünkü kiralama geliri
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.today,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Son Kiralama Geliri:',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '${_formatCurrency(_currentUser!.lastDailyRentalIncome)} ₺',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Toplam kiralama geliri
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.account_balance_wallet,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Toplam Kiralama:',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '${_formatCurrency(_currentUser!.totalRentalIncome)} ₺',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Araç sayısı
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.directions_car,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Kiralanan Araç:',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '$_vehicleCount araç',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Avantajlar
-          Text(
-            'home.galleryBenefits'.tr(),
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 12),
-          
-          _buildGalleryBenefit(
-            icon: Icons.car_rental,
-            title: 'home.rentalService'.tr(),
-          ),
-          const SizedBox(height: 8),
-          
-          _buildGalleryBenefit(
-            icon: Icons.trending_down,
-            title: 'home.opportunityPurchases'.tr(),
-          ),
-          const SizedBox(height: 8),
-          
-          _buildGalleryBenefit(
-            icon: Icons.trending_up,
-            title: 'home.highProfitMargin'.tr(),
-          ),
-          const SizedBox(height: 8),
-          
-          _buildGalleryBenefit(
-            icon: Icons.workspace_premium,
-            title: 'home.prestigeReputation'.tr(),
-          ),
+          // Kiradaki Araçlar Listesi
+          _buildRentedVehiclesList(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRentedVehiclesList() {
+    // Kiradaki araçları filtrele
+    final rentedVehicles = _userVehicles.where((v) => v.isRented).toList();
+
+    if (rentedVehicles.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'gallery.noRentedVehicles'.tr(),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'gallery.rentedVehicles'.tr(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: rentedVehicles.length,
+          itemBuilder: (context, index) {
+            final vehicle = rentedVehicles[index];
+            final dailyIncome = vehicle.purchasePrice * RentalService.dailyRentalRate;
+            
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.directions_car, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${'gallery.dailyIncome'.tr()}: ${_formatCurrency(dailyIncome)} TL',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.stop_circle_outlined, color: Colors.white),
+                    tooltip: 'gallery.stopRenting'.tr(),
+                    onPressed: () async {
+                      await _rentalService.stopRentingVehicle(vehicle.id);
+                      _loadCurrentUser(); // Listeyi yenile
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showRentOutDialog() async {
+    // Kiralanabilir araçları getir
+    final rentableVehicles = await _rentalService.getRentableVehicles(_currentUser!.id);
+    
+    if (!mounted) return;
+
+    if (rentableVehicles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 8,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: Text('gallery.noRentableVehicles'.tr()),
+          backgroundColor: Colors.orange.withOpacity(0.8),
+        ),
+      );
+      return;
+    }
+
+    // Seçilen araçları tutmak için set
+    final selectedVehicleIds = <String>{};
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text('gallery.rentOutTitle'.tr()),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: rentableVehicles.length,
+              itemBuilder: (context, index) {
+                final vehicle = rentableVehicles[index];
+                final dailyIncome = vehicle.purchasePrice * RentalService.dailyRentalRate;
+                final isSelected = selectedVehicleIds.contains(vehicle.id);
+
+                return CheckboxListTile(
+                  value: isSelected,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      if (value == true) {
+                        selectedVehicleIds.add(vehicle.id);
+                      } else {
+                        selectedVehicleIds.remove(vehicle.id);
+                      }
+                    });
+                  },
+                  title: Text(vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr())),
+                  subtitle: Text(
+                    '${'gallery.dailyIncome'.tr()}: ${_formatCurrency(dailyIncome)} TL',
+                    style: const TextStyle(color: Colors.green),
+                  ),
+                  secondary: const Icon(Icons.car_rental),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('common.cancel'.tr()),
+            ),
+            ElevatedButton(
+              onPressed: selectedVehicleIds.isEmpty
+                  ? null
+                  : () async {
+                      Navigator.pop(context);
+                      
+                      // Seçilen araçları kiraya ver
+                      for (final vehicleId in selectedVehicleIds) {
+                        await _rentalService.rentVehicle(vehicleId);
+                      }
+                      
+                      // Başarı mesajı
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('gallery.rentSuccess'.tr()),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                      
+                      // Ekranı yenile
+                      _loadCurrentUser();
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('gallery.rentOut'.tr()),
+            ),
+          ],
+        ),
       ),
     );
   }

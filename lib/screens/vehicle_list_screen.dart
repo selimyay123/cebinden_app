@@ -445,7 +445,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            vehicle.fullName,
+                            vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

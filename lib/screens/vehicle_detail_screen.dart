@@ -213,7 +213,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _vehicle.fullName,
+                        _vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -531,7 +531,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ),
               ),
               const SizedBox(height: 16),
-              _buildInfoRow('purchase.vehicle'.tr(), _vehicle.fullName),
+              _buildInfoRow('purchase.vehicle'.tr(), _vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr())),
               const Divider(),
               _buildInfoRow(
                 'purchase.currentBalance'.tr(),
@@ -1258,7 +1258,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             children: [
               _buildInfoRow('vehicles.listingNo'.tr(), '#${_vehicle.id.substring(0, 8).toUpperCase()}'),
               _buildInfoRow('vehicles.listingDate'.tr(), _formatDate(_vehicle.listedAt)),
-              _buildInfoRow('vehicles.sellerType'.tr(), _vehicle.sellerType),
+              _buildInfoRow('vehicles.sellerType'.tr(), 'vehicles.${_vehicle.sellerType}'.tr()),
             ],
           ),
           const SizedBox(height: 12),
@@ -1269,7 +1269,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               _buildInfoRow('vehicles.brand'.tr(), _vehicle.brand),
               _buildInfoRow('vehicles.model'.tr(), _vehicle.model),
               _buildInfoRow('vehicles.year'.tr(), _vehicle.year.toString()),
-              _buildInfoRow('vehicles.condition'.tr(), _vehicle.condition),
+              _buildInfoRow('vehicles.condition'.tr(), 'vehicles.${_vehicle.condition}'.tr()),
             ],
           ),
           const SizedBox(height: 12),
@@ -1277,14 +1277,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             title: 'vehicles.technicalSpecs'.tr(),
             icon: Icons.settings,
             children: [
-              _buildInfoRow('vehicles.bodyType'.tr(), _vehicle.bodyType),
+              _buildInfoRow('vehicles.bodyType'.tr(), 'vehicles.${_vehicle.bodyType.toLowerCase()}'.tr()),
               _buildInfoRow('vehicles.engineSize'.tr(), '${_vehicle.engineSize} L'),
               _buildInfoRow('vehicles.horsepower'.tr(), '${_vehicle.horsepower} HP'),
-              _buildInfoRow('vehicles.fuelType'.tr(), _vehicle.fuelType),
-              _buildInfoRow('vehicles.transmission'.tr(), _vehicle.transmission),
-              _buildInfoRow('vehicles.driveType'.tr(), _vehicle.driveType),
+              _buildInfoRow('vehicles.fuelType'.tr(), 'vehicles.${_vehicle.fuelType}'.tr()),
+              _buildInfoRow('vehicles.transmission'.tr(), 'vehicles.${_vehicle.transmission}'.tr()),
+              _buildInfoRow('vehicles.driveType'.tr(), 'vehicles.${_vehicle.driveType}'.tr()),
               _buildInfoRow('vehicles.mileage'.tr(), '${_formatNumber(_vehicle.mileage)} km'),
-              _buildInfoRow('vehicles.color'.tr(), _vehicle.color),
+              _buildInfoRow('vehicles.color'.tr(), 'vehicles.${_vehicle.color}'.tr()),
             ],
           ),
           const SizedBox(height: 12),

@@ -438,7 +438,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        vehicle.fullName,
+                        vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -514,7 +514,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              vehicle.fuelType,
+                              'vehicles.${vehicle.fuelType}'.tr(),
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: Colors.blue,
@@ -533,7 +533,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              vehicle.transmission,
+                              'vehicles.${vehicle.transmission}'.tr(),
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: Colors.orange,
@@ -755,7 +755,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            vehicle.fullName,
+                            vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,

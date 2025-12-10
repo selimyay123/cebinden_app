@@ -28,11 +28,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   final _descriptionController = TextEditingController();
   bool _isLoading = false;
   
-  // Fiyat analizi için
-  Color _priceColor = Colors.grey;
-  String _priceFeedback = '';
-  double _fairMarketValue = 0;
-  double _maxTolerance = 1.3; // Varsayılan %30
+
 
   @override
   void initState() {
@@ -42,51 +38,10 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     final suggestedPrice = widget.vehicle.purchasePrice * 1.1;
     _priceController.text = CurrencyInputFormatter.format(suggestedPrice);
     
-    // FMV Hesapla (OfferService ile aynı mantık)
-    final random = Random(widget.vehicle.id.hashCode); 
-    final fluctuation = 0.9 + random.nextDouble() * 0.2;
-    double baseFMV = widget.vehicle.purchasePrice * fluctuation;
-    double scoreMultiplier = widget.vehicle.score / 100.0;
-    scoreMultiplier = scoreMultiplier.clamp(0.8, 1.2);
-    _fairMarketValue = baseFMV * scoreMultiplier;
-    
     _loadUserAndCalculateBonus();
-    
-    // Listener ekle
-    _priceController.addListener(_updatePriceFeedback);
   }
 
-  void _updatePriceFeedback() {
-    final priceText = _priceController.text;
-    if (priceText.isEmpty) {
-      setState(() {
-        _priceFeedback = '';
-        _priceColor = Colors.grey;
-      });
-      return;
-    }
-    
-    final price = CurrencyInputFormatter.parse(priceText);
-    if (price == null || price <= 0) return;
-    
-    final ratio = price / _fairMarketValue;
-    
-    setState(() {
-      if (ratio > _maxTolerance) {
-        _priceFeedback = 'sell.priceTooHigh'.tr();
-        _priceColor = Colors.red;
-      } else if (ratio > 1.15) {
-        _priceFeedback = 'sell.priceHigh'.tr();
-        _priceColor = Colors.orange;
-      } else if (ratio > 1.05) {
-        _priceFeedback = 'sell.priceFair'.tr();
-        _priceColor = Colors.green;
-      } else {
-        _priceFeedback = 'sell.priceCheap'.tr();
-        _priceColor = Colors.blue;
-      }
-    });
-  }
+
 
   Future<void> _loadUserAndCalculateBonus() async {
     final userMap = await _db.getCurrentUser();
@@ -96,9 +51,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       
       // Ballı Dil yeteneği varsa toleransı artır
       if (user.unlockedSkills.any((s) => s.startsWith('charisma'))) {
-        setState(() {
-          _maxTolerance = 1.5; // %50'ye kadar tolerans
-        });
+        // Tolerans mantığı kaldırıldı
       }
       
       if (multiplier > 1.0) {
@@ -331,7 +284,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   }
 
   Widget _buildPriceInput() {
-    final maxPrice = widget.vehicle.purchasePrice * 1.15;
+    final maxPrice = (widget.vehicle.purchasePrice * 1.15).roundToDouble();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,45 +332,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           },
         ),
         const SizedBox(height: 8),
-        Text(
-          'sell.suggestedPriceHint'.trParams({'price': _formatCurrency(widget.vehicle.purchasePrice * 1.1)}),
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-        if (_priceFeedback.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: _priceColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: _priceColor.withOpacity(0.5)),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  _priceColor == Colors.red ? Icons.warning : Icons.info,
-                  color: _priceColor,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _priceFeedback,
-                    style: TextStyle(
-                      color: _priceColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ],
     );
   }

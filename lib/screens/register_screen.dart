@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import 'home_screen.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -113,6 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
       return;
     }
 
+    /*
     // Cinsiyet kontrolü
     if (_selectedGender == null) {
       setState(() {
@@ -140,13 +142,14 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
       });
       return;
     }
+    */
 
     // Kullanıcı kaydı oluştur
     final success = await _authService.registerUser(
       username: username,
       password: password,
-      gender: _selectedGender!,
-      birthDate: _selectedBirthDate!,
+      gender: _selectedGender ?? 'Belirtilmemiş', // Varsayılan değer
+      birthDate: _selectedBirthDate ?? DateTime(2000, 1, 1), // Varsayılan değer
     );
 
     if (!mounted) return;
@@ -337,6 +340,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                 ),
                 const SizedBox(height: 16),
 
+                /*
                 // Cinsiyet seçimi
                 DropdownButtonFormField<String>(
                   value: _selectedGender,
@@ -414,6 +418,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                   ),
                 ),
                 const SizedBox(height: 8),
+                */
 
                 // Hata mesajı
                 if (_errorMessage != null)
@@ -476,6 +481,34 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                             ),
                           ),
                   ),
+                ),
+                const SizedBox(height: 24),
+
+                // Giriş yap seçeneği
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'auth.alreadyHaveAccount'.tr(),
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'auth.login'.tr(),
+                        style: const TextStyle(
+                          color: Colors.deepPurple,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import 'home_screen.dart';
@@ -75,14 +76,24 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Stack(
         children: [
           Image.asset(
-              'assets/images/cebinden_intro.jpeg',
+              'assets/images/splash_screen.png',
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
             ),
-          const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          const Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 50.0),
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  strokeWidth: 3,
+                  strokeCap: StrokeCap.round,
+                ),
+              ),
             ),
           ),
         ],

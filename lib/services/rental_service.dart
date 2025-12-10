@@ -1,6 +1,7 @@
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
+import '../models/user_vehicle_model.dart';
 
 /// Galeri sahipleri için araç kiralama hizmeti
 class RentalService {
@@ -27,8 +28,11 @@ class RentalService {
       // Her araç için kiralama geliri hesapla
       double totalRental = 0.0;
       for (var vehicle in vehicles) {
-        final rentalIncome = vehicle.purchasePrice * dailyRentalRate;
-        totalRental += rentalIncome;
+        // Sadece kirada olan araçlardan gelir elde edilir
+        if (vehicle.isRented) {
+          final rentalIncome = vehicle.purchasePrice * dailyRentalRate;
+          totalRental += rentalIncome;
+        }
       }
 
       return totalRental;
@@ -113,6 +117,63 @@ class RentalService {
         'totalIncome': 0.0,
         'projectedDaily': 0.0,
       };
+    }
+  }
+
+
+  /// Aracı kiraya ver
+  Future<bool> rentVehicle(String vehicleId) async {
+    try {
+      final vehicle = await _db.getUserVehicleById(vehicleId);
+      if (vehicle == null) return false;
+
+      // Satışta olan araç artık kiralanabilir
+      // if (vehicle.isListedForSale) return false;
+
+      // Zaten kiradaysa işlem yapma
+      if (vehicle.isRented) return true;
+
+      final updatedVehicle = vehicle.copyWithRent(isRented: true);
+      return await _db.updateUserVehicle(vehicleId, updatedVehicle.toJson());
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Aracı kiradan çek
+  Future<bool> stopRentingVehicle(String vehicleId) async {
+    try {
+      final vehicle = await _db.getUserVehicleById(vehicleId);
+      if (vehicle == null) return false;
+
+      // Zaten kirada değilse işlem yapma
+      if (!vehicle.isRented) return true;
+
+      final updatedVehicle = vehicle.copyWithRent(isRented: false);
+      return await _db.updateUserVehicle(vehicleId, updatedVehicle.toJson());
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Kiralanabilir araçları getir (Satışta olmayan ve kirada olmayanlar)
+  Future<List<UserVehicle>> getRentableVehicles(String userId) async {
+    try {
+      final vehicles = await _db.getUserActiveVehicles(userId);
+      // Satışta olanlar da kiralanabilir, sadece kirada olmayanları getir
+      return vehicles.where((v) => !v.isRented).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Kiradaki araçları getir
+  Future<List<UserVehicle>> getRentedVehicles(String userId) async {
+    try {
+      final vehicles = await _db.getUserActiveVehicles(userId);
+      return vehicles.where((v) => v.isRented).toList();
+    } catch (e) {
+      return [];
     }
   }
 }
