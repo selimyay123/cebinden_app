@@ -1,5 +1,6 @@
 import '../models/user_model.dart';
 import 'database_helper.dart';
+import 'activity_service.dart';
 
 class DailyLoginService {
   final DatabaseHelper _db = DatabaseHelper();
@@ -65,6 +66,9 @@ class DailyLoginService {
       'consecutiveLoginDays': streak,
       'lastDailyRewardDate': DateTime.now().toIso8601String(),
     });
+
+    // Aktivite kaydı
+    await ActivityService().logDailyLogin(userId, finalReward);
 
     return true;
   }

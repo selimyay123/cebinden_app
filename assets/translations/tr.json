@@ -109,6 +109,8 @@
     "watchAd": "Reklam İzle",
     "statistics": "İstatistikler",
     "recentActivity": "Son İşlemler",
+    "nextDayIn": "Yeni güne kalan süre",
+    "changeTimeZone": "Zaman Dilimini Değiştir",
     "totalVehicles": "Toplam Araç",
     "totalVehiclesShort": "Toplam Araç",
     "pendingOffers": "Bekleyen Teklif",
@@ -121,7 +123,7 @@
     "rentVehicle": "Araç Kirala",
     "buyGallery": "Galeri Satın Al",
     "professionalBusiness": "Profesyonel İşletme",
-    "tasks": "Görevler",
+    "tasks": "Yetenek Ağacı",
     "noRecentActivity": "Henüz işlem yok",
     "startBuying": "Hemen alışverişe başlayın!",
     "bonusAwarded": "🎉 Özel bonus! Bakiyeniz 5,000,000 TL'ye yükseltildi!",
@@ -362,8 +364,9 @@
     "creatingListing": "İlan Oluşturuluyor...",
     "salePriceLabel": "Satış Fiyatı *",
     "priceHint": "Örn: 350000",
-    "maxPriceHint": "Maksimum: {price} TL (%15 Kar Limiti)",
-    "priceLimitExceeded": "Fiyat, alış fiyatının %15'ini geçemez!",
+    "maxPriceHint": "Maksimum: {price} TL (%{percent} Kar Limiti)",
+    "priceLimitExceeded": "Fiyat, alış fiyatının %{percent}'ini geçemez!",
+    "extraMargin": "+%{percent} Ekstra Kâr Limiti",
     "priceRequired": "Fiyat zorunludur",
     "priceInvalid": "Geçerli bir fiyat girin",
     "suggestedPriceHint": "Önerilen fiyat: {price} TL (Alış fiyatı + %10)",
@@ -399,6 +402,7 @@
   },
   "offers": {
     "title": "Tekliflerim",
+    "limitWarning": "Her araç için en fazla 10 teklif alabilirsiniz. Yeni teklifler için mevcutları reddedebilirsiniz.",
     "noOffers": "Henüz Teklif Yok",
     "noOffersDesc": "Araç satışa çıkardığınızda teklifler burada görünecek",
     "incoming": "Gelen Teklifler",
@@ -658,16 +662,6 @@
       "achievement": "Başarım"
     }
   },
-  "listings": {
-    "title": "İlanlarım",
-    "myListings": "İlanlarım",
-    "activeListings": "Aktif İlanlar",
-    "noListings": "Henüz İlan Yok",
-    "noListingsDesc": "Satışa çıkardığınız araçlar burada görünecek",
-    "listedDate": "İlan Tarihi",
-    "views": "Görüntülenme",
-    "offersReceived": "Gelen Teklif"
-  },
   "favorites": {
     "myFavorites": "Favori İlanlarım",
     "addToFavorites": "Favorilere Ekle",
@@ -794,7 +788,29 @@
     "tasksComingSoon": "Görevler sayfası yakında...",
     "rentComingSoon": "Araç kiralama sayfası yakında...",
     "vehicle": "araç",
-    "vehicles": "araç",
+    "vehicles": "araç"
+  },
+  "activity": {
+    "title": "Aktivite Geçmişi",
+    "noActivities": "Henüz Aktivite Yok",
+    "noActivitiesDesc": "İşlemleriniz burada listelenecek",
+    "purchaseTitle": "Araç Satın Alımı",
+    "purchaseDesc": "{brand} {model} satın alındı",
+    "saleTitle": "Araç Satışı",
+    "saleDesc": "{brand} {model} satıldı ({profit} TL Kar)",
+    "rentalTitle": "Kira Geliri",
+    "rentalDesc": "{count} araçtan kira geliri toplandı",
+    "levelUpTitle": "Seviye Atlama",
+    "levelUpDesc": "Seviye {level}'e ulaşıldı",
+    "taxiTitle": "Taksi Kazancı",
+    "taxiDesc": "Taksi görevinden kazanıldı",
+    "dailyLoginTitle": "Günlük Bonus",
+    "dailyLoginDesc": "Günlük giriş ödülü",
+    "clearAll": "Tümünü Temizle",
+    "clearAllConfirm": "Tüm aktivite geçmişini silmek istediğinize emin misiniz?",
+    "cleared": "Geçmiş temizlendi"
+  },
+  "listing": {
     "listing": "ilan",
     "listings": "ilan",
     "vehicleLimit": "Araç Limiti"
@@ -811,6 +827,7 @@
     "model": "Model",
     "year": "Yıl",
     "mileage": "Kilometre",
+    "marketValue": "Piyasa Değeri",
     "fuel": "Yakıt",
     "transmission": "Vites",
     "engine": "Motor",
@@ -1768,6 +1785,16 @@
     "fastLearner": "Hızlı Öğrenen",
     "fastLearnerDesc": "Tüm işlemlerden %25 daha fazla XP kazan",
     "negotiationPower": "Pazarlık Gücü",
-    "negotiationPowerDesc": "Müzakerede %15 daha fazla indirim yap"
+    "negotiationPowerDesc": "Müzakerede %15 daha fazla indirim yap",
+    "marketInsider": "Piyasa Kurdu",
+    "marketInsiderDesc": "Araçların tahmini piyasa değerini gör",
+    "quickFlipper": "Hızlı Satıcı",
+    "quickFlipperDesc": "İlanlarına %15 daha hızlı teklif gelir",
+    "rentalTycoon": "Filo Yöneticisi",
+    "rentalTycoonDesc": "Kira gelirlerin %10 artar",
+    "influencer": "Reklam Yıldızı",
+    "influencerDesc": "Reklam ödüllerin %20 artar",
+    "charismaticSeller": "İkna Kabiliyeti",
+    "charismaticSellerDesc": "Karşı tekliflerinin kabul edilme şansı %10 artar"
   }
 }

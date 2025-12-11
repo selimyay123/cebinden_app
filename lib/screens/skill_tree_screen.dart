@@ -331,47 +331,52 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with TickerProviderSt
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Emoji icon
-                        Text(
-                          skill.emoji,
-                          style: TextStyle(
-                            fontSize: 40,
-                            color: isLocked ? Colors.black38 : Colors.white,
+                        // Top Content (Centered)
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Emoji icon
+                              Text(
+                                skill.emoji,
+                                style: TextStyle(
+                                  fontSize: 40,
+                                  color: isLocked ? Colors.black38 : Colors.white,
+                                ),
+                              ),
+                              
+                              const SizedBox(height: 12),
+                              
+                              // Name
+                              Text(
+                                skill.nameKey.tr(),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: isLocked ? Colors.black54 : Colors.white,
+                                ),
+                              ),
+                              
+                              const SizedBox(height: 8),
+                              
+                              // Description
+                              Text(
+                                skill.descKey.tr(),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: isLocked ? Colors.black45 : Colors.white.withOpacity(0.9),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        
-                        const SizedBox(height: 12),
-                        
-                        // Name
-                        Text(
-                          skill.nameKey.tr(),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: isLocked ? Colors.black54 : Colors.white,
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 8),
-                        
-                        // Description
-                        Text(
-                          skill.descKey.tr(),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: isLocked ? Colors.black45 : Colors.white.withOpacity(0.9),
-                          ),
-                        ),
-                        
-                        const Spacer(),
                         
                         // Cost or status
                         if (!isUnlocked)

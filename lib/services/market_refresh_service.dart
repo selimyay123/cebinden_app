@@ -2557,6 +2557,11 @@ class MarketRefreshService {
     }
     return null;
   }
+
+  /// İlanı kaldır (Satın alma sonrası)
+  void removeListing(String vehicleId) {
+    _activeListings.removeWhere((l) => l.vehicle.id == vehicleId);
+  }
 }
 
 /// Pazar ilanı wrapper

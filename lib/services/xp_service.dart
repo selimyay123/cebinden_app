@@ -1,6 +1,7 @@
 import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'skill_service.dart';
+import 'activity_service.dart';
 
 /// XP kazanım kaynakları
 enum XPSource {
@@ -141,14 +142,19 @@ class XPService {
     // Ödülleri kullanıcıya ekle
     final newBalance = user.balance + cashReward;
     final newGold = user.gold + goldReward;
+    final newSkillPoints = user.skillPoints + 1; // Her seviye için 1 yetenek puanı
     
     await _db.updateUser(userId, {
       'balance': newBalance,
       'gold': newGold,
+      'skillPoints': newSkillPoints,
     });
     
     // Kilitleri aç
     final unlocks = _getUnlocksForLevel(newLevel);
+
+    // Aktivite kaydı
+    await ActivityService().logLevelUp(userId, newLevel, cashReward);
     
     return LevelUpReward(
       level: newLevel,

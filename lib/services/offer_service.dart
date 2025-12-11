@@ -12,6 +12,7 @@ import 'game_time_service.dart';
 import 'xp_service.dart';
 import 'daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
+import 'activity_service.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
 import 'market_refresh_service.dart'; // Araç detayları için
 
@@ -84,6 +85,12 @@ class OfferService {
       // Bugün kaç alıcı gelecek? (0-5 arası)
       // NOT: _calculateDailyBuyerCount artık async ve kullanıcı ID'si alıyor
       int buyerCount = await _calculateDailyBuyerCount(listing);
+      
+      // 🆕 STRICT LIMIT: Kalan boş slot sayısına göre buyerCount'u sınırla
+      final remainingSlots = 10 - pendingCount;
+      if (buyerCount > remainingSlots) {
+        buyerCount = remainingSlots;
+      }
       
       int offersCreated = 0;
       
@@ -248,6 +255,9 @@ class OfferService {
       if (profit > 0) {
         await _questService.updateProgress(offer.sellerId, QuestType.earnProfit, profit.toInt());
       }
+
+      // Aktivite kaydı
+      await ActivityService().logVehicleSale(offer.sellerId, vehicle, offer.offerPrice);
       
       return xpResult;
     } catch (e) {
@@ -508,7 +518,7 @@ class OfferService {
       final aiBuyer = AIBuyer.generateRandom();
       
       // AI alıcının karşı teklifi değerlendirmesi
-      final decision = _evaluateCounterOfferByBuyer(
+      final decision = await _evaluateCounterOfferByBuyer(
         aiBuyer: aiBuyer,
         originalOfferPrice: originalOffer.offerPrice,
         counterOfferAmount: counterOfferAmount,
@@ -561,13 +571,21 @@ class OfferService {
   }
 
   /// AI alıcının karşı teklifi değerlendirmesi
-  Map<String, dynamic> _evaluateCounterOfferByBuyer({
+  Future<Map<String, dynamic>> _evaluateCounterOfferByBuyer({
     required AIBuyer aiBuyer,
     required double originalOfferPrice,
     required double counterOfferAmount,
     required double listingPrice,
-  }) {
+  }) async {
     final random = Random();
+    
+    // İkna Kabiliyeti yeteneği
+    double successBonus = 0.0;
+    final userMap = await _db.getCurrentUser();
+    if (userMap != null) {
+      final user = User.fromJson(userMap);
+      successBonus = SkillService.getCounterOfferSuccessBonus(user);
+    }
     
     // Karşı teklifin orijinal teklife göre artış yüzdesi
     final increasePercent = ((counterOfferAmount - originalOfferPrice) / originalOfferPrice) * 100;
@@ -581,21 +599,32 @@ class OfferService {
     // Karar verme mantığı
     if (priceRatio >= 0.95) {
       // Karşı teklif çok yüksek (%95+ ilan fiyatı) - çoğunlukla reddet
-      if (random.nextDouble() < 0.7) {
+      if (random.nextDouble() < 0.7 + successBonus) { // Bonus burada da işe yarasın (kabul şansı değil ama reddetmeme şansı)
+        // Kabul et (veya en azından reddetme) - BURASI HATALI MANTIK OLABİLİR
+        // Düzeltme: random < X ise reddediyor. Bonus varsa reddetme ihtimali azalmalı.
+        // Yani random < 0.7 - successBonus
+      }
+      
+      // Basitleştirilmiş mantık: Kabul etme şansını artırıyoruz.
+      // Eğer random < kabul_ihtimali ise kabul et.
+      
+      // 1. Durum: Çok yüksek fiyat
+      // Normalde %30 kabul şansı (0.7 reddetme)
+      if (random.nextDouble() < 0.3 + successBonus) {
+         return {
+          'decision': 'accept',
+          'response': _generateAcceptanceResponse(),
+        };
+      } else {
         return {
           'decision': 'reject',
           'response': _generateRejectionResponse(),
         };
-      } else {
-        // Kabul et
-        return {
-          'decision': 'accept',
-          'response': _generateAcceptanceResponse(),
-        };
       }
     } else if (priceRatio >= 0.85) {
       // İyi bir karşı teklif (%85-95 arası) - çoğunlukla kabul et
-      if (random.nextDouble() < 0.6 + (aggressiveness * 0.2)) {
+      // Normalde %60 + agresiflik kabul şansı
+      if (random.nextDouble() < 0.6 + (aggressiveness * 0.2) + successBonus) {
         return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
@@ -611,7 +640,8 @@ class OfferService {
       }
     } else if (priceRatio >= 0.70) {
       // Orta seviye karşı teklif (%70-85 arası) - pazarlık devam eder
-      if (random.nextDouble() < 0.4) {
+      // Normalde %40 kabul şansı
+      if (random.nextDouble() < 0.4 + successBonus) {
         return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
@@ -632,18 +662,16 @@ class OfferService {
       }
     } else {
       // Düşük karşı teklif (%70'in altı) - çoğunlukla reddet
-      if (random.nextDouble() < 0.8) {
+      // Normalde %20 kabul şansı (0.8 reddetme)
+      if (random.nextDouble() < 0.2 + successBonus) {
+         return {
+          'decision': 'accept',
+          'response': _generateAcceptanceResponse(),
+        };
+      } else {
         return {
           'decision': 'reject',
           'response': _generateRejectionResponse(),
-        };
-      } else {
-        // Son bir deneme karşı teklifi
-        final newCounter = counterOfferAmount * 1.15;
-        return {
-          'decision': 'counter',
-          'counterAmount': newCounter,
-          'response': _generateCounterOfferResponse(newCounter),
         };
       }
     }
@@ -693,6 +721,9 @@ class OfferService {
       if (profit > 0) {
         await _questService.updateProgress(offer.sellerId, QuestType.earnProfit, profit.toInt());
       }
+
+      // Aktivite kaydı
+      await ActivityService().logVehicleSale(offer.sellerId, vehicle, finalPrice);
       
       return true;
     } catch (e) {
@@ -806,9 +837,13 @@ class OfferService {
         hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
         score: sourceVehicle?.score ?? 75,
         imageUrl: offer.vehicleImageUrl,
+        originalListingPrice: offer.listingPrice, // 🆕 Orijinal ilan fiyatını kaydet
       );
       
       await _db.addUserVehicle(userVehicle);
+
+      // Aktivite kaydı
+      await ActivityService().logVehiclePurchase(userId, userVehicle);
       
       return true;
     } catch (e) {
@@ -872,13 +907,19 @@ class OfferService {
 
     }
     
-    // Yetenek Kontrolü: Piyasa Kurdu (Market Guru)
-    // İlanlar %50 daha fazla görüntülenir -> %50 daha fazla alıcı
+    // Yetenek Kontrolü: Hızlı Satıcı (Quick Flipper)
+    // İlanlara daha hızlı teklif gelir -> Daha fazla günlük alıcı
     final sellerMap = await _db.getUserById(listing.userId);
     if (sellerMap != null) {
       final seller = User.fromJson(sellerMap);
-      if (seller.unlockedSkills.contains('market_guru')) {
-        baseCount = (baseCount * 1.5).round();
+      
+      // Hız çarpanını al (örn: 0.85 -> %15 daha hızlı)
+      final speedMultiplier = SkillService.getOfferSpeedMultiplier(seller);
+      
+      if (speedMultiplier < 1.0) {
+        // Hız arttıkça (çarpan düştükçe) alıcı sayısı artmalı
+        // Örn: 0.85 çarpanı -> 1 / 0.85 = 1.17 kat alıcı
+        baseCount = (baseCount / speedMultiplier).round();
       }
     }
     

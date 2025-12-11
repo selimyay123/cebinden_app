@@ -2,6 +2,8 @@ import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
+import 'activity_service.dart';
+import 'skill_service.dart';
 
 /// Galeri sahipleri için araç kiralama hizmeti
 class RentalService {
@@ -30,7 +32,15 @@ class RentalService {
       for (var vehicle in vehicles) {
         // Sadece kirada olan araçlardan gelir elde edilir
         if (vehicle.isRented) {
-          final rentalIncome = vehicle.purchasePrice * dailyRentalRate;
+          double rentalIncome = vehicle.purchasePrice * dailyRentalRate;
+          
+          // Filo Yöneticisi yeteneği
+          final userMap = await _db.getUserById(userId);
+          if (userMap != null) {
+            final user = User.fromJson(userMap);
+            rentalIncome *= SkillService.getRentalIncomeMultiplier(user);
+          }
+          
           totalRental += rentalIncome;
         }
       }
@@ -69,6 +79,12 @@ class RentalService {
         'totalRentalIncome': newTotalRental,
         'lastDailyRentalIncome': rentalIncome,
       });
+
+      // Aktivite kaydı
+      // Kiradaki araç sayısını bul
+      final vehicles = await _db.getUserActiveVehicles(userId);
+      final rentedCount = vehicles.where((v) => v.isRented).length;
+      await ActivityService().logRentalIncome(userId, rentalIncome, rentedCount);
 
       return rentalIncome;
     } catch (e) {

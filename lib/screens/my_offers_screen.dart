@@ -16,6 +16,8 @@ import '../models/vehicle_model.dart'; // Vehicle modeli için
 import 'dart:math'; // Random için
 import 'home_screen.dart';
 
+import 'package:lottie/lottie.dart'; // 🆕 Animasyon için
+
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın tekliflerini göster
@@ -39,6 +41,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
+  final MarketRefreshService _marketService = MarketRefreshService();
 
   TabController? _tabController;
 
@@ -194,9 +197,36 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               controller: _tabController!,
               children: [
                 // Gelen Teklifler - Marka Listesi
-                _incomingOffersByBrand.isEmpty
-                    ? _buildEmptyState(isIncoming: true)
-                    : _buildBrandList(isIncoming: true),
+                Column(
+                  children: [
+                    // 🆕 Uyarı Mesajı
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      color: Colors.orange.shade50,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.info_outline, color: Colors.orange),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'offers.limitWarning'.tr(),
+                              style: TextStyle(
+                                color: Colors.orange.shade900,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: _incomingOffersByBrand.isEmpty
+                          ? _buildEmptyState(isIncoming: true)
+                          : _buildBrandList(isIncoming: true),
+                    ),
+                  ],
+                ),
 
                 // Gönderilen Teklifler - Marka Listesi
                 _sentOffersByBrand.isEmpty
@@ -1801,6 +1831,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     }
   }
 
+
+
   /// Karşı teklifi kabul et
   Future<void> _handleAcceptCounterOffer(Offer offer) async {
     // Onay dialogu göster
@@ -1913,21 +1945,19 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         return;
       }
 
+      // 🎬 Animasyon göster
+      await _playPurchaseAnimation();
+
       // Teklifi kabul et ve satın alma işlemini gerçekleştir
       bool success = await _acceptCounterOffer(offer, currentUser);
 
       if (mounted) {
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              behavior: SnackBarBehavior.floating,
-              content: Text('✅ ${'offer.counterOfferAcceptedSuccess'.tr()}'),
-              backgroundColor: Colors.green.withOpacity(0.8),
-              duration: const Duration(seconds: 3),
-            ),
-          );
+          // İlanı kaldır (Marketten sil)
+          _marketService.removeListing(offer.vehicleId);
+
+          // Başarı dialogunu göster
+          _showPurchaseSuccessDialog(offer, currentUser.balance - offer.counterOfferAmount!);
 
           // Listeyi yenile
           await _loadOffers();
@@ -1952,6 +1982,170 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         }
       }
     }
+  }
+
+  /// Satın alma animasyonunu oynat
+  Future<void> _playPurchaseAnimation() async {
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.85),
+      builder: (context) => PopScope(
+        canPop: false, // Geri tuşunu devre dışı bırak
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Dönen çekiç/tokmak animasyonu
+              Lottie.asset(
+                'assets/animations/buying_car.json',
+                width: 300,
+                height: 300,
+                repeat: false, // Sadece 1 kez oynat
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Animasyon süresi kadar bekle (~2 saniye)
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    if (mounted) {
+      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+    }
+  }
+
+  /// Satın alma başarılı dialogunu göster
+  void _showPurchaseSuccessDialog(Offer offer, double newBalance) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Başarı ikonu
+              Container(
+                width: 100,
+                height: 100,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 60,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'purchase.congratulations'.tr(),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${offer.vehicleBrand} ${offer.vehicleModel}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'purchase.successfullyPurchased'.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.celebration,
+                      color: Colors.green,
+                      size: 40,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'purchase.nowYours'.tr(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Dialog'u kapat
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'purchase.great'.tr(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   /// Karşı teklifi reddet
@@ -2211,9 +2405,26 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         throw Exception(result['error'] ?? 'Unknown error');
       }
 
-      // Sonuç dialogunu göster
-      if (mounted) {
-        _showCounterOfferResultDialog(result, originalOffer);
+      // 🆕 Eğer teklif kabul edildiyse animasyon ve başarı dialogu göster
+      if (result['decision'] == 'accept' || result['status'] == OfferStatus.accepted) {
+        // 🎬 Animasyon göster
+        await _playPurchaseAnimation();
+
+        // İlanı kaldır (Marketten sil)
+        _marketService.removeListing(originalOffer.vehicleId);
+
+        // Kullanıcıyı güncelle (bakiye değişti)
+        final updatedUser = await _authService.getCurrentUser();
+
+        // Başarı dialogunu göster
+        if (mounted && updatedUser != null) {
+          _showPurchaseSuccessDialog(originalOffer, updatedUser.balance);
+        }
+      } else {
+        // Sonuç dialogunu göster (Red veya Yeni Karşı Teklif)
+        if (mounted) {
+          _showCounterOfferResultDialog(result, originalOffer);
+        }
       }
 
       // Listeyi yenile

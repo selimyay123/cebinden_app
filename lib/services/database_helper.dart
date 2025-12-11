@@ -3,6 +3,7 @@ import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
 import '../models/notification_model.dart';
+import '../models/activity_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -29,6 +30,7 @@ class DatabaseHelper {
     final notificationsBoxInstance = await Hive.openBox<Map>(notificationsBox);
     final favoritesBoxInstance = await Hive.openBox<Map>(favoritesBox);
     final dailyQuestsBoxInstance = await Hive.openBox<Map>(dailyQuestsBox);
+    final activitiesBoxInstance = await Hive.openBox<Map>(activitiesBox);
     
                 
     // Debug: Tüm kullanıcıları listele
@@ -181,11 +183,13 @@ class DatabaseHelper {
     await _userVehiclesBox.clear();
     await _offersBox.clear();
     await _notificationsBox.clear();
+    await _activitiesBox.clear();
     await _usersBox.flush();
     await _currentUserBox.flush();
     await _userVehiclesBox.flush();
     await _offersBox.flush();
     await _notificationsBox.flush();
+    await _activitiesBox.flush();
   }
 
   // ============================================================================
@@ -811,6 +815,72 @@ class DatabaseHelper {
       await _dailyQuestsBox.flush();
     } catch (e) {
       // Hata olsa da devam et
+    }
+  }
+  // ============================================================================
+  // ACTIVITIES (Aktivite Geçmişi)
+  // ============================================================================
+
+  static const String activitiesBox = 'activities';
+
+  // Activities box'ını al
+  Box<Map> get _activitiesBox => Hive.box<Map>(activitiesBox);
+
+  // Aktivite ekle
+  Future<bool> addActivity(Activity activity) async {
+    try {
+      final activityMap = Map<dynamic, dynamic>.from(activity.toJson());
+      await _activitiesBox.put(activity.id, activityMap);
+      await _activitiesBox.flush();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Kullanıcının aktivitelerini getir
+  Future<List<Activity>> getUserActivities(String userId) async {
+    try {
+      final allActivities = _activitiesBox.values;
+      final userActivities = <Activity>[];
+      
+      for (var activityMap in allActivities) {
+        final activity = Activity.fromJson(Map<String, dynamic>.from(activityMap));
+        if (activity.userId == userId) {
+          userActivities.add(activity);
+        }
+      }
+      
+      // Tarihe göre sırala (en yeni en üstte)
+      userActivities.sort((a, b) => b.date.compareTo(a.date));
+      
+      return userActivities;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Aktivite sil
+  Future<bool> deleteActivity(String activityId) async {
+    try {
+      await _activitiesBox.delete(activityId);
+      await _activitiesBox.flush();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Kullanıcının tüm aktivitelerini sil
+  Future<bool> clearUserActivities(String userId) async {
+    try {
+      final activities = await getUserActivities(userId);
+      for (var activity in activities) {
+        await deleteActivity(activity.id);
+      }
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

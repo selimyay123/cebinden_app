@@ -41,56 +41,119 @@ class DailyQuestService {
     final quests = <DailyQuest>[];
     final random = Random();
     
-    // Olası görev tipleri
-    final possibleTypes = [
-      QuestType.buyVehicle,
-      QuestType.sellVehicle,
-      QuestType.makeOffer,
-      QuestType.earnProfit,
-      // Login görevi her zaman sabit olabilir veya şansa bağlı
-    ];
-    
-    // 3 farklı görev seç
-    // 1. Görev: Araç Alım/Satım (Kolay)
-    if (random.nextBool()) {
-      quests.add(DailyQuest.create(
-        userId: userId,
+    // Görev Şablonları Havuzu
+    final templates = [
+      // --- Araç Alma Görevleri ---
+      _QuestTemplate(
         type: QuestType.buyVehicle,
         description: "quests.descriptions.buyVehicle",
-        targetCount: 2,
-        rewardXP: 50,
-        rewardMoney: 10000,
-      ));
-    } else {
-      quests.add(DailyQuest.create(
-        userId: userId,
+        minCount: 1,
+        maxCount: 1,
+        baseXP: 50,
+        baseMoney: 10000,
+      ),
+      _QuestTemplate(
+        type: QuestType.buyVehicle,
+        description: "quests.descriptions.buyVehicle",
+        minCount: 2,
+        maxCount: 3,
+        baseXP: 100,
+        baseMoney: 25000,
+      ),
+      
+      // --- Araç Satma Görevleri ---
+      _QuestTemplate(
         type: QuestType.sellVehicle,
         description: "quests.descriptions.sellVehicle",
-        targetCount: 1,
-        rewardXP: 50,
-        rewardMoney: 15000,
+        minCount: 1,
+        maxCount: 1,
+        baseXP: 50,
+        baseMoney: 15000,
+      ),
+      _QuestTemplate(
+        type: QuestType.sellVehicle,
+        description: "quests.descriptions.sellVehicle",
+        minCount: 2,
+        maxCount: 3,
+        baseXP: 120,
+        baseMoney: 35000,
+      ),
+      
+      // --- Teklif Verme Görevleri ---
+      _QuestTemplate(
+        type: QuestType.makeOffer,
+        description: "quests.descriptions.makeOffer",
+        minCount: 3,
+        maxCount: 5,
+        baseXP: 60,
+        baseMoney: 5000,
+      ),
+      _QuestTemplate(
+        type: QuestType.makeOffer,
+        description: "quests.descriptions.makeOffer",
+        minCount: 6,
+        maxCount: 10,
+        baseXP: 100,
+        baseMoney: 12000,
+      ),
+      
+      // --- Kar Etme Görevleri ---
+      _QuestTemplate(
+        type: QuestType.earnProfit,
+        description: "quests.descriptions.earnProfit",
+        minCount: 50000,
+        maxCount: 100000,
+        baseXP: 80,
+        baseMoney: 15000,
+        step: 10000, // Yuvarlak sayılar için
+      ),
+      _QuestTemplate(
+        type: QuestType.earnProfit,
+        description: "quests.descriptions.earnProfit",
+        minCount: 150000,
+        maxCount: 300000,
+        baseXP: 150,
+        baseMoney: 40000,
+        step: 50000,
+      ),
+    ];
+    
+    // Havuzdan rastgele 3 farklı şablon seç
+    // Şablonları karıştır
+    templates.shuffle(random);
+    
+    // İlk 3 tanesini al (veya daha az varsa hepsini)
+    final selectedTemplates = templates.take(3).toList();
+    
+    // Seçilen şablonlardan görevleri oluştur
+    for (var template in selectedTemplates) {
+      // Hedef sayıyı belirle (min-max arası)
+      int targetCount;
+      if (template.minCount == template.maxCount) {
+        targetCount = template.minCount;
+      } else {
+        // Step varsa ona göre yuvarla (özellikle para miktarları için)
+        if (template.step > 1) {
+          final steps = (template.maxCount - template.minCount) ~/ template.step;
+          targetCount = template.minCount + (random.nextInt(steps + 1) * template.step);
+        } else {
+          targetCount = template.minCount + random.nextInt(template.maxCount - template.minCount + 1);
+        }
+      }
+      
+      // Ödülleri zorluğa göre ölçekle (basit bir mantık)
+      // Eğer maxCount'a yakınsa ödül biraz artabilir, şimdilik base değerleri kullanıyoruz
+      // İleride buraya daha karmaşık formül eklenebilir.
+      
+      quests.add(DailyQuest.create(
+        userId: userId,
+        type: template.type,
+        description: template.description,
+        targetCount: targetCount,
+        rewardXP: template.baseXP,
+        rewardMoney: template.baseMoney.toDouble(),
       ));
     }
-    
-    // 2. Görev: Teklif/Pazarlık (Orta)
-    quests.add(DailyQuest.create(
-      userId: userId,
-      type: QuestType.makeOffer,
-      description: "quests.descriptions.makeOffer",
-      targetCount: 5,
-      rewardXP: 75,
-      rewardMoney: 5000,
-    ));
-    
-    // 3. Görev: Kar/Zorlu (Zor)
-    quests.add(DailyQuest.create(
-      userId: userId,
-      type: QuestType.earnProfit,
-      description: "quests.descriptions.earnProfit",
-      targetCount: 200000, // Miktar olarak tutuyoruz
-      rewardXP: 100,
-      rewardMoney: 20000,
-    ));
     
     return quests;
   }
@@ -143,4 +206,25 @@ class DailyQuestService {
     
     return true;
   }
+}
+
+// Yardımcı sınıf: Görev Şablonu
+class _QuestTemplate {
+  final QuestType type;
+  final String description;
+  final int minCount;
+  final int maxCount;
+  final int baseXP;
+  final int baseMoney;
+  final int step; // Rastgele sayı üretirken adım aralığı (örn: 10000'er artış)
+
+  _QuestTemplate({
+    required this.type,
+    required this.description,
+    required this.minCount,
+    required this.maxCount,
+    required this.baseXP,
+    required this.baseMoney,
+    this.step = 1,
+  });
 }

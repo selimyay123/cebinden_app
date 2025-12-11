@@ -11,6 +11,7 @@ import '../services/offer_service.dart';
 import '../services/favorite_service.dart';
 import '../services/localization_service.dart';
 import '../services/xp_service.dart';
+import '../services/activity_service.dart';
 import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
@@ -19,7 +20,7 @@ import '../services/market_refresh_service.dart'; // Market Servisi (Fiyat hesap
 import '../widgets/vehicle_top_view.dart';
 import '../widgets/level_up_dialog.dart';
 import 'my_offers_screen.dart';
-import 'my_vehicles_screen.dart';
+
 import 'package:intl/intl.dart';
 import 'home_screen.dart';
 
@@ -393,6 +394,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final discountedPrice = _vehicle.price * multiplier;
     final hasSkillDiscount = multiplier < 1.0;
 
+    // Piyasa Kurdu yeteneği kontrolü
+    final hasMarketInsider = SkillService.canSeeMarketValue(_currentUser!);
+
     if (!priceDropped && !hasSkillDiscount) {
       // Hiçbir indirim yok
       return Text(
@@ -408,6 +412,49 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        if (hasMarketInsider) ...[
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blueGrey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.analytics_outlined, color: Colors.blueGrey, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'skills.marketInsider'.tr(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('vehicle.marketValue'.tr()),
+                    Text(
+                      '${_formatCurrency(_vehicle.price * 0.9)} - ${_formatCurrency(_vehicle.price * 1.1)} TL',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
         // 1. İlan Fiyatı (Ekspertiz düşüşü varsa)
         if (priceDropped) ...[
           Text(
@@ -658,36 +705,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       return;
     }
 
-    // 🎬 Tam ekran animasyon overlay'ini göster
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black.withValues(alpha: 0.85),
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false, // Geri tuşunu devre dışı bırak
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Dönen çekiç/tokmak animasyonu
-              Lottie.asset(
-                'assets/animations/buying_car.json',
-                width: 300,
-                height: 300,
-                repeat: false, // Sadece 1 kez oynat
-              ),
-
-            ],
-          ),
-        ),
-      ),
-    );
-
-    // Animasyon süresi kadar bekle (~2 saniye)
-    await Future.delayed(const Duration(milliseconds: 2000));
-
-    if (!mounted) return;
-    Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+    // 🎬 Animasyon göster
+    await _playPurchaseAnimation();
 
     try {
       // 1️⃣ Bakiyeyi düş (İndirimli fiyat)
@@ -725,9 +744,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         hasAccidentRecord: _vehicle.hasAccidentRecord,
         score: _vehicle.score, // İlan skoru (Vehicle'dan alınır)
         imageUrl: _vehicle.imageUrl,
+        originalListingPrice: _vehicle.price, // 🆕 Orijinal ilan fiyatını kaydet
       );
-
+      
       final vehicleAddSuccess = await _db.addUserVehicle(userVehicle);
+      
+      // 4️⃣ İlanı kaldır (Marketten sil)
+      _marketService.removeListing(_vehicle.id);
 
       if (!vehicleAddSuccess) {
         // Bakiyeyi geri yükle
@@ -754,135 +777,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       // 🎯 Günlük Görev Güncellemesi: Araç Satın Alma
       await _questService.updateProgress(_currentUser!.id, QuestType.buyVehicle, 1);
 
+      // Aktivite kaydı
+      await ActivityService().logVehiclePurchase(_currentUser!.id, userVehicle);
+
       if (!mounted) return;
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Başarı ikonu
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: const BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 60,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'purchase.congratulations'.tr(),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  _vehicle.fullName,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'purchase.successfullyPurchased'.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      const Icon(
-                        Icons.celebration,
-                        color: Colors.green,
-                        size: 40,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'purchase.nowYours'.tr(),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Dialog'u kapat
-                    Navigator.pop(context, true); // Detail sayfasından çık ve "satın alma başarılı" bilgisi gönder
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'purchase.great'.tr(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      // Başarılı dialogu göster
+      _showPurchaseSuccessDialog(_currentUser!.balance);
+
     } catch (e) {
       // ❌ Hata durumu
       
@@ -1738,6 +1640,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
   /// Teklifi gönder
+  /// Teklifi gönder
   Future<void> _submitOffer(double offerAmount) async {
     if (_currentUser == null) return;
 
@@ -1776,16 +1679,30 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       // 🎯 Günlük Görev Güncellemesi: Teklif Gönderme
       await _questService.updateProgress(_currentUser!.id, QuestType.makeOffer, 1);
       
-      // Eğer teklif kabul edildiyse ekstra XP
+      // Eğer teklif kabul edildiyse ekstra XP ve Satın Alma İşlemleri
       if (result['decision'] == 'accept') {
         final acceptXP = await _xpService.onOfferAccepted(_currentUser!.id);
         if (acceptXP.hasGain && mounted) {
           _showXPGainAnimationOverlay(acceptXP);
         }
-      }
 
-      // Sonuç dialogunu göster ve yönlendir
-      _showOfferResultDialog(result);
+        // 🎬 Animasyon göster
+        await _playPurchaseAnimation();
+
+        // İlanı kaldır (Marketten sil)
+        _marketService.removeListing(_vehicle.id);
+
+        // Kullanıcıyı güncelle (bakiye değişti)
+        await _loadCurrentUser();
+
+        // Başarı dialogunu göster
+        if (mounted && _currentUser != null) {
+          _showPurchaseSuccessDialog(_currentUser!.balance);
+        }
+      } else {
+        // Sonuç dialogunu göster (Red veya Karşı Teklif)
+        _showOfferResultDialog(result);
+      }
     } catch (e) {
       // Loading kapat
       if (mounted) Navigator.pop(context);
@@ -1986,26 +1903,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
       if (result['success']) {
         if (mounted) {
-          // Başarılı mesajı
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('offer.offerAcceptedAndPurchased'.tr()),
-              backgroundColor: Colors.green,
-            ),
-          );
-          
-          // Konfetiyi patlat (opsiyonel ama hoş olur)
-          // Konfetiyi patlat (opsiyonel ama hoş olur)
-          
-          // Biraz bekle ve araçlarım sayfasına git
-          await Future.delayed(const Duration(seconds: 1));
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MyVehiclesScreen(),
-              ),
-            );
+          // 🎬 Animasyon göster
+          await _playPurchaseAnimation();
+
+          // İlanı kaldır (Marketten sil)
+          _marketService.removeListing(_vehicle.id);
+
+          // Kullanıcıyı güncelle
+          await _loadCurrentUser();
+
+          // Başarı dialogunu göster
+          if (mounted && _currentUser != null) {
+            _showPurchaseSuccessDialog(_currentUser!.balance);
           }
         }
       } else {
@@ -2033,6 +1942,180 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     }
   }
   
+  /// Satın alma animasyonunu oynat
+  Future<void> _playPurchaseAnimation() async {
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.85),
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false, // Geri tuşunu devre dışı bırak
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Dönen çekiç/tokmak animasyonu
+              Lottie.asset(
+                'assets/animations/buying_car.json',
+                width: 300,
+                height: 300,
+                repeat: false, // Sadece 1 kez oynat
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Animasyon süresi kadar bekle (~2 saniye)
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    if (mounted) {
+      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+    }
+  }
+
+  /// Satın alma başarılı dialogunu göster
+  void _showPurchaseSuccessDialog(double newBalance) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Başarı ikonu
+              Container(
+                width: 100,
+                height: 100,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 60,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'purchase.congratulations'.tr(),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${_vehicle.brand} ${_vehicle.model}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _vehicle.fullName,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'purchase.successfullyPurchased'.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.celebration,
+                      color: Colors.green,
+                      size: 40,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'purchase.nowYours'.tr(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Dialog'u kapat
+                  Navigator.pop(context, true); // Detail sayfasından çık ve "satın alma başarılı" bilgisi gönder
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'purchase.great'.tr(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // ========== XP SİSTEMİ METODLARI ==========
   
   /// XP kazanım animasyonu göster (overlay)

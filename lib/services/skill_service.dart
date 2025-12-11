@@ -67,68 +67,60 @@ class SkillService {
       secondaryColor: Color(0xFF26C6DA),
     ),
     
-    // 4. Pazarlık Gücü - Müzakerede %15 daha fazla indirim
+    // 5. Piyasa Kurdu - Araç piyasa değeri aralığını gösterir
     Skill(
-      id: 'negotiation_power',
-      nameKey: 'skills.negotiationPower',
-      descKey: 'skills.negotiationPowerDesc',
+      id: 'market_insider',
+      nameKey: 'skills.marketInsider',
+      descKey: 'skills.marketInsiderDesc',
       cost: 2,
-      emoji: '💪',
-      primaryColor: Color(0xFF4CAF50),
-      secondaryColor: Color(0xFF66BB6A),
+      emoji: '📊',
+      primaryColor: Color(0xFF607D8B),
+      secondaryColor: Color(0xFF78909C),
     ),
-    
-    // ============================================================================
-    // HENÜZ ENTEGRE EDİLMEMİŞ YETENEKLER (YORUM SATIRINDA)
-    // ============================================================================
-    
-    /* ENTEGRASYON BEKLİYOR
-    
-    // Pazarlık Ustası - Teklif yaparken %10 daha düşük (KISMİ: sadece satın alma)
+
+    // 6. Hızlı Satıcı - Teklifler %15 daha hızlı gelir
     Skill(
-      id: 'negotiation',
-      nameKey: 'skills.negotiation',
-      descKey: 'skills.negotiationDesc',
-      cost: 2,
-      emoji: '💰',
-      primaryColor: Color(0xFF4CAF50),
-      secondaryColor: Color(0xFF66BB6A),
-    ),
-    
-    // Hızlı Satış - %20 daha hızlı teklif (ENTEGRE DEĞİL)
-    Skill(
-      id: 'quick_sale',
-      nameKey: 'skills.quickSale',
-      descKey: 'skills.quickSaleDesc',
-      cost: 2,
+      id: 'quick_flipper',
+      nameKey: 'skills.quickFlipper',
+      descKey: 'skills.quickFlipperDesc',
+      cost: 3,
       emoji: '⚡',
       primaryColor: Color(0xFFFF9800),
       secondaryColor: Color(0xFFFFB74D),
     ),
-    
-    // Piyasa Analisti - Araç değeri gösterilir (ENTEGRE DEĞİL)
+
+    // 7. Filo Yöneticisi - Kira geliri %10 artar
     Skill(
-      id: 'market_analyst',
-      nameKey: 'skills.marketAnalyst',
-      descKey: 'skills.marketAnalystDesc',
+      id: 'rental_tycoon',
+      nameKey: 'skills.rentalTycoon',
+      descKey: 'skills.rentalTycoonDesc',
       cost: 2,
-      emoji: '🔍',
-      primaryColor: Color(0xFF2196F3),
-      secondaryColor: Color(0xFF42A5F5),
+      emoji: '🏢',
+      primaryColor: Color(0xFF3F51B5),
+      secondaryColor: Color(0xFF5C6BC0),
     ),
-    
-    // Altın Madenci - Görevlerden %50 daha fazla altın (ENTEGRE DEĞİL)
+
+    // 8. Reklam Yıldızı - Reklam ödülleri %20 artar
     Skill(
-      id: 'gold_miner',
-      nameKey: 'skills.goldMiner',
-      descKey: 'skills.goldMinerDesc',
-      cost: 2,
-      emoji: '💎',
-      primaryColor: Color(0xFFFFD700),
-      secondaryColor: Color(0xFFFFE55C),
+      id: 'influencer',
+      nameKey: 'skills.influencer',
+      descKey: 'skills.influencerDesc',
+      cost: 1,
+      emoji: '🌟',
+      primaryColor: Color(0xFFFFC107),
+      secondaryColor: Color(0xFFFFD54F),
     ),
-    
-    */
+
+    // 9. İkna Kabiliyeti - Karşı teklif kabul şansı %10 artar
+    Skill(
+      id: 'charismatic_seller',
+      nameKey: 'skills.charismaticSeller',
+      descKey: 'skills.charismaticSellerDesc',
+      cost: 3,
+      emoji: '🤝',
+      primaryColor: Color(0xFFE91E63),
+      secondaryColor: Color(0xFFF06292),
+    ),
   ];
 
   // ============================================================================
@@ -177,15 +169,15 @@ class SkillService {
 
   /// Hızlı Satış: Teklif gelme hızı çarpanı
   static double getOfferSpeedMultiplier(User user) {
-    if (hasSkill(user, 'quick_sale')) {
-      return 1.20; // %20 daha fazla teklif
+    if (hasSkill(user, 'quick_flipper')) {
+      return 0.85; // %15 daha hızlı (süre çarpanı)
     }
     return 1.0;
   }
 
   /// Piyasa Analisti: Araç değeri gösterilsin mi?
   static bool canSeeMarketValue(User user) {
-    return hasSkill(user, 'market_analyst');
+    return hasSkill(user, 'market_insider');
   }
 
   /// İtibar: Gelen tekliflere bonus
@@ -224,6 +216,30 @@ class SkillService {
   static double getNegotiationPowerBonus(User user) {
     if (hasSkill(user, 'negotiation_power')) {
       return 0.15; // %15 daha fazla indirim yapabilir
+    }
+    return 0.0;
+  }
+
+  /// Filo Yöneticisi: Kira geliri çarpanı
+  static double getRentalIncomeMultiplier(User user) {
+    if (hasSkill(user, 'rental_tycoon')) {
+      return 1.10; // %10 daha fazla kira geliri
+    }
+    return 1.0;
+  }
+
+  /// Reklam Yıldızı: Reklam ödülü çarpanı
+  static double getAdRewardMultiplier(User user) {
+    if (hasSkill(user, 'influencer')) {
+      return 1.20; // %20 daha fazla ödül
+    }
+    return 1.0;
+  }
+
+  /// İkna Kabiliyeti: Karşı teklif kabul şansı bonusu
+  static double getCounterOfferSuccessBonus(User user) {
+    if (hasSkill(user, 'charismatic_seller')) {
+      return 0.10; // %10 ekstra şans
     }
     return 0.0;
   }

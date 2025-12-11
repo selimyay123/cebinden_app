@@ -106,18 +106,24 @@ class AIBuyer {
         offerPrice = fairPrice * (0.95 + random.nextDouble() * 0.10);
         break;
       case BuyerType.urgent:
-        // İlan fiyatının %95-100'ünü teklif eder
-        offerPrice = listingPrice * (0.95 + random.nextDouble() * 0.05);
+        // İlan fiyatının %92-97'sini teklif eder (Eskiden %95-100 idi)
+        offerPrice = listingPrice * (0.92 + random.nextDouble() * 0.05);
         break;
       case BuyerType.generous:
-        // İlan fiyatının %100-110'unu teklif eder
-        offerPrice = listingPrice * (1.00 + random.nextDouble() * 0.10);
+        // İlan fiyatının %96-99'unu teklif eder (Eskiden %98-100 idi)
+        offerPrice = listingPrice * (0.96 + random.nextDouble() * 0.03);
         break;
     }
     
     // Bütçeyi aşmamalı
     if (offerPrice > budget) {
       offerPrice = budget * 0.95; // Bütçenin %95'i
+    }
+
+    // 🆕 KESİN KURAL: Teklif asla ilan fiyatını geçemez, hatta biraz altında olmalı
+    // Kullanıcı isteği: 400k için max 395k gelsin (~%98-99)
+    if (offerPrice >= listingPrice) {
+      offerPrice = listingPrice * 0.99; // En fazla %99'u
     }
     
     // 1000'e yuvarla

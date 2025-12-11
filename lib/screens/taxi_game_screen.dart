@@ -6,6 +6,8 @@ import '../services/database_helper.dart';
 import '../models/user_model.dart';
 import '../services/localization_service.dart';
 import '../services/ad_service.dart';
+import '../services/activity_service.dart';
+import '../services/skill_service.dart';
 
 class TaxiGameScreen extends StatefulWidget {
   const TaxiGameScreen({super.key});
@@ -200,6 +202,9 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
         await _db.updateUser(user.id, {
           'balance': user.balance + _moneyEarned,
         });
+
+        // Aktivite kaydı
+        await ActivityService().logTaxiEarnings(user.id, _moneyEarned.toDouble());
       }
     }
 
@@ -271,15 +276,23 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () async {
+                        onPressed: () async {
                         await _adService.showRewardedAd(
                           onRewarded: (reward) async {
                             final userMap = await _db.getCurrentUser();
                             if (userMap != null) {
                               final user = User.fromJson(userMap);
+                              
+                              // Reklam Yıldızı yeteneği
+                              final multiplier = SkillService.getAdRewardMultiplier(user);
+                              final finalReward = _moneyEarned * multiplier;
+                              
                               await _db.updateUser(user.id, {
-                                'balance': user.balance + _moneyEarned,
+                                'balance': user.balance + finalReward,
                               });
+
+                              // Aktivite kaydı (Ekstra kazanç)
+                              await ActivityService().logTaxiEarnings(user.id, finalReward.toDouble());
                             }
                             
                             if (mounted) {

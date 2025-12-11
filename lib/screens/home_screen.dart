@@ -33,6 +33,9 @@ import 'skill_tree_screen.dart'; // Yetenek Ağacı Ekranı
 import 'package:lottie/lottie.dart';
 import '../services/rental_service.dart'; // Kiralama Servisi
 
+import '../widgets/game_time_countdown.dart'; // 🆕 Game Time Countdown
+import 'activity_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -377,6 +380,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               IconButton(
+                icon: const Icon(Icons.history),
+                tooltip: 'activity.title'.tr(),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ActivityScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.logout),
                 tooltip: 'auth.logout'.tr(),
                 onPressed: _logout,
@@ -405,6 +420,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         // Profil ve Bakiye Kartı
                         _buildProfileCard(),
+
+                        // 🆕 Oyun Zamanı Sayacı
+                        const GameTimeCountdown(),
+                        const SizedBox(height: 16),
                         
                         // XP Progress Kartı ve Reklam İzle yan yana
                         _buildXPAndAdRow(),

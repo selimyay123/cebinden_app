@@ -76,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Stack(
         children: [
           Image.asset(
-              'assets/images/splash_screen.png',
+              'assets/images/splash_screen.jpeg',
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,

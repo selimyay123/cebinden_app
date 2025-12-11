@@ -284,17 +284,56 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   }
 
   Widget _buildPriceInput() {
-    final maxPrice = (widget.vehicle.purchasePrice * 1.15).roundToDouble();
+    // 🆕 DİNAMİK KÂR LİMİTİ
+    // Standart limit: %15
+    double profitMargin = 0.15;
+    double discountRate = 0.0;
+
+    // Eğer araç indirimli alındıysa, indirim oranı kadar ekstra kâr limiti ekle
+    if (widget.vehicle.originalListingPrice != null && widget.vehicle.originalListingPrice! > widget.vehicle.purchasePrice) {
+      discountRate = (widget.vehicle.originalListingPrice! - widget.vehicle.purchasePrice) / widget.vehicle.originalListingPrice!;
+      profitMargin += discountRate;
+    }
+
+    final maxPrice = (widget.vehicle.purchasePrice * (1 + profitMargin)).roundToDouble();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'sell.salePriceLabel'.tr(),
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'sell.salePriceLabel'.tr(),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (discountRate > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.trending_up, size: 14, color: Colors.green),
+                    const SizedBox(width: 4),
+                    Text(
+                      'sell.extraMargin'.trParams({'percent': (discountRate * 100).toStringAsFixed(0)}),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -313,7 +352,10 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             ),
             filled: true,
             fillColor: Colors.grey[100],
-            helperText: 'sell.maxPriceHint'.trParams({'price': _formatCurrency(maxPrice)}),
+            helperText: 'sell.maxPriceHint'.trParams({
+              'price': _formatCurrency(maxPrice),
+              'percent': (profitMargin * 100).toStringAsFixed(0),
+            }),
             helperStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
           ),
           validator: (value) {
@@ -326,7 +368,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             }
             // Minimum limit removed
             if (price > maxPrice) {
-              return 'sell.priceLimitExceeded'.tr();
+              return 'sell.priceLimitExceeded'.trParams({
+                'percent': (profitMargin * 100).toStringAsFixed(0),
+              });
             }
             return null;
           },

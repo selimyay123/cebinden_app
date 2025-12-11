@@ -36,6 +36,8 @@ class UserVehicle {
   final double? salePrice;
   final DateTime? saleDate;
 
+  final double? originalListingPrice; // Satın alındığındaki ilan fiyatı (Kâr limiti hesabı için)
+
   UserVehicle({
     required this.id,
     required this.userId,
@@ -63,6 +65,7 @@ class UserVehicle {
     this.isSold = false,
     this.salePrice,
     this.saleDate,
+    this.originalListingPrice,
   });
 
   // Factory constructor: Yeni araç satın alma
@@ -83,6 +86,7 @@ class UserVehicle {
     required bool hasAccidentRecord,
     required int score, // Vehicle'dan alınacak
     String? imageUrl,
+    double? originalListingPrice,
   }) {
     return UserVehicle(
       id: const Uuid().v4(),
@@ -104,6 +108,7 @@ class UserVehicle {
       imageUrl: imageUrl,
       score: score,
       isRented: false,
+      originalListingPrice: originalListingPrice,
     );
   }
 
@@ -136,6 +141,7 @@ class UserVehicle {
       isSold: json['isSold'] as bool? ?? false,
       salePrice: json['salePrice'] != null ? (json['salePrice'] as num).toDouble() : null,
       saleDate: json['saleDate'] != null ? DateTime.parse(json['saleDate'] as String) : null,
+      originalListingPrice: json['originalListingPrice'] != null ? (json['originalListingPrice'] as num).toDouble() : null,
     );
   }
 
@@ -168,6 +174,7 @@ class UserVehicle {
       'isSold': isSold,
       'salePrice': salePrice,
       'saleDate': saleDate?.toIso8601String(),
+      'originalListingPrice': originalListingPrice,
     };
   }
 
@@ -231,6 +238,7 @@ class UserVehicle {
       salePrice: salePrice,
       saleDate: saleDate,
       isRented: false, // Satışa çıkınca kiralama biter (veya kontrol edilir)
+      originalListingPrice: originalListingPrice,
     );
   }
 
@@ -266,6 +274,7 @@ class UserVehicle {
       salePrice: salePrice,
       saleDate: saleDate,
       isRented: false, // Satılınca kiralama biter
+      originalListingPrice: originalListingPrice,
     );
   }
 
@@ -300,6 +309,7 @@ class UserVehicle {
       salePrice: salePrice,
       saleDate: saleDate,
       isRented: isRented,
+      originalListingPrice: originalListingPrice,
     );
   }
 }

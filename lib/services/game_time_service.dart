@@ -199,6 +199,47 @@ class GameTimeService with WidgetsBindingObserver {
   
   /// Oyun günü süresini al
   int getGameDayDuration() => _gameDayDurationMinutes;
+
+  /// Yeni güne kalan süreyi al
+  Duration getTimeUntilNextDay() {
+    // Toplam geçen dakika (gerçek zaman)
+    final totalMinutes = getRealMinutesPassed();
+    
+    // Şu anki günün başlangıcından beri geçen dakika
+    final minutesInCurrentDay = totalMinutes % _gameDayDurationMinutes;
+    
+    // Kalan dakika
+    final remainingMinutes = _gameDayDurationMinutes - minutesInCurrentDay;
+    
+    // Dakikayı saniyeye çevir (daha hassas olması için session başlangıcına göre saniye hesabı yapılabilir ama şimdilik dakika yeterli)
+    // Ancak UI'da saniye saydırmak için daha hassas hesap lazım.
+    
+    if (_sessionStartTime != null && _isAppActive) {
+      // Session başlangıcından beri geçen süre (Duration olarak)
+      final sessionDuration = DateTime.now().difference(_sessionStartTime!);
+      
+      // Toplam geçen süre (önceki sessionlar + şu anki)
+      // _totalPlayedMinutes sadece tam dakikaları tutuyor, bu yüzden hassasiyet kaybı var.
+      // Ancak basit bir geri sayım için:
+      
+      // Kalan süreyi hesapla: (Toplam Gün Süresi - (Toplam Geçen Süre % Toplam Gün Süresi))
+      // Bunu dakika cinsinden yapıyoruz.
+      
+      // Daha hassas hesaplama için:
+      // Şu anki dakika içindeki saniyeleri de hesaba katalım.
+      final secondsInCurrentMinute = DateTime.now().second;
+      
+      // Kalan tam dakika
+      final remainingFullMinutes = remainingMinutes - 1;
+      
+      // Kalan saniye
+      final remainingSeconds = 60 - secondsInCurrentMinute;
+      
+      return Duration(minutes: remainingFullMinutes, seconds: remainingSeconds);
+    }
+    
+    return Duration(minutes: remainingMinutes);
+  }
   
   /// Servisi temizle
   void dispose() {
