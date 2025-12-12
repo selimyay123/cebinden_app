@@ -82,7 +82,7 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
         children: [
           // Main Card Content
           Container(
-            margin: const EdgeInsets.only(top: 40, bottom: 80), // Space for gift top and buttons bottom
+            margin: const EdgeInsets.only(top: 0, bottom: 80), // Space for buttons bottom
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(24),
@@ -236,7 +236,12 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                                 color: Colors.deepPurple.shade100,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.person, size: 40, color: Colors.deepPurple),
+                              child: Lottie.asset(
+                                'assets/animations/gold.json',
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -283,33 +288,7 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
             ),
           ),
 
-          // Top Gift Icon (Overlapping)
-          Positioned(
-            top: 0,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Icon(
-                  Icons.card_giftcard,
-                  size: 50,
-                  color: Colors.deepPurple,
-                ),
-              ),
-            ),
-          ),
+
 
           // Close Button (Top Right)
           Positioned(

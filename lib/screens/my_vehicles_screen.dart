@@ -791,11 +791,49 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                       _buildSectionTitle('vehicles.purchaseDate'.tr()),
                       const SizedBox(height: 12),
                       _buildInfoCard([
-                        _buildDetailRow(
-                          Icons.shopping_cart,
-                          'vehicles.purchasePrice'.tr(),
-                          '${_formatCurrency(vehicle.purchasePrice)} TL',
-                          Colors.deepPurple,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey[100]!),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.shopping_cart, size: 20, color: Colors.deepPurple),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'vehicles.purchasePrice'.tr(),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${_formatCurrency(vehicle.purchasePrice)} TL',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         _buildDetailRow(
                           Icons.calendar_today,

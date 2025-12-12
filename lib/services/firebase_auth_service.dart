@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 import 'database_helper.dart';
@@ -94,8 +95,6 @@ class FirebaseAuthService {
         id: const Uuid().v4(),
         username: firebaseUser.displayName ?? firebaseUser.email?.split('@')[0] ?? 'GoogleUser',
         password: '', // Google ile giriş için şifre gerekmez
-        gender: 'Erkek', // Varsayılan (kullanıcı daha sonra değiştirebilir)
-        birthDate: DateTime(1990, 1, 1), // Varsayılan (kullanıcı daha sonra değiştirebilir)
         registeredAt: DateTime.now(),
         balance: 1000000.0, // Başlangıç parası
         profitLossPercentage: 0.0,
@@ -138,5 +137,103 @@ class FirebaseAuthService {
   bool isSignedIn() {
     return _firebaseAuth.currentUser != null;
   }
-}
+  /// Apple ile giriş yap
+  Future<User?> signInWithApple() async {
+    try {
+      // 1. Apple Sign-In akışını başlat
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
 
+      // 2. OAuthCredential oluştur
+      final firebase_auth.OAuthCredential credential = firebase_auth.OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      // 3. Firebase'e giriş yap
+      final firebase_auth.UserCredential userCredential = 
+          await _firebaseAuth.signInWithCredential(credential);
+      
+      final firebase_auth.User? firebaseUser = userCredential.user;
+      
+      if (firebaseUser == null) {
+        return null;
+      }
+
+      // 4. Kullanıcıyı local database'de kontrol et veya oluştur
+      // Apple ID'ye göre ara
+      final existingUser = await _findUserByAppleId(firebaseUser.uid);
+      
+      if (existingUser != null) {
+        return existingUser;
+      } else {
+        // Yeni kullanıcı oluştur
+        final newUser = await _createAppleUser(firebaseUser, appleCredential);
+        return newUser;
+      }
+    } catch (e) {
+      print("Apple Sign In Error: $e");
+      return null;
+    }
+  }
+
+  /// Apple kullanıcı ID'sine göre local database'de kullanıcı ara
+  Future<User?> _findUserByAppleId(String appleUserId) async {
+    try {
+      final usersMapList = await DatabaseHelper().getAllUsers();
+      
+      for (var userMap in usersMapList) {
+        if (userMap['appleUserId'] == appleUserId) {
+          return User.fromJson(userMap);
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Apple bilgilerinden yeni kullanıcı oluştur
+  Future<User> _createAppleUser(
+      firebase_auth.User firebaseUser, AuthorizationCredentialAppleID appleCredential) async {
+    try {
+      String displayName = '';
+      if (appleCredential.givenName != null && appleCredential.familyName != null) {
+        displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
+      } else if (firebaseUser.displayName != null && firebaseUser.displayName!.isNotEmpty) {
+        displayName = firebaseUser.displayName!;
+      }
+      
+      // Eğer isim hala boşsa veya "Apple User" ise ve email varsa, email'in baş kısmını kullan
+      if ((displayName.isEmpty || displayName == 'Apple User') && firebaseUser.email != null) {
+        displayName = firebaseUser.email!.split('@')[0];
+      } else if (displayName.isEmpty) {
+        displayName = 'Apple User';
+      }
+
+      final newUser = User(
+        id: firebaseUser.uid,
+        username: displayName,
+        password: '', // Şifre yok (Apple ile giriş)
+        registeredAt: DateTime.now(),
+        balance: 5000000.0, // Başlangıç parası
+        level: 1,
+        xp: 0,
+        garageLimit: 2,
+        authProvider: 'apple',
+        appleUserId: appleCredential.userIdentifier,
+        email: firebaseUser.email,
+      );
+
+      await DatabaseHelper().insertUser(newUser.toJson()); // Assuming DatabaseHelper().insertUser still takes a map
+      return newUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+}

@@ -72,8 +72,6 @@ class AuthService {
   Future<bool> registerUser({
     required String username,
     required String password,
-    required String gender,
-    required DateTime birthDate,
   }) async {
     if (username.trim().isEmpty || password.isEmpty) {
       return false;
@@ -89,8 +87,6 @@ class AuthService {
     final newUser = User.create(
       username: username.trim(),
       password: _hashPassword(password),
-      gender: gender,
-      birthDate: birthDate,
     );
 
     // Database'e ekle
@@ -98,8 +94,6 @@ class AuthService {
       'id': newUser.id,
       'username': newUser.username,
       'password': newUser.password,
-      'gender': newUser.gender,
-      'birthDate': newUser.birthDate.toIso8601String(),
       'registeredAt': newUser.registeredAt.toIso8601String(),
       'balance': newUser.balance,
       'profitLossPercentage': newUser.profitLossPercentage,
@@ -133,6 +127,25 @@ class AuthService {
       return user;
     } catch (e) {
       
+      return null;
+    }
+  }
+
+  // Apple ile giriş yap
+  Future<User?> loginWithApple() async {
+    try {
+      // Firebase üzerinden Apple Sign-In
+      final user = await _firebaseAuth.signInWithApple();
+      
+      if (user == null) {
+        return null; // Kullanıcı giriş iptal etti veya hata oluştu
+      }
+      
+      // Aktif kullanıcıyı ayarla
+      await _db.setCurrentUser(user.id);
+      
+      return user;
+    } catch (e) {
       return null;
     }
   }

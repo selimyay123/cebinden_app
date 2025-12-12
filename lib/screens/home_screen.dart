@@ -66,6 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _sellVehicleButtonKey = GlobalKey();
   final GlobalKey _offersButtonKey = GlobalKey();
   final GlobalKey _balanceKey = GlobalKey();
+  final GlobalKey _gameTimeKey = GlobalKey();
+  final GlobalKey _xpCardKey = GlobalKey();
+  final GlobalKey _taxiGameButtonKey = GlobalKey();
   
   // Kiralama geliri animasyonu için
   double _lastRentalIncome = 0.0;
@@ -73,6 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
   
   // Tutorial aktif mi? (scroll'u engellemek için)
   bool _isTutorialActive = false;
+  
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -413,16 +418,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: RefreshIndicator(
                     onRefresh: _loadCurrentUser,
                     child: SingleChildScrollView(
-                      physics: _isTutorialActive 
-                          ? const NeverScrollableScrollPhysics() // Tutorial sırasında scroll kapalı
-                          : const AlwaysScrollableScrollPhysics(),
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                       children: [
                         // Profil ve Bakiye Kartı
                         _buildProfileCard(),
 
                         // 🆕 Oyun Zamanı Sayacı
-                        const GameTimeCountdown(),
+                        GameTimeCountdown(key: _gameTimeKey),
                         const SizedBox(height: 16),
                         
                         // XP Progress Kartı ve Reklam İzle yan yana
@@ -480,12 +484,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Glassmorphism Container Helper
   Widget _buildGlassContainer({
+    Key? key,
     required Widget child, 
     EdgeInsetsGeometry? padding, 
     EdgeInsetsGeometry? margin,
     double borderRadius = 16,
   }) {
     return Container(
+      key: key,
       margin: margin,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
@@ -519,6 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final isProfit = _currentUser!.profitLossPercentage >= 0;
     
     return Container(
+      key: _balanceKey, // Tutorial için key buraya taşındı
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -598,7 +605,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     children: [
                       TweenAnimationBuilder<double>(
-                        key: _balanceKey, // Tutorial için key
+                        // key: _balanceKey, // Key yukarı taşındı
                         tween: Tween<double>(
                           begin: _currentUser!.balance - (_showRentalIncomeAnimation ? _lastRentalIncome : 0),
                           end: _currentUser!.balance,
@@ -1003,6 +1010,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // XP Kartı (Tam genişlik)
           _buildGlassContainer(
+            key: _xpCardKey,
             padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1453,7 +1461,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GridView.builder(
+      child: GridView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1462,9 +1470,9 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSpacing: 12,
           childAspectRatio: 1.5, // Buton yükseklik/genişlik oranı (daha alçak)
         ),
-        itemCount: quickActions.length,
-        itemBuilder: (context, index) {
-          final action = quickActions[index];
+        children: quickActions.asMap().entries.map((entry) {
+          final index = entry.key;
+          final action = entry.value;
           
           // Tutorial için key'leri atıyoruz
           Key? buttonKey;
@@ -1476,6 +1484,8 @@ class _HomeScreenState extends State<HomeScreen> {
             buttonKey = _myVehiclesButtonKey; // Garajım butonu
           } else if (index == 4) {
             buttonKey = _offersButtonKey; // Teklifler butonu
+          } else if (index == 7) {
+            buttonKey = _taxiGameButtonKey; // Taksi Oyunu butonu
           }
           // NOT: Reklam İzle artık XP kartının yanında, index'lerden çıkarıldı
           
@@ -1488,7 +1498,7 @@ class _HomeScreenState extends State<HomeScreen> {
             badge: action['badge'] as int?,
             reward: action['reward'] as String?,
           );
-        },
+        }).toList(),
       ),
     );
   }
@@ -3081,6 +3091,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     isSelected: true, // Dashboard seçili
                   ),
                   _buildDrawerItem(
+                  icon: Icons.school,
+                  title: 'tutorial.title'.tr(),
+                  onTap: () {
+                    Navigator.pop(context); // Drawer'ı kapat
+                    // Tutorial'ı başlat
+                    _showTutorial();
+                  },
+                ),
+                  _buildDrawerItem(
                     icon: Icons.assignment,
                     title: 'quests.title'.tr(),
                     onTap: () {
@@ -3284,13 +3303,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// İlk açılış kontrolü ve tutorial gösterimi
   Future<void> _checkAndShowTutorial() async {
-    // ====== TEST MODU: Her açılışta tutorial göster ======
-    // if (_currentUser != null && mounted) {
-    //   await Future.delayed(const Duration(milliseconds: 800));
-    //   _showTutorial();
-    // }
-    
-    // ====== ASIL KOD (Test bitince aktif et) ======
+    // Tutorial kontrolü
     final prefs = await SharedPreferences.getInstance();
     final tutorialCompleted = prefs.getBool('tutorial_completed') ?? false;
     
@@ -3309,39 +3322,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Tutorial'ı göster
   void _showTutorial() {
-    final targets = _createTutorialTargets();
-    
-    // Scroll'u engelle
+    // Tutorial zaten gösterildiyse veya aktifse gösterme
+    if (_isTutorialActive) return;
+
     setState(() {
       _isTutorialActive = true;
     });
-    
+
+    // Bölüm 1'i başlat
     TutorialCoachMark(
-      targets: targets,
+      targets: _createTutorialTargetsPart1(),
       colorShadow: Colors.black,
+      textSkip: "SKIP",
       paddingFocus: 10,
       opacityShadow: 0.8,
-      hideSkip: false,
-      textSkip: 'tutorial.skip'.tr(),
-      textStyleSkip: const TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-      // Overlay'e (karanlık alana) tıklanmasını engelle
-      onClickOverlay: (target) {
-        // Hiçbir şey yapma, tıklama engellendi
-      },
       onFinish: () {
-        _setTutorialCompleted();
-        // Scroll'u tekrar aktif et
-        setState(() {
-          _isTutorialActive = false;
-        });
+        // Bölüm 1 bittiğinde scroll yap ve Bölüm 2'yi başlat
+        _startTutorialPart2();
+      },
+      onClickTarget: (target) {
+        // Tıklanan hedefe göre özel işlemler yapılabilir
+      },
+      onClickOverlay: (target) {
+        // Overlay'e tıklandığında sonraki adıma geç
       },
       onSkip: () {
         _setTutorialCompleted();
-        // Scroll'u tekrar aktif et
         setState(() {
           _isTutorialActive = false;
         });
@@ -3350,16 +3356,85 @@ class _HomeScreenState extends State<HomeScreen> {
     ).show(context: context);
   }
 
-  /// Tutorial adımlarını oluştur
-  List<TargetFocus> _createTutorialTargets() {
+  void _startTutorialPart2() {
+    // Scroll işlemi
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        350.0, // Grid'in görünür olacağı tahmini pozisyon
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      ).then((_) {
+        // Scroll bittikten sonra Bölüm 2'yi başlat
+        if (!mounted) return;
+        
+        TutorialCoachMark(
+          targets: _createTutorialTargetsPart2(),
+          colorShadow: Colors.black,
+          textSkip: "SKIP",
+          paddingFocus: 10,
+          opacityShadow: 0.8,
+          onFinish: () {
+            _setTutorialCompleted();
+            setState(() {
+              _isTutorialActive = false;
+            });
+          },
+          onSkip: () {
+            _setTutorialCompleted();
+            setState(() {
+              _isTutorialActive = false;
+            });
+            return true;
+          },
+        ).show(context: context);
+      });
+    } else {
+      // Scroll yapılamazsa direkt başlat (fallback)
+      TutorialCoachMark(
+        targets: _createTutorialTargetsPart2(),
+        colorShadow: Colors.black,
+        textSkip: "SKIP",
+        paddingFocus: 10,
+        opacityShadow: 0.8,
+        onFinish: () {
+          _setTutorialCompleted();
+          setState(() {
+            _isTutorialActive = false;
+          });
+        },
+        onSkip: () {
+          _setTutorialCompleted();
+          setState(() {
+            _isTutorialActive = false;
+          });
+          return true;
+        },
+      ).show(context: context);
+    }
+  }
+
+  void _scrollToTarget(GlobalKey key) {
+    if (key.currentContext != null) {
+      Scrollable.ensureVisible(
+        key.currentContext!,
+        alignment: 0.5, // Ortala
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  /// Tutorial Bölüm 1 (Scroll gerektirmeyen üst kısım)
+  List<TargetFocus> _createTutorialTargetsPart1() {
     return [
-      // ADIM 1: Market Butonu (İlanlar)
+      // ADIM 1: Bakiye ve Altın
       TargetFocus(
-        identify: "market_button",
-        keyTarget: _marketButtonKey,
+        identify: "balance",
+        keyTarget: _balanceKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
         radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
@@ -3390,17 +3465,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '1/5',
+                        '1/8',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-                      const Icon(
-                        Icons.arrow_downward,
-                        color: Colors.white,
-                        size: 24,
-                      ),
+
                     ],
                   ),
                 ],
@@ -3409,17 +3480,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      
-      // ADIM 2: Garajım Butonu
+
+      // ADIM 2: Oyun Zamanı
       TargetFocus(
-        identify: "my_vehicles_button",
-        keyTarget: _myVehiclesButtonKey,
+        identify: "game_time",
+        keyTarget: _gameTimeKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
         radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
         contents: [
           TargetContent(
-            align: ContentAlign.top,
+            align: ContentAlign.bottom,
             builder: (context, controller) => Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -3447,17 +3519,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '2/5',
+                        '2/8',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-                      const Icon(
-                        Icons.arrow_upward,
-                        color: Colors.white,
-                        size: 24,
-                      ),
+
                     ],
                   ),
                 ],
@@ -3466,14 +3534,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      
-      // ADIM 3: Araç Sat Butonu
+
+      // ADIM 3: XP ve Seviye
       TargetFocus(
-        identify: "sell_vehicle_button",
-        keyTarget: _sellVehicleButtonKey,
+        identify: "xp_card",
+        keyTarget: _xpCardKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
         radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
@@ -3504,17 +3573,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '3/5',
+                        '3/8',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-                      const Icon(
-                        Icons.arrow_downward,
-                        color: Colors.white,
-                        size: 24,
-                      ),
+
                     ],
                   ),
                 ],
@@ -3523,17 +3588,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      
-      // ADIM 4: Teklifler Butonu
+    ];
+  }
+
+  /// Tutorial Bölüm 2 (Scroll gerektiren alt kısım)
+  List<TargetFocus> _createTutorialTargetsPart2() {
+    return [
+      // ADIM 4: Market Butonu
       TargetFocus(
-        identify: "offers_button",
-        keyTarget: _offersButtonKey,
+        identify: "market_button",
+        keyTarget: _marketButtonKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
         radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
         contents: [
           TargetContent(
-            align: ContentAlign.top, // Yukarıda göster (ekranın altında olduğu için)
+            align: ContentAlign.top,
             builder: (context, controller) => Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -3561,17 +3632,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '4/5',
+                        '4/8',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-                      const Icon(
-                        Icons.arrow_upward, // Ok yukarı göstermeli
-                        color: Colors.white,
-                        size: 24,
-                      ),
+
                     ],
                   ),
                 ],
@@ -3581,16 +3648,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       
-      // ADIM 5: Bakiye
+      // ADIM 5: Araç Sat Butonu
       TargetFocus(
-        identify: "balance",
-        keyTarget: _balanceKey,
+        identify: "sell_vehicle_button",
+        keyTarget: _sellVehicleButtonKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
         radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
+            align: ContentAlign.top,
             builder: (context, controller) => Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -3618,7 +3686,169 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '5/5',
+                        '5/8',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      // ADIM 6: Garajım Butonu
+      TargetFocus(
+        identify: "my_vehicles_button",
+        keyTarget: _myVehiclesButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step6_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step6_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '6/8',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      
+      // ADIM 7: Teklifler Butonu
+      TargetFocus(
+        identify: "offers_button",
+        keyTarget: _offersButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step7_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step7_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '7/8',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      // ADIM 8: Taksi Oyunu
+      TargetFocus(
+        identify: "taxi_game_button",
+        keyTarget: _taxiGameButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step8_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step8_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '8/8',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3666,6 +3896,15 @@ class _HomeScreenState extends State<HomeScreen> {
     
     // Eğer ödül alınabilirse dialog göster
     if (status['canClaim'] == true && mounted) {
+      // İLK GİRİŞ KONTROLÜ:
+      // Eğer kullanıcı ilk kez ödül alacaksa (lastDailyRewardDate == null)
+      // Dialog gösterme, sessizce ödülü ver ve geç (Burası 0. gün sayılır)
+      if (_currentUser?.lastDailyRewardDate == null && status['streak'] == 1) {
+        await _loginService.claimReward(_currentUser!.id);
+        await _loadCurrentUser(); // Kullanıcıyı güncelle
+        return;
+      }
+
       // Biraz gecikmeli göster ki UI yüklensin
       await Future.delayed(const Duration(milliseconds: 1000));
       

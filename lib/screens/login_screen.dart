@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import 'home_screen.dart';
@@ -102,6 +103,39 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
       if (!mounted) return;
       setState(() {
         _errorMessage = 'login.googleLoginError'.tr();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loginWithApple() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final user = await _authService.loginWithApple();
+
+      if (!mounted) return;
+
+      if (user != null) {
+        // Başarılı Apple girişi
+        
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
+        );
+      } else {
+        setState(() {
+          _errorMessage = 'purchase.appleLoginFailed'.tr();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = 'purchase.appleLoginError'.tr();
         _isLoading = false;
       });
     }
@@ -341,6 +375,37 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                     ),
                   ),
                 ),
+                // Apple ile giriş butonu (Sadece iOS)
+                if (Platform.isIOS) ...[
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 56,
+                    child: OutlinedButton.icon(
+                      onPressed: _isLoading ? null : _loginWithApple,
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.black),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                      ),
+                      icon: const FaIcon(
+                        FontAwesomeIcons.apple,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      label: Text(
+                        'purchase.appleSignIn'.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
 
                 // Kayıt ol linki

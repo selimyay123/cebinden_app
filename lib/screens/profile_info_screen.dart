@@ -57,7 +57,7 @@ class ProfileInfoScreen extends StatelessWidget {
                     radius: 50,
                     backgroundColor: Colors.deepPurple.withOpacity(0.1),
                     child: Icon(
-                      user.gender == 'Erkek' ? Icons.person : Icons.person_outline,
+                      Icons.person,
                       size: 50,
                       color: Colors.deepPurple,
                     ),
@@ -83,9 +83,6 @@ class ProfileInfoScreen extends StatelessWidget {
               icon: Icons.person_outline,
               children: [
                 _buildInfoRow('profile.username'.tr(), user.username),
-                _buildInfoRow('profile.gender'.tr(), user.gender == 'Erkek' ? 'gender.male'.tr() : 'gender.female'.tr()),
-                _buildInfoRow('profile.birthDate'.tr(), _formatDate(user.birthDate)),
-                _buildInfoRow('profile.age'.tr(), '${user.age} ${'profile.yearsOld'.tr()}'),
               ],
             ),
 

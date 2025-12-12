@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/settings_helper.dart';
-import '../services/database_helper.dart';
-import '../services/offer_service.dart';
 import '../services/localization_service.dart';
 import '../services/game_time_service.dart';
 import '../models/user_model.dart';
@@ -10,8 +8,6 @@ import 'profile_info_screen.dart';
 import 'change_password_screen.dart';
 import 'about_screen.dart';
 import 'login_screen.dart';
-import '../widgets/level_up_dialog.dart';
-import '../services/xp_service.dart';
 import 'home_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -23,7 +19,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin {
   final AuthService _authService = AuthService();
-  final OfferService _offerService = OfferService();
   final LocalizationService _localizationService = LocalizationService();
   final GameTimeService _gameTimeService = GameTimeService();
   late SettingsHelper _settingsHelper;
@@ -130,19 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       // NOT: MaterialApp otomatik rebuild olacak, ekstra setState gerekmez!
     }
     
-    // Kullanıcıya bilgi ver
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          behavior: SnackBarBehavior.floating,
-          content: Text('settings.darkModeComingSoon'.tr()),
-          backgroundColor: Colors.grey.withOpacity(0.8),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
+
   }
 
   Future<void> _updateCurrency(String? currency) async {
@@ -190,159 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
     }
   }
 
-  Future<void> _generateTestOffers() async {
-    // Loading göster
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text(
-              'misc.generatingOffers'.tr(),
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
 
-    try {
-      // AI tekliflerini oluştur
-      int offersCreated = await _offerService.generateDailyOffers();
-
-      if (mounted) {
-        Navigator.pop(context); // Loading'i kapat
-
-        if (offersCreated == 0) {
-          // Hiç teklif oluşturulmadıysa açıklayıcı mesaj göster
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('ℹ️ ${'common.info'.tr()}'),
-              content: Text('settings.noListingsForOffers'.tr()),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('settings.ok'.tr()),
-                ),
-              ],
-            ),
-          );
-        } else {
-          // Sonuç göster
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('✅ ${'settings.success'.tr()}'),
-              content: Text('$offersCreated ${'settings.offersCreatedSuccess'.tr()}\n\n${'settings.checkOffersSection'.tr()}'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('settings.ok'.tr()),
-                ),
-              ],
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        Navigator.pop(context); // Loading'i kapat
-
-        // Hata göster
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('❌ ${'settings.error'.tr()}'),
-            content: Text('${'settings.offersCreatedError'.tr()}:\n\n$e'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('settings.ok'.tr()),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _addTestGold() async {
-    if (_currentUser == null) return;
-
-    try {
-      // 50 altın ekle
-      final newGold = _currentUser!.gold + 50;
-      await DatabaseHelper().updateUser(_currentUser!.id, {'gold': newGold});
-
-      // Kullanıcıyı yeniden yükle
-      _currentUser = await _authService.getCurrentUser();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            behavior: SnackBarBehavior.floating,
-            content: Text('✅ 50 altın eklendi! Toplam: ${_currentUser!.gold.toInt()} altın'),
-            backgroundColor: Colors.green.withOpacity(0.8),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-        
-        // Ayarları yeniden yükle
-        setState(() {});
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            behavior: SnackBarBehavior.floating,
-            content: Text('❌ Hata: $e'),
-            backgroundColor: Colors.red.withOpacity(0.8),
-          ),
-        );
-      }
-    }
-  }
-
-
-  Future<void> _clearDatabase() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('settings.clearDatabase'.tr()),
-        content: Text('settings.clearDatabaseConfirm'.tr()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text('settings.clearDatabase'.tr()),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      await DatabaseHelper().clearDatabase();
-      if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-          (route) => false,
-        );
-      }
-    }
-  }
 
   Future<void> _deleteAccount() async {
     if (_currentUser == null) return;
@@ -407,23 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
     }
   }
 
-  void _showTestLevelUp() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => LevelUpDialog(
-        reward: LevelUpReward(
-          level: 5,
-          cashBonus: 250000,
-          goldBonus: 10,
-          unlocks: [
-            'xp.unlock.premiumVehicles',
-            'xp.unlock.advancedOffers',
-          ],
-        ),
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -639,40 +454,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
             ],
           ),
 
-          // DEBUG (GELİŞTİRİCİ AYARLARI)
-          _buildSection(
-            title: 'settings.developer'.tr(),
-            children: [
-              _buildListTile(
-                icon: Icons.auto_awesome,
-                title: 'settings.generateOffers'.tr(),
-                subtitle: 'settings.generateOffersDesc'.tr(),
-                textColor: Colors.blue,
-                onTap: _generateTestOffers,
-              ),
-              _buildListTile(
-                icon: Icons.star,
-                title: 'Test Level Up',
-                subtitle: 'Level up animasyonunu test et',
-                textColor: Colors.purple,
-                onTap: _showTestLevelUp,
-              ),
-              _buildListTile(
-                icon: Icons.monetization_on,
-                title: 'Add 50 Gold',
-                subtitle: 'Test için 50 altın ekle',
-                textColor: Colors.amber,
-                onTap: _addTestGold,
-              ),
-              _buildListTile(
-                icon: Icons.delete_sweep,
-                title: 'settings.clearDatabase'.tr(),
-                subtitle: 'settings.clearDatabaseDesc'.tr(),
-                textColor: Colors.orange,
-                onTap: _clearDatabase,
-              ),
-            ],
-          ),
+
 
           // Hesap İşlemleri
           _buildSection(

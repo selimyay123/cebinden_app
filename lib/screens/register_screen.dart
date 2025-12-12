@@ -18,8 +18,6 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
   final AuthService _authService = AuthService();
   bool _isLoading = false;
   String? _errorMessage;
-  String? _selectedGender;
-  DateTime? _selectedBirthDate;
   bool _obscurePassword = true;
   bool _obscurePasswordConfirm = true;
 
@@ -31,26 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
     super.dispose();
   }
 
-  Future<void> _selectBirthDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2000, 1, 1),
-      firstDate: DateTime(1940, 1, 1),
-      lastDate: DateTime.now(),
-      locale: Locale(LocalizationService().currentLanguage, LocalizationService().currentLanguage.toUpperCase()),
-      helpText: 'auth.selectBirthDate'.tr(),
-      cancelText: 'common.cancel'.tr(),
-      confirmText: 'common.ok'.tr(),
-      fieldLabelText: 'auth.birthDate'.tr(),
-    );
 
-    if (picked != null && picked != _selectedBirthDate) {
-      setState(() {
-        _selectedBirthDate = picked;
-        _errorMessage = null;
-      });
-    }
-  }
 
   Future<void> _register() async {
     setState(() {
@@ -114,42 +93,12 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
       return;
     }
 
-    /*
-    // Cinsiyet kontrolü
-    if (_selectedGender == null) {
-      setState(() {
-        _errorMessage = 'auth.selectGender'.tr();
-        _isLoading = false;
-      });
-      return;
-    }
 
-    // Doğum tarihi kontrolü
-    if (_selectedBirthDate == null) {
-      setState(() {
-        _errorMessage = 'auth.selectBirthDate'.tr();
-        _isLoading = false;
-      });
-      return;
-    }
-
-    // Yaş kontrolü (en az 13 yaşında olmalı)
-    final age = DateTime.now().year - _selectedBirthDate!.year;
-    if (age < 13) {
-      setState(() {
-        _errorMessage = 'auth.ageRestriction'.tr();
-        _isLoading = false;
-      });
-      return;
-    }
-    */
 
     // Kullanıcı kaydı oluştur
     final success = await _authService.registerUser(
       username: username,
       password: password,
-      gender: _selectedGender ?? 'Belirtilmemiş', // Varsayılan değer
-      birthDate: _selectedBirthDate ?? DateTime(2000, 1, 1), // Varsayılan değer
     );
 
     if (!mounted) return;
@@ -340,85 +289,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                 ),
                 const SizedBox(height: 16),
 
-                /*
-                // Cinsiyet seçimi
-                DropdownButtonFormField<String>(
-                  value: _selectedGender,
-                  decoration: InputDecoration(
-                    labelText: 'auth.gender'.tr(),
-                    prefixIcon: const Icon(Icons.people),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.deepPurple,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  items: [
-                    DropdownMenuItem(
-                      value: 'Erkek',
-                      child: Text('auth.male'.tr()),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Kadın',
-                      child: Text('auth.female'.tr()),
-                    ),
-                  ],
-                  onChanged: _isLoading
-                      ? null
-                      : (value) {
-                          setState(() {
-                            _selectedGender = value;
-                            _errorMessage = null;
-                          });
-                        },
-                ),
-                const SizedBox(height: 16),
 
-                // Doğum tarihi seçimi
-                InkWell(
-                  onTap: _isLoading ? null : _selectBirthDate,
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'auth.birthDate'.tr(),
-                      prefixIcon: const Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Colors.deepPurple,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      _selectedBirthDate == null
-                          ? 'auth.selectBirthDate'.tr()
-                          : '${_selectedBirthDate!.day.toString().padLeft(2, '0')}/${_selectedBirthDate!.month.toString().padLeft(2, '0')}/${_selectedBirthDate!.year}',
-                      style: TextStyle(
-                        color: _selectedBirthDate == null
-                            ? Colors.grey[600]
-                            : Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                */
 
                 // Hata mesajı
                 if (_errorMessage != null)
