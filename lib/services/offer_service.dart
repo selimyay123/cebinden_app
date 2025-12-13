@@ -408,10 +408,11 @@ class OfferService {
         // counter - yeni karşı teklif
         newStatus = OfferStatus.pending;
         newCounterAmount = evaluation['counterAmount'] as double?;
+        newSellerResponse = evaluation['response'] as String;
         
         // ✅ BUGFIX: Satıcının karşı teklifi öncekinden yüksek olamaz
         if (previousCounterOffer != null && newCounterAmount != null) {
-          if (newCounterAmount >= previousCounterOffer) {
+          if (newCounterAmount! >= previousCounterOffer) {
             // Eğer yeni karşı teklif daha yüksekse, iki seçenek var:
             // 1. Önceki tekliften biraz daha düşük bir teklif ver
             // 2. Reddet
@@ -435,14 +436,11 @@ class OfferService {
               newCounterAmount = null;
             } else {
               // Daha düşük bir karşı teklif ver
+              newStatus = OfferStatus.pending; // Status pending kalmalı
               newCounterAmount = lowerAmount;
               newSellerResponse = _generateCounterOfferResponse(lowerAmount);
             }
           }
-        }
-        
-        if (newStatus == OfferStatus.pending && newCounterAmount != null) {
-          newSellerResponse = evaluation['response'] as String;
         }
       }
       
@@ -459,13 +457,23 @@ class OfferService {
       
       return {
         'success': true,
-        'decision': decision,
+        'decision': decision, // Orijinal kararı döndür (UI için) - veya yeni kararı? UI result dialogu için yeni karar daha iyi olabilir ama orijinal yapı bozulmasın.
+        // UI tarafı result['decision'] kullanıyor. Eğer biz burada decision'ı değiştirdiysek (bugfix bloğunda), UI yanlış gösterebilir.
+        // Ancak UI ayrıca result['status'] ve result['response'] da kullanıyor olabilir mi?
+        // my_offers_screen.dart: _showCounterOfferResultDialog
+        // final decision = result['decision'] as String;
+        // final response = result['response'] as String;
+        // final newCounterOffer = result['counterOffer'] as double?;
+        
+        // Eğer bugfix bloğunda kabul ettiysek, decision 'accept' olmalı.
+        // O yüzden decision değişkenini de güncellemeliyiz.
+        
+        'decision': newStatus == OfferStatus.accepted ? 'accept' : (newStatus == OfferStatus.rejected ? 'reject' : 'counter'),
         'status': newStatus,
         'response': newSellerResponse,
         'counterOffer': newCounterAmount,
       };
     } catch (e) {
-      
       return {'success': false, 'error': e.toString()};
     }
   }

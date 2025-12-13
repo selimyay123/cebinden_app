@@ -3329,6 +3329,22 @@ class _HomeScreenState extends State<HomeScreen> {
       _isTutorialActive = true;
     });
 
+    // Eğer sayfa aşağı kaydırılmışsa önce yukarı kaydır
+    if (_scrollController.hasClients && _scrollController.offset > 0) {
+      _scrollController.animateTo(
+        0.0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      ).then((_) {
+        if (!mounted) return;
+        _startTutorialPart1();
+      });
+    } else {
+      _startTutorialPart1();
+    }
+  }
+
+  void _startTutorialPart1() {
     // Bölüm 1'i başlat
     TutorialCoachMark(
       targets: _createTutorialTargetsPart1(),

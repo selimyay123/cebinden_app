@@ -716,13 +716,13 @@
     "termsOfUse": "Kullanım Koşulları",
     "privacyPolicy": "Gizlilik Politikası",
     "contact": "İletişim",
-    "contactEmail": "info@cebinden.com",
+    "contactEmail": "info@cebindenapp.com",
     "aboutApp": "Uygulama Hakkında",
     "features": "Özellikler",
     "contactTitle": "İletişim",
     "developerTitle": "Geliştirici",
-    "featuresList": "✓ Çeşitli marka ve modellerde araçlar\n✓ Detaylı filtreleme sistemi\n✓ Komik ve eğlenceli ilan açıklamaları\n✓ Kar/zarar takibi\n✓ Kişiselleştirilebilir ayarlar\n✓ Karanlık mod desteği (yakında)\n✓ Çoklu para birimi desteği",
-    "contactContent": "Geri bildirim, öneri veya sorularınız için:\n\n📧 E-posta: info@cebinden.com\n🌐 Web: www.cebinden.com\n📱 Instagram: @cebindenapp",
+    "featuresList": "✓ Gerçekçi araç alım-satım simülasyonu\n✓ Detaylı ekspertiz raporları ve pazarlık sistemi\n✓ Kendi galerinizi yönetme ve büyütme imkanı\n✓ Günlük görevler ve sürpriz ödüller\n✓ Taksi durağı işletmeciliği ve ek gelir kapıları\n✓ Dinamik piyasa koşulları ve ekonomi yönetimi",
+    "contactContent": "Geri bildirim, öneri veya sorularınız için:\n\n📧 E-posta: info@cebindenapp.com\n📱 Instagram: @cebindenapp",
     "developerContent": "Bu uygulama Flutter ile geliştirilmiştir.\n\n© 2024 Cebinden\nmnTüm hakları saklıdır.",
     "disclaimer": "Bu bir oyun/simülasyon uygulamasıdır. Gerçek araç alım-satımı yapmaz. Tüm işlemler sanal ve eğlence amaçlıdır.",
     "web": "Web",
@@ -1771,6 +1771,13 @@
     "influencerDesc": "Reklam ödüllerin %20 artar",
     "charismaticSeller": "İkna Kabiliyeti",
     "charismaticSellerDesc": "Karşı tekliflerinin kabul edilme şansı %10 artar"
+  },
+  "changeUsername": {
+    "title": "Kullanıcı Adı Değiştir",
+    "newUsername": "Yeni Kullanıcı Adı",
+    "enterNewUsername": "Lütfen yeni bir kullanıcı adı girin",
+    "success": "Kullanıcı adı başarıyla güncellendi!",
+    "usernameTaken": "Bu kullanıcı adı zaten alınmış"
   },
   "tutorial": {
     "title": "Eğitim",

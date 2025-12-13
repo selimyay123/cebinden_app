@@ -6,6 +6,7 @@ import '../services/game_time_service.dart';
 import '../models/user_model.dart';
 import 'profile_info_screen.dart';
 import 'change_password_screen.dart';
+import 'change_username_screen.dart';
 import 'about_screen.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
@@ -318,6 +319,26 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
                       builder: (context) => ProfileInfoScreen(user: _currentUser!),
                     ),
                   );
+                },
+              ),
+              _buildListTile(
+                icon: Icons.edit,
+                title: 'changeUsername.title'.tr(),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChangeUsernameScreen(
+                        userId: _currentUser!.id,
+                        currentUsername: _currentUser!.username,
+                      ),
+                    ),
+                  );
+                  
+                  // Eğer kullanıcı adı değiştiyse ayarları yeniden yükle
+                  if (result == true) {
+                    _loadSettings();
+                  }
                 },
               ),
               _buildListTile(

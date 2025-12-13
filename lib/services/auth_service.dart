@@ -185,6 +185,22 @@ class AuthService {
     }
   }
 
+  // Kullanıcı adı değiştir
+  Future<bool> changeUsername({
+    required String userId,
+    required String newUsername,
+  }) async {
+    // Yeni kullanıcı adı dolu mu kontrol et
+    if (newUsername.trim().isEmpty) return false;
+
+    // Kullanıcı adı zaten alınmış mı kontrol et
+    final existingUser = await _db.getUserByUsername(newUsername.trim());
+    if (existingUser != null) return false;
+
+    // Kullanıcı adını güncelle
+    return await _db.updateUser(userId, {'username': newUsername.trim()});
+  }
+
   // Kullanıcı bilgilerini güncelle
   Future<bool> updateUserInfo({
     required String userId,

@@ -103,16 +103,6 @@ class AboutScreen extends StatelessWidget {
                   'about.contactContent'.tr(),
             ),
 
-            const SizedBox(height: 12),
-
-            // Geliştirici
-            _buildInfoCard(
-              icon: Icons.code,
-              title: 'about.developerTitle'.tr(),
-              content:
-                  'about.developerContent'.tr(),
-            ),
-
             const SizedBox(height: 20),
 
             // Uyarı
@@ -139,20 +129,6 @@ class AboutScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Sosyal Medya Butonları (Placeholder)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildSocialButton(Icons.language, 'about.web'.tr()),
-                const SizedBox(width: 12),
-                _buildSocialButton(Icons.mail, 'about.email'.tr()),
-                const SizedBox(width: 12),
-                _buildSocialButton(Icons.camera_alt, 'about.instagram'.tr()),
-              ],
             ),
           ],
         ),

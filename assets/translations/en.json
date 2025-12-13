@@ -718,18 +718,18 @@
     "termsOfUse": "Terms of Use",
     "privacyPolicy": "Privacy Policy",
     "contact": "Contact",
-    "contactEmail": "info@cebinden.com",
+    "contactEmail": "info@cebindenapp.com",
     "aboutApp": "About Application",
     "features": "Features",
     "contactTitle": "Contact",
     "developerTitle": "Developer",
-    "contactContent": "For feedback, suggestions or questions:\n\n📧 Email: info@cebinden.com\n🌐 Web: www.cebinden.com\n📱 Instagram: @cebindenapp",
+    "contactContent": "For feedback, suggestions or questions:\n\n📧 Email: info@cebindenapp.com\n📱 Instagram: @cebindenapp",
     "developerContent": "This application is developed with Flutter.\n\n© 2024 Cebinden\nAll rights reserved.",
     "disclaimer": "This is a game/simulation app. No real vehicle trading involves. All transactions are virtual and for entertainment purposes.",
     "web": "Web",
     "email": "Email",
     "instagram": "Instagram",
-    "featuresList": "✓ Various vehicle brands and models\n✓ Detailed filtering system\n✓ Funny and entertaining listing descriptions\n✓ Profit/loss tracking\n✓ Customizable settings\n✓ Dark mode support (soon)\n✓ Multi-currency support"
+    "featuresList": "✓ Realistic car trading simulation\n✓ Detailed inspection reports and negotiation system\n✓ Manage and expand your own car gallery\n✓ Daily quests and surprise rewards\n✓ Taxi stand management and extra income sources\n✓ Dynamic market conditions and economy management"
   },
   "drawer": {
     "dashboard": "Dashboard",
@@ -1773,6 +1773,13 @@
     "influencerDesc": "Earn 20% more from ad rewards",
     "charismaticSeller": "Charismatic Seller",
     "charismaticSellerDesc": "10% higher chance of counter-offer acceptance"
+  },
+  "changeUsername": {
+    "title": "Change Username",
+    "newUsername": "New Username",
+    "enterNewUsername": "Please enter a new username",
+    "success": "Username updated successfully!",
+    "usernameTaken": "This username is already taken"
   },
   "tutorial": {
     "title": "Tutorial",
