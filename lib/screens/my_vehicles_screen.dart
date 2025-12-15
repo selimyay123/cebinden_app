@@ -469,10 +469,12 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      Row(
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
                         children: [
                           // Satışta Badge'i (eğer satışta ise)
-                          if (vehicle.isListedForSale) ...[
+                          if (vehicle.isListedForSale)
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -502,8 +504,6 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 6),
-                          ],
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
@@ -522,7 +522,6 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,

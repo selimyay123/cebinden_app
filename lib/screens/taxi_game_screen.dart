@@ -221,6 +221,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
     return StatefulBuilder(
       builder: (context, setDialogState) {
         return AlertDialog(
+          backgroundColor: Colors.white.withOpacity(0.7),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [

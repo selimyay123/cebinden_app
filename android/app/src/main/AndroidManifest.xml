@@ -2,7 +2,8 @@
     <application
         android:label="Cebinden"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/ic_cebinden"
+        android:roundIcon="@mipmap/ic_cebinden">
         <activity
             android:name=".MainActivity"
             android:exported="true"

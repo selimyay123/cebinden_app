@@ -225,14 +225,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                         ),
                       ),
                       if (activity.amount != null)
-                        Text(
-                          '${activity.amount! > 0 ? '+' : ''}${_formatCurrency(activity.amount!)} TL',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: activity.amount! > 0 ? Colors.green : Colors.red,
-                          ),
-                        ),
+                        _buildAmountText(activity),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -300,6 +293,38 @@ class _ActivityScreenState extends State<ActivityScreen> {
       case ActivityType.income:
         return Colors.green;
     }
+  }
+
+  Widget _buildAmountText(Activity activity) {
+    final isGold = activity.type == ActivityType.dailyLogin;
+    final amount = activity.amount!;
+    final isPositive = amount > 0;
+    final prefix = isPositive ? '+' : '';
+    
+    String formattedAmount;
+    String currency;
+    Color color;
+
+    if (isGold) {
+      // Gold için ondalıklı gösterim (örn: 0.1, 0.2)
+      formattedAmount = amount.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '');
+      currency = 'Gold';
+      color = Colors.amber[700]!;
+    } else {
+      // TL için tamsayı gösterim
+      formattedAmount = _formatCurrency(amount);
+      currency = 'TL';
+      color = isPositive ? Colors.green : Colors.red;
+    }
+
+    return Text(
+      '$prefix$formattedAmount $currency',
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+        color: color,
+      ),
+    );
   }
 
   String _formatCurrency(double amount) {

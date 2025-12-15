@@ -312,47 +312,19 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: Row(
-              children: [
-                // Claim Button (Green)
-                Expanded(
-                  flex: 1,
-                  child: ElevatedButton(
-                    onPressed: _isClaiming ? null : () => _handleClaim(doubleReward: false),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4CAF50),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
-                    ),
-                    child: Text(
-                      'AL',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // 2x Reward Button (Grey/Video)
-                Expanded(
-                  flex: 1,
-                  child: ElevatedButton.icon(
-                    onPressed: _isClaiming ? null : () => _handleClaim(doubleReward: true),
-                    icon: const Icon(Icons.play_circle_filled, color: Colors.white),
-                    label: const Text(
-                      'ÖDÜL X2',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[700],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 4,
-                    ),
-                  ),
-                ),
-              ],
+            child: ElevatedButton(
+              onPressed: _isClaiming ? null : () => _handleClaim(doubleReward: false),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4CAF50),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 4,
+              ),
+              child: Text(
+                'AL',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],

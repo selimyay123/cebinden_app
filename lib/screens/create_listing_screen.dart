@@ -27,6 +27,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   final _priceController = TextEditingController();
   final _descriptionController = TextEditingController();
   bool _isLoading = false;
+  User? _currentUser;
   
 
 
@@ -47,6 +48,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     final userMap = await _db.getCurrentUser();
     if (userMap != null) {
       final user = User.fromJson(userMap);
+      setState(() => _currentUser = user);
+      
       final multiplier = SkillService.getSellingMultiplier(user);
       
       // Ballı Dil yeteneği varsa toleransı artır
@@ -70,7 +73,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               behavior: SnackBarBehavior.floating,
               content: Text('sell.skillBonus'.trParams({'percent': ((multiplier - 1) * 100).toStringAsFixed(0)})),
               backgroundColor: Colors.indigo.withOpacity(0.8),
-              duration: const Duration(seconds: 3),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -287,6 +290,12 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     // 🆕 DİNAMİK KÂR LİMİTİ
     // Standart limit: %15
     double profitMargin = 0.15;
+    
+    // Yetenek bonusu (İtibar)
+    if (_currentUser != null) {
+      profitMargin += SkillService.getReputationBonus(_currentUser!);
+    }
+
     double discountRate = 0.0;
 
     // Eğer araç indirimli alındıysa, indirim oranı kadar ekstra kâr limiti ekle

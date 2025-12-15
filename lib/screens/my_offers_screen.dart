@@ -2030,7 +2030,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         child: Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.white.withOpacity(0.8),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -2066,14 +2066,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                '${offer.vehicleBrand} ${offer.vehicleModel}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-              ),
+              // Text(
+              //   '${offer.vehicleBrand} ${offer.vehicleModel}',
+              //   style: const TextStyle(
+              //     fontSize: 18,
+              //     fontWeight: FontWeight.bold,
+              //     color: Colors.deepPurple,
+              //   ),
+              // ),
               const SizedBox(height: 8),
               Text(
                 'purchase.successfullyPurchased'.tr(),
@@ -2099,7 +2099,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'purchase.nowYours'.tr(),
+                      'purchase.'.tr(),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
