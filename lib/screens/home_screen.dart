@@ -82,12 +82,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCurrentUser();
+    _initData();
     // İlk reklam yükleme
     _adService.loadRewardedAd();
     
     // Gün değişimini dinle
     _gameTime.addDayChangeListener(_onGameDayChanged);
+  }
+
+  Future<void> _initData() async {
+    await _loadCurrentUser();
+    if (mounted) {
+      _checkDailyStreak();
+    }
   }
 
   @override
@@ -124,9 +131,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     
     // Tekliflerin oluşması için biraz bekle ve yenile
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () async {
       if (mounted) {
-        _loadCurrentUser();
+        await _loadCurrentUser();
+        if (mounted) {
+          _checkDailyStreak();
+        }
       }
     });
   }
@@ -175,8 +185,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
       
+      
       // Günlük giriş bonusunu (Streak) kontrol et
-      _checkDailyStreak();
+      // _checkDailyStreak(); // ARTIK BURADA ÇAĞIRMIYORUZ (Sonsuz döngü/çift dialog hatası için)
       
       // Günlük görevleri kontrol et/oluştur
       _questService.checkAndGenerateQuests(user.id);

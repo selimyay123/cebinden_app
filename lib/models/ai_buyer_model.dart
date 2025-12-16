@@ -180,12 +180,10 @@ class AIBuyer {
   }
 
   static List<String> _generatePreferredBrands(Random random) {
-    // Gerçek marka isimleri (Vehicle kategorilerindeki markalarla eşleşmeli)
+    // Fictional brand names used in the app
     final allBrands = [
-      'BMW', 'Mercedes-Benz', 'Audi', 'Volkswagen', 'Ford',
-      'Renault', 'Peugeot', 'Fiat', 'Toyota', 'Honda',
-      'Hyundai', 'Kia', 'Nissan', 'Mazda', 'Opel',
-      'Skoda', 'Seat', 'Volvo', 'Chevrolet', 'Alfa Romeo',
+      'Bavora', 'Mercurion', 'Audira', 'Volkstar', 'Fortran',
+      'Renauva', 'Fialto', 'Koyoro', 'Hanto', 'Hundar', 'Oplon',
     ];
     
     // 2-4 arası marka seç (daha geniş tercihler)

@@ -43,7 +43,8 @@
     "continue": "Devam Et",
     "active": "Aktif",
     "dear": "Sayın",
-    "attention": "Dikkat!"
+    "attention": "Dikkat!",
+    "retry": "Tekrar Dene"
   },
   "errors": {
     "balanceUpdateFailed": "Bakiye güncellenemedi",
@@ -833,6 +834,12 @@
     "maxPriceHint": "Maks: {price} TL (%15 Kâr)",
     "profitLossStatus": "{status}: {amount} TL (%{percent})"
   },
+  "listings": {
+    "title": "İlanlarım",
+    "myListings": "İlanlarım",
+    "noListings": "Henüz İlan Yok",
+    "noListingsDesc": "Henüz satışa çıkardığınız bir araç yok."
+  },
   "misc": {
     "daysAgo": "gün önce",
     "hoursAgo": "saat önce",
@@ -1378,6 +1385,7 @@
     "googleLoginError": "Google ile giriş yapılırken bir hata oluştu."
   },
   "store": {
+    "productsLoadError": "Ürünler yüklenirken hata oluştu",
     "title": "Mağaza",
     "buyGold": "Altın Al",
     "convertGold": "Altın Bozdur",
@@ -1735,7 +1743,10 @@
     "listingSuccess": "İlan başarıyla oluşturuldu!",
     "listingError": "İlan oluşturulamadı!",
     "listingErrorWithMessage": "Hata",
-    "skillBonus": "Yetenek Bonusu: %{percent} daha yüksek fiyata satabilirsin!"
+    "skillBonus": "Yetenek Bonusu: %{percent} daha yüksek fiyata satabilirsin!",
+    "editButton": "Düzenle",
+    "removeListing": "Kaldır",
+    "listingRemoved": "İlan başarıyla kaldırıldı"
   },
   "skills": {
     "title": "Yetenek Ağacı",

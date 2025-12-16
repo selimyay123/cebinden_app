@@ -43,7 +43,8 @@
     "continue": "Continue",
     "active": "Active",
     "dear": "Dear",
-    "attention": "Attention!"
+    "attention": "Attention!",
+    "retry": "Retry"
   },
   "errors": {
     "balanceUpdateFailed": "Balance could not be updated",
@@ -827,6 +828,12 @@
     "maxPriceHint": "Max: {price} TL (15% Profit)",
     "profitLossStatus": "{status}: {amount} TL (%{percent})"
   },
+  "listings": {
+    "title": "My Listings",
+    "myListings": "My Listings",
+    "noListings": "No Listings Yet",
+    "noListingsDesc": "You haven't listed any vehicles for sale yet."
+  },
   "misc": {
     "daysAgo": "days ago",
     "hoursAgo": "hours ago",
@@ -1373,6 +1380,7 @@
     "googleLoginError": "An error occurred during Google sign-in."
   },
   "store": {
+    "productsLoadError": "Error loading products",
     "title": "Store",
     "buyGold": "Buy Gold",
     "convertGold": "Convert Gold",
@@ -1737,7 +1745,10 @@
     "listingSuccess": "Listing created successfully!",
     "listingError": "Failed to create listing!",
     "listingErrorWithMessage": "Error",
-    "skillBonus": "Skill Bonus: You can sell for %{percent} higher price!"
+    "skillBonus": "Skill Bonus: You can sell for %{percent} higher price!",
+    "editButton": "Edit",
+    "removeListing": "Remove",
+    "listingRemoved": "Listing removed successfully"
   },
   "skills": {
     "title": "Skill Tree",

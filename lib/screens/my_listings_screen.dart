@@ -221,13 +221,15 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
     final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepPurple);
     
     return InkWell(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => MyListingsScreen(selectedBrand: brand),
           ),
         );
+        // Geri dönünce listeyi yenile (ilan silinmiş/düzenlenmiş olabilir)
+        _loadUserListedVehicles();
       },
       child: Container(
         decoration: BoxDecoration(

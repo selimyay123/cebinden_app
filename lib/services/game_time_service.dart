@@ -69,8 +69,24 @@ class GameTimeService with WidgetsBindingObserver {
     if (minutes < 2 || minutes > 30) {
       throw Exception('Oyun günü süresi 2-30 dakika arasında olmalıdır');
     }
+    
+    // Mevcut duruma göre hangi gündeyiz?
+    final currentTotalMinutes = getRealMinutesPassed();
+    final currentDay = (currentTotalMinutes / _gameDayDurationMinutes).floor() + 1;
+    
+    // Yeni süreye göre bu günün başlangıcına denk gelen toplam süreyi hesapla
+    // Böylece süre değişince günün ortasından değil, başından başlarız (kafa karışıklığını önler)
+    final newTotalMinutes = (currentDay - 1) * minutes;
+    
+    // Aradaki farkı _totalPlayedMinutes'e yansıt
+    final diff = newTotalMinutes - currentTotalMinutes;
+    _totalPlayedMinutes += diff;
+    
+    // Değerleri güncelle ve kaydet
     _gameDayDurationMinutes = minutes;
     await SettingsHelper.setGameDayDuration(minutes);
+    await SettingsHelper.setTotalPlayedMinutes(_totalPlayedMinutes);
+    
     _updateCurrentTime();
   }
   

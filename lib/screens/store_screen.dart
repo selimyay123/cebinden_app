@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../services/iap_service.dart';
 import '../models/user_model.dart';
 import 'home_screen.dart';
 
@@ -17,6 +20,8 @@ class StoreScreen extends StatefulWidget {
 class _StoreScreenState extends State<StoreScreen> {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
+  final IAPService _iapService = IAPService();
+  late StreamSubscription<String> _purchaseSubscription;
   User? _currentUser;
   bool _isLoading = true;
 
@@ -24,6 +29,39 @@ class _StoreScreenState extends State<StoreScreen> {
   void initState() {
     super.initState();
     _loadCurrentUser();
+    _iapService.initialize();
+    _purchaseSubscription = _iapService.purchaseEvents.listen(_handlePurchaseEvent);
+  }
+
+  @override
+  void dispose() {
+    _purchaseSubscription.cancel();
+    super.dispose();
+  }
+
+  void _handlePurchaseEvent(String event) {
+    if (event == 'success') {
+      _loadCurrentUser(); // Update balance
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
+          content: Text('store.purchaseSuccess'.tr()), // Make sure to add this key or use hardcoded for now
+          backgroundColor: Colors.green.withOpacity(0.8),
+        ),
+      );
+    } else if (event.startsWith('error:')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
+          content: Text(event.substring(7)),
+          backgroundColor: Colors.red.withOpacity(0.8),
+        ),
+      );
+    }
   }
 
   Future<void> _loadCurrentUser() async {
@@ -290,124 +328,194 @@ class _StoreScreenState extends State<StoreScreen> {
   }
 
   Widget _buildGoldPackages() {
-    final packages = [
-      {'gold': 1, 'price': 100, 'bonus': 0},
-      {'gold': 5, 'price': 450, 'bonus': 50},
-      {'gold': 10, 'price': 850, 'bonus': 150},
-      {'gold': 25, 'price': 2000, 'bonus': 500},
-    ];
-
-    return Column(
-      children: packages.map((package) {
-        final gold = package['gold'] as int;
-        final price = package['price'] as int;
-        final bonus = package['bonus'] as int;
-        final hasBonus = bonus > 0;
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: Material(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            elevation: 2,
-            child: InkWell(
-              onTap: () => _showPurchaseDialog(gold, price),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // İkon
-                    Container(
-                      width: 60,
-                      height: 60,
-                      child: Lottie.asset(
-                        'assets/animations/gold.json',
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.contain,
-                      ),
+    return ValueListenableBuilder<String?>(
+      valueListenable: _iapService.errorNotifier,
+      builder: (context, error, child) {
+        if (error != null) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const SizedBox(height: 8),
+                  Text(
+                    'store.productsLoadError'.tr(), // Add this key or use fallback
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    error,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      _iapService.initialize();
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: Text('common.retry'.tr()),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple,
+                      foregroundColor: Colors.white,
                     ),
-                    const SizedBox(width: 16),
-                    
-                    // Bilgiler
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Wrap(
-                            spacing: 8,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(
-                                '$gold ${'store.gold'.tr()}',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (hasBonus)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: Colors.green),
-                                  ),
-                                  child: Text(
-                                    '+$bonus TL ${'store.bonus'.tr()}',
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '≈ ${_formatCurrency(gold * 1000000.0)} ${'store.gameCurrency'.tr()}',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Fiyat
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return ValueListenableBuilder<List<ProductDetails>>(
+          valueListenable: _iapService.productsNotifier,
+          builder: (context, products, child) {
+            if (products.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 8),
+                      Text('store.loadingProducts'.tr()),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              children: products.map((product) {
+            // Bonus hesaplama (ID'ye göre)
+            int bonus = 0;
+            int goldAmount = 0;
+            
+            if (product.id.contains('01')) {
+              goldAmount = 1;
+              bonus = 0;
+            } else if (product.id.contains('05')) {
+              goldAmount = 5;
+              bonus = 50;
+            } else if (product.id.contains('10')) {
+              goldAmount = 10;
+              bonus = 150;
+            } else if (product.id.contains('25')) {
+              goldAmount = 25;
+              bonus = 500;
+            }
+            
+            final hasBonus = bonus > 0;
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: Material(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                elevation: 2,
+                child: InkWell(
+                  onTap: () => _showPurchaseDialog(product, goldAmount, bonus),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
                       children: [
-                        Text(
-                          '$price TL',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepPurple,
+                        // İkon
+                        Container(
+                          width: 60,
+                          height: 60,
+                          child: Lottie.asset(
+                            'assets/animations/gold.json',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.contain,
                           ),
                         ),
-                        Text(
-                          'store.realMoney'.tr(),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[600],
+                        const SizedBox(width: 16),
+                        
+                        // Bilgiler
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                spacing: 8,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    product.title.replaceAll('(Cebinden)', '').trim(), // App store title cleaning
+                                    style: const TextStyle(
+                                      fontSize: 18, // Biraz küçülttüm çünkü title uzun olabilir
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (hasBonus)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: Colors.green),
+                                      ),
+                                      child: Text(
+                                        '+$bonus TL ${'store.bonus'.tr()}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '≈ ${_formatCurrency(goldAmount * 1000000.0)} ${'store.gameCurrency'.tr()}',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
+                        
+                        // Fiyat
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              product.price,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurple,
+                              ),
+                            ),
+                            Text(
+                              'store.realMoney'.tr(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
+    );
+      },
     );
   }
 
@@ -526,118 +634,112 @@ class _StoreScreenState extends State<StoreScreen> {
     );
   }
 
-  void _showPurchaseDialog(int gold, int price) {
+  void _showPurchaseDialog(ProductDetails product, int gold, int bonus) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.shopping_cart, color: Colors.amber),
+      builder: (context) => ValueListenableBuilder<bool>(
+        valueListenable: _iapService.purchasePendingNotifier,
+        builder: (context, isPending, child) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(width: 12),
-            Expanded(child: Text('store.purchaseGold'.tr())),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('store.package'.tr()),
-                      Text(
-                        '$gold ${'store.gold'.tr()}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('store.price'.tr()),
-                      Text(
-                        '$price TL',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline, size: 20, color: Colors.blue),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'store.paymentComingSoon'.tr(),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  behavior: SnackBarBehavior.floating,
-                  content: Text('store.paymentSystemComingSoon'.tr()),
-                  backgroundColor: Colors.orange.withOpacity(0.8),
+                  child: const Icon(Icons.shopping_cart, color: Colors.amber),
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-              foregroundColor: Colors.white,
+                const SizedBox(width: 12),
+                Expanded(child: Text('store.purchaseGold'.tr())),
+              ],
             ),
-            child: Text('store.buy'.tr()),
-          ),
-        ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('store.package'.tr()),
+                          Text(
+                            product.title.replaceAll('(Cebinden)', '').trim(),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('store.price'.tr()),
+                          Text(
+                            product.price,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (isPending)
+                  const Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 8),
+                        Text('İşlem yapılıyor, lütfen bekleyin...'),
+                      ],
+                    ),
+                  )
+                else
+                  Text(
+                    'Güvenli ödeme ile satın almak üzeresiniz.',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+              ],
+            ),
+            actions: [
+              if (!isPending) ...[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('common.cancel'.tr()),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Dialog'u kapatma, işlem bitince otomatik kapanabilir veya kullanıcı kapatır
+                    // Ama pending durumunda dialog güncellenecek
+                    _iapService.buyProduct(product);
+                    // Dialogu kapatıp loading gösterebiliriz ama burada dialog içinde loading gösteriyoruz
+                    Navigator.pop(context); // Dialogu kapat
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text('store.buy'.tr()),
+                ),
+              ],
+            ],
+          );
+        },
       ),
     );
   }
