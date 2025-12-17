@@ -2025,8 +2025,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
           content: Text('home.galleryInsufficientFunds'.tr()),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.red.withOpacity(0.8),
           duration: const Duration(seconds: 3),
         ),
       );

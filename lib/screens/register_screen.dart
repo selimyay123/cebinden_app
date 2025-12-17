@@ -137,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                   width: 180,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 20),
+                // const SizedBox(height: 20),
 
                 // Başlık
                 Text(
@@ -149,7 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                     color: Colors.deepPurple,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
 
                 Text(
                   'app.subtitle'.tr(),
@@ -159,7 +159,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 25),
 
                 // Alt başlık
                 Text(
@@ -353,7 +353,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                           ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 4),
 
                 // Giriş yap seçeneği
                 Row(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import 'dart:math'; // Random için
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
@@ -88,6 +89,40 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     super.dispose();
   }
 
+  /// Satışa koyma animasyonunu oynat
+  Future<void> _playListForSaleAnimation() async {
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.85),
+      builder: (context) => PopScope(
+        canPop: false, // Geri tuşunu devre dışı bırak
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Lottie.asset(
+                'assets/animations/list_for_sale.json',
+                width: 300,
+                height: 300,
+                repeat: false,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Animasyon süresi kadar bekle (~2-3 saniye)
+    await Future.delayed(const Duration(milliseconds: 2500));
+
+    if (mounted) {
+      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+    }
+  }
+
   Future<void> _createListing() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -110,6 +145,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       if (!mounted) return;
 
       if (success) {
+        // 🎬 Satışa koyma animasyonunu oynat
+        await _playListForSaleAnimation();
+
         // Başarı mesajı
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

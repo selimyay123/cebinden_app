@@ -904,14 +904,19 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 'listedDate': null,
               });
               
-              if (success && mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('sell.listingRemoved'.tr()),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                _loadUserListedVehicles(); // Listeyi yenile
+              if (success) {
+                // 🆕 İlana ait tüm teklifleri sil
+                await _db.deleteOffersForVehicle(vehicle.id);
+
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('sell.listingRemoved'.tr()),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  _loadUserListedVehicles(); // Listeyi yenile
+                }
               }
             },
             style: ElevatedButton.styleFrom(

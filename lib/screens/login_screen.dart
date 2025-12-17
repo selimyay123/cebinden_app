@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                   width: 180,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 20),
+                // const SizedBox(height: 10),
 
                 // Başlık
                 Text(
@@ -172,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                     color: Colors.deepPurple,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
 
                 Text(
                   'app.subtitle'.tr(),
@@ -182,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
 
                 // Alt başlık
                 Text(

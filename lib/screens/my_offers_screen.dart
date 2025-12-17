@@ -1303,6 +1303,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
 
     if (confirmed == true) {
+      // 🎬 Satış animasyonunu oynat
+      await _playSellingAnimation();
+
       // Loading göster
       showDialog(
         context: context,
@@ -2019,6 +2022,41 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     }
   }
 
+  /// Satış animasyonunu oynat (YENİ)
+  Future<void> _playSellingAnimation() async {
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.85),
+      builder: (context) => PopScope(
+        canPop: false, // Geri tuşunu devre dışı bırak
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Satış animasyonu
+              Lottie.asset(
+                'assets/animations/selling_car.json',
+                width: 300,
+                height: 300,
+                repeat: false, // Sadece 1 kez oynat
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Animasyon süresi kadar bekle (~2 saniye)
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    if (mounted) {
+      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+    }
+  }
+
   /// Satın alma başarılı dialogunu göster
   void _showPurchaseSuccessDialog(Offer offer, double newBalance) {
     showDialog(
@@ -2407,8 +2445,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
       // 🆕 Eğer teklif kabul edildiyse animasyon ve başarı dialogu göster
       if (result['decision'] == 'accept' || result['status'] == OfferStatus.accepted) {
-        // 🎬 Animasyon göster
-        await _playPurchaseAnimation();
+        // 🎬 Satış animasyonunu oynat
+        await _playSellingAnimation();
 
         // İlanı kaldır (Marketten sil)
         _marketService.removeListing(originalOffer.vehicleId);

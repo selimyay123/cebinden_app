@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
@@ -41,27 +42,49 @@ class _StoreScreenState extends State<StoreScreen> {
 
   void _handlePurchaseEvent(String event) {
     if (event == 'success') {
-      _loadCurrentUser(); // Update balance
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          behavior: SnackBarBehavior.floating,
-          content: Text('store.purchaseSuccess'.tr()), // Make sure to add this key or use hardcoded for now
+          content: Text('store.purchaseSuccess'.tr()),
           backgroundColor: Colors.green.withOpacity(0.8),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 8,
         ),
       );
+      _loadCurrentUser(); // Bakiyeyi güncelle
     } else if (event.startsWith('error:')) {
+      final rawError = event.substring(7);
+      final errorMessage = _getLocalizedErrorMessage(rawError);
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          behavior: SnackBarBehavior.floating,
-          content: Text(event.substring(7)),
+          content: Text(errorMessage),
           backgroundColor: Colors.red.withOpacity(0.8),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 8,
         ),
       );
     }
+  }
+
+  String _getLocalizedErrorMessage(String error) {
+    if (error.contains('BillingResponse.itemUnavailable')) {
+      return 'store.errorItemUnavailable'.tr();
+    } else if (error.contains('BillingResponse.serviceUnavailable')) {
+      return 'store.errorServiceUnavailable'.tr();
+    } else if (error.contains('BillingResponse.userCanceled')) {
+      return 'store.errorUserCanceled'.tr();
+    } else if (error.contains('BillingResponse.itemAlreadyOwned')) {
+      return 'store.errorItemUnavailable'.tr(); // Already owned treated as unavailable for consumable logic or similar
+    }
+    
+    // Fallback for unknown errors, but try to be helpful if it's a readable string
+    if (error.isNotEmpty && !error.contains('BillingResponse')) {
+       return error; 
+    }
+    
+    return 'store.errorUnknown'.tr();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -121,7 +144,24 @@ class _StoreScreenState extends State<StoreScreen> {
                             const SizedBox(height: 32),
 
                             // Altın Satın Alma Paketleri
-                            _buildSectionTitle('store.buyGold'.tr()),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildSectionTitle('store.buyGold'.tr()),
+                                const SizedBox(height: 4),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Text(
+                                    '1 ${'store.gold'.tr()} = 1.000.000 ${'store.gameCurrency'.tr()}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                             const SizedBox(height: 12),
                             _buildGoldPackages(),
                             
@@ -438,46 +478,22 @@ class _StoreScreenState extends State<StoreScreen> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Wrap(
-                                spacing: 8,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  Text(
-                                    product.title.replaceAll('(Cebinden)', '').trim(), // App store title cleaning
-                                    style: const TextStyle(
-                                      fontSize: 18, // Biraz küçülttüm çünkü title uzun olabilir
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if (hasBonus)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: Colors.green),
-                                      ),
-                                      child: Text(
-                                        '+$bonus TL ${'store.bonus'.tr()}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                              Text(
+                                product.title.replaceAll(RegExp(r'\(.*\)'), '').trim(),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '≈ ${_formatCurrency(goldAmount * 1000000.0)} ${'store.gameCurrency'.tr()}',
+                                _formatCurrency(goldAmount * 1000000.0),
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 14,
                                   color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
@@ -485,25 +501,13 @@ class _StoreScreenState extends State<StoreScreen> {
                         ),
                         
                         // Fiyat
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              product.price,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                            Text(
-                              'store.realMoney'.tr(),
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
+                        Text(
+                          product.price,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
                         ),
                       ],
                     ),
@@ -576,25 +580,15 @@ class _StoreScreenState extends State<StoreScreen> {
               color: Colors.grey[50],
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'store.exchangeRate'.tr(),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                  ),
+            child: Center(
+              child: Text(
+                '1 ${'store.gold'.tr()} = 1.000.000 TL',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
                 ),
-                Text(
-                  '1 ${'store.gold'.tr()} = 1.000.000 TL',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -637,107 +631,165 @@ class _StoreScreenState extends State<StoreScreen> {
   void _showPurchaseDialog(ProductDetails product, int gold, int bonus) {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.5), // Arka planı biraz karart
       builder: (context) => ValueListenableBuilder<bool>(
         valueListenable: _iapService.purchasePendingNotifier,
         builder: (context, isPending, child) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-            ),
-            title: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.shopping_cart, color: Colors.amber),
-                ),
-                const SizedBox(width: 12),
-                Expanded(child: Text('store.purchaseGold'.tr())),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white.withOpacity(0.8), // Hafif şeffaf beyaz
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      // Başlık
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('store.package'.tr()),
-                          Text(
-                            product.title.replaceAll('(Cebinden)', '').trim(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.shopping_cart, color: Colors.amber),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('store.price'.tr()),
-                          Text(
-                            product.price,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple,
-                              fontSize: 18,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'store.purchaseGold'.tr(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 20),
+                      
+                      // İçerik
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white.withOpacity(0.5)),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'store.package'.tr(),
+                                  style: TextStyle(color: Colors.grey[700]),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    product.title.replaceAll(RegExp(r'\(.*\)'), '').trim(),
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.end,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'store.price'.tr(),
+                                  style: TextStyle(color: Colors.grey[700]),
+                                ),
+                                Text(
+                                  product.price,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepPurple,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      if (isPending)
+                        const Column(
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 16),
+                            Text('İşlem yapılıyor, lütfen bekleyin...'),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            Text(
+                              'Güvenli ödeme ile satın almak üzeresiniz.',
+                              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text('common.cancel'.tr()),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      _iapService.buyProduct(product);
+                                      Navigator.pop(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepPurple,
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: Text('store.buy'.tr()),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                if (isPending)
-                  const Center(
-                    child: Column(
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 8),
-                        Text('İşlem yapılıyor, lütfen bekleyin...'),
-                      ],
-                    ),
-                  )
-                else
-                  Text(
-                    'Güvenli ödeme ile satın almak üzeresiniz.',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-              ],
+              ),
             ),
-            actions: [
-              if (!isPending) ...[
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('common.cancel'.tr()),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Dialog'u kapatma, işlem bitince otomatik kapanabilir veya kullanıcı kapatır
-                    // Ama pending durumunda dialog güncellenecek
-                    _iapService.buyProduct(product);
-                    // Dialogu kapatıp loading gösterebiliriz ama burada dialog içinde loading gösteriyoruz
-                    Navigator.pop(context); // Dialogu kapat
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Text('store.buy'.tr()),
-                ),
-              ],
-            ],
           );
         },
       ),
