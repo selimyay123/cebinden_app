@@ -955,9 +955,9 @@ class _StoreScreenState extends State<StoreScreen> {
                           enableInteractiveSelection: false, // Context menu'yu kapat
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 32,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 2,
+                            letterSpacing: 1,
                           ),
                           decoration: InputDecoration(
                             filled: true,
@@ -976,13 +976,13 @@ class _StoreScreenState extends State<StoreScreen> {
                             suffix: Text(
                               'store.gold'.tr(),
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey[600],
                               ),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20,
+                              horizontal: 12,
                               vertical: 16,
                             ),
                             errorText: validationError,

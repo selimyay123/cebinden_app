@@ -39,7 +39,7 @@
     "sort": "Sırala",
     "refresh": "Yenile",
     "share": "Paylaş",
-    "currency": "₺",
+    "currency": "TL",
     "continue": "Devam Et",
     "active": "Aktif",
     "dear": "Sayın",
@@ -64,7 +64,9 @@
     "title": "TAKSİ GÖREVİ",
     "collectMoney": "Para destelerini topla!",
     "swipeToMove": "Kaydırmak için sürükle",
-    "start": "BAŞLA"
+    "start": "BAŞLA",
+    "earnedXP": "+ {amount} XP",
+    "earnedGold": "+ {amount} Altın"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -453,6 +455,7 @@
     "rejectTitle": "Teklifi Reddet",
     "rejectAndDelete": "Reddet ve Sil",
     "rejectSuccess": "Teklif reddedildi ve silindi.",
+    "rejectWarning": "Bu işlem geri alınamaz.",
     "acceptCounterTitle": "Karşı Teklifi Kabul Et",
     "acceptCounterConfirmMessage": "{brand} {model} için karşı teklifi kabul etmek istediğinize emin misiniz?",
     "yourOfferLabel": "Teklifiniz:",
@@ -1751,7 +1754,12 @@
     "skillBonus": "Yetenek Bonusu: %{percent} daha yüksek fiyata satabilirsin!",
     "editButton": "Düzenle",
     "removeListing": "Kaldır",
-    "listingRemoved": "İlan başarıyla kaldırıldı"
+    "listingRemoved": "İlan başarıyla kaldırıldı",
+    "listingUpdated": "İlan başarıyla güncellendi",
+    "listingUpdateFailed": "İlan güncellenemedi",
+    "editListing": "İlanı Düzenle",
+    "profitStatus": "Kâr",
+    "lossStatus": "Zarar"
   },
   "skills": {
     "title": "Yetenek Ağacı",

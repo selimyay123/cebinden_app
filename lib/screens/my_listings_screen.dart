@@ -1131,9 +1131,7 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   if (price == null || price <= 0) {
                     return 'vehicles.validPrice'.tr();
                   }
-                  if (price < 150000) {
-                    return 'Min 150.000 TL';
-                  }
+
                   if (price > maxPrice) {
                     return 'Max %15';
                   }

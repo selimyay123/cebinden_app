@@ -77,13 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
       return;
     }
 
-    if (password.length < 6) {
-      setState(() {
-        _errorMessage = 'auth.passwordMinLength'.tr();
-        _isLoading = false;
-      });
-      return;
-    }
+
 
     if (password != passwordConfirm) {
       setState(() {

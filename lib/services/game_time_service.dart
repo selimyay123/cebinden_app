@@ -29,7 +29,7 @@ class GameTimeService with WidgetsBindingObserver {
   Timer? _updateTimer;
   
   // Ayarlar
-  int _gameDayDurationMinutes = 5; // Default: 1 oyun günü = 5 dakika
+  int _gameDayDurationMinutes = 1; // Default: 1 oyun günü = 1 dakika
   
   /// Oyun zamanını başlat
   Future<void> initialize() async {
@@ -48,8 +48,8 @@ class GameTimeService with WidgetsBindingObserver {
     // Oturumu başlat
     _startSession();
     
-    // Periyodik güncelleme (her dakika) - sadece aktifken çalışır
-    _updateTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+    // Periyodik güncelleme (her saniye) - hassas zamanlama için
+    _updateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_isAppActive) {
         _updateCurrentTime();
       }
@@ -66,8 +66,8 @@ class GameTimeService with WidgetsBindingObserver {
   
   /// Oyun günü süresini değiştir
   Future<void> setGameDayDuration(int minutes) async {
-    if (minutes < 2 || minutes > 30) {
-      throw Exception('Oyun günü süresi 2-30 dakika arasında olmalıdır');
+    if (minutes < 1 || minutes > 30) {
+      throw Exception('Oyun günü süresi 1-30 dakika arasında olmalıdır');
     }
     
     // Mevcut duruma göre hangi gündeyiz?
@@ -218,43 +218,22 @@ class GameTimeService with WidgetsBindingObserver {
 
   /// Yeni güne kalan süreyi al
   Duration getTimeUntilNextDay() {
-    // Toplam geçen dakika (gerçek zaman)
-    final totalMinutes = getRealMinutesPassed();
-    
-    // Şu anki günün başlangıcından beri geçen dakika
-    final minutesInCurrentDay = totalMinutes % _gameDayDurationMinutes;
-    
-    // Kalan dakika
-    final remainingMinutes = _gameDayDurationMinutes - minutesInCurrentDay;
-    
-    // Dakikayı saniyeye çevir (daha hassas olması için session başlangıcına göre saniye hesabı yapılabilir ama şimdilik dakika yeterli)
-    // Ancak UI'da saniye saydırmak için daha hassas hesap lazım.
-    
+    // Toplam geçen saniye (gerçek zaman)
+    int currentSessionSeconds = 0;
     if (_sessionStartTime != null && _isAppActive) {
-      // Session başlangıcından beri geçen süre (Duration olarak)
-      final sessionDuration = DateTime.now().difference(_sessionStartTime!);
-      
-      // Toplam geçen süre (önceki sessionlar + şu anki)
-      // _totalPlayedMinutes sadece tam dakikaları tutuyor, bu yüzden hassasiyet kaybı var.
-      // Ancak basit bir geri sayım için:
-      
-      // Kalan süreyi hesapla: (Toplam Gün Süresi - (Toplam Geçen Süre % Toplam Gün Süresi))
-      // Bunu dakika cinsinden yapıyoruz.
-      
-      // Daha hassas hesaplama için:
-      // Şu anki dakika içindeki saniyeleri de hesaba katalım.
-      final secondsInCurrentMinute = DateTime.now().second;
-      
-      // Kalan tam dakika
-      final remainingFullMinutes = remainingMinutes - 1;
-      
-      // Kalan saniye
-      final remainingSeconds = 60 - secondsInCurrentMinute;
-      
-      return Duration(minutes: remainingFullMinutes, seconds: remainingSeconds);
+      currentSessionSeconds = DateTime.now().difference(_sessionStartTime!).inSeconds;
     }
     
-    return Duration(minutes: remainingMinutes);
+    final totalSeconds = (_totalPlayedMinutes * 60) + currentSessionSeconds;
+    final dayDurationSeconds = _gameDayDurationMinutes * 60;
+    
+    // Şu anki günün başlangıcından beri geçen saniye
+    final secondsInCurrentDay = totalSeconds % dayDurationSeconds;
+    
+    // Kalan saniye
+    final remainingSeconds = dayDurationSeconds - secondsInCurrentDay;
+    
+    return Duration(seconds: remainingSeconds);
   }
   
   /// Servisi temizle

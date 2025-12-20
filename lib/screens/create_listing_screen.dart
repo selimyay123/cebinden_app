@@ -390,6 +390,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             FilteringTextInputFormatter.digitsOnly,
             CurrencyInputFormatter(),
           ],
+          onChanged: (value) {
+            setState(() {});
+          },
           decoration: InputDecoration(
             hintText: 'sell.priceHint'.tr(),
             prefixText: '₺ ',
@@ -422,6 +425,66 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             return null;
           },
         ),
+        
+        // 🆕 Kar/Zarar Göstergesi
+        if (_priceController.text.isNotEmpty) ...[
+          Builder(
+            builder: (context) {
+              final currentPrice = CurrencyInputFormatter.parse(_priceController.text);
+              final profit = currentPrice - widget.vehicle.purchasePrice;
+              final isProfit = profit >= 0;
+              final profitPercent = widget.vehicle.purchasePrice > 0 
+                  ? (profit / widget.vehicle.purchasePrice) * 100 
+                  : 0;
+              
+              return Container(
+                margin: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isProfit ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isProfit ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isProfit ? Icons.trending_up : Icons.trending_down,
+                      color: isProfit ? Colors.green : Colors.red,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isProfit ? 'sell.profitStatus'.tr() : 'sell.lossStatus'.tr(),
+                            style: TextStyle(
+                              color: isProfit ? Colors.green[700] : Colors.red[700],
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${isProfit ? '+' : ''}${_formatCurrency(profit)} TL (%${profitPercent.abs().toStringAsFixed(1)})',
+                            style: TextStyle(
+                              color: isProfit ? Colors.green[900] : Colors.red[900],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          ),
+        ],
         const SizedBox(height: 8),
       ],
     );

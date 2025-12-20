@@ -435,7 +435,7 @@
     "rejectTitle": "Reject Offer",
     "rejectAndDelete": "Reject and Delete",
     "rejectSuccess": "Offer rejected and deleted.",
-    "rejectWarning": "Rejected offer will be permanently permanently deleted.",
+    "rejectWarning": "This action cannot be undone.",
     "acceptCounterTitle": "Accept Counter Offer",
     "acceptCounterConfirmMessage": "Are you sure you want to accept the counter offer for {brand} {model}?",
     "yourOfferLabel": "Your Offer:",
@@ -523,7 +523,9 @@
     "title": "TAXI MISSION",
     "collectMoney": "Collect money stacks!",
     "swipeToMove": "Swipe to move",
-    "start": "START"
+    "start": "START",
+    "earnedXP": "+ {amount} XP",
+    "earnedGold": "+ {amount} Gold"
   },
   "negotiation": {
     "accept": {
@@ -1753,7 +1755,12 @@
     "skillBonus": "Skill Bonus: You can sell for %{percent} higher price!",
     "editButton": "Edit",
     "removeListing": "Remove",
-    "listingRemoved": "Listing removed successfully"
+    "listingRemoved": "Listing removed successfully",
+    "listingUpdated": "Listing updated successfully",
+    "listingUpdateFailed": "Failed to update listing",
+    "editListing": "Edit Listing",
+    "profitStatus": "Profit",
+    "lossStatus": "Loss"
   },
   "skills": {
     "title": "Skill Tree",

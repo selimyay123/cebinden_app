@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
@@ -74,6 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
   double _lastRentalIncome = 0.0;
   bool _showRentalIncomeAnimation = false;
   
+  // Fire animasyonu için
+  bool _showFireAnimation = false;
+  
   // Tutorial aktif mi? (scroll'u engellemek için)
   bool _isTutorialActive = false;
   
@@ -107,6 +111,20 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Gün değiştiğinde çağrılır
   void _onGameDayChanged(int oldDay, int newDay) async {
     if (!mounted) return;
+    
+    // Fire animasyonunu tetikle (Teklifler yenileniyor)
+    setState(() {
+      _showFireAnimation = true;
+    });
+    
+    // 3 saniye sonra animasyonu gizle
+    Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showFireAnimation = false;
+        });
+      }
+    });
     
     // Galeri sahibiyse kiralama geliri işle
     if (_currentUser != null && _currentUser!.ownsGallery) {
@@ -1394,6 +1412,8 @@ class _HomeScreenState extends State<HomeScreen> {
         'label': 'home.myOffers'.tr(),
         'color': Colors.teal,
         'badge': _pendingOffersCount > 0 ? _pendingOffersCount : null, // Badge ekledik
+        'animationPath': 'assets/animations/fire.json', // Fire animasyonu
+        'showAnimation': _showFireAnimation,
         'onTap': () async {
           // Teklifler sayfasına git
           await Navigator.push(
@@ -1508,6 +1528,8 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: action['onTap'] as VoidCallback,
             badge: action['badge'] as int?,
             reward: action['reward'] as String?,
+            animationPath: action['animationPath'] as String?,
+            showAnimation: action['showAnimation'] as bool? ?? false,
           );
         }).toList(),
       ),
@@ -1522,6 +1544,8 @@ class _HomeScreenState extends State<HomeScreen> {
     required VoidCallback onTap,
     int? badge, // Badge parametresi ekledik
     String? reward, // Ödül gösterimi için
+    String? animationPath, // Animasyon dosyası yolu
+    bool showAnimation = false, // Animasyon gösterilsin mi?
   }) {
     return InkWell(
       key: key, // Key'i burada kullanıyoruz
@@ -1540,7 +1564,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: color.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: color, size: 26),
+                  child: showAnimation && animationPath != null
+                      ? Lottie.asset(
+                          animationPath,
+                          width: 26,
+                          height: 26,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(icon, color: color, size: 26);
+                          },
+                        )
+                      : Icon(icon, color: color, size: 26),
                 ),
                 // Badge
                 if (badge != null && badge > 0)

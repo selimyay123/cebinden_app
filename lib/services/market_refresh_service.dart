@@ -35,10 +35,7 @@ class MarketRefreshService {
     'Hundar': 0.058,     // %5.8
     'Koyoro': 0.055,       // %5.5
     'Audira': 0.044,       // %4.4
-    'Peugot': 0.042,       // %4.2
     'Hanto': 0.037,      // %3.7
-    'Skodra': 0.034,       // %3.4
-    'Citronix': 0.030,     // %3.0
   };
   
   // Model spawn oranları (marka -> model -> oran)
@@ -109,10 +106,6 @@ class MarketRefreshService {
       'Caz': 0.04,         // Jazz - %4
     },
     // Diğer markalar için varsayılan olarak eşit dağılım kullanılacak
-    'Peugot': {},
-    'Hanto': {},
-    'Skodra': {},
-    'Citronix': {},
     'Fialto': {},
     'Oplon': {},
   };
@@ -130,9 +123,6 @@ class MarketRefreshService {
     'Koyoro': ['Airoko', 'Lotus', 'Karma'],
     'Audira': ['B3', 'B4', 'B6', 'B5'],
     'Hanto': ['Vice', 'VHL', 'Caz'],
-    'Peugot': ['208', '308', '3008', '5008', '2008'],
-    'Skodra': ['Fabia', 'Octavia', 'Superb', 'Karoq', 'Kodiaq'],
-    'Citronix': ['C3', 'C4', 'C5 Aircross', 'Berlingo', 'C-Elysée'],
   };
 
   // Sabit veriler

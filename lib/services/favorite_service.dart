@@ -78,7 +78,8 @@ class FavoriteService {
             if (marketVehicle != null) {
               favorites.add(marketVehicle);
             } else {
-              favorites.add(storedVehicle);
+              // Araç markette yoksa (satılmış veya süresi dolmuş), favorilerden de temizle
+              await _favoritesBox.delete(key);
             }
           } catch (e) {
 

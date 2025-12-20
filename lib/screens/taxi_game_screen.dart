@@ -9,6 +9,8 @@ import '../services/ad_service.dart';
 import '../services/activity_service.dart';
 import '../services/skill_service.dart';
 
+enum ObstacleType { car, pedestrian }
+
 class TaxiGameScreen extends StatefulWidget {
   const TaxiGameScreen({super.key});
 
@@ -26,16 +28,18 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
   static const double playerHeight = 70.0;
   static const double obstacleHeight = 70.0;
   static const double coinSize = 40.0;
-  static const int rewardPerCoin = 10;
+  static const int rewardPerCoin = 25;
   
   // Oyun Durumu
   bool _isPlaying = false;
   bool _isGameOver = false;
   int _score = 0;
   int _moneyEarned = 0;
+  int _xpEarned = 0; // 🆕 XP Kazancı
+  int _goldEarned = 0; // 🆕 Altın Kazancı
   int _coinsCollected = 0;
   int _playerLane = 1; // 0: Sol, 1: Orta, 2: Sağ
-  double _gameSpeed = 300.0; // Piksel/saniye cinsinden hız
+  double _gameSpeed = 500.0; // 🆕 Başlangıç hızı artırıldı (300 -> 500)
   late Ticker _ticker;
   Duration? _lastElapsed;
   
@@ -81,9 +85,11 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
       _isGameOver = false;
       _score = 0;
       _moneyEarned = 0;
+      _xpEarned = 0;
+      _goldEarned = 0;
       _coinsCollected = 0;
       _playerLane = 1;
-      _gameSpeed = 300.0; // Başlangıç hızı (px/sn)
+      _gameSpeed = 500.0; // 🆕 Hızlı başlangıç
       _obstacles.clear();
       _coins.clear();
       _distanceTraveled = 0;
@@ -97,10 +103,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
 
   void _updateGame(double dt) {
     // Hızlandırma (Her 1000px'de bir %5 hızlan)
-    // _gameSpeed += dt * 5; // Basit lineer hızlanma yerine mesafe bazlı kontrol
-    if (_distanceTraveled % 1000 < (_gameSpeed * dt)) {
-       _gameSpeed *= 1.02; // %2 hızlan
-       if (_gameSpeed > 800) _gameSpeed = 800; // Max hız
+    // 🆕 Daha agresif hızlanma: Her 500px'de bir %3 hızlan
+    if (_distanceTraveled % 500 < (_gameSpeed * dt)) {
+       _gameSpeed *= 1.03; 
+       if (_gameSpeed > 1200) _gameSpeed = 1200; // Max hız artırıldı
     }
     
     final moveAmount = _gameSpeed * dt;
@@ -112,7 +118,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
     // Engel ve Coin Oluşturma
     if (_distanceTraveled >= _nextSpawnDistance) {
       _spawnObjects();
-      _nextSpawnDistance = _distanceTraveled + 350 + Random().nextInt(250);
+      _nextSpawnDistance = _distanceTraveled + 300 + Random().nextInt(200); // 🆕 Mesafe kısaltıldı
     }
 
     // Engelleri Hareket Ettir
@@ -122,6 +128,11 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
       if (_obstacles[i].y > MediaQuery.of(context).size.height) {
         _obstacles.removeAt(i);
         _score++;
+        
+        // 🆕 XP Ödülü: Her 5 engel geçişinde 1 XP
+        if (_score % 5 == 0) {
+          _xpEarned++;
+        }
       } else {
         // Çarpışma Kontrolü
         final playerY = MediaQuery.of(context).size.height - 180;
@@ -147,9 +158,16 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
         if (_coins[i].lane == _playerLane &&
             _coins[i].y + coinSize > playerY &&
             _coins[i].y < playerY + playerHeight) {
-          _coins.removeAt(i);
+          
+          // 🆕 Altın Coin Kontrolü
+          if (_coins[i].isGold) {
+            _goldEarned++;
+          } else {
+            _moneyEarned += rewardPerCoin;
+          }
+          
           _coinsCollected++;
-          _moneyEarned += rewardPerCoin;
+          _coins.removeAt(i);
         }
       }
     }
@@ -159,8 +177,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
     final random = Random();
     int obstacleLane = random.nextInt(laneCount);
     
-    // Engel ekle
-    _obstacles.add(Obstacle(lane: obstacleLane, y: -100));
+    // 🆕 Engel Tipi Seçimi (%20 yaya, %80 araba)
+    ObstacleType type = random.nextDouble() < 0.2 ? ObstacleType.pedestrian : ObstacleType.car;
+    
+    _obstacles.add(Obstacle(lane: obstacleLane, y: -100, type: type));
     
     // %40 şansla coin ekle
     if (random.nextDouble() < 0.4) {
@@ -169,7 +189,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
         coinLane = random.nextInt(laneCount);
       } while (coinLane == obstacleLane);
       
-      _coins.add(Coin(lane: coinLane, y: -100));
+      // 🆕 %5 şansla Altın Coin
+      bool isGold = random.nextDouble() < 0.05;
+      
+      _coins.add(Coin(lane: coinLane, y: -100, isGold: isGold));
     }
   }
 
@@ -194,16 +217,19 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
       _isPlaying = false;
     });
 
-    // Ödülü ver
-    if (_moneyEarned > 0) {
-      final userMap = await _db.getCurrentUser();
-      if (userMap != null) {
-        final user = User.fromJson(userMap);
-        await _db.updateUser(user.id, {
-          'balance': user.balance + _moneyEarned,
-        });
+    // Ödülleri ver
+    final userMap = await _db.getCurrentUser();
+    if (userMap != null) {
+      final user = User.fromJson(userMap);
+      
+      await _db.updateUser(user.id, {
+        'balance': user.balance + _moneyEarned,
+        'xp': user.xp + _xpEarned, // 🆕 XP ekle
+        'gold': user.gold + _goldEarned, // 🆕 Altın ekle
+      });
 
-        // Aktivite kaydı
+      // Aktivite kaydı
+      if (_moneyEarned > 0) {
         await ActivityService().logTaxiEarnings(user.id, _moneyEarned.toDouble());
       }
     }
@@ -221,7 +247,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
     return StatefulBuilder(
       builder: (context, setDialogState) {
         return AlertDialog(
-          backgroundColor: Colors.white.withOpacity(0.7),
+          backgroundColor: Colors.white.withOpacity(0.9),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
@@ -251,6 +277,26 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                     color: Colors.green,
                   ),
                 ),
+                // 🆕 XP ve Altın Göstergesi
+                if (_xpEarned > 0 || _goldEarned > 0) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_xpEarned > 0) ...[
+                        const Icon(Icons.star, color: Colors.blue, size: 16),
+                        const SizedBox(width: 4),
+                        Text('taxiGame.earnedXP'.trParams({'amount': '$_xpEarned'}), style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                        const SizedBox(width: 12),
+                      ],
+                      if (_goldEarned > 0) ...[
+                        const Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text('taxiGame.earnedGold'.trParams({'amount': '$_goldEarned'}), style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                      ],
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -289,7 +335,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                               final finalReward = _moneyEarned * multiplier;
                               
                               await _db.updateUser(user.id, {
-                                'balance': user.balance + finalReward,
+                                'balance': user.balance + finalReward, // Ekstra kazanç (zaten ilk kazanç eklendi)
                               });
 
                               // Aktivite kaydı (Ekstra kazanç)
@@ -546,15 +592,17 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
 class Obstacle {
   int lane;
   double y;
+  ObstacleType type; // 🆕 Engel Tipi
 
-  Obstacle({required this.lane, required this.y});
+  Obstacle({required this.lane, required this.y, this.type = ObstacleType.car});
 }
 
 class Coin {
   int lane;
   double y;
+  bool isGold; // 🆕 Altın Coin mi?
 
-  Coin({required this.lane, required this.y});
+  Coin({required this.lane, required this.y, this.isGold = false});
 }
 
 class GamePainter extends CustomPainter {
@@ -628,13 +676,11 @@ class GamePainter extends CustomPainter {
 
     // 4. Coinler
     final coinPaint = Paint()..color = Colors.green[700]!;
+    final goldCoinPaint = Paint()..color = Colors.amber[600]!; // 🆕 Altın Rengi
     final coinBorderPaint = Paint()
       ..color = Colors.green[300]!
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
-    
-    // TextPainter kullanarak ikon çizmek pahalı olabilir, basit şekiller çizelim
-    // Veya TextPainter'ı önbelleğe alabiliriz ama şimdilik basit çizim yapalım
     
     for (var coin in coins) {
       double coinX = roadX + (coin.lane * laneWidth) + (laneWidth - coinSize) / 2;
@@ -646,49 +692,66 @@ class GamePainter extends CustomPainter {
         Paint()..color = Colors.black.withOpacity(0.3)
       );
 
-      canvas.drawRect(coinRect, coinPaint);
+      canvas.drawRect(coinRect, coin.isGold ? goldCoinPaint : coinPaint);
       canvas.drawRect(coinRect, coinBorderPaint);
       
-      // İçine dolar işareti ($)
-      _drawText(canvas, '\$', coinX + coinSize/2, coin.y + coinSize/2, 
+      // İçine dolar işareti ($) veya G
+      _drawText(canvas, coin.isGold ? 'G' : '\$', coinX + coinSize/2, coin.y + coinSize/2, 
         color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold);
     }
 
-    // 5. Engeller (Arabalar)
+    // 5. Engeller (Arabalar ve Yayalar)
     final carPaint = Paint()..color = Colors.red[700]!;
+    final pedestrianPaint = Paint()..color = Colors.blue[700]!; // 🆕 Yaya Rengi
     
     for (var obstacle in obstacles) {
       double obsX = roadX + (obstacle.lane * laneWidth) + (laneWidth - 50) / 2;
-      final obsRect = Rect.fromLTWH(obsX, obstacle.y, 50, obstacleHeight);
       
-      // Gölge
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(obsRect.shift(const Offset(0, 4)), const Radius.circular(12)),
-        Paint()..color = Colors.black.withOpacity(0.4)
-      );
+      if (obstacle.type == ObstacleType.car) {
+        // ARABA ÇİZİMİ
+        final obsRect = Rect.fromLTWH(obsX, obstacle.y, 50, obstacleHeight);
+        
+        // Gölge
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(obsRect.shift(const Offset(0, 4)), const Radius.circular(12)),
+          Paint()..color = Colors.black.withOpacity(0.4)
+        );
 
-      // Araba Gövdesi
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(obsRect, const Radius.circular(12)),
-        carPaint,
-      );
-      
-      // Stop lambaları
-      final lightPaint = Paint()..color = Colors.redAccent;
-      canvas.drawRect(Rect.fromLTWH(obsX + 8, obstacle.y + obstacleHeight - 11, 6, 3), lightPaint);
-      canvas.drawRect(Rect.fromLTWH(obsX + 50 - 14, obstacle.y + obstacleHeight - 11, 6, 3), lightPaint);
-      
-      // Araba ikonu yerine basit cam çizimi
-      final windowPaint = Paint()..color = Colors.black.withOpacity(0.3);
-      canvas.drawRect(Rect.fromLTWH(obsX + 5, obstacle.y + 15, 40, 20), windowPaint);
+        // Araba Gövdesi
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(obsRect, const Radius.circular(12)),
+          carPaint,
+        );
+        
+        // Stop lambaları
+        final lightPaint = Paint()..color = Colors.redAccent;
+        canvas.drawRect(Rect.fromLTWH(obsX + 8, obstacle.y + obstacleHeight - 11, 6, 3), lightPaint);
+        canvas.drawRect(Rect.fromLTWH(obsX + 50 - 14, obstacle.y + obstacleHeight - 11, 6, 3), lightPaint);
+        
+        // Cam
+        final windowPaint = Paint()..color = Colors.black.withOpacity(0.3);
+        canvas.drawRect(Rect.fromLTWH(obsX + 5, obstacle.y + 15, 40, 20), windowPaint);
+        
+      } else {
+        // 🆕 YAYA ÇİZİMİ (Basit)
+        double pedWidth = 30;
+        double pedHeight = 30;
+        double pedX = obsX + (50 - pedWidth) / 2;
+        double pedY = obstacle.y + (obstacleHeight - pedHeight) / 2;
+        
+        // Kafa
+        canvas.drawCircle(Offset(pedX + pedWidth/2, pedY), 8, pedestrianPaint);
+        
+        // Gövde
+        canvas.drawRect(Rect.fromLTWH(pedX, pedY + 8, pedWidth, 20), pedestrianPaint);
+        
+        // Kollar (Basit çizgi)
+        // canvas.drawLine(...)
+      }
     }
 
     // 6. Oyuncu (Taksi)
     double playerX = roadX + (playerLane * laneWidth) + (laneWidth - 50) / 2;
-    // Animasyonlu geçiş için lerp kullanılabilir ama şimdilik direkt pozisyon
-    // Not: _playerLane int olduğu için animasyon setState ile yapılıyor, 
-    // CustomPainter içinde animasyon için playerLane'in double olması gerekirdi.
-    // Şimdilik basit tutalım.
     
     final playerRect = Rect.fromLTWH(playerX, playerY, 50, playerHeight);
     

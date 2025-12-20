@@ -410,6 +410,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
                   value: _gameDayDuration,
                   underline: const SizedBox(),
                   items: [
+                    DropdownMenuItem(value: 1, child: Text('1 ${'misc.minutes'.tr()}')),
                     DropdownMenuItem(value: 2, child: Text('2 ${'misc.minutes'.tr()}')),
                     DropdownMenuItem(value: 5, child: Text('5 ${'misc.minutes'.tr()}')),
                     DropdownMenuItem(value: 10, child: Text('10 ${'misc.minutes'.tr()}')),

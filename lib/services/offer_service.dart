@@ -360,8 +360,9 @@ class OfferService {
         'counterOffer': counterAmount,
         'offer': offer,
       };
-    } catch (e) {
-      
+    } catch (e, stackTrace) {
+      debugPrint('Error in submitUserOffer: $e');
+      debugPrint('Stack trace: $stackTrace');
       return {'success': false, 'error': e.toString()};
     }
   }
