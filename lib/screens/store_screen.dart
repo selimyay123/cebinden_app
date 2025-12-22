@@ -129,49 +129,54 @@ class _StoreScreenState extends State<StoreScreen> {
                       child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Bakiye Kartı
-                            _buildBalanceCard(),
-                            const SizedBox(height: 24),
-                            
-                            // Garaj Genişletme
-                            _buildSectionTitle('Garaj Genişletme'),
-                            const SizedBox(height: 12),
-                            _buildGarageExpansionCard(),
-                            
-                            const SizedBox(height: 32),
-
-                            // Altın Satın Alma Paketleri
-                            Column(
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 600),
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildSectionTitle('store.buyGold'.tr()),
-                                const SizedBox(height: 4),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  child: Text(
-                                    '1 ${'store.gold'.tr()} = 1.000.000 ${'store.gameCurrency'.tr()}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
-                                      fontWeight: FontWeight.w500,
+                                // Bakiye Kartı
+                                _buildBalanceCard(),
+                                const SizedBox(height: 24),
+                                
+                                // Garaj Genişletme
+                                _buildSectionTitle('Garaj Genişletme'),
+                                const SizedBox(height: 12),
+                                _buildGarageExpansionCard(),
+                                
+                                const SizedBox(height: 32),
+
+                                // Altın Satın Alma Paketleri
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildSectionTitle('store.buyGold'.tr()),
+                                    const SizedBox(height: 4),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 16),
+                                      child: Text(
+                                        '1 ${'store.gold'.tr()} = 1.000.000 ${'store.gameCurrency'.tr()}',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
+                                const SizedBox(height: 12),
+                                _buildGoldPackages(),
+                                
+                                const SizedBox(height: 32),
+                                
+                                // Altın Bozdurma
+                                _buildSectionTitle('store.convertGold'.tr()),
+                                const SizedBox(height: 12),
+                                _buildConvertGoldSection(),
                               ],
                             ),
-                            const SizedBox(height: 12),
-                            _buildGoldPackages(),
-                            
-                            const SizedBox(height: 32),
-                            
-                            // Altın Bozdurma
-                            _buildSectionTitle('store.convertGold'.tr()),
-                            const SizedBox(height: 12),
-                            _buildConvertGoldSection(),
-                          ],
+                          ),
                         ),
                       ),
                     ),

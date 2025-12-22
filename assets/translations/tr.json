@@ -1823,5 +1823,8 @@
     "step8_desc": "Acil paraya mı ihtiyacınız var? Taksi minioyununu oynayarak aktif olarak para kazanın!",
     "finish": "Bitir",
     "skip": "Atla"
+  },
+  "permissions": {
+    "tracking_description": "Bu izin, size daha ilgi çekici reklamlar sunabilmemiz için gereklidir."
   }
 }

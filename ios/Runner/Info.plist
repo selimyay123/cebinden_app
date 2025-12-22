@@ -65,5 +65,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Bu izin, size daha ilgi çekici reklamlar sunabilmemiz için gereklidir.</string>
 </dict>
 </plist>

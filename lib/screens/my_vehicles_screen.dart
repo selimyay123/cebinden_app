@@ -94,20 +94,25 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
           ),
           body: _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    // Limit Göstergesi
-                    _buildLimitIndicator(),
-                    
-                    // İçerik
-                    Expanded(
-                      child: _myVehicles.isEmpty
-                          ? _buildEmptyState()
-                          : widget.selectedBrand != null
-                              ? _buildVehicleList()
-                              : _buildBrandList(),
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Column(
+                      children: [
+                        // Limit Göstergesi
+                        _buildLimitIndicator(),
+                        
+                        // İçerik
+                        Expanded(
+                          child: _myVehicles.isEmpty
+                              ? _buildEmptyState()
+                              : widget.selectedBrand != null
+                                  ? _buildVehicleList()
+                                  : _buildBrandList(),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
         );
       },
@@ -200,8 +205,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
       onRefresh: _loadMyVehicles,
       child: GridView.builder(
         padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           childAspectRatio: 1.2,

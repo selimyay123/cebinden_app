@@ -1824,5 +1824,8 @@
     "step8_desc": "Need quick cash? Play the Taxi minigame to earn money actively!",
     "finish": "Finish",
     "skip": "Skip"
+  },
+  "permissions": {
+    "tracking_description": "This permission is required to provide you with more interesting ads."
   }
 }

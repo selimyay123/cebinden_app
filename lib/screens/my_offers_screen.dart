@@ -197,41 +197,51 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               controller: _tabController!,
               children: [
                 // Gelen Teklifler - Marka Listesi
-                Column(
-                  children: [
-                    // 🆕 Uyarı Mesajı
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      color: Colors.orange.shade50,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.info_outline, color: Colors.orange),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'offers.limitWarning'.tr(),
-                              style: TextStyle(
-                                color: Colors.orange.shade900,
-                                fontSize: 13,
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Column(
+                      children: [
+                        // 🆕 Uyarı Mesajı
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          color: Colors.orange.shade50,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline, color: Colors.orange),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'offers.limitWarning'.tr(),
+                                  style: TextStyle(
+                                    color: Colors.orange.shade900,
+                                    fontSize: 13,
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        Expanded(
+                          child: _incomingOffersByBrand.isEmpty
+                              ? _buildEmptyState(isIncoming: true)
+                              : _buildBrandList(isIncoming: true),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: _incomingOffersByBrand.isEmpty
-                          ? _buildEmptyState(isIncoming: true)
-                          : _buildBrandList(isIncoming: true),
-                    ),
-                  ],
+                  ),
                 ),
 
                 // Gönderilen Teklifler - Marka Listesi
-                _sentOffersByBrand.isEmpty
-                    ? _buildEmptyState(isIncoming: false)
-                    : _buildBrandList(isIncoming: false),
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: _sentOffersByBrand.isEmpty
+                        ? _buildEmptyState(isIncoming: false)
+                        : _buildBrandList(isIncoming: false),
+                  ),
+                ),
               ],
             ),
     );
@@ -245,8 +255,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       onRefresh: _loadOffers,
       child: GridView.builder(
         padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           childAspectRatio: 1.2,
@@ -426,49 +436,54 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : activeVehicles.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.check_circle_outline,
-                        size: 80,
-                        color: Colors.grey[300],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'myVehicles.noActiveOffers'.tr(),
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[700],
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: activeVehicles.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              size: 80,
+                              color: Colors.grey[300],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'myVehicles.noActiveOffers'.tr(),
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'myVehicles.noPendingOffersForBrand'.tr(),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _loadOffers,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: activeVehicles.length,
+                          itemBuilder: (context, index) {
+                            final vehicleId = activeVehicles.keys.elementAt(index);
+                            final offers = activeVehicles[vehicleId]!;
+                            return _buildVehicleSelectionCard(vehicleId, offers);
+                          },
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'myVehicles.noPendingOffersForBrand'.tr(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadOffers,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: activeVehicles.length,
-                    itemBuilder: (context, index) {
-                      final vehicleId = activeVehicles.keys.elementAt(index);
-                      final offers = activeVehicles[vehicleId]!;
-                      return _buildVehicleSelectionCard(vehicleId, offers);
-                    },
-                  ),
-                ),
+              ),
+            ),
     );
   }
 
@@ -510,54 +525,59 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : vehicleOffers.isEmpty
-              ? _buildEmptyState(isIncoming: isIncoming)
-              : RefreshIndicator(
-                  onRefresh: _loadOffers,
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // Araç Bilgi Kartı
-                      if (firstOffer != null) _buildVehicleInfoCard(firstOffer),
-                      const SizedBox(height: 16),
-                      
-                      // "Tüm Teklifleri Reddet" Butonu (Sadece gelen tekliflerde ve bekleyen teklif varsa)
-                      if (isIncoming && vehicleOffers.any((o) => o.isPending))
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: ElevatedButton.icon(
-                            onPressed: () => _rejectAllOffers(vehicleOffers),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: vehicleOffers.isEmpty
+                    ? _buildEmptyState(isIncoming: isIncoming)
+                    : RefreshIndicator(
+                        onRefresh: _loadOffers,
+                        child: ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            // Araç Bilgi Kartı
+                            if (firstOffer != null) _buildVehicleInfoCard(firstOffer),
+                            const SizedBox(height: 16),
+                            
+                            // "Tüm Teklifleri Reddet" Butonu (Sadece gelen tekliflerde ve bekleyen teklif varsa)
+                            if (isIncoming && vehicleOffers.any((o) => o.isPending))
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _rejectAllOffers(vehicleOffers),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 2,
+                                  ),
+                                  icon: const Icon(Icons.cancel, size: 24),
+                                  label: Text(
+                                    'myVehicles.rejectAll'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                               ),
-                              elevation: 2,
-                            ),
-                            icon: const Icon(Icons.cancel, size: 24),
-                            label: Text(
-                              'myVehicles.rejectAll'.tr(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                            
+                            // Teklif Listesi
+                            ...vehicleOffers.map((offer) {
+                              if (isIncoming) {
+                                return _buildIncomingOfferCard(offer);
+                              } else {
+                                return _buildSentOfferCard(offer);
+                              }
+                            }).toList(),
+                          ],
                         ),
-                      
-                      // Teklif Listesi
-                      ...vehicleOffers.map((offer) {
-                        if (isIncoming) {
-                          return _buildIncomingOfferCard(offer);
-                        } else {
-                          return _buildSentOfferCard(offer);
-                        }
-                      }).toList(),
-                    ],
-                  ),
-                ),
+                      ),
+              ),
+            ),
     );
   }
 

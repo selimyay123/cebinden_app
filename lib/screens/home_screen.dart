@@ -449,61 +449,66 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: SingleChildScrollView(
                       controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                      children: [
-                        // Profil ve Bakiye Kartı
-                        _buildProfileCard(),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 600),
+                          child: Column(
+                            children: [
+                              // Profil ve Bakiye Kartı
+                              _buildProfileCard(),
 
-                        // 🆕 Oyun Zamanı Sayacı
-                        GameTimeCountdown(key: _gameTimeKey),
-                        const SizedBox(height: 16),
-                        
-                        // XP Progress Kartı ve Reklam İzle yan yana
-                        _buildXPAndAdRow(),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Hızlı İşlemler
-                        _buildQuickActions(),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Galeri Satın Al (sadece galeri sahibi değilse göster)
-                        if (_currentUser != null && !_currentUser!.ownsGallery)
-                          _buildBuyGalleryButton(),
-                        
-                        if (_currentUser != null && !_currentUser!.ownsGallery)
-                          const SizedBox(height: 16),
-                        
-                        // Galerim (sadece galeri sahibiyse göster)
-                        if (_currentUser != null && _currentUser!.ownsGallery)
-                          _buildMyGallerySection(),
-                        
-                        if (_currentUser != null && _currentUser!.ownsGallery)
-                          const SizedBox(height: 16),
-                        
-                        // İstatistikler
-                        _buildStatistics(),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Araçlarım (YORUM: Garaj özelliği için ayrı sayfa yapıldı)
-                        // _buildMyVehicles(),
-                        // const SizedBox(height: 16),
-                        
-                        // İlanlarım (YORUM: Quick actions'a taşındı)
-                        // if (_userListedVehicles.isNotEmpty) ...[
-                        //   _buildMyListings(),
-                        //   const SizedBox(height: 16),
-                        // ],
-                        
-                        // Son İşlemler veya Bilgilendirme
-                        _buildRecentActivity(),
-                        
-                        const SizedBox(height: 24),
-                      ],
+                              // 🆕 Oyun Zamanı Sayacı
+                              GameTimeCountdown(key: _gameTimeKey),
+                              const SizedBox(height: 16),
+                              
+                              // XP Progress Kartı ve Reklam İzle yan yana
+                              _buildXPAndAdRow(),
+                              
+                              const SizedBox(height: 16),
+                              
+                              // Hızlı İşlemler
+                              _buildQuickActions(),
+                              
+                              const SizedBox(height: 16),
+                              
+                              // Galeri Satın Al (sadece galeri sahibi değilse göster)
+                              if (_currentUser != null && !_currentUser!.ownsGallery)
+                                _buildBuyGalleryButton(),
+                              
+                              if (_currentUser != null && !_currentUser!.ownsGallery)
+                                const SizedBox(height: 16),
+                              
+                              // Galerim (sadece galeri sahibiyse göster)
+                              if (_currentUser != null && _currentUser!.ownsGallery)
+                                _buildMyGallerySection(),
+                              
+                              if (_currentUser != null && _currentUser!.ownsGallery)
+                                const SizedBox(height: 16),
+                              
+                              // İstatistikler
+                              _buildStatistics(),
+                              
+                              const SizedBox(height: 16),
+                              
+                              // Araçlarım (YORUM: Garaj özelliği için ayrı sayfa yapıldı)
+                              // _buildMyVehicles(),
+                              // const SizedBox(height: 16),
+                              
+                              // İlanlarım (YORUM: Quick actions'a taşındı)
+                              // if (_userListedVehicles.isNotEmpty) ...[
+                              //   _buildMyListings(),
+                              //   const SizedBox(height: 16),
+                              // ],
+                              
+                              // Son İşlemler veya Bilgilendirme
+                              _buildRecentActivity(),
+                              
+                              const SizedBox(height: 24),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
                   ),
                 ),
         );
@@ -555,6 +560,7 @@ class _HomeScreenState extends State<HomeScreen> {
     
     return Container(
       key: _balanceKey, // Tutorial için key buraya taşındı
+      width: double.infinity,
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -572,12 +578,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Profil Resmi
           Container(
-            width: 70,
-            height: 70,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
@@ -585,13 +592,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
                 width: 3,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: CircleAvatar(
               backgroundColor: Colors.deepPurple.shade100,
               child: Text(
                 _currentUser!.username[0].toUpperCase(),
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 36,
                   fontWeight: FontWeight.bold,
                   color: Colors.deepPurple.shade700,
                 ),
@@ -599,291 +613,255 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           
-          const SizedBox(width: 16),
+          const SizedBox(height: 16),
           
           // Kullanıcı Bilgileri
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Kullanıcı Adı
-                Text(
-                  _currentUser!.username,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Kullanıcı Adı
+              Text(
+                _currentUser!.username,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
-                
-                const SizedBox(height: 12),
-                
-                // Toplam Para (Animasyonlu)
-                Text(
-                  'home.balance'.tr(),
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Toplam Para (Animasyonlu)
+              Text(
+                'home.balance'.tr(),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(height: 4),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      TweenAnimationBuilder<double>(
-                        // key: _balanceKey, // Key yukarı taşındı
-                        tween: Tween<double>(
-                          begin: _currentUser!.balance - (_showRentalIncomeAnimation ? _lastRentalIncome : 0),
-                          end: _currentUser!.balance,
-                        ),
-                        duration: const Duration(seconds: 2),
-                        curve: Curves.easeOut,
-                        builder: (context, value, child) {
-                          return Text(
-                            '${_formatCurrency(value)} ${'common.currency'.tr()}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          );
-                        },
+              ),
+              const SizedBox(height: 4),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      // key: _balanceKey, // Key yukarı taşındı
+                      tween: Tween<double>(
+                        begin: _currentUser!.balance - (_showRentalIncomeAnimation ? _lastRentalIncome : 0),
+                        end: _currentUser!.balance,
                       ),
-                      
-                      // Kiralama Geliri Göstergesi (Animasyonlu)
-                      if (_showRentalIncomeAnimation)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: TweenAnimationBuilder<double>(
-                            tween: Tween<double>(begin: 0.0, end: 1.0),
-                            duration: const Duration(milliseconds: 500),
-                            builder: (context, value, child) {
-                              return Opacity(
-                                opacity: value,
-                                child: Transform.translate(
-                                  offset: Offset(0, 20 * (1 - value)), // Aşağıdan yukarı kayma
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.9),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(Icons.car_rental, color: Colors.white, size: 14),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '+${_formatCurrency(_lastRentalIncome)}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                      duration: const Duration(seconds: 2),
+                      curve: Curves.easeOut,
+                      builder: (context, value, child) {
+                        return Text(
+                          '${_formatCurrency(value)} ${'common.currency'.tr()}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                      },
+                    ),
+                    
+                    // Kiralama Geliri Göstergesi (Animasyonlu)
+                    if (_showRentalIncomeAnimation)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 500),
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: Transform.translate(
+                                offset: Offset(0, 20 * (1 - value)), // Aşağıdan yukarı kayma
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.9),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.car_rental, color: Colors.white, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '+${_formatCurrency(_lastRentalIncome)}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              
+              // Günlük Kar/Zarar Göstergesi
+              Builder(
+                builder: (context) {
+                  final dailyProfit = _currentUser!.balance - _currentUser!.dailyStartingBalance;
+                  final isPositive = dailyProfit >= 0;
+                  final percentage = _currentUser!.dailyStartingBalance > 0 
+                      ? (dailyProfit / _currentUser!.dailyStartingBalance) * 100 
+                      : 0.0;
+                  
+                  // Eğer değişim yoksa %0 göster
+                  if (dailyProfit.abs() < 1) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        '%0.0 (0 TL)',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isPositive ? Icons.arrow_upward : Icons.arrow_downward,
+                          color: isPositive ? Colors.greenAccent : Colors.redAccent,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '%${percentage.abs().toStringAsFixed(1)} ',
+                          style: TextStyle(
+                            color: isPositive ? Colors.greenAccent : Colors.redAccent,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                
-                // Günlük Kar/Zarar Göstergesi
-                Builder(
-                  builder: (context) {
-                    final dailyProfit = _currentUser!.balance - _currentUser!.dailyStartingBalance;
-                    final isPositive = dailyProfit >= 0;
-                    final percentage = _currentUser!.dailyStartingBalance > 0 
-                        ? (dailyProfit / _currentUser!.dailyStartingBalance) * 100 
-                        : 0.0;
-                    
-                    // Eğer değişim yoksa %0 göster
-                    if (dailyProfit.abs() < 1) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          '%0.0 (0 TL)',
+                        Text(
+                          '(${isPositive ? '+' : ''}${_formatCurrency(dailyProfit)} TL)',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: isPositive ? Colors.greenAccent.withOpacity(0.9) : Colors.redAccent.withOpacity(0.9),
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      );
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Row(
-                        children: [
-                          Icon(
-                            isPositive ? Icons.arrow_upward : Icons.arrow_downward,
-                            color: isPositive ? Colors.greenAccent : Colors.redAccent,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '%${percentage.abs().toStringAsFixed(1)} ',
-                            style: TextStyle(
-                              color: isPositive ? Colors.greenAccent : Colors.redAccent,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            '(${isPositive ? '+' : ''}${_formatCurrency(dailyProfit)} TL)',
-                            style: TextStyle(
-                              color: isPositive ? Colors.greenAccent.withOpacity(0.9) : Colors.redAccent.withOpacity(0.9),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                      ],
+                    ),
+                  );
+                }
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Altın ve Kar/Zarar
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  // Altın
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.amber,
+                        width: 1.5,
                       ),
-                    );
-                  }
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // Altın ve Kar/Zarar
-                Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    // Altın
-                    Container(
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Lottie.asset(
+                          'assets/animations/gold.json',
+                          width: 32,
+                          height: 32,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          // ${'store.gold'.tr()}
+                          '${_currentUser!.gold.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Altın Al Butonu
+                  InkWell(
+                    onTap: () async {
+                      // Mağaza sayfasına git
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const StoreScreen(),
+                        ),
+                      );
+                      // Sayfa kapanınca dashboard'u yenile (altın satın alınmış olabilir)
+                      await _loadCurrentUser();
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
+                        horizontal: 20,
+                        vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.amber,
-                          width: 1.5,
-                        ),
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.amber.withOpacity(0.4),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Lottie.asset(
-                            'assets/animations/gold.json',
-                            width: 32,
-                            height: 32,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(width: 6),
                           Text(
-                            // ${'store.gold'.tr()}
-                            '${_currentUser!.gold.toStringAsFixed(2)}',
+                            'store.buyGold'.tr(),
                             style: const TextStyle(
-                              color: Colors.amber,
+                              color: Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          const SizedBox(width: 4),
                         ],
                       ),
                     ),
-                    // Altın Al Butonu
-                    InkWell(
-                      onTap: () async {
-                        // Mağaza sayfasına git
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const StoreScreen(),
-                          ),
-                        );
-                        // Sayfa kapanınca dashboard'u yenile (altın satın alınmış olabilir)
-                        await _loadCurrentUser();
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 13,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.amber,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'store.buyGold'.tr(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            // const Icon(
-                            //   Icons.add,
-                            //   color: Colors.white,
-                            //   size: 14,
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // const SizedBox(width: 8),
-                    // Kar/Zarar
-                    // Container(
-                    //   padding: const EdgeInsets.symmetric(
-                    //     horizontal: 12,
-                    //     vertical: 6,
-                    //   ),
-                    //   decoration: BoxDecoration(
-                    //     color: isProfit 
-                    //         ? Colors.green.withOpacity(0.2)
-                    //         : Colors.red.withOpacity(0.2),
-                    //     borderRadius: BorderRadius.circular(20),
-                    //     border: Border.all(
-                    //       color: isProfit ? Colors.green : Colors.red,
-                    //       width: 1.5,
-                    //     ),
-                    //   ),
-                    //   child: Row(
-                    //     mainAxisSize: MainAxisSize.min,
-                    //     children: [
-                    //       Icon(
-                    //         isProfit 
-                    //             ? Icons.trending_up 
-                    //             : Icons.trending_down,
-                    //         color: isProfit ? Colors.green : Colors.red,
-                    //         size: 18,
-                    //       ),
-                    //       const SizedBox(width: 6),
-                    //       Text(
-                    //         '${isProfit ? '+' : ''}${_currentUser!.profitLossPercentage.toStringAsFixed(2)}%',
-                    //         style: TextStyle(
-                    //           color: isProfit ? Colors.green : Colors.red,
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.bold,
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),
@@ -1495,11 +1473,11 @@ class _HomeScreenState extends State<HomeScreen> {
       child: GridView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // 2 sütun
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200, // Maksimum genişlik 200px (Tablette 3 sütun sığar)
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1.5, // Buton yükseklik/genişlik oranı (daha alçak)
+          childAspectRatio: 1.5, // Buton yükseklik/genişlik oranı
         ),
         children: quickActions.asMap().entries.map((entry) {
           final index = entry.key;
