@@ -12,7 +12,20 @@
           "package_name": "com.cebinden.cebinden_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "585097479960-1i1bob25pk8se48aatk7vprnlmcl7vcr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cebinden.cebinden_app",
+            "certificate_hash": "5cb8fbdd904bcb48f62a967db97175fc97ae7120"
+          }
+        },
+        {
+          "client_id": "585097479960-k9aovpgg9dvcppafcfa9ialit6mmcnlb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBJYz_NoHMbv8KLd-Xkc_YDxW49K9mXQ8c"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "585097479960-k9aovpgg9dvcppafcfa9ialit6mmcnlb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "585097479960-jd9clpbd09ttok1lgienfbaaedqofv9c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cebinden.cebindenApp"
+              }
+            }
+          ]
         }
       }
     }
