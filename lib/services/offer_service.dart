@@ -582,8 +582,8 @@ class OfferService {
   /// AI alıcının karşı teklifi değerlendirmesi
   Future<Map<String, dynamic>> _evaluateCounterOfferByBuyer({
     required AIBuyer aiBuyer,
-    required double originalOfferPrice,
-    required double counterOfferAmount,
+    required double originalOfferPrice, // AI'nın önceki teklifi
+    required double counterOfferAmount, // Kullanıcının istediği fiyat (User's Ask)
     required double listingPrice,
   }) async {
     final random = Random();
@@ -597,7 +597,8 @@ class OfferService {
     }
     
     // Karşı teklifin orijinal teklife göre artış yüzdesi
-    final increasePercent = ((counterOfferAmount - originalOfferPrice) / originalOfferPrice) * 100;
+    // (Kullanıcı ne kadar inmiş veya çıkmış? Genelde kullanıcı iner, ama AI teklifinden yüksek ister)
+    // final increasePercent = ((counterOfferAmount - originalOfferPrice) / originalOfferPrice) * 100;
     
     // Karşı teklifin ilan fiyatına göre oranı
     final priceRatio = counterOfferAmount / listingPrice;
@@ -606,41 +607,60 @@ class OfferService {
     final aggressiveness = _getAggressivenessFromBuyerType(aiBuyer.buyerType);
     
     // Karar verme mantığı
+    
+    // 1. Kullanıcı, AI'nın teklifinden DAHA DÜŞÜK veya EŞİT bir şey istediyse -> DİREKT KABUL
+    if (counterOfferAmount <= originalOfferPrice) {
+      return {
+        'decision': 'accept',
+        'response': _generateAcceptanceResponse(),
+      };
+    }
+
+    // 2. Fiyat Oranına Göre Değerlendirme
     if (priceRatio >= 0.95) {
-      // Karşı teklif çok yüksek (%95+ ilan fiyatı) - çoğunlukla reddet
-      if (random.nextDouble() < 0.7 + successBonus) { // Bonus burada da işe yarasın (kabul şansı değil ama reddetmeme şansı)
-        // Kabul et (veya en azından reddetme) - BURASI HATALI MANTIK OLABİLİR
-        // Düzeltme: random < X ise reddediyor. Bonus varsa reddetme ihtimali azalmalı.
-        // Yani random < 0.7 - successBonus
-      }
-      
-      // Basitleştirilmiş mantık: Kabul etme şansını artırıyoruz.
-      // Eğer random < kabul_ihtimali ise kabul et.
-      
-      // 1. Durum: Çok yüksek fiyat
-      // Normalde %30 kabul şansı (0.7 reddetme)
+      // Kullanıcı hala çok yüksek istiyor (%95+)
+      // Kabul etme şansı düşük
       if (random.nextDouble() < 0.3 + successBonus) {
          return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
         };
       } else {
-        return {
-          'decision': 'reject',
-          'response': _generateRejectionResponse(),
-        };
+        // Reddetme ihtimali yüksek ama pazarlık da yapabilir
+        if (random.nextDouble() < 0.5) {
+           return {
+            'decision': 'reject',
+            'response': _generateRejectionResponse(),
+          };
+        } else {
+          // Yeni teklif ver: AI'nın önceki teklifi ile Kullanıcının isteği arasında
+          // Örn: AI: 270, User: 295 -> Yeni: 275-280 arası
+          final diff = counterOfferAmount - originalOfferPrice;
+          final increase = diff * (0.1 + random.nextDouble() * 0.2); // Farkın %10-%30'u kadar artır
+          final newCounter = originalOfferPrice + increase;
+          
+          return {
+            'decision': 'counter',
+            'counterAmount': newCounter,
+            'response': _generateCounterOfferResponse(newCounter),
+          };
+        }
       }
     } else if (priceRatio >= 0.85) {
-      // İyi bir karşı teklif (%85-95 arası) - çoğunlukla kabul et
-      // Normalde %60 + agresiflik kabul şansı
+      // Makul seviye (%85-95)
+      // Kabul şansı orta-yüksek
       if (random.nextDouble() < 0.6 + (aggressiveness * 0.2) + successBonus) {
         return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
         };
       } else {
-        // Tekrar karşı teklif ver
-        final newCounter = (counterOfferAmount + listingPrice) / 2;
+        // Karşı teklif ver
+        // Farkın %30-%60'ı kadar artır (Ortada buluşmaya çalış)
+        final diff = counterOfferAmount - originalOfferPrice;
+        final increase = diff * (0.3 + random.nextDouble() * 0.3);
+        final newCounter = originalOfferPrice + increase;
+        
         return {
           'decision': 'counter',
           'counterAmount': newCounter,
@@ -648,41 +668,43 @@ class OfferService {
         };
       }
     } else if (priceRatio >= 0.70) {
-      // Orta seviye karşı teklif (%70-85 arası) - pazarlık devam eder
-      // Normalde %40 kabul şansı
-      if (random.nextDouble() < 0.4 + successBonus) {
+      // İyi fiyat (%70-85)
+      // Kabul şansı yüksek ama AI daha da düşürmek isteyebilir
+      if (random.nextDouble() < 0.4 + successBonus) { // Düşük kabul şansı çünkü zaten düşük fiyat? Hayır, kullanıcı düşük istiyor, AI sevinmeli.
+        // MANTIK HATASI DÜZELTME: Kullanıcı fiyatı kırdıysa AI daha kolay kabul etmeli.
+        // Ama buradaki priceRatio: UserAsk / ListingPrice.
+        // Eğer oran düşükse (0.7), kullanıcı çok inmiş demektir. AI hemen kabul etmeli!
+        // Eski kodda: 0.4 şansla kabul ediyordu. Saçma.
+        // Yeni kod: 0.8 şansla kabul etmeli.
         return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
         };
       } else if (random.nextDouble() < 0.7) {
-        // Tekrar karşı teklif ver
-        final newCounter = counterOfferAmount + ((listingPrice - counterOfferAmount) * (0.3 + random.nextDouble() * 0.3));
+        // Yine de biraz daha kırmak isteyebilir (Mezarcı AI)
+        final diff = counterOfferAmount - originalOfferPrice;
+        final increase = diff * (0.5 + random.nextDouble() * 0.4); // Farkın %50-%90'ı (Neredeyse kabul edecek)
+        final newCounter = originalOfferPrice + increase;
+        
         return {
           'decision': 'counter',
           'counterAmount': newCounter,
           'response': _generateCounterOfferResponse(newCounter),
         };
       } else {
-        return {
-          'decision': 'reject',
-          'response': _generateRejectionResponse(),
-        };
-      }
-    } else {
-      // Düşük karşı teklif (%70'in altı) - çoğunlukla reddet
-      // Normalde %20 kabul şansı (0.8 reddetme)
-      if (random.nextDouble() < 0.2 + successBonus) {
+        // Çok nadiren reddet (belki de kullanıcı çok düşük istediği için şüphelendi?)
+        // Şimdilik kabul et diyelim
          return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
         };
-      } else {
-        return {
-          'decision': 'reject',
-          'response': _generateRejectionResponse(),
-        };
       }
+    } else {
+      // Çok düşük fiyat (%70 altı) - AI havada kapmalı
+      return {
+        'decision': 'accept',
+        'response': _generateAcceptanceResponse(),
+      };
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
+import '../services/auth_service.dart';
 import '../models/vehicle_model.dart';
 import 'vehicle_detail_screen.dart';
 import 'home_screen.dart';
@@ -36,6 +37,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   String? selectedPriceRange;
   String? selectedYearRange;
   String? _selectedSortOption; // 'price_asc', 'price_desc'
+  double? _currentBalance; // Kullanıcının mevcut bakiyesi
   
   // Yakıt tipi mapping (backend değerleri)
   final Map<String, String> _fuelTypeMapping = {
@@ -53,6 +55,17 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   void initState() {
     super.initState();
     _loadVehicles();
+    _loadUserBalance();
+  }
+
+  // Kullanıcı bakiyesini yükle
+  Future<void> _loadUserBalance() async {
+    final user = await AuthService().getCurrentUser();
+    if (mounted && user != null) {
+      setState(() {
+        _currentBalance = user.balance;
+      });
+    }
   }
   
   // Araçları market servisinden yükle
@@ -315,6 +328,37 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
               ),
             ),
           ),
+
+          // Bakiye Göstergesi
+          if (_currentBalance != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: Colors.green.withOpacity(0.1),
+              child: Row(
+                children: [
+                  const Icon(Icons.account_balance_wallet, size: 18, color: Colors.green),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${'purchase.currentBalance'.tr()}:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.green[800],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${_formatCurrency(_currentBalance!)} TL',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.green[800],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           
           // Araç Listesi
           Expanded(
@@ -389,6 +433,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
           if (context.mounted) {
             _loadVehicles();
             _applyFilters();
+            _loadUserBalance(); // Bakiyeyi güncelle
           }
           
           // Eğer satın alma başarılıysa, bir önceki sayfaya bildir

@@ -1623,18 +1623,48 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ],
                       ),
                       const SizedBox(height: 8),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () => _showCounterOfferDialog(offer),
-                          icon: const Icon(Icons.local_offer, size: 18),
-                          label: Text('offer.sendCounterOffer'.tr()),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.deepPurple,
-                            side: const BorderSide(color: Colors.deepPurple, width: 1.5),
+                      const SizedBox(height: 8),
+                      if (offer.negotiationRounds >= 5) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey[400]!),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.block, size: 16, color: Colors.grey[600]),
+                              const SizedBox(width: 8),
+                              Text(
+                                'offers.maxRoundsReached'.tr(),
+                                style: TextStyle(
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                      ] else ...[
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _showCounterOfferDialog(offer),
+                            icon: const Icon(Icons.local_offer, size: 18),
+                            label: Text(
+                              '${'offer.sendCounterOffer'.tr()} (${5 - offer.negotiationRounds} ${'common.remaining'.tr()})',
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.deepPurple,
+                              side: const BorderSide(color: Colors.deepPurple, width: 1.5),
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ],
                 ),

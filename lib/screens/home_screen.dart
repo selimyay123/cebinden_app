@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:async';
 import 'dart:ui';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -69,7 +70,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _balanceKey = GlobalKey();
   final GlobalKey _gameTimeKey = GlobalKey();
   final GlobalKey _xpCardKey = GlobalKey();
+  final GlobalKey _storeButtonKey = GlobalKey(); // Mağaza butonu için key
   final GlobalKey _taxiGameButtonKey = GlobalKey();
+  final GlobalKey _myListingsButtonKey = GlobalKey(); // İlanlarım butonu için key
+  final GlobalKey _skillTreeButtonKey = GlobalKey(); // Yetenek ağacı butonu için key
   
   // Kiralama geliri animasyonu için
   double _lastRentalIncome = 0.0;
@@ -446,68 +450,80 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: RefreshIndicator(
                     onRefresh: _loadCurrentUser,
-                    child: SingleChildScrollView(
+                    child: CustomScrollView(
                       controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 600),
-                          child: Column(
-                            children: [
-                              // Profil ve Bakiye Kartı
-                              _buildProfileCard(),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 600),
+                              child: Column(
+                                children: [
+                                  // Profil ve Bakiye Kartı
+                                  _buildProfileCard(),
 
-                              // 🆕 Oyun Zamanı Sayacı
-                              GameTimeCountdown(key: _gameTimeKey),
-                              const SizedBox(height: 16),
-                              
-                              // XP Progress Kartı ve Reklam İzle yan yana
-                              _buildXPAndAdRow(),
-                              
-                              const SizedBox(height: 16),
-                              
-                              // Hızlı İşlemler
-                              _buildQuickActions(),
-                              
-                              const SizedBox(height: 16),
-                              
-                              // Galeri Satın Al (sadece galeri sahibi değilse göster)
-                              if (_currentUser != null && !_currentUser!.ownsGallery)
-                                _buildBuyGalleryButton(),
-                              
-                              if (_currentUser != null && !_currentUser!.ownsGallery)
-                                const SizedBox(height: 16),
-                              
-                              // Galerim (sadece galeri sahibiyse göster)
-                              if (_currentUser != null && _currentUser!.ownsGallery)
-                                _buildMyGallerySection(),
-                              
-                              if (_currentUser != null && _currentUser!.ownsGallery)
-                                const SizedBox(height: 16),
-                              
-                              // İstatistikler
-                              _buildStatistics(),
-                              
-                              const SizedBox(height: 16),
-                              
-                              // Araçlarım (YORUM: Garaj özelliği için ayrı sayfa yapıldı)
-                              // _buildMyVehicles(),
-                              // const SizedBox(height: 16),
-                              
-                              // İlanlarım (YORUM: Quick actions'a taşındı)
-                              // if (_userListedVehicles.isNotEmpty) ...[
-                              //   _buildMyListings(),
-                              //   const SizedBox(height: 16),
-                              // ],
-                              
-                              // Son İşlemler veya Bilgilendirme
-                              _buildRecentActivity(),
-                              
-                              const SizedBox(height: 24),
-                            ],
+                                  // 🆕 Oyun Zamanı Sayacı
+                                  GameTimeCountdown(key: _gameTimeKey),
+                                  const SizedBox(height: 16),
+                                  
+                                  // XP Progress Kartı ve Reklam İzle yan yana
+                                  _buildXPAndAdRow(),
+                                  
+                                  const SizedBox(height: 16),
+                                  
+                                  // Hızlı İşlemler
+                                  // _buildQuickActions(), // YORUM: SliverGrid olarak aşağıya taşındı
+                                  
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        
+                        // Hızlı İşlemler (SliverGrid)
+                        _buildQuickActionsSliver(),
+                        
+                        SliverToBoxAdapter(
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 600),
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 16),
+                                  
+                                  // Galeri Satın Al (sadece galeri sahibi değilse göster)
+                                  if (_currentUser != null && !_currentUser!.ownsGallery)
+                                    _buildBuyGalleryButton(),
+                                  
+                                  if (_currentUser != null && !_currentUser!.ownsGallery)
+                                    const SizedBox(height: 16),
+                                  
+                                  // Galerim (sadece galeri sahibiyse göster)
+                                  if (_currentUser != null && _currentUser!.ownsGallery)
+                                    _buildMyGallerySection(),
+                                  
+                                  if (_currentUser != null && _currentUser!.ownsGallery)
+                                    const SizedBox(height: 16),
+                                  
+                                  // İstatistikler
+                                  _buildStatistics(),
+                                  
+                                  const SizedBox(height: 16),
+                                  
+                                  // Son İşlemler veya Bilgilendirme
+                                  _buildRecentActivity(),
+                                  
+                                  const SizedBox(height: 24),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+
+                      ],
                     ),
                   ),
                 ),
@@ -524,6 +540,28 @@ class _HomeScreenState extends State<HomeScreen> {
     EdgeInsetsGeometry? margin,
     double borderRadius = 16,
   }) {
+    // Android'de performans için blur efektini kapat
+    if (Platform.isAndroid) {
+      return Container(
+        key: key,
+        margin: margin,
+        padding: padding,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.85), // Blur yerine daha opak beyaz
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: child,
+      );
+    }
+
     return Container(
       key: key,
       margin: margin,
@@ -942,7 +980,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '${(_currentUser!.levelProgress * 100).toStringAsFixed(0)}%',
+                  _currentUser!.level >= 100 
+                      ? 'MAX' 
+                      : '${(_currentUser!.levelProgress * 100).floor()}%',
                   style: const TextStyle(
                     color: Colors.deepPurple,
                     fontSize: 14,
@@ -1086,7 +1126,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        '${(_currentUser!.levelProgress * 100).toStringAsFixed(0)}%',
+                        _currentUser!.level >= 100 
+                            ? 'MAX' 
+                            : '${(_currentUser!.levelProgress * 100).floor()}%',
                         style: const TextStyle(
                           color: Colors.deepPurple,
                           fontSize: 12,
@@ -1304,67 +1346,107 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Hızlı İşlemler
-  Widget _buildQuickActions() {
-    // Hızlı işlem butonları listesi - Yeni özellik eklemek için buraya ekleyin
-    final quickActions = [
+  // Hızlı İşlemler (SliverGrid Versiyonu)
+  Widget _buildQuickActionsSliver() {
+    final quickActions = _getQuickActions();
+
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.5,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final action = quickActions[index];
+            
+            // Tutorial için key'leri atıyoruz
+            Key? buttonKey;
+            if (index == 0) {
+              buttonKey = _marketButtonKey;
+            } else if (index == 1) {
+              buttonKey = _sellVehicleButtonKey;
+            } else if (index == 2) {
+              buttonKey = _myVehiclesButtonKey;
+            } else if (index == 3) { // İlanlarım butonu
+              buttonKey = _myListingsButtonKey;
+            } else if (index == 4) {
+              buttonKey = _offersButtonKey;
+            } else if (index == 5) { // Yetenek Ağacı butonu
+              buttonKey = _skillTreeButtonKey;
+            } else if (index == 6) { // Mağaza butonu
+              buttonKey = _storeButtonKey;
+            } else if (index == 7) {
+              buttonKey = _taxiGameButtonKey;
+            }
+            
+            return _buildActionButton(
+              key: buttonKey,
+              icon: action['icon'] as IconData,
+              label: action['label'] as String,
+              color: action['color'] as Color,
+              onTap: action['onTap'] as VoidCallback,
+              badge: action['badge'] as int?,
+              reward: action['reward'] as String?,
+              animationPath: action['animationPath'] as String?,
+              showAnimation: action['showAnimation'] as bool? ?? false,
+            );
+          },
+          childCount: quickActions.length,
+        ),
+      ),
+    );
+  }
+
+  // Hızlı İşlemler Listesi
+  List<Map<String, dynamic>> _getQuickActions() {
+    return [
       {
         'icon': Icons.shopping_cart,
         'label': 'home.buyVehicle'.tr(),
         'color': Colors.blue,
         'onTap': () async {
-          // YORUM: Kategori seçim sayfası devre dışı, doğrudan otomobil kategorisi
-          // final purchased = await Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => const VehicleCategoryScreen(),
-          //   ),
-          // );
-          
-          // Doğrudan marka seçim sayfasına git (Otomobil kategorisi)
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BrandSelectionScreen(
-              categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
-              categoryColor: Colors.blue,
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BrandSelectionScreen(
+                categoryName: 'vehicles.categoryAuto'.tr(),
+                categoryColor: Colors.blue,
+              ),
             ),
-          ),
-        );
-        
-        // Sayfa kapanınca dashboard'u yenile
-        await _loadCurrentUser();  }
+          );
+          await _loadCurrentUser();
         },
+      },
       {
         'icon': Icons.sell,
         'label': 'home.sellVehicle'.tr(),
         'color': Colors.orange,
         'onTap': () async {
-        // Araç satış sayfasına git ve sonuç bekle
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SellVehicleScreen(),
-          ),
-        );
-        
-        // Sayfa kapanınca dashboard'u yenile
-        await _loadCurrentUser();
-      },  },
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SellVehicleScreen(),
+            ),
+          );
+          await _loadCurrentUser();
+        },
+      },
       {
         'icon': Icons.garage,
         'label': 'home.myVehicles'.tr(),
         'color': Colors.green,
-        'badge': _vehicleCount > 0 ? _vehicleCount : null, // Araç sayısı badge'i
+        'badge': _vehicleCount > 0 ? _vehicleCount : null,
         'onTap': () async {
-          // Kullanıcının satın aldığı araçları göster
           await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const MyVehiclesScreen(),
             ),
           );
-          // Sayfa kapanınca dashboard'u yenile (araç satılmış olabilir)
           await _loadCurrentUser();
         },
       },
@@ -1372,16 +1454,14 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.store,
         'label': 'home.myListings'.tr(),
         'color': Colors.purple,
-        'badge': _userListedVehicles.length > 0 ? _userListedVehicles.length : null, // İlan sayısı badge'i
+        'badge': _userListedVehicles.length > 0 ? _userListedVehicles.length : null,
         'onTap': () async {
-          // İlanlar sayfasına git
           await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const MyListingsScreen(),
             ),
           );
-          // Sayfa kapanınca dashboard'u yenile (ilan kaldırılmış olabilir)
           await _loadCurrentUser();
         },
       },
@@ -1389,23 +1469,21 @@ class _HomeScreenState extends State<HomeScreen> {
         'icon': Icons.local_offer,
         'label': 'home.myOffers'.tr(),
         'color': Colors.teal,
-        'badge': _pendingOffersCount > 0 ? _pendingOffersCount : null, // Badge ekledik
-        'animationPath': 'assets/animations/fire.json', // Fire animasyonu
+        'badge': _pendingOffersCount > 0 ? _pendingOffersCount : null,
+        'animationPath': 'assets/animations/fire.json',
         'showAnimation': _showFireAnimation,
         'onTap': () async {
-          // Teklifler sayfasına git
           await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const MyOffersScreen(),
             ),
           );
-          // Sayfa kapanınca dashboard'u yenile
           await _loadCurrentUser();
         },
       },
       {
-        'icon': Icons.psychology, // Yetenekler ikonu
+        'icon': Icons.psychology,
         'label': 'home.tasks'.tr(),
         'color': Colors.indigo,
         'badge': (_currentUser?.skillPoints ?? 0) > 0 ? (_currentUser!.skillPoints) : null,
@@ -1419,20 +1497,17 @@ class _HomeScreenState extends State<HomeScreen> {
           await _loadCurrentUser();
         },
       },
-      // NOT: Reklam İzle butonu artık XP kartının yanında
       {
         'icon': Icons.store,
         'label': 'store.title'.tr(),
         'color': Colors.deepOrange,
         'onTap': () async {
-          // Mağaza sayfasına git
           await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const StoreScreen(),
             ),
           );
-          // Sayfa kapanınca dashboard'u yenile (altın bozdurulmuş olabilir)
           await _loadCurrentUser();
         },
       },
@@ -1441,77 +1516,16 @@ class _HomeScreenState extends State<HomeScreen> {
         'label': 'home.taxi'.tr(),
         'color': Colors.amber,
         'onTap': () async {
-          // Taksi oyununa git
           await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const TaxiGameScreen(),
             ),
           );
-          // Sayfa kapanınca dashboard'u yenile (para kazanılmış olabilir)
           await _loadCurrentUser();
         },
       },
-      // {
-      //   'icon': Icons.car_rental,
-      //   'label': 'Araç Kirala',
-      //   'color': Colors.purple,
-      //   'onTap': () {
-      //     // TODO: Araç kiralama sayfası
-      //     ScaffoldMessenger.of(context).showSnackBar(
-      //       const (
-      //         content: Text('Araç kiralama sayfası yakında...'),
-      //         duration: Duration(seconds: 2),
-      //       ),
-      //     );
-      //   },
-      // },
     ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GridView(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200, // Maksimum genişlik 200px (Tablette 3 sütun sığar)
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.5, // Buton yükseklik/genişlik oranı
-        ),
-        children: quickActions.asMap().entries.map((entry) {
-          final index = entry.key;
-          final action = entry.value;
-          
-          // Tutorial için key'leri atıyoruz
-          Key? buttonKey;
-          if (index == 0) {
-            buttonKey = _marketButtonKey; // Araç Al butonu
-          } else if (index == 1) {
-            buttonKey = _sellVehicleButtonKey; // Araç Sat butonu
-          } else if (index == 2) {
-            buttonKey = _myVehiclesButtonKey; // Garajım butonu
-          } else if (index == 4) {
-            buttonKey = _offersButtonKey; // Teklifler butonu
-          } else if (index == 7) {
-            buttonKey = _taxiGameButtonKey; // Taksi Oyunu butonu
-          }
-          // NOT: Reklam İzle artık XP kartının yanında, index'lerden çıkarıldı
-          
-          return _buildActionButton(
-            key: buttonKey,
-            icon: action['icon'] as IconData,
-            label: action['label'] as String,
-            color: action['color'] as Color,
-            onTap: action['onTap'] as VoidCallback,
-            badge: action['badge'] as int?,
-            reward: action['reward'] as String?,
-            animationPath: action['animationPath'] as String?,
-            showAnimation: action['showAnimation'] as bool? ?? false,
-          );
-        }).toList(),
-      ),
-    );
   }
 
   Widget _buildActionButton({
@@ -3416,10 +3430,8 @@ class _HomeScreenState extends State<HomeScreen> {
           paddingFocus: 10,
           opacityShadow: 0.8,
           onFinish: () {
-            _setTutorialCompleted();
-            setState(() {
-              _isTutorialActive = false;
-            });
+            // Bölüm 2 bittiğinde Bölüm 3'e geç
+            _startTutorialPart3();
           },
           onSkip: () {
             _setTutorialCompleted();
@@ -3439,10 +3451,7 @@ class _HomeScreenState extends State<HomeScreen> {
         paddingFocus: 10,
         opacityShadow: 0.8,
         onFinish: () {
-          _setTutorialCompleted();
-          setState(() {
-            _isTutorialActive = false;
-          });
+          _startTutorialPart3();
         },
         onSkip: () {
           _setTutorialCompleted();
@@ -3452,6 +3461,55 @@ class _HomeScreenState extends State<HomeScreen> {
           return true;
         },
       ).show(context: context);
+    }
+  }
+
+  void _startTutorialPart3() {
+    // Bölüm 3 için scroll işlemi
+    if (_scrollController.hasClients) {
+      Future scrollFuture;
+      
+      // Eğer Teklifler butonu zaten render edilmişse ona odaklan
+      if (_offersButtonKey.currentContext != null) {
+        scrollFuture = Scrollable.ensureVisible(
+          _offersButtonKey.currentContext!,
+          alignment: 0.5, // Ekranda ortala
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        // Render edilmemişse (ekran dışındaysa) biraz aşağı kaydır
+        scrollFuture = _scrollController.animateTo(
+          _scrollController.offset + 200.0,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+
+      scrollFuture.then((_) {
+        if (!mounted) return;
+        
+        TutorialCoachMark(
+          targets: _createTutorialTargetsPart3(),
+          colorShadow: Colors.black,
+          textSkip: "SKIP",
+          paddingFocus: 10,
+          opacityShadow: 0.8,
+          onFinish: () {
+            _setTutorialCompleted();
+            setState(() {
+              _isTutorialActive = false;
+            });
+          },
+          onSkip: () {
+            _setTutorialCompleted();
+            setState(() {
+              _isTutorialActive = false;
+            });
+            return true;
+          },
+        ).show(context: context);
+      });
     }
   }
 
@@ -3507,13 +3565,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '1/8',
+                        '1/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -3533,7 +3590,7 @@ class _HomeScreenState extends State<HomeScreen> {
         focusAnimationDuration: const Duration(milliseconds: 600),
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
+            align: ContentAlign.top, // Düzeltildi: Üstte görünsün
             builder: (context, controller) => Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -3561,13 +3618,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '2/8',
+                        '2/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -3587,7 +3643,7 @@ class _HomeScreenState extends State<HomeScreen> {
         focusAnimationDuration: const Duration(milliseconds: 600),
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
+            align: ContentAlign.top, // Düzeltildi: Üstte görünsün
             builder: (context, controller) => Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -3615,13 +3671,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '3/8',
+                        '3/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -3633,6 +3688,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  /// Tutorial Bölüm 2 (Scroll gerektiren alt kısım)
   /// Tutorial Bölüm 2 (Scroll gerektiren alt kısım)
   List<TargetFocus> _createTutorialTargetsPart2() {
     return [
@@ -3674,13 +3730,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '4/8',
+                        '4/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -3728,13 +3783,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '5/8',
+                        '5/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -3782,13 +3836,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '6/8',
+                        '6/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -3797,11 +3850,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      
-      // ADIM 7: Teklifler Butonu
+
+      // ADIM 7: İlanlarım
       TargetFocus(
-        identify: "offers_button",
-        keyTarget: _offersButtonKey,
+        identify: "my_listings_button",
+        keyTarget: _myListingsButtonKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
         radius: 15,
@@ -3836,13 +3889,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '7/8',
+                        '7/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -3851,11 +3903,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
-      // ADIM 8: Taksi Oyunu
+    ];
+  }
+  
+  /// Tutorial Bölüm 3 (En alt kısım)
+  List<TargetFocus> _createTutorialTargetsPart3() {
+    return [
+      // ADIM 8: Tekliflerim
       TargetFocus(
-        identify: "taxi_game_button",
-        keyTarget: _taxiGameButtonKey,
+        identify: "offers_button",
+        keyTarget: _offersButtonKey,
         alignSkip: Alignment.topRight,
         shape: ShapeLightFocus.RRect,
         radius: 15,
@@ -3890,27 +3947,191 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '8/8',
+                        '8/11',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      // ADIM 9: Yetenek Ağacı
+      TargetFocus(
+        identify: "skill_tree_button",
+        keyTarget: _skillTreeButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step9_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step9_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '9/11',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(20),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      // ADIM 10: Mağaza
+      TargetFocus(
+        identify: "store_button",
+        keyTarget: _storeButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step10_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step10_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '10/11',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
                         ),
-                        child: Text(
-                          'tutorial.finish'.tr(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      // ADIM 11: Taksi Oyunu
+      TargetFocus(
+        identify: "taxi_game_button",
+        keyTarget: _taxiGameButtonKey,
+        alignSkip: Alignment.topRight,
+        shape: ShapeLightFocus.RRect,
+        radius: 15,
+        focusAnimationDuration: const Duration(milliseconds: 600),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'tutorial.step11_title'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'tutorial.step11_desc'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '11/11',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          controller.next();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            'tutorial.finish'.tr(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

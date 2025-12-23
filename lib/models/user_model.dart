@@ -111,6 +111,9 @@ class User {
       requiredXp = level * level * 100;
     }
     
+    // 🆕 Level Cap: Max 100
+    if (level > 100) return 100;
+    
     return level;
   }
   

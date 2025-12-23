@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -47,6 +48,26 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
 
   @override
   Widget build(BuildContext context) {
+    if (Platform.isAndroid) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: _buildContent(),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: ClipRRect(
@@ -67,7 +88,15 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                 ),
               ],
             ),
-            child: Column(
+            child: _buildContent(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -122,10 +151,6 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                   ),
                 ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
+            );
   }
 }

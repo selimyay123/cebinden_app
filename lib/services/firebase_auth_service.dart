@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,8 +13,10 @@ class FirebaseAuthService {
 
   final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    // iOS için CLIENT_ID manuel olarak belirtilmeli
-    clientId: '585097479960-jd9clpbd09ttok1lgienfbaaedqofv9c.apps.googleusercontent.com',
+    // iOS için CLIENT_ID manuel olarak belirtilmeli, Android'de google-services.json'dan otomatik alınır
+    clientId: Platform.isIOS 
+        ? '585097479960-jd9clpbd09ttok1lgienfbaaedqofv9c.apps.googleusercontent.com'
+        : null,
     scopes: [
       'email',
       'profile',
@@ -64,7 +67,7 @@ class FirebaseAuthService {
       }
       
     } catch (e) {
-      
+      print("GOOGLE SIGN IN ERROR: $e");
       return null;
     }
   }

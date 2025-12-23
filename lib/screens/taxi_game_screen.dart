@@ -36,10 +36,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
   int _score = 0;
   int _moneyEarned = 0;
   int _xpEarned = 0; // 🆕 XP Kazancı
-  int _goldEarned = 0; // 🆕 Altın Kazancı
+  double _goldEarned = 0.0; // 🆕 Altın Kazancı
   int _coinsCollected = 0;
   int _playerLane = 1; // 0: Sol, 1: Orta, 2: Sağ
-  double _gameSpeed = 500.0; // 🆕 Başlangıç hızı artırıldı (300 -> 500)
+  double _gameSpeed = 400.0; // 🆕 Başlangıç hızı düşürüldü (500 -> 400)
   late Ticker _ticker;
   Duration? _lastElapsed;
   
@@ -86,10 +86,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
       _score = 0;
       _moneyEarned = 0;
       _xpEarned = 0;
-      _goldEarned = 0;
+      _goldEarned = 0.0;
       _coinsCollected = 0;
       _playerLane = 1;
-      _gameSpeed = 500.0; // 🆕 Hızlı başlangıç
+      _gameSpeed = 400.0; // 🆕 Yavaş başlangıç
       _obstacles.clear();
       _coins.clear();
       _distanceTraveled = 0;
@@ -103,10 +103,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
 
   void _updateGame(double dt) {
     // Hızlandırma (Her 1000px'de bir %5 hızlan)
-    // 🆕 Daha agresif hızlanma: Her 500px'de bir %3 hızlan
-    if (_distanceTraveled % 500 < (_gameSpeed * dt)) {
-       _gameSpeed *= 1.03; 
-       if (_gameSpeed > 1200) _gameSpeed = 1200; // Max hız artırıldı
+    // 🆕 Daha dengeli hızlanma: Her 1000px'de bir %2 hızlan
+    if (_distanceTraveled % 1000 < (_gameSpeed * dt)) {
+       _gameSpeed *= 1.02; 
+       if (_gameSpeed > 1000) _gameSpeed = 1000; // Max hız düşürüldü
     }
     
     final moveAmount = _gameSpeed * dt;
@@ -161,7 +161,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
           
           // 🆕 Altın Coin Kontrolü
           if (_coins[i].isGold) {
-            _goldEarned++;
+            _goldEarned += 0.1;
           } else {
             _moneyEarned += rewardPerCoin;
           }
@@ -189,8 +189,8 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
         coinLane = random.nextInt(laneCount);
       } while (coinLane == obstacleLane);
       
-      // 🆕 %5 şansla Altın Coin
-      bool isGold = random.nextDouble() < 0.05;
+      // 🆕 %1 şansla Altın Coin (Daha nadir)
+      bool isGold = random.nextDouble() < 0.01;
       
       _coins.add(Coin(lane: coinLane, y: -100, isGold: isGold));
     }
@@ -292,7 +292,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                       if (_goldEarned > 0) ...[
                         const Icon(Icons.monetization_on, color: Colors.amber, size: 16),
                         const SizedBox(width: 4),
-                        Text('taxiGame.earnedGold'.trParams({'amount': '$_goldEarned'}), style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                        Text('taxiGame.earnedGold'.trParams({'amount': _goldEarned.toStringAsFixed(1)}), style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
                       ],
                     ],
                   ),

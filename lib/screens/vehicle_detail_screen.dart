@@ -2066,7 +2066,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'purchase.nowYours'.tr(),
+                      'purchase.successMessage'.tr(),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
