@@ -1347,10 +1347,13 @@ class _StoreScreenState extends State<StoreScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text(
               '✅ ${gold.toStringAsFixed(2)} ${'store.gold'.tr()} → ${_formatCurrency(gameCurrency)} TL',
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.withOpacity(0.8),
           ),
         );
       }
@@ -1358,8 +1361,11 @@ class _StoreScreenState extends State<StoreScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('store.convertError'.tr()),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.withOpacity(0.8),
           ),
         );
       }

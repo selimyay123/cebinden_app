@@ -1384,6 +1384,7 @@
   },
   "store": {
     "productsLoadError": "Error loading products",
+    "loadingProducts": "Loading products...",
     "title": "Store",
     "buyGold": "Buy Gold",
     "convertGold": "Convert Gold",

@@ -1105,6 +1105,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         bodyType: _vehicle.bodyType,
         horsepower: _vehicle.horsepower,
       );
+
+      // Eğer hesaplanan gerçek fiyat, beyan edilen fiyattan düşük değilse
+      // (Piyasa dalgalanmaları veya rastgele faktörler nedeniyle olabilir)
+      // Kullanıcıya "sorun bulundu" dediğimiz için mutlaka fiyatı düşürmeliyiz.
+      if (newPrice >= _vehicle.declaredPrice) {
+        // En az %5 indirim uygula
+        newPrice = _vehicle.declaredPrice * 0.95;
+      }
       
       // Fiyatı güncelle
       if (mounted) {
@@ -2148,36 +2156,45 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               child: Opacity(
                 opacity: value,
                 child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Colors.amber, Colors.orange],
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
                       ),
-                      borderRadius: BorderRadius.circular(30),
-                      // Gölge kaldırıldı
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.stars,
-                          color: Colors.white,
-                          size: 32,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.deepPurple, Colors.deepPurple.shade300],
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '+${result.xpGained} XP',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.deepPurple.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.stars,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '+${result.xpGained} XP',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -1390,6 +1390,7 @@
   },
   "store": {
     "productsLoadError": "Ürünler yüklenirken hata oluştu",
+    "loadingProducts": "Ürünler yükleniyor...",
     "title": "Mağaza",
     "buyGold": "Altın Al",
     "convertGold": "Altın Bozdur",
