@@ -507,7 +507,7 @@ class _StoreScreenState extends State<StoreScreen> {
                         
                         // Fiyat
                         Text(
-                          product.price,
+                          product.price.replaceAll('₺', 'TL'),
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -727,7 +727,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                   style: TextStyle(color: Colors.grey[700]),
                                 ),
                                 Text(
-                                  product.price,
+                                  product.price.replaceAll('₺', 'TL'),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.deepPurple,

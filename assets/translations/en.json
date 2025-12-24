@@ -44,7 +44,8 @@
     "active": "Active",
     "dear": "Dear",
     "attention": "Attention!",
-    "retry": "Retry"
+    "retry": "Retry",
+    "remaining": "remaining"
   },
   "errors": {
     "balanceUpdateFailed": "Balance could not be updated",
@@ -96,7 +97,7 @@
     "totalVehicles": "Total Vehicles",
     "totalVehiclesShort": "Total Vehicles",
     "pendingOffers": "Pending Offers",
-    "totalTransactions": "Total Transactions",
+    "totalTransactions": "Transactions",
     "myVehicles": "My Vehicles",
     "myListings": "My Listings",
     "myOffers": "My Offers",
@@ -636,7 +637,7 @@
     "darkModeComingSoon": "Dark mode feature will be available soon",
     "language": "Language",
     "languageFull": "Language",
-    "currency": "₺",
+    "currency": "Currency",
     "currencyUpdated": "Currency updated",
     "notifications": "Notifications",
     "newListings": "New Listings Notifications",

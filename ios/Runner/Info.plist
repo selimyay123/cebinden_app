@@ -67,5 +67,7 @@
 	</array>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Bu izin, size daha ilgi çekici reklamlar sunabilmemiz için gereklidir.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

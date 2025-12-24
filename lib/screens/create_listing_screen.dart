@@ -395,7 +395,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           },
           decoration: InputDecoration(
             hintText: 'sell.priceHint'.tr(),
-            prefixText: '₺ ',
+            prefixText: 'TL ',
             suffixText: 'TL',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

@@ -457,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SliverToBoxAdapter(
                           child: Center(
                             child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 600),
+                              constraints: const BoxConstraints(maxWidth: 800),
                               child: Column(
                                 children: [
                                   // Profil ve Bakiye Kartı
@@ -488,7 +488,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         SliverToBoxAdapter(
                           child: Center(
                             child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 600),
+                              constraints: const BoxConstraints(maxWidth: 800),
                               child: Column(
                                 children: [
                                   const SizedBox(height: 16),
@@ -1346,56 +1346,63 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Hızlı İşlemler (SliverGrid Versiyonu)
+  // Hızlı İşlemler (SliverGrid Versiyonu -> Constrained Box Versiyonu)
   Widget _buildQuickActionsSliver() {
     final quickActions = _getQuickActions();
 
-    return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.5,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final action = quickActions[index];
-            
-            // Tutorial için key'leri atıyoruz
-            Key? buttonKey;
-            if (index == 0) {
-              buttonKey = _marketButtonKey;
-            } else if (index == 1) {
-              buttonKey = _sellVehicleButtonKey;
-            } else if (index == 2) {
-              buttonKey = _myVehiclesButtonKey;
-            } else if (index == 3) { // İlanlarım butonu
-              buttonKey = _myListingsButtonKey;
-            } else if (index == 4) {
-              buttonKey = _offersButtonKey;
-            } else if (index == 5) { // Yetenek Ağacı butonu
-              buttonKey = _skillTreeButtonKey;
-            } else if (index == 6) { // Mağaza butonu
-              buttonKey = _storeButtonKey;
-            } else if (index == 7) {
-              buttonKey = _taxiGameButtonKey;
-            }
-            
-            return _buildActionButton(
-              key: buttonKey,
-              icon: action['icon'] as IconData,
-              label: action['label'] as String,
-              color: action['color'] as Color,
-              onTap: action['onTap'] as VoidCallback,
-              badge: action['badge'] as int?,
-              reward: action['reward'] as String?,
-              animationPath: action['animationPath'] as String?,
-              showAnimation: action['showAnimation'] as bool? ?? false,
-            );
-          },
-          childCount: quickActions.length,
+    return SliverToBoxAdapter(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.5,
+              ),
+              itemCount: quickActions.length,
+              itemBuilder: (context, index) {
+                final action = quickActions[index];
+                
+                // Tutorial için key'leri atıyoruz
+                Key? buttonKey;
+                if (index == 0) {
+                  buttonKey = _marketButtonKey;
+                } else if (index == 1) {
+                  buttonKey = _sellVehicleButtonKey;
+                } else if (index == 2) {
+                  buttonKey = _myVehiclesButtonKey;
+                } else if (index == 3) { // İlanlarım butonu
+                  buttonKey = _myListingsButtonKey;
+                } else if (index == 4) {
+                  buttonKey = _offersButtonKey;
+                } else if (index == 5) { // Yetenek Ağacı butonu
+                  buttonKey = _skillTreeButtonKey;
+                } else if (index == 6) { // Mağaza butonu
+                  buttonKey = _storeButtonKey;
+                } else if (index == 7) {
+                  buttonKey = _taxiGameButtonKey;
+                }
+                
+                return _buildActionButton(
+                  key: buttonKey,
+                  icon: action['icon'] as IconData,
+                  label: action['label'] as String,
+                  color: action['color'] as Color,
+                  onTap: action['onTap'] as VoidCallback,
+                  badge: action['badge'] as int?,
+                  reward: action['reward'] as String?,
+                  animationPath: action['animationPath'] as String?,
+                  showAnimation: action['showAnimation'] as bool? ?? false,
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -1658,7 +1665,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.blue,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.local_offer,
@@ -1667,7 +1674,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.orange,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildStatItem(
                   icon: Icons.show_chart,
@@ -1690,7 +1697,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -2085,7 +2092,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         content: Text(
-          'home.galleryPrice'.tr() + ': ${_formatCurrency(galleryPrice)} ₺\n\n' +
+          'home.galleryPrice'.tr() + ': ${_formatCurrency(galleryPrice)} TL\n\n' +
           'common.continue'.tr() + '?',
           style: const TextStyle(fontSize: 16),
         ),
@@ -2958,7 +2965,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${_formatCurrency(vehicle.listingPrice ?? 0)} ₺',
+                    '${_formatCurrency(vehicle.listingPrice ?? 0)} TL',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

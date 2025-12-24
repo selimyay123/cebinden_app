@@ -969,7 +969,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${_formatCurrency(offer.offerPrice)} ₺',
+                    '${_formatCurrency(offer.offerPrice)} TL',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -1035,7 +1035,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ],
                       ),
                       Text(
-                        '${profitLoss >= 0 ? '+' : ''}${_formatCurrency(profitLoss)} ₺',
+                        '${profitLoss >= 0 ? '+' : ''}${_formatCurrency(profitLoss)} TL',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -1077,7 +1077,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ),
                       ),
                       Text(
-                        '${_formatCurrency(vehicle!.purchasePrice)} ₺',
+                        '${_formatCurrency(vehicle!.purchasePrice)} TL',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -1285,7 +1285,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     children: [
                       Text('offers.offerPriceLabel'.tr()),
                       Text(
-                        '${_formatCurrency(offer.offerPrice)} ₺',
+                        '${_formatCurrency(offer.offerPrice)} TL',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.green,

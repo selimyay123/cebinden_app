@@ -440,10 +440,25 @@ class SellerProfile {
     }
     
     // 4. Reserve price'ın altına inme (mantık kontrolü)
-    adjustedCounter = adjustedCounter.clamp(reservePrice * 1.02, listingPrice * 0.99);
+    double lowerBound1 = reservePrice * 1.02;
+    final upperBound = listingPrice * 0.99;
+    
+    // Lower bound upper bound'dan büyük olamaz
+    if (lowerBound1 > upperBound) {
+      lowerBound1 = upperBound;
+    }
+    
+    adjustedCounter = adjustedCounter.clamp(lowerBound1, upperBound);
     
     // 5. Kullanıcı teklifinden mutlaka yüksek ol
-    adjustedCounter = adjustedCounter.clamp(offerPrice * 1.05, listingPrice * 0.99);
+    double lowerBound2 = offerPrice * 1.05;
+    
+    // Lower bound upper bound'dan büyük olamaz
+    if (lowerBound2 > upperBound) {
+      lowerBound2 = upperBound;
+    }
+    
+    adjustedCounter = adjustedCounter.clamp(lowerBound2, upperBound);
     
     // 6. 1000'e yuvarla (daha gerçekçi görünsün)
     return (adjustedCounter / 1000).round() * 1000.0;

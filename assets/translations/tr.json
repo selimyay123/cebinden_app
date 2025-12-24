@@ -44,7 +44,8 @@
     "active": "Aktif",
     "dear": "Sayın",
     "attention": "Dikkat!",
-    "retry": "Tekrar Dene"
+    "retry": "Tekrar Dene",
+    "remaining": "kalan"
   },
   "errors": {
     "balanceUpdateFailed": "Bakiye güncellenemedi",
@@ -117,7 +118,7 @@
     "totalVehicles": "Toplam Araç",
     "totalVehiclesShort": "Toplam Araç",
     "pendingOffers": "Bekleyen Teklif",
-    "totalTransactions": "Toplam İşlem",
+    "totalTransactions": "İşlemler",
     "myVehicles": "Araçlarım",
     "myListings": "İlanlarım",
     "myOffers": "Tekliflerim",

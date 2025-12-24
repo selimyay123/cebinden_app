@@ -24,6 +24,7 @@ android {
         jniLibs {
             useLegacyPackaging = true
         }
+        doNotStrip("**/*.so")
     }
 
     compileOptions {

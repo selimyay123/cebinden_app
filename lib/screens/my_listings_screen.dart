@@ -1111,7 +1111,7 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   setState(() {}); // UI'ı güncelle
                 },
                 decoration: InputDecoration(
-                  prefixText: '₺ ',
+                  prefixText: 'TL ',
                   suffixText: 'TL',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
