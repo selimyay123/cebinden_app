@@ -37,6 +37,9 @@ import '../services/rental_service.dart'; // Kiralama Servisi
 
 import '../widgets/game_time_countdown.dart'; // 🆕 Game Time Countdown
 import 'activity_screen.dart';
+import 'leaderboard_screen.dart';
+import 'social/social_hub_screen.dart';
+import '../services/leaderboard_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -213,6 +216,9 @@ class _HomeScreenState extends State<HomeScreen> {
       
       // Günlük görevleri kontrol et/oluştur
       _questService.checkAndGenerateQuests(user.id);
+      
+      // Liderlik tablosu için verileri senkronize et (Arka planda)
+      LeaderboardService().updateUserScore(updatedUser);
       
       // Kullanıcı yüklendikten sonra tutorial'ı kontrol et
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -430,6 +436,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.people, color: Colors.blueAccent),
+                tooltip: 'Sosyal',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SocialHubScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.leaderboard, color: Colors.amber),
+                tooltip: 'Liderlik Tablosu',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LeaderboardScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.logout),
                 tooltip: 'auth.logout'.tr(),
                 onPressed: _logout,
@@ -620,6 +650,7 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Profil Resmi
+          const SizedBox(height: 20), // Resim biraz aşağı kaydırıldı
           Container(
             width: 80,
             height: 80,
@@ -640,14 +671,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: CircleAvatar(
               backgroundColor: Colors.deepPurple.shade100,
-              child: Text(
-                _currentUser!.username[0].toUpperCase(),
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple.shade700,
-                ),
-              ),
+              backgroundImage: _currentUser?.profileImageUrl != null
+                  ? AssetImage(_currentUser!.profileImageUrl!)
+                  : null,
+              child: _currentUser?.profileImageUrl == null
+                  ? Text(
+                      _currentUser!.username[0].toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple.shade700,
+                      ),
+                    )
+                  : null,
             ),
           ),
           
@@ -3073,6 +3109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Profil Resmi
+                  const SizedBox(height: 20), // Resim biraz aşağı kaydırıldı
                   Container(
                     width: 70,
                     height: 70,
@@ -3086,16 +3123,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: CircleAvatar(
                       backgroundColor: Colors.deepPurple.shade100,
-                      child: _currentUser != null
-                          ? Text(
-                              _currentUser!.username[0].toUpperCase(),
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple.shade700,
-                              ),
-                            )
-                          : const Icon(Icons.person, size: 40),
+                      backgroundImage: _currentUser?.profileImageUrl != null
+                          ? AssetImage(_currentUser!.profileImageUrl!)
+                          : null,
+                      child: _currentUser?.profileImageUrl == null
+                          ? (_currentUser != null
+                              ? Text(
+                                  _currentUser!.username[0].toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepPurple.shade700,
+                                  ),
+                                )
+                              : const Icon(Icons.person, size: 40))
+                          : null,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -3226,6 +3268,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       await _loadCurrentUser();
                     },
                   ),
+                  _buildDrawerItem(
+                    icon: Icons.leaderboard,
+                    title: 'drawer.leaderboard'.tr(),
+                    onTap: () {
+                      Navigator.pop(context); // Drawer'ı kapat
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LeaderboardScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   // _buildDrawerItem(
                   //   icon: Icons.car_rental,
                   //   title: 'Araç Kirala',
@@ -3273,14 +3328,18 @@ class _HomeScreenState extends State<HomeScreen> {
               child: _buildDrawerItem(
                 icon: Icons.settings,
                 title: 'drawer.settings'.tr(),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const SettingsScreen(),
                     ),
                   );
+                  // Ayarlardan dönünce kullanıcı verilerini güncelle (örn. profil resmi değişmiş olabilir)
+                  if (mounted) {
+                    _loadCurrentUser();
+                  }
                 },
               ),
             ),

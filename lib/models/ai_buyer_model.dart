@@ -159,6 +159,63 @@ class AIBuyer {
       return Random().nextDouble() < 0.20; // Her durumda %20 şans (genel ilgi)
     }
   }
+  
+  /// Bağlamsal mesaj üret (Aracın durumuna göre)
+  /// Eğer null dönerse standart mesaj kullanılmalı
+  String? generateContextualMessage({
+    required int mileage,
+    required bool hasAccidentRecord,
+    required double listingPrice,
+    required double fairPrice,
+  }) {
+    final random = Random();
+    
+    // %60 ihtimalle bağlamsal mesaj üret (yoksa standart mesaj kalsın)
+    if (random.nextDouble() > 0.6) return null;
+    
+    List<String> possibleMessages = [];
+    
+    // 1. Hasar Durumu Kontrolü
+    if (hasAccidentRecord) {
+      // Hasarlı araç
+      possibleMessages.add(_getContextualMessage('accident', random));
+    } else {
+      // Temiz araç (%50 şansla öv)
+      if (random.nextBool()) {
+        possibleMessages.add(_getContextualMessage('clean', random));
+      }
+    }
+    
+    // 2. Kilometre Kontrolü
+    if (mileage > 150000) {
+      // Yüksek km
+      possibleMessages.add(_getContextualMessage('highMileage', random));
+    } else if (mileage < 50000) {
+      // Düşük km
+      possibleMessages.add(_getContextualMessage('lowMileage', random));
+    }
+    
+    // 3. Fiyat Kontrolü
+    double priceRatio = listingPrice / fairPrice;
+    if (priceRatio > 1.15) {
+      // Pahalı (%15'ten fazla)
+      possibleMessages.add(_getContextualMessage('expensive', random));
+    } else if (priceRatio < 0.90) {
+      // Ucuz (%10'dan fazla indirimli)
+      possibleMessages.add(_getContextualMessage('cheap', random));
+    }
+    
+    if (possibleMessages.isEmpty) return null;
+    
+    // Olası mesajlardan birini seç
+    return possibleMessages[random.nextInt(possibleMessages.length)];
+  }
+
+  static String _getContextualMessage(String category, Random random) {
+    // 1-4 arası random sayı
+    int index = 1 + random.nextInt(4);
+    return 'aiBuyer.messages.contextual.$category.$index';
+  }
 
   // === HELPER METHODS ===
 

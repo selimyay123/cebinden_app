@@ -358,6 +358,7 @@
     "makeOffer": "Teklif Ver"
   },
   "offers": {
+    "counter": "Karşı Teklif",
     "title": "Tekliflerim",
     "limitWarning": "Her araç için en fazla 10 teklif alabilirsiniz. Yeni teklifler için mevcutları reddedebilirsiniz.",
     "noOffers": "Henüz Teklif Yok",
@@ -373,6 +374,8 @@
     "rejected": "Reddedildi",
     "expired": "Süresi Doldu",
     "buyer": "Alıcı",
+    "seller": "Satıcı",
+    "you": "Siz",
     "offerPrice": "Teklif Fiyatı",
     "offerDate": "Teklif Tarihi",
     "message": "Mesaj",
@@ -501,6 +504,44 @@
         "3": "Çok beğendim, istediğiniz ücreti ödemeye hazırım.",
         "4": "Bu araç tam bana göre, paranız hazır.",
         "5": "Kesinlikle almak istiyorum, fiyat konusunda esnek değilim."
+      },
+      "contextual": {
+        "highMileage": {
+          "1": "Kilometresi yaşına göre biraz yüksek, bu yüzden teklifim bu.",
+          "2": "Bu kilometredeki bir araç için fiyat biraz fazla geldi.",
+          "3": "Motor yorgun olabilir, kilometresi düşündürücü.",
+          "4": "Çok yol yapmış bir araç, masraf çıkarabilir."
+        },
+        "lowMileage": {
+          "1": "Kilometresi çok iyi, tam aradığım temizlikte.",
+          "2": "Bu kadar az kullanılmış olması harika.",
+          "3": "Sıfır ayarında bir araç, kaçırmak istemedim.",
+          "4": "Düşük kilometreli araç bulmak zor, teklifim ciddi."
+        },
+        "accident": {
+          "1": "Hasar kaydı olması beni biraz düşündürüyor.",
+          "2": "Kazalı olması değerini düşürüyor maalesef.",
+          "3": "Geçmişi temiz değil, bu yüzden fiyatı kırdım.",
+          "4": "Hasar kaydını göz önünde bulundurarak bu fiyatı veriyorum."
+        },
+        "clean": {
+          "1": "Hatasız olması çok büyük avantaj.",
+          "2": "Değişensiz, boyasız araç arıyordum.",
+          "3": "Temiz geçmişi için bu fiyatı hakediyor.",
+          "4": "Ekspertiz raporu güven verdi."
+        },
+        "expensive": {
+          "1": "Piyasaya göre biraz yüksek yazmışsınız.",
+          "2": "Fiyatı biraz daha makul tutarsanız hemen alırım.",
+          "3": "Bütçemi zorluyor ama yine de teklif vermek istedim.",
+          "4": "Benzerlerine göre pahalı kalmış."
+        },
+        "cheap": {
+          "1": "Fiyatı çok uygun, hemen almak istiyorum.",
+          "2": "Bu fiyata kaçmaz, nakitim hazır.",
+          "3": "Fırsat aracı olmuş, teklifimi kabul edin.",
+          "4": "Piyasanın altında, hemen anlaşalım."
+        }
       }
     }
   },
@@ -676,7 +717,10 @@
     "ok": "Tamam",
     "gameSettings": "Oyun Ayarları",
     "gameDayDuration": "Oyun Günü Süresi",
-    "gameDayDurationUpdated": "Oyun günü süresi {minutes} dakika olarak ayarlandı"
+    "gameDayDurationUpdated": "Oyun günü süresi {minutes} dakika olarak ayarlandı",
+    "changeProfilePicture": "Profil Resmi Değiştir",
+    "selectProfilePicture": "Profil Resmi Seç",
+    "profilePictureUpdated": "Profil resmi güncellendi!"
   },
   "profile": {
     "title": "Profil Bilgileri",
@@ -745,7 +789,33 @@
     "tasksComingSoon": "Görevler sayfası yakında...",
     "rentComingSoon": "Araç kiralama sayfası yakında...",
     "vehicle": "araç",
-    "vehicles": "araç"
+    "vehicles": "araç",
+    "leaderboard": "Liderlik Tablosu",
+    "social": {
+      "title": "Sosyal",
+      "friends": "Arkadaşlar",
+      "requests": "İstekler",
+      "search": "Ara",
+      "searchHint": "Kullanıcı adı ara...",
+      "noFriends": "Henüz arkadaşın yok",
+      "removeFriend": "Arkadaşı Sil",
+      "removeFriendConfirm": "{0} adlı kullanıcıyı arkadaş listenden silmek istediğine emin misin?",
+      "friendRemoved": "Arkadaş silindi",
+      "deleteMessage": "Mesajı Sil",
+      "deleteMessageConfirm": "Bu mesajı silmek istediğine emin misin?",
+      "clearChat": "Sohbeti Temizle",
+      "clearChatConfirm": "Tüm sohbet geçmişini silmek istediğine emin misin? Bu işlem geri alınamaz.",
+      "chatCleared": "Sohbet temizlendi",
+      "findFriends": "Arkadaş Ara",
+      "noRequests": "Bekleyen istek yok",
+      "requestSent": "Arkadaşlık isteği gönderildi!",
+      "requestAccepted": "Arkadaşlık isteği kabul edildi!",
+      "requestRejected": "İstek reddedildi",
+      "alreadyFriends": "Zaten arkadaşsınız",
+      "requestAlreadySent": "İstek zaten gönderilmiş",
+      "sendMessage": "Mesaj yaz...",
+      "addFriend": "Arkadaş Ekle"
+    }
   },
   "activity": {
     "title": "Aktivite Geçmişi",

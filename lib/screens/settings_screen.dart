@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/auth_service.dart';
 import '../services/settings_helper.dart';
 import '../services/localization_service.dart';
@@ -147,6 +148,126 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
             behavior: SnackBarBehavior.floating,
             content: Text('settings.currencyUpdated'.tr()),
             backgroundColor: Colors.grey.withOpacity(0.8),
+          ),
+        );
+      }
+    }
+  }
+
+
+
+  void _showProfilePictureDialog() {
+    final List<String> profileImages = [
+      'assets/pp/man1.png',
+      'assets/pp/man2.png',
+      'assets/pp/man3.png',
+      'assets/pp/women1.png',
+      'assets/pp/women2.png',
+      'assets/pp/women3.png',
+    ];
+
+    String? selectedImage = _currentUser?.profileImageUrl;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF1E1E1E),
+            title: Text(
+              'settings.selectProfilePicture'.tr(),
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemCount: profileImages.length,
+                itemBuilder: (context, index) {
+                  final imagePath = profileImages[index];
+                  final isSelected = selectedImage == imagePath;
+                  
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedImage = imagePath;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: isSelected 
+                            ? Border.all(color: Colors.deepPurpleAccent, width: 3)
+                            : null,
+                      ),
+                      child: CircleAvatar(
+                        backgroundImage: AssetImage(imagePath),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('common.cancel'.tr(), style: const TextStyle(color: Colors.white70)),
+              ),
+              ElevatedButton(
+                onPressed: selectedImage != null && selectedImage != _currentUser?.profileImageUrl
+                    ? () {
+                        Navigator.pop(context);
+                        _updateProfilePicture(selectedImage!);
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurpleAccent,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text('common.save'.tr()),
+              ),
+            ],
+          );
+        }
+      ),
+    );
+  }
+
+  Future<void> _updateProfilePicture(String imagePath) async {
+    if (_currentUser == null) return;
+
+    final success = await _authService.updateUserInfo(
+      userId: _currentUser!.id,
+      profileImageUrl: imagePath,
+    );
+
+    if (success) {
+      await _loadSettings(); // Reload user to update UI
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('settings.profilePictureUpdated'.tr()),
+            backgroundColor: Colors.green.withOpacity(0.8),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 8,
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('common.error'.tr()),
+            backgroundColor: Colors.red.withOpacity(0.8),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 8,
           ),
         );
       }
@@ -320,6 +441,12 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
                     ),
                   );
                 },
+              ),
+
+              _buildListTile(
+                icon: Icons.image,
+                title: 'settings.changeProfilePicture'.tr(),
+                onTap: _showProfilePictureDialog,
               ),
               _buildListTile(
                 icon: Icons.edit,

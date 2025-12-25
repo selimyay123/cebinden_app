@@ -338,6 +338,7 @@
     "appleLoginError": "An error occurred during Apple sign in"
   },
   "offers": {
+    "counter": "Counter",
     "title": "My Offers",
     "limitWarning": "You can receive a maximum of 10 offers per vehicle. You can reject existing offers to receive new ones.",
     "noOffers": "No Offers Yet",
@@ -353,6 +354,8 @@
     "rejected": "Rejected",
     "expired": "Expired",
     "buyer": "Buyer",
+    "seller": "Seller",
+    "you": "You",
     "offerPrice": "Offer Price",
     "offerDate": "Offer Date",
     "message": "Message",
@@ -481,6 +484,44 @@
         "3": "I liked it very much, I am ready to pay the fee you want.",
         "4": "This car is just for me, your money is ready.",
         "5": "I definitely want to buy it, I am not flexible about the price."
+      },
+      "contextual": {
+        "highMileage": {
+          "1": "Mileage is a bit high for its age, that's why my offer is this.",
+          "2": "For a vehicle with this mileage, the price seemed a bit high.",
+          "3": "Engine might be tired, mileage is concerning.",
+          "4": "A car that has traveled a lot, might cause expenses."
+        },
+        "lowMileage": {
+          "1": "Mileage is very good, exactly the cleanliness I was looking for.",
+          "2": "It's great that it has been used so little.",
+          "3": "A car like new, didn't want to miss it.",
+          "4": "Hard to find low mileage cars, my offer is serious."
+        },
+        "accident": {
+          "1": "Having an accident record makes me think a bit.",
+          "2": "Unfortunately being damaged lowers its value.",
+          "3": "History is not clean, so I broke the price.",
+          "4": "I am giving this price considering the accident record."
+        },
+        "clean": {
+          "1": "Being faultless is a huge advantage.",
+          "2": "I was looking for a car without replacement or paint.",
+          "3": "Deserves this price for its clean history.",
+          "4": "Expertise report gave confidence."
+        },
+        "expensive": {
+          "1": "You wrote a bit high compared to the market.",
+          "2": "If you keep the price a bit more reasonable I will buy immediately.",
+          "3": "It pushes my budget but I wanted to make an offer anyway.",
+          "4": "Remained expensive compared to similar ones."
+        },
+        "cheap": {
+          "1": "Price is very affordable, I want to buy immediately.",
+          "2": "Cannot be missed at this price, my cash is ready.",
+          "3": "Became an opportunity vehicle, accept my offer.",
+          "4": "Below market, let's agree immediately."
+        }
       }
     }
   },
@@ -673,7 +714,10 @@
     "ok": "OK",
     "gameSettings": "Game Settings",
     "gameDayDuration": "Game Day Duration",
-    "gameDayDurationUpdated": "Game day duration set to {minutes} minutes"
+    "gameDayDurationUpdated": "Game day duration set to {minutes} minutes",
+    "changeProfilePicture": "Change Profile Picture",
+    "selectProfilePicture": "Select Profile Picture",
+    "profilePictureUpdated": "Profile picture updated!"
   },
   "profile": {
     "title": "Profile Information",
@@ -746,7 +790,33 @@
     "tasksComingSoon": "Tasks page coming soon...",
     "rentComingSoon": "Vehicle rental page coming soon...",
     "vehicle": "vehicle",
-    "vehicles": "vehicles"
+    "vehicles": "vehicles",
+    "leaderboard": "Leaderboard",
+    "social": {
+      "title": "Social",
+      "friends": "Friends",
+      "requests": "Requests",
+      "search": "Search",
+      "searchHint": "Search username...",
+      "removeFriend": "Remove Friend",
+      "removeFriendConfirm": "Are you sure you want to remove {0} from your friends?",
+      "friendRemoved": "Friend removed",
+      "deleteMessage": "Delete Message",
+      "deleteMessageConfirm": "Are you sure you want to delete this message?",
+      "clearChat": "Clear Chat",
+      "clearChatConfirm": "Are you sure you want to clear the entire chat history? This cannot be undone.",
+      "chatCleared": "Chat cleared",
+      "noFriends": "No friends yet",
+      "findFriends": "Find Friends",
+      "noRequests": "No pending requests",
+      "requestSent": "Friend request sent!",
+      "requestAccepted": "Friend request accepted!",
+      "requestRejected": "Request rejected",
+      "alreadyFriends": "Already friends",
+      "requestAlreadySent": "Request already sent",
+      "sendMessage": "Type a message...",
+      "addFriend": "Add Friend"
+    }
   },
   "activity": {
     "title": "Activity Log",

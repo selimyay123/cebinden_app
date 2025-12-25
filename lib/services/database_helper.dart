@@ -4,6 +4,7 @@ import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
 import '../models/notification_model.dart';
 import '../models/activity_model.dart';
+import 'leaderboard_service.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -55,9 +56,18 @@ class DatabaseHelper {
       final userMap = Map<dynamic, dynamic>.from(user);
       await _usersBox.put(userId, userMap);
       await _usersBox.flush(); // Verileri diske yaz
-                  return 1;
+      
+      // Firestore'a da kaydet (Leaderboard için)
+      try {
+        final userObj = User.fromJson(userMap.cast<String, dynamic>());
+        await LeaderboardService().updateUserScore(userObj);
+      } catch (e) {
+        print('Firestore sync error: $e');
+      }
+
+      return 1;
     } catch (e) {
-            return -1;
+      return -1;
     }
   }
 
@@ -144,6 +154,21 @@ class DatabaseHelper {
 
       await _usersBox.put(userId, updatedUser);
       await _usersBox.flush();
+      
+      // Firestore'a da senkronize et (Leaderboard için)
+      // Sadece bakiye, level veya profil resmi değiştiyse güncelleme yap
+      if (updates.containsKey('balance') || 
+          updates.containsKey('level') || 
+          updates.containsKey('profileImageUrl') ||
+          updates.containsKey('username')) {
+        try {
+          final userObj = User.fromJson(updatedUser.cast<String, dynamic>());
+          // Arka planda güncelle, kullanıcıyı bekletme
+          LeaderboardService().updateUserScore(userObj);
+        } catch (e) {
+          print('Firestore sync error: $e');
+        }
+      }
       
       return true;
     } catch (e) {

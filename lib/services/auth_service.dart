@@ -205,10 +205,12 @@ class AuthService {
   Future<bool> updateUserInfo({
     required String userId,
     String? currency,
+    String? profileImageUrl,
   }) async {
     try {
       final updates = <String, dynamic>{};
       if (currency != null) updates['currency'] = currency;
+      if (profileImageUrl != null) updates['profileImageUrl'] = profileImageUrl;
 
       if (updates.isEmpty) return true;
 

@@ -122,7 +122,13 @@ class OfferService {
             offerPrice: offerPrice,
             offerDate: DateTime.now(),
             status: OfferStatus.pending,
-            message: buyer.message,
+
+            message: buyer.generateContextualMessage(
+              mileage: listing.mileage,
+              hasAccidentRecord: listing.hasAccidentRecord,
+              listingPrice: listing.listingPrice!,
+              fairPrice: fairPrice,
+            ) ?? buyer.message,
             listingPrice: listing.listingPrice!,
             fairPrice: fairPrice,
             expirationDate: DateTime.now().add(const Duration(days: 7)),
@@ -221,33 +227,44 @@ class OfferService {
       }
       
       // 5. Aracı satıldı olarak işaretle
+      // Eğer karşı teklif varsa onu, yoksa normal teklif fiyatını kullan
+      final finalPrice = offer.counterOfferAmount ?? offer.offerPrice;
+
+      // 5. Aracı satıldı olarak işaretle
       bool vehicleUpdated = await _db.updateUserVehicle(offer.vehicleId, {
         'isSold': true,
         'isListedForSale': false,
-        'salePrice': offer.offerPrice,
+        'salePrice': finalPrice,
         'saleDate': DateTime.now().toIso8601String(),
       });
       
       if (!vehicleUpdated) {
-        
         // Rollback
         await _db.updateUser(seller.id, {'balance': seller.balance - offer.offerPrice});
         await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
         return null;
       }
+
+      // Satın alma işlemini gerçekleştir
+      final success = await _processIncomingOfferAcceptance(offer, finalPrice);
       
-      // 6. Diğer teklifleri reddet
-      await _db.rejectOtherOffers(offer.vehicleId, offer.offerId);
+      if (!success) {
+        // Başarısız olursa durumu geri al
+        await _db.updateOffer(offer.offerId, {'status': OfferStatus.pending.index});
+        return null;
+      }
       
-      // 7. 🔔 Satıcıya araç satıldı bildirimi gönder
-      await NotificationService().sendVehicleSoldNotification(
-        userId: offer.sellerId,
-        vehicleName: '${offer.vehicleBrand} ${offer.vehicleModel}',
-        salePrice: offer.offerPrice,
+      // 🔔 Alıcıya bildirim gönder
+      // Bildirim için doğru fiyatı içeren bir kopya oluştur
+      final acceptedOffer = offer.copyWith(offerPrice: finalPrice);
+      
+      await NotificationService().sendOfferAcceptedNotification(
+        buyerId: offer.buyerId,
+        offer: acceptedOffer,
       );
       
       // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu)
-      final profit = offer.offerPrice - vehicle.purchasePrice;
+      final profit = finalPrice - vehicle.purchasePrice;
       final xpResult = await _xpService.onVehicleSale(offer.sellerId, profit);
       
       // 🎯 Günlük Görev Güncellemesi: Araç Satışı ve Kâr
@@ -257,7 +274,7 @@ class OfferService {
       }
 
       // Aktivite kaydı
-      await ActivityService().logVehicleSale(offer.sellerId, vehicle, offer.offerPrice);
+      await ActivityService().logVehicleSale(offer.sellerId, vehicle, finalPrice);
       
       return xpResult;
     } catch (e) {
@@ -275,6 +292,18 @@ class OfferService {
       return success;
     } catch (e) {
 
+      return false;
+    }
+  }
+
+
+
+  /// Satıcının karşı teklifini reddet
+  Future<bool> rejectCounterOffer(Offer offer) async {
+    try {
+      // Reddedilen teklifi sil
+      return await _db.deleteOffer(offer.offerId);
+    } catch (e) {
       return false;
     }
   }
@@ -617,6 +646,44 @@ class OfferService {
     }
 
     // 2. Fiyat Oranına Göre Değerlendirme
+    
+    // 🆕 YENİ MANTIK: Alıcının ilk teklifi ile satıcının istediği arasındaki uçurum kontrolü
+    // Eğer alıcı çok düşükten başladıysa (örn: %85), satıcının yüksek isteğini (örn: %95) kabul etmemeli.
+    final initialOfferRatio = originalOfferPrice / listingPrice;
+    
+    // Eğer satıcı ilana çok yakın bir fiyat istiyorsa (%90 üzeri)
+    if (priceRatio >= 0.90) {
+      // Ve alıcı düşükten başladıysa (%90 altı)
+      if (initialOfferRatio < 0.90) {
+        // Kabul etme şansı ÇOK DÜŞÜK olmalı (Mezarcı ölücü tayfa)
+        if (random.nextDouble() < 0.1 + successBonus) { // %10 şans
+           return {
+            'decision': 'accept',
+            'response': _generateAcceptanceResponse(),
+          };
+        } else {
+          // Reddet veya küçük bir artış yap
+          if (random.nextDouble() < 0.4) {
+             return {
+              'decision': 'reject',
+              'response': _generateRejectionResponse(),
+            };
+          } else {
+            // Küçük artış (İnatçı pazarlık)
+            final diff = counterOfferAmount - originalOfferPrice;
+            final increase = diff * (0.05 + random.nextDouble() * 0.15); // Farkın %5-%20'si
+            final newCounter = originalOfferPrice + increase;
+            
+            return {
+              'decision': 'counter',
+              'counterAmount': newCounter,
+              'response': _generateCounterOfferResponse(newCounter),
+            };
+          }
+        }
+      }
+    }
+
     if (priceRatio >= 0.95) {
       // Kullanıcı hala çok yüksek istiyor (%95+)
       // Kabul etme şansı düşük
@@ -670,12 +737,7 @@ class OfferService {
     } else if (priceRatio >= 0.70) {
       // İyi fiyat (%70-85)
       // Kabul şansı yüksek ama AI daha da düşürmek isteyebilir
-      if (random.nextDouble() < 0.4 + successBonus) { // Düşük kabul şansı çünkü zaten düşük fiyat? Hayır, kullanıcı düşük istiyor, AI sevinmeli.
-        // MANTIK HATASI DÜZELTME: Kullanıcı fiyatı kırdıysa AI daha kolay kabul etmeli.
-        // Ama buradaki priceRatio: UserAsk / ListingPrice.
-        // Eğer oran düşükse (0.7), kullanıcı çok inmiş demektir. AI hemen kabul etmeli!
-        // Eski kodda: 0.4 şansla kabul ediyordu. Saçma.
-        // Yeni kod: 0.8 şansla kabul etmeli.
+      if (random.nextDouble() < 0.8 + successBonus) { // DÜZELTİLDİ: %80 şansla kabul (Fiyat iyi düştü)
         return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
@@ -964,7 +1026,7 @@ class OfferService {
     // Kullanıcı %15 kâr ile satmak istiyor, piyasa dalgalanması (%90) ile birleşince
     // oran 1.15 / 0.9 = 1.27 olabiliyor. 1.30 sınırda kalıyor.
     // Bu yüzden toleransı 1.40'a çekiyoruz.
-    double maxTolerance = 1.40;
+    double maxTolerance = 2.00;
     
     // Yetenek Etkisi: Ballı Dil (Charisma)
     // Toleransı artırır (Daha pahalıya satabilirsin)

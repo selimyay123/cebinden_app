@@ -543,23 +543,29 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                             if (isIncoming && vehicleOffers.any((o) => o.isPending))
                               Container(
                                 margin: const EdgeInsets.only(bottom: 16),
-                                child: ElevatedButton.icon(
-                                  onPressed: () => _rejectAllOffers(vehicleOffers),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 2,
-                                  ),
-                                  icon: const Icon(Icons.cancel, size: 24),
-                                  label: Text(
-                                    'myVehicles.rejectAll'.tr(),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                child: Center(
+                                  child: SizedBox(
+                                    height: 36,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () => _rejectAllOffers(vehicleOffers),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red.shade50,
+                                        foregroundColor: Colors.red,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18),
+                                          side: BorderSide(color: Colors.red.shade200),
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.delete_sweep, size: 18),
+                                      label: Text(
+                                        'myVehicles.rejectAll'.tr(),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -826,9 +832,347 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
   }
 
-  // Gelen teklif kartı - Tek bir teklif detayı
+  // Gelen teklif kartı - Chat Arayüzü
   Widget _buildIncomingOfferCard(Offer offer) {
-    return _buildOfferTile(offer);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Alıcı Mesajı (Sol - Gri Balon)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Avatar
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: Colors.grey.shade300,
+                child: Text(
+                  offer.buyerName[0],
+                  style: TextStyle(
+                    color: Colors.grey.shade800,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              
+              // Mesaj Balonu
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // İsim ve Zaman
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 4),
+                      child: Row(
+                        children: [
+                          Text(
+                            offer.buyerName,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _getTimeAgo(offer.offerDate),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Balon
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(4),
+                          topRight: Radius.circular(16),
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Mesaj Metni
+                          if (offer.message != null)
+                            Text(
+                              offer.message!.tr(),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          
+                          const SizedBox(height: 8),
+                          const Divider(height: 16),
+                          
+                          // Teklif Fiyatı
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'offers.offerPrice'.tr() + ': ',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                '${_formatCurrency(offer.offerPrice)} TL',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.deepOrange,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // Kar/Zarar Analizi (FutureBuilder ile araç bilgisini çek)
+                          FutureBuilder<UserVehicle?>(
+                            future: _db.getUserVehicleById(offer.vehicleId),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData || snapshot.data == null) return const SizedBox();
+                              
+                              final vehicle = snapshot.data!;
+                              final profitLoss = offer.offerPrice - vehicle.purchasePrice;
+                              final profitLossPercentage = (profitLoss / vehicle.purchasePrice) * 100;
+                              final isProfit = profitLoss >= 0;
+                              final color = isProfit ? Colors.green : Colors.red;
+
+                              return Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: color.withOpacity(0.3)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isProfit ? Icons.trending_up : Icons.trending_down,
+                                      size: 14,
+                                      color: color,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${isProfit ? '+' : ''}${_formatCurrency(profitLoss)} TL',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: color,
+                                      ),
+                                    ),
+                                    Text(
+                                      ' (%${profitLossPercentage.toStringAsFixed(1)})',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: color,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 40), // Sağdan boşluk
+            ],
+          ),
+          
+          // 2. Kullanıcı Cevabı (Sağ - Renkli Balon)
+          if (!offer.isPending || offer.counterOfferAmount != null) ...[
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(width: 40), // Soldan boşluk
+                
+                // Mesaj Balonu
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // Balon
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: _getUserResponseColor(offer),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(4),
+                            bottomLeft: Radius.circular(16),
+                            bottomRight: Radius.circular(16),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _buildUserResponseContent(offer),
+                          ],
+                        ),
+                      ),
+                      
+                      // Durum (Okundu vs.)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, right: 4),
+                        child: Icon(
+                          Icons.done_all,
+                          size: 14,
+                          color: _getUserResponseColor(offer).withOpacity(1.0), // Koyu ton
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+          
+          // 3. Aksiyon Butonları (Hızlı Cevap Barı)
+          if (offer.isPending) ...[
+            const SizedBox(height: 12),
+            Container(
+              margin: const EdgeInsets.only(left: 48), // Avatar hizasından başla
+              child: Row(
+                children: [
+                  // Kabul Et
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _handleAcceptOffer(offer),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      child: const Icon(Icons.check, size: 20),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  
+                  // Karşı Teklif
+                  Expanded(
+                    flex: 2, // Daha geniş
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showCounterOfferDialogForIncoming(offer, null),
+                      icon: const Icon(Icons.swap_horiz, size: 16),
+                      label: Text(
+                        'offers.counter'.tr(),
+                        style: const TextStyle(fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.deepPurple,
+                        side: BorderSide(color: Colors.deepPurple.shade200),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  
+                  // Reddet
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => _handleRejectOffer(offer),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: BorderSide(color: Colors.red.shade200),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      child: const Icon(Icons.close, size: 20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Color _getUserResponseColor(Offer offer) {
+    if (offer.status == OfferStatus.accepted) return Colors.green.shade100;
+    if (offer.status == OfferStatus.rejected) return Colors.red.shade100;
+    if (offer.counterOfferAmount != null) return Colors.orange.shade100;
+    return Colors.blue.shade100;
+  }
+
+  Widget _buildUserResponseContent(Offer offer) {
+    if (offer.status == OfferStatus.accepted) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check_circle, size: 16, color: Colors.green),
+          const SizedBox(width: 8),
+          Text(
+            'negotiation.accept.1'.tr(), // "Teklifiniz uygun, kabul ediyorum!"
+            style: const TextStyle(color: Colors.black87),
+          ),
+        ],
+      );
+    } else if (offer.status == OfferStatus.rejected) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.cancel, size: 16, color: Colors.red),
+          const SizedBox(width: 8),
+          Text(
+            'negotiation.reject.1'.tr(), // "Maalesef bu fiyat çok düşük."
+            style: const TextStyle(color: Colors.black87),
+          ),
+        ],
+      );
+    } else if (offer.counterOfferAmount != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            'negotiation.counter.3'.trParams({'amount': _formatCurrency(offer.counterOfferAmount!)}),
+            style: const TextStyle(color: Colors.black87),
+          ),
+        ],
+      );
+    }
+    return const SizedBox();
   }
 
   Widget _buildStatChip(String label, int count, Color color) {
@@ -1285,7 +1629,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     children: [
                       Text('offers.offerPriceLabel'.tr()),
                       Text(
-                        '${_formatCurrency(offer.offerPrice)} TL',
+                        '${_formatCurrency(offer.counterOfferAmount ?? offer.offerPrice)} TL',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
@@ -1300,7 +1644,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text('misc.balanceAdded'.trParams({'amount': _formatCurrency(offer.offerPrice)})),
+                  Text('misc.balanceAdded'.trParams({'amount': _formatCurrency(offer.counterOfferAmount ?? offer.offerPrice)})),
                   Text('offers.vehicleSold'.tr()),
                   Text('offers.otherOffersRejected'.tr()),
                 ],
@@ -1394,345 +1738,462 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     }
   }
 
-  /// Gönderilen teklif kartı oluştur
-  Widget _buildSentOfferCard(Offer offer) {
-    Color statusColor;
-    IconData statusIcon;
-    String statusText;
-
-    switch (offer.status) {
-      case OfferStatus.accepted:
-        statusColor = Colors.green;
-        statusIcon = Icons.check_circle;
-        statusText = 'offer.accepted'.tr();
-        break;
-      case OfferStatus.rejected:
-        statusColor = Colors.red;
-        statusIcon = Icons.cancel;
-        statusText = 'offer.rejected'.tr();
-        break;
-      case OfferStatus.pending:
-        if (offer.counterOfferAmount != null) {
-          statusColor = Colors.orange;
-          statusIcon = Icons.swap_horiz;
-          statusText = 'offer.counterOffer'.tr();
-        } else {
-          statusColor = Colors.blue;
-          statusIcon = Icons.schedule;
-          statusText = 'offer.pending'.tr();
-        }
-        break;
-      default:
-        statusColor = Colors.grey;
-        statusIcon = Icons.help_outline;
-        statusText = offer.status.toString();
-    }
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+  /// Gönderilen teklif kartı - Chat Arayüzü
+  Future<void> _handleAcceptCounterOffer(Offer offer) async {
+    // Onay dialogu
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('offer.acceptCounterTitle'.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Araç bilgileri
-            Row(
-              children: [
-                if (offer.vehicleImageUrl.isNotEmpty)                  // Araç Resmi
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: _buildVehicleImage(offer.vehicleImageUrl, 100, 75),
-                  ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            Text('offer.acceptCounterConfirmMessage'.trParams({
+              'brand': offer.vehicleBrand,
+              'model': offer.vehicleModel,
+            })),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Text('offer.counterOfferLabel'.tr()),
                       Text(
-                        '${offer.vehicleBrand} ${offer.vehicleModel}',
+                        '${_formatCurrency(offer.counterOfferAmount!)} TL',
                         style: const TextStyle(
-                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${offer.vehicleYear}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
+                          color: Colors.green,
+                          fontSize: 18,
                         ),
                       ),
                     ],
                   ),
-                ),
-                // Durum badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: statusColor, width: 1.5),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(statusIcon, size: 16, color: statusColor),
-                      const SizedBox(width: 4),
-                      Text(
-                        statusText,
-                        style: TextStyle(
-                          color: statusColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const Divider(height: 24),
-
-            // Fiyat bilgileri
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'offer.listingPrice'.tr(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_formatCurrency(offer.listingPrice)} TL',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                Icon(Icons.arrow_forward, color: Colors.grey[400]),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'offer.yourOffer'.tr(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_formatCurrency(offer.offerPrice)} TL',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Karşı teklif varsa göster
-            if (offer.counterOfferAmount != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.swap_horiz, color: Colors.orange[700]),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'offer.counterOfferAmount'.tr(),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.orange[900],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${_formatCurrency(offer.counterOfferAmount!)} ${'common.currency'.tr()}',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.orange[900],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Karşı teklif için butonlar (pending durumunda)
-                    if (offer.status == OfferStatus.pending) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () => _handleRejectCounterOffer(offer),
-                              icon: const Icon(Icons.close, size: 18),
-                              label: Text('offers.reject'.tr()),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.red,
-                                side: const BorderSide(color: Colors.red),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () => _handleAcceptCounterOffer(offer),
-                              icon: const Icon(Icons.check, size: 18),
-                              label: Text('offers.accept'.tr()),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const SizedBox(height: 8),
-                      if (offer.negotiationRounds >= 5) ...[
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey[400]!),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.block, size: 16, color: Colors.grey[600]),
-                              const SizedBox(width: 8),
-                              Text(
-                                'offers.maxRoundsReached'.tr(),
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ] else ...[
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: () => _showCounterOfferDialog(offer),
-                            icon: const Icon(Icons.local_offer, size: 18),
-                            label: Text(
-                              '${'offer.sendCounterOffer'.tr()} (${5 - offer.negotiationRounds} ${'common.remaining'.tr()})',
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.deepPurple,
-                              side: const BorderSide(color: Colors.deepPurple, width: 1.5),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ],
-                ),
-              ),
-            ],
-
-            // Satıcı cevabı varsa göster
-            if (offer.sellerResponse != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.message, size: 16, color: Colors.grey[600]),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _getLocalizedSellerResponse(offer),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[800],
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-
-            // Tarih
-            const SizedBox(height: 12),
-            Text(
-              _formatDate(offer.offerDate),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
+                  const Divider(),
+                  Text('offer.garageInfo'.tr()),
+                  Text('offer.balanceInfo'.trParams({'amount': _formatCurrency(offer.counterOfferAmount!)})),
+                ],
               ),
             ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            child: Text('offer.acceptButton'.tr()),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      // Loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      final result = await _offerService.acceptCounterOffer(offer);
+
+      if (mounted) {
+        Navigator.pop(context); // Loading kapat
+
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
+              content: Text('offer.counterOfferAcceptedSuccess'.tr()),
+              backgroundColor: Colors.green.withOpacity(0.8),
+            ),
+          );
+          _loadOffers();
+          _shouldRefreshParent = true;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
+              content: Text(result['error'] ?? 'purchase.insufficientBalance'.tr()),
+              backgroundColor: Colors.red.withOpacity(0.8),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _handleRejectCounterOffer(Offer offer) async {
+    // Onay dialogu
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('offer.rejectCounterOfferTitle'.tr()),
+        content: Text('offer.rejectCounterOfferMessage'.trParams({
+          'brand': offer.vehicleBrand,
+          'model': offer.vehicleModel,
+        })),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('offer.rejectAndDelete'.tr()),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await _offerService.rejectCounterOffer(offer);
+
+      if (mounted && success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            content: Text('offer.counterOfferRejectedSuccess'.tr()),
+            backgroundColor: Colors.red.withOpacity(0.8),
+          ),
+        );
+        _loadOffers();
+        _shouldRefreshParent = true;
+      }
+    }
+  }
+
+  Widget _buildSentOfferCard(Offer offer) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Kullanıcı Mesajı (Sağ - Renkli Balon)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(width: 40), // Soldan boşluk
+              
+              // Mesaj Balonu
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // İsim ve Zaman
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4, bottom: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getTimeAgo(offer.offerDate),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'offers.you'.tr(), // "Siz"
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Balon
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrange.shade100,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(4),
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          // Mesaj Metni (Opsiyonel, genelde kullanıcı mesaj yazmaz ama modelde var)
+                          if (offer.message != null)
+                             Text(
+                              offer.message!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          
+                          if (offer.message != null) const SizedBox(height: 8),
+                          if (offer.message != null) const Divider(height: 16),
+                          
+                          // Teklif Fiyatı
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'offer.yourOffer'.tr() + ': ',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              Text(
+                                '${_formatCurrency(offer.offerPrice)} TL',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.deepOrange,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // İlan Fiyatı ve Fark
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'offer.listingPrice'.tr() + ': ',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                '${_formatCurrency(offer.listingPrice)} TL',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey.shade800,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '(%${offer.offerPercentage.toStringAsFixed(1)})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: offer.offerPercentage >= -10 ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Durum (Okundu vs.)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, right: 4),
+                      child: Icon(
+                        Icons.done_all,
+                        size: 14,
+                        color: Colors.deepOrange.shade300,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          
+          // 2. Satıcı Cevabı (Sol - Gri Balon)
+          // Eğer cevap geldiyse veya durum değiştiyse
+          if (offer.sellerResponse != null || !offer.isPending) ...[
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Avatar (Satıcı)
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.grey.shade300,
+                  child: const Icon(Icons.store, size: 18, color: Colors.grey),
+                ),
+                const SizedBox(width: 8),
+                
+                // Mesaj Balonu
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // İsim
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, bottom: 4),
+                        child: Text(
+                          'offers.seller'.tr(), // "Satıcı"
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ),
+                      
+                      // Balon
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: _getSellerResponseColor(offer),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4),
+                            topRight: Radius.circular(16),
+                            bottomLeft: Radius.circular(16),
+                            bottomRight: Radius.circular(16),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Cevap Metni
+                            if (offer.sellerResponse != null)
+                              Text(
+                                offer.sellerResponse!.tr(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              )
+                            else if (offer.status == OfferStatus.accepted)
+                              Text(
+                                'negotiation.accept.1'.tr(),
+                                style: const TextStyle(color: Colors.black87),
+                              )
+                            else if (offer.status == OfferStatus.rejected)
+                              Text(
+                                'negotiation.reject.1'.tr(),
+                                style: const TextStyle(color: Colors.black87),
+                              ),
+                              
+                            // Karşı Teklif Varsa
+                            if (offer.counterOfferAmount != null) ...[
+                              const SizedBox(height: 8),
+                              const Divider(height: 16),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'offer.counterOfferAmount'.tr() + ': ',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${_formatCurrency(offer.counterOfferAmount!)} TL',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange.shade800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 40),
+              ],
+            ),
+            
+            // 3. Aksiyon Butonları (Satıcı Karşı Teklif Verdiyse)
+            if (offer.status == OfferStatus.pending && offer.counterOfferAmount != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                margin: const EdgeInsets.only(left: 48),
+                child: Row(
+                  children: [
+                    // Kabul Et
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _handleAcceptCounterOffer(offer),
+                        icon: const Icon(Icons.check, size: 16),
+                        label: Text('offers.accept'.tr()),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    
+                    // Reddet
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _handleRejectCounterOffer(offer),
+                        icon: const Icon(Icons.close, size: 16),
+                        label: Text('offers.reject'.tr()),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: BorderSide(color: Colors.red.shade200),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ],
       ),
     );
   }
 
-  String _getLocalizedSellerResponse(Offer offer) {
-    if (offer.sellerResponse == null) return '';
-    
-    // Eğer response bir key ise (nokta içeriyorsa basit bir kontrol)
-    if (offer.sellerResponse!.contains('offerService.responses')) {
-      // Eğer counter offer ise parametre ekle
-      if (offer.sellerResponse!.contains('counter')) {
-        return offer.sellerResponse!.trParams({
-          'amount': _formatCurrency(offer.counterOfferAmount ?? 0),
-        });
-      }
-      // Diğer durumlar için direkt çevir
-      return offer.sellerResponse!.tr();
-    }
-    
-    // Eski/hardcoded mesajlar için direkt döndür
-    return offer.sellerResponse!;
+  Color _getSellerResponseColor(Offer offer) {
+    if (offer.status == OfferStatus.accepted) return Colors.green.shade100;
+    if (offer.status == OfferStatus.rejected) return Colors.red.shade100;
+    if (offer.counterOfferAmount != null) return Colors.orange.shade100;
+    return Colors.grey.shade200;
   }
+
+
+
+
+
 
   // Tüm bekleyen teklifleri reddet (YENİ)
   Future<void> _rejectAllOffers(List<Offer> offers) async {
@@ -1742,8 +2203,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     if (pendingOffers.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          elevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          behavior: SnackBarBehavior.floating,
           content: Text('misc.noPendingToReject'.tr()),
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.orange.withOpacity(0.8),
         ),
       );
       return;
@@ -1782,6 +2246,15 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
 
     if (confirmed == true) {
+      // Loading göster
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
       // Tüm teklifleri reddet
       int successCount = 0;
       
@@ -1791,18 +2264,26 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       }
 
       if (mounted) {
+        Navigator.pop(context); // Loading'i kapat
+
         if (successCount == pendingOffers.length) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('✅ ${'offers.rejectAllSuccess'.trParams({'count': successCount.toString()})}'),
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.green.withOpacity(0.8),
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('⚠️ ${'offers.rejectAllPartialSuccess'.trParams({'count': successCount.toString(), 'total': pendingOffers.length.toString()})}'),
-              backgroundColor: Colors.orange,
+              backgroundColor: Colors.orange.withOpacity(0.8),
             ),
           );
         }
@@ -1842,9 +2323,20 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
 
     if (confirmed == true) {
+      // Loading göster
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
       bool success = await _offerService.rejectOffer(offer);
 
       if (mounted) {
+        Navigator.pop(context); // Loading'i kapat
+
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -1875,8 +2367,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              elevation: 8,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptError'.tr()),
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.red.withOpacity(0.8),
             ),
           );
         }
@@ -1886,156 +2381,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
 
 
-  /// Karşı teklifi kabul et
-  Future<void> _handleAcceptCounterOffer(Offer offer) async {
-    // Onay dialogu göster
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green),
-            const SizedBox(width: 8),
-            Text('offer.acceptCounterTitle'.tr()),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'offer.acceptCounterConfirmMessage'.trParams({
-                'brand': offer.vehicleBrand,
-                'model': offer.vehicleModel,
-              }),
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('offer.yourOfferLabel'.tr(), style: TextStyle(color: Colors.grey[600])),
-                      Text(
-                        '${_formatCurrency(offer.offerPrice)} ${'common.currency'.tr()}',
-                        style: const TextStyle(
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'offer.counterOfferLabel'.tr(),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '${_formatCurrency(offer.counterOfferAmount!)} ${'common.currency'.tr()}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'offer.garageInfo'.tr(),
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-            ),
-            Text(
-              'offer.balanceInfo'.trParams({'amount': _formatCurrency(offer.counterOfferAmount!)}),
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('offer.acceptButton'.tr()),
-          ),
-        ],
-      ),
-    );
 
-    if (confirmed == true) {
-      // Kullanıcı bilgilerini al
-      final currentUser = await _authService.getCurrentUser();
-      if (currentUser == null) return;
-
-      // Bakiye kontrolü
-      if (currentUser.balance < offer.counterOfferAmount!) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('purchase.insufficientBalance'.tr()),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-        return;
-      }
-
-      // 🎬 Animasyon göster
-      await _playPurchaseAnimation();
-
-      // Teklifi kabul et ve satın alma işlemini gerçekleştir
-      bool success = await _acceptCounterOffer(offer, currentUser);
-
-      if (mounted) {
-        if (success) {
-          // İlanı kaldır (Marketten sil)
-          _marketService.removeListing(offer.vehicleId);
-
-          // Başarı dialogunu göster
-          _showPurchaseSuccessDialog(offer, currentUser.balance - offer.counterOfferAmount!);
-
-          // Listeyi yenile
-          await _loadOffers();
-          
-          // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
-          if (widget.selectedVehicleId != null) {
-            final remainingOffers = _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
-            final hasPendingOffers = remainingOffers.any((o) => o.isPending);
-            
-            if (!hasPendingOffers) {
-              // Artık bekleyen teklif yok, araç listesine dön ve güncelleme sinyali gönder
-              Navigator.pop(context, true);
-            }
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('offers.acceptError'.tr()),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-  }
 
   /// Satın alma animasyonunu oynat
   Future<void> _playPurchaseAnimation() async {
@@ -2236,73 +2582,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
   }
 
-  /// Karşı teklifi reddet
-  Future<void> _handleRejectCounterOffer(Offer offer) async {
-    // Onay dialogu göster
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('offers.rejectCounterOfferTitle'.tr()),
-        content: Text(
-          'offers.rejectCounterOfferMessage'.trParams({
-            'brand': offer.vehicleBrand,
-            'model': offer.vehicleModel,
-          }),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('offers.rejectAndDelete'.tr()),
-          ),
-        ],
-      ),
-    );
 
-    if (confirmed == true) {
-      bool success = await _offerService.rejectOffer(offer);
-
-      if (mounted) {
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              behavior: SnackBarBehavior.floating,
-              content: Text('✅ ${'offer.counterOfferRejectedSuccess'.tr()}'),
-              backgroundColor: Colors.green.withOpacity(0.8),
-              duration: const Duration(seconds: 3),
-            ),
-          );
-
-          // Listeyi yenile
-          await _loadOffers();
-          
-          // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
-          if (widget.selectedVehicleId != null) {
-            final remainingOffers = _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
-            final hasPendingOffers = remainingOffers.any((o) => o.isPending);
-            
-            if (!hasPendingOffers) {
-              // Artık bekleyen teklif yok, araç listesine dön ve güncelleme sinyali gönder
-              Navigator.pop(context, true);
-            }
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('offers.rejectError'.tr()),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-  }
 
   /// Karşı teklif gönderme dialogunu göster
   void _showCounterOfferDialog(Offer offer) {
@@ -2425,7 +2705,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               final offerText = counterOfferController.text.trim();
               if (offerText.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('offer.enterAmountError'.tr())),
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.enterAmountError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
                 );
                 return;
               }
@@ -2433,7 +2719,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               final newOffer = double.tryParse(offerText.replaceAll('.', ''));
               if (newOffer == null || newOffer <= 0) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('offer.invalidAmountError'.tr())),
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.invalidAmountError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
                 );
                 return;
               }
@@ -2442,8 +2734,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               if (newOffer <= minOffer || newOffer >= maxOffer) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
                     content: Text('offer.counterOfferRangeError'.tr()),
-                    backgroundColor: Colors.red,
+                    backgroundColor: Colors.red.withOpacity(0.8),
                   ),
                 );
                 return;
@@ -2524,8 +2819,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('offer.sendError'.tr()),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.withOpacity(0.8),
           ),
         );
       }
@@ -2645,12 +2943,20 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   }
 
   /// Gelen teklife karşı teklif gönderme dialogunu göster
-  void _showCounterOfferDialogForIncoming(Offer offer, UserVehicle? vehicle) {
+  Future<void> _showCounterOfferDialogForIncoming(Offer offer, UserVehicle? vehicle) async {
+    // Eğer araç bilgisi yoksa (Chat ekranından geliyorsa), veritabanından çek
+    UserVehicle? targetVehicle = vehicle;
+    if (targetVehicle == null) {
+      targetVehicle = await _db.getUserVehicleById(offer.vehicleId);
+    }
+
+    if (!mounted) return;
+
     showDialog(
       context: context,
       builder: (context) => _CounterOfferDialog(
         offer: offer,
-        vehicle: vehicle,
+        vehicle: targetVehicle,
         onSend: (double amount) {
           _submitCounterOfferForIncoming(offer, amount);
         },
@@ -2696,8 +3002,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
             content: Text('offers.counterOfferError'.tr()),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.withOpacity(0.8),
           ),
         );
       }
