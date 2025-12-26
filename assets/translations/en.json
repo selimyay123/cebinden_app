@@ -26,7 +26,8 @@
     "back": "Back",
     "next": "Next",
     "ads": {
-      "clickToWin": "Click to win 5000 TL"
+      "clickToWin": "Click to win 5000 TL",
+      "freeMoney": "Free 5000 TL"
     },
     "done": "Done",
     "loading": "Loading...",
@@ -45,7 +46,8 @@
     "dear": "Dear",
     "attention": "Attention!",
     "retry": "Retry",
-    "remaining": "remaining"
+    "remaining": "remaining",
+    "free": "FREE"
   },
   "errors": {
     "balanceUpdateFailed": "Balance could not be updated",
@@ -97,16 +99,23 @@
     "totalVehicles": "Total Vehicles",
     "totalVehiclesShort": "Total Vehicles",
     "pendingOffers": "Pending Offers",
+    "ranks": {
+      "rookie": "Rookie Driver",
+      "speedster": "Speedster",
+      "asphaltBeast": "Asphalt Beast",
+      "cityRuler": "City Ruler",
+      "legend": "Legend"
+    },
     "totalTransactions": "Transactions",
-    "myVehicles": "My Vehicles",
-    "myListings": "My Listings",
-    "myOffers": "My Offers",
-    "buyVehicle": "Buy Vehicle",
-    "sellVehicle": "Sell Vehicle",
+    "myVehicles": "GARAGE",
+    "myListings": "LISTINGS",
+    "myOffers": "OFFERS",
+    "buyVehicle": "BUY",
+    "sellVehicle": "SELL",
     "rentVehicle": "Rent Vehicle",
     "buyGallery": "Buy Gallery",
     "professionalBusiness": "Professional Business",
-    "tasks": "Tasks",
+    "tasks": "SKILLS",
     "noRecentActivity": "No recent activity",
     "startBuying": "Start shopping now!",
     "bonusAwarded": "🎉 Special bonus! Your balance has been increased to 5,000,000 ₺!",
@@ -144,7 +153,8 @@
     "opportunityPurchases": "Opportunity Purchases",
     "highProfitMargin": "High Profit Margin",
     "prestigeReputation": "Prestige & Reputation",
-    "taxi": "Start Taxi"
+    "taxi": "TAXI",
+    "buyGold": "Buy Gold"
   },
   "vehicles": {
     "title": "Vehicles",
@@ -1455,7 +1465,7 @@
   "store": {
     "productsLoadError": "Error loading products",
     "loadingProducts": "Loading products...",
-    "title": "Store",
+    "title": "STORE",
     "buyGold": "Buy Gold",
     "convertGold": "Convert Gold",
     "errorItemUnavailable": "This item is currently unavailable.",

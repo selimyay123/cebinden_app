@@ -423,17 +423,27 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
               children: [
                 // Araç İkonu
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     color: Colors.deepPurple.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.directions_car,
-                    size: 40,
-                    color: Colors.deepPurple,
-                  ),
+                  child: vehicle.imageUrl != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            vehicle.imageUrl!,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : const Icon(
+                          Icons.directions_car,
+                          size: 40,
+                          color: Colors.deepPurple,
+                        ),
                 ),
                 const SizedBox(width: 16),
                 
@@ -859,12 +869,13 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                       _buildSectionTitle('vehicles.technicalSpecs'.tr()),
                       const SizedBox(height: 12),
                       _buildInfoCard([
-                        _buildDetailRow(
-                          Icons.color_lens,
-                          'vehicles.color'.tr(),
-                          'colors.${vehicle.color}'.tr(),
-                          Colors.pink,
-                        ),
+                        if (vehicle.color != 'Standart')
+                          _buildDetailRow(
+                            Icons.color_lens,
+                            'vehicles.color'.tr(),
+                            'colors.${vehicle.color}'.tr(),
+                            Colors.pink,
+                          ),
                         _buildDetailRow(
                           Icons.local_gas_station,
                           'vehicles.fuelType'.tr(),

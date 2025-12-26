@@ -26,7 +26,8 @@
     "back": "Geri",
     "next": "İleri",
     "ads": {
-      "clickToWin": "5000 TL kazanmak için tıkla"
+      "clickToWin": "5000 TL kazanmak için tıkla",
+      "freeMoney": "Bedava 5000 TL"
     },
     "done": "Tamamla",
     "loading": "Yükleniyor...",
@@ -45,7 +46,8 @@
     "dear": "Sayın",
     "attention": "Dikkat!",
     "retry": "Tekrar Dene",
-    "remaining": "kalan"
+    "remaining": "kalan",
+    "free": "BEDAVA"
   },
   "errors": {
     "balanceUpdateFailed": "Bakiye güncellenemedi",
@@ -117,17 +119,24 @@
     "changeTimeZone": "Zaman Dilimini Değiştir",
     "totalVehicles": "Toplam Araç",
     "totalVehiclesShort": "Toplam Araç",
-    "pendingOffers": "Bekleyen Teklif",
+    "pendingOffers": "Bekleyen Teklifler",
+    "ranks": {
+      "rookie": "Çaylak Sürücü",
+      "speedster": "Hız Tutkunu",
+      "asphaltBeast": "Asfalt Canavarı",
+      "cityRuler": "Şehrin Hakimi",
+      "legend": "Efsane"
+    },
     "totalTransactions": "İşlemler",
-    "myVehicles": "Araçlarım",
-    "myListings": "İlanlarım",
-    "myOffers": "Tekliflerim",
-    "buyVehicle": "Araç Al",
-    "sellVehicle": "Araç Sat",
+    "myVehicles": "GARAJ",
+    "myListings": "İLANLARIM",
+    "myOffers": "TEKLİFLER",
+    "buyVehicle": "AL",
+    "sellVehicle": "SAT",
     "rentVehicle": "Araç Kirala",
     "buyGallery": "Galeri Satın Al",
     "professionalBusiness": "Profesyonel İşletme",
-    "tasks": "Yetenek Ağacı",
+    "tasks": "YETENEKLER",
     "noRecentActivity": "Henüz işlem yok",
     "startBuying": "Hemen alışverişe başlayın!",
     "bonusAwarded": "🎉 Özel bonus! Bakiyeniz 5,000,000 TL'ye yükseltildi!",
@@ -165,7 +174,8 @@
     "opportunityPurchases": "Fırsat Alımları",
     "highProfitMargin": "Yüksek Kar Marjı",
     "prestigeReputation": "Prestij & İtibar",
-    "taxi": "Taksi Başlat"
+    "taxi": "TAKSİ",
+    "buyGold": "Altın Al"
   },
   "vehicles": {
     "title": "Araçlar",
@@ -1461,7 +1471,7 @@
   "store": {
     "productsLoadError": "Ürünler yüklenirken hata oluştu",
     "loadingProducts": "Ürünler yükleniyor...",
-    "title": "Mağaza",
+    "title": "MAĞAZA",
     "buyGold": "Altın Al",
     "convertGold": "Altın Bozdur",
     "errorItemUnavailable": "Bu ürün şu anda mevcut değil.",

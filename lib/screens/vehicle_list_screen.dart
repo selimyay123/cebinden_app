@@ -455,25 +455,39 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                 ),
               ),
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.directions_car,
-                      size: 50,
-                      color: widget.categoryColor.withOpacity(0.6),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      vehicle.color,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                child: vehicle.imageUrl != null
+                    ? ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
+                        child: Image.asset(
+                          vehicle.imageUrl!,
+                          width: 170,
+                          height: 140,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.directions_car,
+                            size: 50,
+                            color: widget.categoryColor.withOpacity(0.6),
+                          ),
+                          const SizedBox(height: 4),
+                          if (vehicle.color != 'Standart')
+                            Text(
+                              vehicle.color,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ),
             

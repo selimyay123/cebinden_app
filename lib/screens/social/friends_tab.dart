@@ -154,6 +154,7 @@ class _FriendsTabState extends State<FriendsTab> {
         }
 
         return ListView.builder(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
           itemCount: docs.length,
           itemBuilder: (context, index) {
             final doc = docs[index];
@@ -165,7 +166,7 @@ class _FriendsTabState extends State<FriendsTab> {
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
+                color: Colors.deepPurple.shade900.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
@@ -189,7 +190,7 @@ class _FriendsTabState extends State<FriendsTab> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chat_bubble_outline, color: Color(0xFFE5B80B)),
+                      icon: const Icon(Icons.chat_bubble_outline, color: Colors.purpleAccent),
                       onPressed: () => _openChat(friendId, friendName, friendImage),
                     ),
                     IconButton(

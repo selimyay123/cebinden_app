@@ -147,6 +147,9 @@ class User {
     return nextLevelTotalXp - xp;
   }
 
+  /// Toplam Kar/Zarar (Varsayılan başlangıç parası 1M TL kabul edilerek)
+  double get totalProfitLoss => balance - 1000000.0;
+
   // JSON'dan User nesnesi oluşturma
   factory User.fromJson(Map<String, dynamic> json) {
     return User(

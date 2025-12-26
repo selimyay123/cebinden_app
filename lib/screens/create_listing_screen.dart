@@ -546,7 +546,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             _buildDetailRow('sell.transmission'.tr(), 'vehicleAttributes.${widget.vehicle.transmission}'.tr()),
             _buildDetailRow('sell.engine'.tr(), widget.vehicle.engineSize),
             _buildDetailRow('sell.drive'.tr(), 'vehicleAttributes.${widget.vehicle.driveType}'.tr()),
-            _buildDetailRow('sell.color'.tr(), 'colors.${widget.vehicle.color}'.tr()),
+            if (widget.vehicle.color != 'Standart')
+              _buildDetailRow('sell.color'.tr(), 'colors.${widget.vehicle.color}'.tr()),
             _buildDetailRow('sell.warranty'.tr(), widget.vehicle.hasWarranty ? 'sell.var'.tr() : 'sell.yok'.tr()),
             _buildDetailRow('sell.accidentRecord'.tr(), widget.vehicle.hasAccidentRecord ? 'sell.var'.tr() : 'sell.yok'.tr()),
           ],

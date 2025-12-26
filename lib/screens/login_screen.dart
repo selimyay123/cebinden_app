@@ -201,6 +201,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                   TextField(
                     controller: _usernameController,
                     enabled: !_isLoading,
+                    maxLength: 10,
                     decoration: InputDecoration(
                       labelText: 'auth.username'.tr(),
                       hintText: 'auth.enterUsername'.tr(),

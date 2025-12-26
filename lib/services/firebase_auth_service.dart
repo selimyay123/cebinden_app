@@ -227,7 +227,7 @@ class FirebaseAuthService {
         balance: 5000000.0, // Başlangıç parası
         level: 1,
         xp: 0,
-        garageLimit: 2,
+        // garageLimit: 3, // Varsayılan değer (User modelinden gelir)
         authProvider: 'apple',
         appleUserId: appleCredential.userIdentifier,
         email: firebaseUser.email,

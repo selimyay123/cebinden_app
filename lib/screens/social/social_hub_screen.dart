@@ -15,7 +15,7 @@ class SocialHubScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: const Color(0xFF121212),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF1E1E1E),
+          backgroundColor: Colors.deepPurple.shade900,
           elevation: 0,
           title: Text(
             'drawer.social.title'.tr(),
@@ -29,9 +29,9 @@ class SocialHubScreen extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
           ),
           bottom: TabBar(
-            indicatorColor: const Color(0xFFE5B80B),
-            labelColor: const Color(0xFFE5B80B),
-            unselectedLabelColor: Colors.grey,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white60,
             labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.w600),
             tabs: [
               Tab(text: 'drawer.social.friends'.tr()),
@@ -40,12 +40,20 @@ class SocialHubScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: [
-            FriendsTab(),
-            RequestsTab(),
-            SearchTab(),
-          ],
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/social_bg.jpeg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: const TabBarView(
+            children: [
+              FriendsTab(),
+              RequestsTab(),
+              SearchTab(),
+            ],
+          ),
         ),
       ),
     );

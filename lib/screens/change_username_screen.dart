@@ -169,6 +169,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
               // Yeni Kullanıcı Adı
               TextField(
                 controller: _usernameController,
+                maxLength: 10,
                 decoration: InputDecoration(
                   labelText: 'changeUsername.newUsername'.tr(),
                   prefixIcon: const Icon(Icons.person),

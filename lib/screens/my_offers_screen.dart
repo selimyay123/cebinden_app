@@ -171,7 +171,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             },
           ),
         ],
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
@@ -206,16 +206,16 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
-                          color: Colors.orange.shade50,
+                          color: Colors.deepPurple.shade50,
                           child: Row(
                             children: [
-                              const Icon(Icons.info_outline, color: Colors.orange),
+                              const Icon(Icons.info_outline, color: Colors.deepPurple),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   'offers.limitWarning'.tr(),
                                   style: TextStyle(
-                                    color: Colors.orange.shade900,
+                                    color: Colors.deepPurple.shade900,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -273,7 +273,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   // Marka kartı widget'ı
   Widget _buildBrandCard(String brand, int offerCount, bool isIncoming) {
-    final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepOrange);
+    final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepPurple);
     
     return InkWell(
       onTap: () async {
@@ -430,7 +430,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             },
           ),
         ],
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -519,7 +519,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             },
           ),
         ],
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -662,7 +662,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.deepOrange.shade50,
+                color: Colors.deepPurple.shade50,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
@@ -702,7 +702,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.deepOrange,
+                            color: Colors.deepPurple,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -720,7 +720,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   // Ok ikonu
                   const Icon(
                     Icons.arrow_forward_ios,
-                    color: Colors.deepOrange,
+                    color: Colors.deepPurple,
                     size: 24,
                   ),
                 ],
@@ -755,7 +755,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.deepOrange.shade50, Colors.white],
+            colors: [Colors.deepPurple.shade50, Colors.white],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -779,7 +779,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepOrange,
+                      color: Colors.deepPurple,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -802,11 +802,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.deepOrange,
+                      color: Colors.deepPurple,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.deepOrange.withOpacity(0.3),
+                          color: Colors.deepPurple.withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -932,7 +932,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.deepOrange,
+                                  color: Colors.deepPurple,
                                 ),
                               ),
                             ],
@@ -1132,7 +1132,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   Color _getUserResponseColor(Offer offer) {
     if (offer.status == OfferStatus.accepted) return Colors.green.shade100;
     if (offer.status == OfferStatus.rejected) return Colors.red.shade100;
-    if (offer.counterOfferAmount != null) return Colors.orange.shade100;
+    if (offer.counterOfferAmount != null) return Colors.deepPurple.shade100;
     return Colors.blue.shade100;
   }
 
@@ -1271,11 +1271,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor: Colors.deepOrange.shade100,
+                      backgroundColor: Colors.deepPurple.shade100,
                       child: Text(
                         offer.buyerName[0],
                         style: TextStyle(
-                          color: Colors.deepOrange.shade700,
+                          color: Colors.deepPurple.shade700,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1317,7 +1317,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepOrange,
+                      color: Colors.deepPurple,
                     ),
                   ),
                   Row(
@@ -1557,7 +1557,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     } else if (offer.status == OfferStatus.rejected) {
       return Colors.red.shade50;
     } else if (offer.offerPercentage >= -10) {
-      return Colors.orange.shade50;
+      return Colors.deepPurple.shade50;
     } else {
       return Colors.grey.shade50;
     }
@@ -1569,7 +1569,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     } else if (offer.status == OfferStatus.rejected) {
       return Colors.red;
     } else if (offer.offerPercentage >= -10) {
-      return Colors.orange;
+      return Colors.deepPurple;
     } else {
       return Colors.grey.shade300;
     }
@@ -1930,7 +1930,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.deepOrange.shade100,
+                        color: Colors.deepPurple.shade100,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(16),
                           topRight: Radius.circular(4),
@@ -1970,7 +1970,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.deepOrange,
+                                  color: Colors.deepPurple,
                                 ),
                               ),
                             ],
@@ -2017,7 +2017,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       child: Icon(
                         Icons.done_all,
                         size: 14,
-                        color: Colors.deepOrange.shade300,
+                        color: Colors.deepPurple.shade300,
                       ),
                     ),
                   ],
@@ -2113,7 +2113,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.orange.shade800,
+                                      color: Colors.deepPurple.shade800,
                                     ),
                                   ),
                                 ],
@@ -2186,7 +2186,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   Color _getSellerResponseColor(Offer offer) {
     if (offer.status == OfferStatus.accepted) return Colors.green.shade100;
     if (offer.status == OfferStatus.rejected) return Colors.red.shade100;
-    if (offer.counterOfferAmount != null) return Colors.orange.shade100;
+    if (offer.counterOfferAmount != null) return Colors.deepPurple.shade100;
     return Colors.grey.shade200;
   }
 
@@ -2207,7 +2207,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           behavior: SnackBarBehavior.floating,
           content: Text('misc.noPendingToReject'.tr()),
-          backgroundColor: Colors.orange.withOpacity(0.8),
+          backgroundColor: Colors.deepPurple.withOpacity(0.8),
         ),
       );
       return;
@@ -2283,7 +2283,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               behavior: SnackBarBehavior.floating,
               content: Text('⚠️ ${'offers.rejectAllPartialSuccess'.trParams({'count': successCount.toString(), 'total': pendingOffers.length.toString()})}'),
-              backgroundColor: Colors.orange.withOpacity(0.8),
+              backgroundColor: Colors.deepPurple.withOpacity(0.8),
             ),
           );
         }
@@ -2850,7 +2850,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       title = 'offer.rejected'.tr();
     } else {
       icon = Icons.swap_horiz;
-      iconColor = Colors.orange;
+      iconColor = Colors.deepPurple;
       title = 'offer.counterOffer'.tr();
     }
 
@@ -2881,9 +2881,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
+                  color: Colors.deepPurple.shade50,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.shade200),
+                  border: Border.all(color: Colors.deepPurple.shade200),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2894,7 +2894,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.deepOrange,
+                        color: Colors.deepPurple,
                       ),
                     ),
                   ],
@@ -3033,7 +3033,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       title = 'offer.rejected'.tr();
     } else {
       icon = Icons.swap_horiz;
-      iconColor = Colors.orange;
+      iconColor = Colors.deepPurple;
       title = 'offer.counterOffer'.tr();
     }
 
@@ -3073,9 +3073,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
+                  color: Colors.deepPurple.shade50,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.shade200),
+                  border: Border.all(color: Colors.deepPurple.shade200),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -3086,7 +3086,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.deepOrange,
+                        color: Colors.deepPurple,
                       ),
                     ),
                   ],

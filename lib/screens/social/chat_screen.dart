@@ -117,7 +117,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: Colors.deepPurple.shade900,
         title: Row(
           children: [
             CircleAvatar(
@@ -170,8 +170,15 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/social_bg.jpeg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          children: [
           Expanded(
             child: StreamBuilder<DocumentSnapshot>(
               stream: _chatService.getChat(widget.chatId),
@@ -222,7 +229,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
                         decoration: BoxDecoration(
-                          color: isMe ? const Color(0xFFE5B80B) : const Color(0xFF2C2C2C),
+                          color: isMe ? Colors.purpleAccent : Colors.deepPurple.shade900.withOpacity(0.8),
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
@@ -238,7 +245,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               Text(
                                 data['text'] ?? '',
                                 style: GoogleFonts.poppins(
-                                  color: isMe ? Colors.black : Colors.white,
+                                  color: Colors.white,
                                   fontSize: 15,
                                 ),
                               ),
@@ -246,7 +253,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               Text(
                                 time,
                                 style: TextStyle(
-                                  color: isMe ? Colors.black54 : Colors.grey[400],
+                                  color: Colors.white70,
                                   fontSize: 10,
                                 ),
                               ),
@@ -264,7 +271,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           Container(
             padding: const EdgeInsets.all(16),
-            color: const Color(0xFF1E1E1E),
+            color: Colors.deepPurple.shade900,
             child: Row(
               children: [
                 Expanded(
@@ -275,7 +282,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       hintText: 'drawer.social.sendMessage'.tr(),
                       hintStyle: TextStyle(color: Colors.grey[600]),
                       filled: true,
-                      fillColor: const Color(0xFF2C2C2C),
+                      fillColor: Colors.deepPurple.shade800,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
                         borderSide: BorderSide.none,
@@ -287,9 +294,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 const SizedBox(width: 8),
                 CircleAvatar(
-                  backgroundColor: const Color(0xFFE5B80B),
+                  backgroundColor: Colors.purpleAccent,
                   child: IconButton(
-                    icon: const Icon(Icons.send, color: Colors.black),
+                    icon: const Icon(Icons.send, color: Colors.white),
                     onPressed: _sendMessage,
                   ),
                 ),
@@ -298,6 +305,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 }

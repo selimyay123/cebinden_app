@@ -122,6 +122,7 @@ class _RequestsTabState extends State<RequestsTab> {
         }
 
         return ListView.builder(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
           itemCount: docs.length,
           itemBuilder: (context, index) {
             final doc = docs[index];
@@ -140,7 +141,7 @@ class _RequestsTabState extends State<RequestsTab> {
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
+                    color: Colors.deepPurple.shade900.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: ListTile(

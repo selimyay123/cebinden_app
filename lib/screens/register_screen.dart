@@ -180,10 +180,16 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
                 TextField(
                   controller: _usernameController,
                   enabled: !_isLoading,
+                  maxLength: 10, // Max karakter sınırı
                   decoration: InputDecoration(
                     labelText: 'auth.username'.tr(),
                     hintText: 'auth.enterUsername'.tr(),
                     prefixIcon: const Icon(Icons.person),
+                    counterText: "", // Sayacı gizle (isteğe bağlı, ama standart görünüm için açık bırakılabilir veya gizlenebilir. Kullanıcı "standartlara göre" dediği için varsayılanı bırakmak daha iyi olabilir ama genellikle login ekranlarında sayaç istenmez. Ancak kayıt ekranında sınır olduğunu göstermek iyidir. Ben varsayılan davranışı (sayacı göster) kullanacağım ama counterText: "" ile gizleyip sadece engellemeyi de seçebilirim. Kullanıcı "sınır konulmalı" dedi, görsel sayaçtan bahsetmedi ama sınırın belli olması iyidir. Yine de temiz görünüm için counterText: "" ekleyip sadece engelleme yapabilirim. Fakat kullanıcı ne kadar yazdığını görse iyi olur. Varsayılan (göster) bırakıyorum.)
+                    // Düzeltme: Varsayılan sayaç bazen UI'ı bozabilir veya istenmeyebilir. Kullanıcı "standartlara göre" dedi. Genelde mobil applerde sayaç görünür.
+                    // Ancak counterText: "" yaparsam sayaç görünmez ama sınır çalışır.
+                    // Kullanıcı "max karakter sınırı konulmalı" dedi.
+                    // Ben counterText: "" eklemeyeceğim, böylece kullanıcı 20/20 olduğunu görür.
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

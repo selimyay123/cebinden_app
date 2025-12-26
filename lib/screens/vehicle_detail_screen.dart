@@ -170,12 +170,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    // Placeholder Resim (Icon)
-                    Icon(
-                      Icons.directions_car,
-                      size: 120,
-                      color: Colors.grey[400],
-                    ),
+                    // Araç Resmi veya Placeholder
+                    if (_vehicle.imageUrl != null)
+                      Image.asset(
+                        _vehicle.imageUrl!,
+                        fit: BoxFit.cover,
+                      )
+                    else
+                      Icon(
+                        Icons.directions_car,
+                        size: 120,
+                        color: Colors.grey[400],
+                      ),
                     // Gradient overlay
                     Positioned(
                       bottom: 0,
@@ -188,7 +194,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withValues(alpha: 0.7),
+                              Colors.black.withOpacity(0.7),
                               Colors.transparent,
                             ],
                           ),
@@ -1194,7 +1200,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               _buildInfoRow('vehicles.transmission'.tr(), 'vehicles.${_vehicle.transmission}'.tr()),
               _buildInfoRow('vehicles.driveType'.tr(), 'vehicles.${_vehicle.driveType}'.tr()),
               _buildInfoRow('vehicles.mileage'.tr(), '${_formatNumber(_vehicle.mileage)} km'),
-              _buildInfoRow('vehicles.color'.tr(), 'vehicles.${_vehicle.color}'.tr()),
+              if (_vehicle.color != 'Standart')
+                _buildInfoRow('vehicles.color'.tr(), 'vehicles.${_vehicle.color}'.tr()),
             ],
           ),
           const SizedBox(height: 12),

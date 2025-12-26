@@ -11,6 +11,7 @@ import 'change_username_screen.dart';
 import 'about_screen.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
+import 'statistics_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -591,6 +592,16 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
           _buildSection(
             title: 'settings.appInfo'.tr(),
             children: [
+              _buildListTile(
+                icon: Icons.bar_chart,
+                title: 'home.statistics'.tr(),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const StatisticsScreen()),
+                  );
+                },
+              ),
               _buildListTile(
                 icon: Icons.info_outline,
                 title: 'settings.about'.tr(),

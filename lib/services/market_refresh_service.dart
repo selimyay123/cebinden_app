@@ -1339,6 +1339,23 @@ class MarketRefreshService {
       horsepower: horsepower,
     );
     
+    // Fialto Zorno için özel resim ve renk mantığı
+    String? imageUrl;
+    String finalColor = _colors[_random.nextInt(_colors.length)];
+    
+    if (brand == 'Fialto' && model == 'Zorno') {
+      final zornoImages = [
+        'blue.png',
+        'grey.png',
+        'orange.png',
+        'red.png',
+        'white.png'
+      ];
+      final randomImage = zornoImages[_random.nextInt(zornoImages.length)];
+      imageUrl = 'assets/car_images/fialto/zorno/$randomImage';
+      finalColor = 'Standart'; // Renk bilgisini gizlemek için standart değer
+    }
+
     // Araç objesi oluştur
     final vehicle = Vehicle.create(
       brand: brand,
@@ -1347,9 +1364,10 @@ class MarketRefreshService {
       mileage: mileage, // Gerçek km
       price: price,
       location: _cities[_random.nextInt(_cities.length)],
-      color: _colors[_random.nextInt(_colors.length)],
+      color: finalColor,
       fuelType: fuelType,
       transmission: transmission,
+      imageUrl: imageUrl,
       condition: 'İkinci El',
       engineSize: engineSize,
       driveType: driveType,

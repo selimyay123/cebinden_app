@@ -99,13 +99,13 @@ class _SearchTabState extends State<SearchTab> {
               hintStyle: TextStyle(color: Colors.grey[600]),
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
               filled: true,
-              fillColor: const Color(0xFF1E1E1E),
+              fillColor: Colors.deepPurple.shade900.withOpacity(0.5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.arrow_forward, color: Color(0xFFE5B80B)),
+                icon: const Icon(Icons.arrow_forward, color: Colors.purpleAccent),
                 onPressed: () => _performSearch(_searchController.text),
               ),
             ),
@@ -138,7 +138,7 @@ class _SearchTabState extends State<SearchTab> {
                         return Container(
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E1E),
+                            color: Colors.deepPurple.shade900.withOpacity(0.5),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: ListTile(
@@ -162,7 +162,7 @@ class _SearchTabState extends State<SearchTab> {
                               style: TextStyle(color: Colors.grey[400]),
                             ),
                             trailing: IconButton(
-                              icon: const Icon(Icons.person_add, color: Color(0xFFE5B80B)),
+                              icon: const Icon(Icons.person_add, color: Colors.purpleAccent),
                               onPressed: () => _sendRequest(user.id),
                             ),
                           ),

@@ -90,117 +90,135 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)))
-          : _topPlayers.isEmpty
-              ? Center(
-                  child: Text(
-                    'Henüz veri yok.',
-                    style: GoogleFonts.poppins(color: Colors.white70),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _topPlayers.length,
-                  itemBuilder: (context, index) {
-                    final player = _topPlayers[index];
-                    final isCurrentUser = _currentUser?.id == player['userId'];
-                    final rank = index + 1;
-                    
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: isCurrentUser 
-                            ? const Color(0xFFE5B80B).withOpacity(0.15) 
-                            : const Color(0xFF1E1E1E),
-                        borderRadius: BorderRadius.circular(16),
-                        border: isCurrentUser 
-                            ? Border.all(color: const Color(0xFFE5B80B).withOpacity(0.5))
-                            : null,
+      body: Stack(
+        children: [
+          // Arka Plan Resmi
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/social_bg.jpeg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Karartma Katmanı (Okunabilirlik için)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.7),
+            ),
+          ),
+          // İçerik
+          _isLoading
+              ? const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)))
+              : _topPlayers.isEmpty
+                  ? Center(
+                      child: Text(
+                        'Henüz veri yok.',
+                        style: GoogleFonts.poppins(color: Colors.white70),
                       ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        leading: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: 50, // Sabit genişlik ile hizalamayı koru
-                              height: 50,
-                              child: rank == 1 
-                                ? Lottie.asset('assets/animations/1st.json')
-                                : Center(
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: _getRankColor(rank),
-                                      ),
-                                      child: Text(
-                                        '$rank',
-                                        style: GoogleFonts.poppins(
-                                          color: rank <= 3 ? Colors.black : Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _topPlayers.length,
+                      itemBuilder: (context, index) {
+                        final player = _topPlayers[index];
+                        final isCurrentUser = _currentUser?.id == player['userId'];
+                        final rank = index + 1;
+                        
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: isCurrentUser 
+                                ? const Color(0xFFE5B80B).withOpacity(0.15) 
+                                : const Color(0xFF1E1E1E).withOpacity(0.8), // Hafif şeffaflık
+                            borderRadius: BorderRadius.circular(16),
+                            border: isCurrentUser 
+                                ? Border.all(color: const Color(0xFFE5B80B).withOpacity(0.5))
+                                : null,
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            leading: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 50, // Sabit genişlik ile hizalamayı koru
+                                  height: 50,
+                                  child: rank == 1 
+                                    ? Lottie.asset('assets/animations/1st.json')
+                                    : Center(
+                                        child: Container(
+                                          width: 30,
+                                          height: 30,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: _getRankColor(rank),
+                                          ),
+                                          child: Text(
+                                            '$rank',
+                                            style: GoogleFonts.poppins(
+                                              color: rank <= 3 ? Colors.black : Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                ),
+                                const SizedBox(width: 12),
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.grey[800]!, width: 1),
                                   ),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.grey[800],
+                                    backgroundImage: player['profileImageUrl'] != null
+                                        ? (player['profileImageUrl'].startsWith('assets/')
+                                            ? AssetImage(player['profileImageUrl'])
+                                            : NetworkImage(player['profileImageUrl'])) as ImageProvider
+                                        : null,
+                                    child: player['profileImageUrl'] == null
+                                        ? Text(
+                                            (player['username'] ?? '?')[0].toUpperCase(),
+                                            style: const TextStyle(color: Colors.white),
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey[800]!, width: 1),
+                            title: Text(
+                              player['username'] ?? 'Bilinmeyen Oyuncu',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
                               ),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.grey[800],
-                                backgroundImage: player['profileImageUrl'] != null
-                                    ? (player['profileImageUrl'].startsWith('assets/')
-                                        ? AssetImage(player['profileImageUrl'])
-                                        : NetworkImage(player['profileImageUrl'])) as ImageProvider
-                                    : null,
-                                child: player['profileImageUrl'] == null
-                                    ? Text(
-                                        (player['username'] ?? '?')[0].toUpperCase(),
-                                        style: const TextStyle(color: Colors.white),
-                                      )
-                                    : null,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              'Seviye ${player['level'] ?? 1}',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white54,
+                                fontSize: 12,
                               ),
                             ),
-                          ],
-                        ),
-                        title: Text(
-                          player['username'] ?? 'Bilinmeyen Oyuncu',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                            trailing: Text(
+                              _formatMoney(player['balance']),
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFFE5B80B),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          'Seviye ${player['level'] ?? 1}',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white54,
-                            fontSize: 12,
-                          ),
-                        ),
-                        trailing: Text(
-                          _formatMoney(player['balance']),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFFE5B80B),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                        );
+                      },
+                    ),
+        ],
+      ),
     );
   }
 
