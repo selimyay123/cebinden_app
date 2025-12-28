@@ -82,9 +82,11 @@
     "selectGender": "Select your gender",
     "usernameMinLength": "Username must be at least 3 characters",
     "usernameMaxLength": "Username cannot exceed 20 characters",
+    "usernameProfanity": "Username cannot contain inappropriate language",
     "passwordMinLength": "Password must be at least 6 characters",
     "ageRestriction": "You must be at least 13 years old",
-    "createAccountTitle": "Choose a username to start the game"
+    "createAccountTitle": "Choose a username to start the game",
+    "reportInfo": "Long press on a user's name to report them"
   },
   "home": {
     "title": "Dashboard",
@@ -308,8 +310,10 @@
     "Benzin": "Gasoline",
     "Dizel": "Diesel",
     "Hybrid": "Hybrid",
+    "Benzin+LPG": "Gasoline+LPG",
     "Manuel": "Manual",
     "Otomatik": "Automatic",
+    "Galeriden": "Gallery",
     "conditionUsed": "Used",
     "conditionNew": "New",
     "sellerGallery": "Gallery",
@@ -664,6 +668,7 @@
       "offerMade": "Offer Made",
       "offerAccepted": "Offer Accepted",
       "dailyLogin": "Daily Login",
+      "dailyRewardClaimed": "Daily reward claimed!",
       "questCompleted": "Quest Completed",
       "achievement": "Achievement"
     }
@@ -727,7 +732,34 @@
     "gameDayDurationUpdated": "Game day duration set to {minutes} minutes",
     "changeProfilePicture": "Change Profile Picture",
     "selectProfilePicture": "Select Profile Picture",
-    "profilePictureUpdated": "Profile picture updated!"
+    "profilePictureUpdated": "Profile picture updated!",
+    "admin": "Admin",
+    "adminPanel": "Admin Panel"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "noReports": "No pending reports.",
+    "reported": "Reported: {username}",
+    "reason": "Reason: {reason}",
+    "description": "Description: {description}",
+    "dismiss": "Dismiss",
+    "dismissConfirmTitle": "Dismiss Report",
+    "dismissConfirmMessage": "Are you sure you want to dismiss this report?",
+    "ban": "Ban",
+    "banConfirmTitle": "Ban User",
+    "banConfirmMessage": "Are you sure you want to ban {username}? This action cannot be undone.",
+    "reportDismissed": "Report dismissed.",
+    "userBanned": "User banned.",
+    "error": "An error occurred."
+  },
+  "report": {
+    "title": "Report User",
+    "message": "Why are you reporting {username}?",
+    "reasonHint": "Reason (e.g. Inappropriate name)",
+    "cancel": "Cancel",
+    "submit": "Report",
+    "success": "Report received. Thank you.",
+    "error": "An error occurred while sending the report."
   },
   "profile": {
     "title": "Profile Information",
@@ -1463,6 +1495,7 @@
     "googleLoginError": "An error occurred during Google sign-in."
   },
   "store": {
+    "purchaseSuccess": "Purchase successful!",
     "productsLoadError": "Error loading products",
     "loadingProducts": "Loading products...",
     "title": "STORE",

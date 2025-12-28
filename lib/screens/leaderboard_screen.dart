@@ -7,6 +7,7 @@ import '../models/user_model.dart';
 import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import '../services/report_service.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -73,7 +74,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Liderlik Tablosu',
+          'drawer.leaderboard'.tr(),
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -115,10 +116,34 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         style: GoogleFonts.poppins(color: Colors.white70),
                       ),
                     )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _topPlayers.length,
-                      itemBuilder: (context, index) {
+                  : Column(
+                      children: [
+                        // Bilgilendirme Mesajı
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          color: Colors.black.withOpacity(0.3),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline, color: Colors.white54, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'auth.reportInfo'.tr(),
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: _topPlayers.length,
+                            itemBuilder: (context, index) {
                         final player = _topPlayers[index];
                         final isCurrentUser = _currentUser?.id == player['userId'];
                         final rank = index + 1;
@@ -213,10 +238,22 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                 fontSize: 15,
                               ),
                             ),
+                            onLongPress: () {
+                              if (!isCurrentUser) {
+                                _showReportDialog(
+                                  userId: player['userId'],
+                                  username: player['username'] ?? 'Bilinmeyen Oyuncu',
+                                );
+                              }
+                            },
                           ),
                         );
-                      },
-                    ),
+                            },
+                          ),
+                        ),
+
+                ],
+              ),
         ],
       ),
     );
@@ -262,5 +299,95 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   String _formatMoney(dynamic amount) {
     if (amount == null) return '₺0';
     return _currencyFormat.format(amount);
+  }
+
+  void _showReportDialog({required String userId, required String username}) {
+    final TextEditingController reasonController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: Text(
+          'report.title'.tr(),
+          style: GoogleFonts.poppins(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'report.message'.trParams({'username': username}),
+              style: GoogleFonts.poppins(color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'report.reasonHint'.tr(),
+                hintStyle: const TextStyle(color: Colors.white38),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.white24),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('report.cancel'.tr(), style: const TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (_currentUser == null) return;
+              
+              final reason = reasonController.text.trim();
+              if (reason.isEmpty) return;
+
+              Navigator.pop(dialogContext); // Dialog'u kapat
+
+              // Raporu gönder
+              final success = await ReportService().reportUser(
+                reporterId: _currentUser!.id,
+                reportedUserId: userId,
+                reportedUsername: username,
+                reason: reason,
+              );
+
+              if (mounted) {
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('report.success'.tr()),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('report.error'.tr()),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('report.submit'.tr()),
+          ),
+        ],
+      ),
+    );
   }
 }

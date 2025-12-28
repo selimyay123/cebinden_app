@@ -68,6 +68,15 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
       return;
     }
 
+    // Küfür kontrolü
+    if (_authService.hasProfanity(username)) {
+      setState(() {
+        _errorMessage = 'auth.usernameProfanity'.tr();
+        _isLoading = false;
+      });
+      return;
+    }
+
     // Şifre kontrolleri
     if (password.isEmpty) {
       setState(() {

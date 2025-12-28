@@ -12,6 +12,7 @@ import 'about_screen.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
 import 'statistics_screen.dart';
+import 'admin_panel_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -614,6 +615,25 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
               ),
             ],
           ),
+
+          // Admin Paneli (Sadece admin görebilir)
+          if (_currentUser != null && _authService.isUserAdmin(_currentUser!))
+            _buildSection(
+              title: 'settings.admin'.tr(),
+              children: [
+                _buildListTile(
+                  icon: Icons.admin_panel_settings,
+                  title: 'settings.adminPanel'.tr(),
+                  textColor: Colors.redAccent,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AdminPanelScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
 
 
 

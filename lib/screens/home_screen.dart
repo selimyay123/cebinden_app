@@ -38,7 +38,7 @@ import '../services/rental_service.dart'; // Kiralama Servisi
 import '../widgets/game_time_countdown.dart'; // 🆕 Game Time Countdown
 import 'activity_screen.dart';
 import 'leaderboard_screen.dart';
-import 'social/social_hub_screen.dart';
+// import 'social/social_hub_screen.dart';
 import '../services/leaderboard_service.dart';
 import '../widgets/city_skyline_painter.dart';
 
@@ -436,6 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
+              /*
               IconButton(
                 icon: const Icon(Icons.people, color: Colors.blueAccent),
                 tooltip: 'Sosyal',
@@ -448,6 +449,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
+              */
               IconButton(
                 icon: const Icon(Icons.leaderboard, color: Colors.amber),
                 tooltip: 'Liderlik Tablosu',
@@ -703,7 +705,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             child: CircleAvatar(
                               backgroundColor: Colors.deepPurple.shade100,
-                              backgroundImage: _currentUser?.profileImageUrl != null
+                              backgroundImage: (_currentUser?.profileImageUrl != null && _currentUser!.profileImageUrl!.isNotEmpty)
                                   ? AssetImage(_currentUser!.profileImageUrl!)
                                   : null,
                               child: _currentUser?.profileImageUrl == null

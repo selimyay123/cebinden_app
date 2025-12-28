@@ -60,6 +60,15 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
       });
       return;
     }
+    
+    // Küfür kontrolü
+    if (_authService.hasProfanity(newUsername)) {
+      setState(() {
+        _errorMessage = 'auth.usernameProfanity'.tr();
+        _isLoading = false;
+      });
+      return;
+    }
 
     if (newUsername == widget.currentUsername) {
       setState(() {

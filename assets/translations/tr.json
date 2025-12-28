@@ -99,9 +99,11 @@
     "selectGender": "Cinsiyetinizi seçin",
     "usernameMinLength": "Kullanıcı adı en az 3 karakter olmalıdır",
     "usernameMaxLength": "Kullanıcı adı en fazla 20 karakter olabilir",
+    "usernameProfanity": "Kullanıcı adı uygunsuz ifadeler içeremez",
     "passwordMinLength": "Şifre en az 6 karakter olmalıdır",
     "ageRestriction": "En az 13 yaşında olmalısınız",
-    "createAccountTitle": "Oyuna başlamak için bir kullanıcı adı seçin"
+    "createAccountTitle": "Oyuna başlamak için bir kullanıcı adı seçin",
+    "reportInfo": "Bir kullanıcıyı raporlamak için isminin üzerine basılı tutun"
   },
   "gender": {
     "male": "Erkek",
@@ -329,8 +331,10 @@
     "Benzin": "Benzin",
     "Dizel": "Dizel",
     "Hybrid": "Hybrid",
+    "Benzin+LPG": "Benzin+LPG",
     "Manuel": "Manuel",
     "Otomatik": "Otomatik",
+    "Galeriden": "Galeriden",
     "conditionUsed": "İkinci El",
     "conditionNew": "Sıfır",
     "sellerGallery": "Galeri",
@@ -667,6 +671,7 @@
       "offerMade": "Teklif Gönderme",
       "offerAccepted": "Teklif Kabulü",
       "dailyLogin": "Günlük Giriş",
+      "dailyRewardClaimed": "Günlük ödül alındı!",
       "questCompleted": "Görev Tamamlama",
       "achievement": "Başarım"
     }
@@ -730,7 +735,34 @@
     "gameDayDurationUpdated": "Oyun günü süresi {minutes} dakika olarak ayarlandı",
     "changeProfilePicture": "Profil Resmi Değiştir",
     "selectProfilePicture": "Profil Resmi Seç",
-    "profilePictureUpdated": "Profil resmi güncellendi!"
+    "profilePictureUpdated": "Profil resmi güncellendi!",
+    "admin": "Admin",
+    "adminPanel": "Admin Paneli"
+  },
+  "admin": {
+    "title": "Admin Paneli",
+    "noReports": "Bekleyen rapor yok.",
+    "reported": "Raporlanan: {username}",
+    "reason": "Sebep: {reason}",
+    "description": "Açıklama: {description}",
+    "dismiss": "Yoksay",
+    "dismissConfirmTitle": "Raporu Yoksay",
+    "dismissConfirmMessage": "Bu raporu yoksaymak istediğinize emin misiniz?",
+    "ban": "Yasakla",
+    "banConfirmTitle": "Kullanıcıyı Yasakla",
+    "banConfirmMessage": "{username} kullanıcısını yasaklamak istediğinize emin misiniz? Bu işlem geri alınamaz.",
+    "reportDismissed": "Rapor yoksayıldı.",
+    "userBanned": "Kullanıcı yasaklandı.",
+    "error": "Hata oluştu."
+  },
+  "report": {
+    "title": "Kullanıcıyı Raporla",
+    "message": "{username} adlı kullanıcıyı neden raporluyorsunuz?",
+    "reasonHint": "Sebep (örn: Uygunsuz isim)",
+    "cancel": "İptal",
+    "submit": "Raporla",
+    "success": "Raporunuz alındı. Teşekkürler.",
+    "error": "Rapor gönderilirken bir hata oluştu."
   },
   "profile": {
     "title": "Profil Bilgileri",
@@ -1469,6 +1501,7 @@
     "googleLoginError": "Google ile giriş yapılırken bir hata oluştu."
   },
   "store": {
+    "purchaseSuccess": "Satın alma başarılı!",
     "productsLoadError": "Ürünler yüklenirken hata oluştu",
     "loadingProducts": "Ürünler yükleniyor...",
     "title": "MAĞAZA",

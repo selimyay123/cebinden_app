@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'auth_service.dart';
 import 'database_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IAPService {
   static final IAPService _instance = IAPService._internal();

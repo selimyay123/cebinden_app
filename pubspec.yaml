@@ -82,6 +82,7 @@ dependencies:
   sign_in_with_apple: ^7.0.1
   cloud_firestore: ^5.6.12
   animated_background: ^2.0.0
+  profanity_filter: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -111,6 +112,17 @@ flutter:
   assets:
     - assets/images/brands/
     - assets/car_images/fialto/zorno/
+    - assets/car_images/Renauva/
+    - assets/car_images/Volkstar/
+    - assets/car_images/Fialto/
+    - assets/car_images/Oplon/
+    - assets/car_images/Bavora/
+    - assets/car_images/Fortran/
+    - assets/car_images/Mercurion/
+    - assets/car_images/Hundar/
+    - assets/car_images/Koyoro/
+    - assets/car_images/Audira/
+    - assets/car_images/Hanto/
     - assets/images/app_logo/
     - assets/images/
     - assets/images/icons/

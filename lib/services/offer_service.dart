@@ -201,80 +201,26 @@ class OfferService {
         return null;
       }
       
-      // 2. Aracı getir
-      UserVehicle? vehicle = await _db.getUserVehicleById(offer.vehicleId);
-      if (vehicle == null) {
-        
-        return null;
-      }
+      // 2. Satın alma işlemini gerçekleştir (Bakiye güncelleme, araç durumu, diğer teklifleri reddetme)
+      // Bu metod içinde bakiye artırılıyor ve araç satıldı olarak işaretleniyor.
+      // Ayrıca XP, Quest ve Aktivite güncellemeleri de burada yapılıyor.
+      final xpResult = await _processIncomingOfferAcceptance(offer, offer.counterOfferAmount ?? offer.offerPrice);
       
-      // 3. Satıcıyı getir
-      Map<String, dynamic>? sellerMap = await _db.getUserById(offer.sellerId);
-      if (sellerMap == null) {
-        
-        return null;
-      }
-      User seller = User.fromJson(sellerMap);
-      
-      // 4. Satıcının bakiyesini artır
-      seller = seller.copyWith(balance: seller.balance + offer.offerPrice);
-      bool balanceUpdated = await _db.updateUser(seller.id, {'balance': seller.balance});
-      if (!balanceUpdated) {
-        
-        // Rollback teklif durumu
-        await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
-        return null;
-      }
-      
-      // 5. Aracı satıldı olarak işaretle
-      // Eğer karşı teklif varsa onu, yoksa normal teklif fiyatını kullan
-      final finalPrice = offer.counterOfferAmount ?? offer.offerPrice;
-
-      // 5. Aracı satıldı olarak işaretle
-      bool vehicleUpdated = await _db.updateUserVehicle(offer.vehicleId, {
-        'isSold': true,
-        'isListedForSale': false,
-        'salePrice': finalPrice,
-        'saleDate': DateTime.now().toIso8601String(),
-      });
-      
-      if (!vehicleUpdated) {
-        // Rollback
-        await _db.updateUser(seller.id, {'balance': seller.balance - offer.offerPrice});
-        await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
-        return null;
-      }
-
-      // Satın alma işlemini gerçekleştir
-      final success = await _processIncomingOfferAcceptance(offer, finalPrice);
-      
-      if (!success) {
+      if (xpResult == null) {
         // Başarısız olursa durumu geri al
-        await _db.updateOffer(offer.offerId, {'status': OfferStatus.pending.index});
+        await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
         return null;
       }
-      
+
       // 🔔 Alıcıya bildirim gönder
       // Bildirim için doğru fiyatı içeren bir kopya oluştur
+      final finalPrice = offer.counterOfferAmount ?? offer.offerPrice;
       final acceptedOffer = offer.copyWith(offerPrice: finalPrice);
       
       await NotificationService().sendOfferAcceptedNotification(
         buyerId: offer.buyerId,
         offer: acceptedOffer,
       );
-      
-      // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu)
-      final profit = finalPrice - vehicle.purchasePrice;
-      final xpResult = await _xpService.onVehicleSale(offer.sellerId, profit);
-      
-      // 🎯 Günlük Görev Güncellemesi: Araç Satışı ve Kâr
-      await _questService.updateProgress(offer.sellerId, QuestType.sellVehicle, 1);
-      if (profit > 0) {
-        await _questService.updateProgress(offer.sellerId, QuestType.earnProfit, profit.toInt());
-      }
-
-      // Aktivite kaydı
-      await ActivityService().logVehicleSale(offer.sellerId, vehicle, finalPrice);
       
       return xpResult;
     } catch (e) {
@@ -771,15 +717,15 @@ class OfferService {
   }
 
   /// Gelen teklifin kabulünü işle (satıcı bakiyesini artır, aracı sat)
-  Future<bool> _processIncomingOfferAcceptance(Offer offer, double finalPrice) async {
+  Future<XPGainResult?> _processIncomingOfferAcceptance(Offer offer, double finalPrice) async {
     try {
       // Aracı getir (kâr hesabı için)
       final vehicle = await _db.getUserVehicleById(offer.vehicleId);
-      if (vehicle == null) return false;
+      if (vehicle == null) return null;
       
       // Satıcıyı getir
       final sellerMap = await _db.getUserById(offer.sellerId);
-      if (sellerMap == null) return false;
+      if (sellerMap == null) return null;
       
       final seller = User.fromJson(sellerMap);
       
@@ -800,13 +746,13 @@ class OfferService {
       // 🔔 Satıcıya araç satıldı bildirimi gönder
       await NotificationService().sendVehicleSoldNotification(
         userId: offer.sellerId,
-        vehicleName: '${offer.vehicleBrand} ${offer.vehicleModel}',
+        vehicleName: '${vehicle.brand} ${vehicle.model}',
         salePrice: finalPrice,
       );
       
       // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu + Başarılı Pazarlık)
       final profit = finalPrice - vehicle.purchasePrice;
-      await _xpService.onVehicleSale(offer.sellerId, profit);
+      final xpResult = await _xpService.onVehicleSale(offer.sellerId, profit);
       await _xpService.onCounterOfferSuccess(offer.sellerId);
       
       // 🎯 Günlük Görev Güncellemesi: Araç Satışı ve Kâr
@@ -818,10 +764,10 @@ class OfferService {
       // Aktivite kaydı
       await ActivityService().logVehicleSale(offer.sellerId, vehicle, finalPrice);
       
-      return true;
+      return xpResult;
     } catch (e) {
       
-      return false;
+      return null;
     }
   }
 

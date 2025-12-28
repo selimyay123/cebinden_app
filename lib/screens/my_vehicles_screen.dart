@@ -429,7 +429,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     color: Colors.deepPurple.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: vehicle.imageUrl != null
+                  child: (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.asset(

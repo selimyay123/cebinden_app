@@ -3,6 +3,7 @@ import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
 import '../services/auth_service.dart';
 import '../models/vehicle_model.dart';
+import '../widgets/vehicle_image.dart';
 import 'vehicle_detail_screen.dart';
 import 'home_screen.dart';
 
@@ -455,17 +456,16 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                 ),
               ),
               child: Center(
-                child: vehicle.imageUrl != null
+                child: (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
                     ? ClipRRect(
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(12),
                           bottomLeft: Radius.circular(12),
                         ),
-                        child: Image.asset(
-                          vehicle.imageUrl!,
-                          width: 170,
+                        child: VehicleImage(
+                          vehicle: vehicle,
+                          width: 120,
                           height: 140,
-                          fit: BoxFit.cover,
                         ),
                       )
                     : Column(
@@ -1515,5 +1515,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       ),
     );
   }
+
+
 }
 

@@ -1,5 +1,6 @@
 import 'package:crypto/crypto.dart';
 import 'dart:convert' as convert;
+import 'package:profanity_filter/profanity_filter.dart';
 import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'firebase_auth_service.dart';
@@ -8,10 +9,35 @@ class AuthService {
   // Singleton pattern
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
-  AuthService._internal();
-
   final DatabaseHelper _db = DatabaseHelper();
   final FirebaseAuthService _firebaseAuth = FirebaseAuthService();
+  final ProfanityFilter _profanityFilter;
+
+  AuthService._internal() : _profanityFilter = ProfanityFilter.filterAdditionally([
+      'amk', 'aq', 'sik', 'yarrak', 'oç', 'pic', 'piç', 'yavşak', 'göt', 'meme', 
+      'sokuk', 'siktir', 'sikiş', 'kaşar', 'orospu', 'orosbu', 'kahpe', 'ibne', 
+      'ipne', 'puşt', 'pezevenk', 'sikik', 'yarak', 'amcık', 'ananı', 'bacını',
+      'sikerim', 'sokayım', 'kaltak', 'dalyarak', 'taşşak', 'tassak'
+    ]);
+
+  // Küfür kontrolü
+  bool hasProfanity(String text) {
+    return _profanityFilter.hasProfanity(text);
+  }
+
+  // Admin kontrolü
+  bool get isAdmin {
+    // Şu anki kullanıcıyı alıp kontrol etmek yerine, 
+    // giriş yapan kullanıcının email'ini kontrol edeceğiz.
+    // Ancak burada doğrudan kullanıcı objesine erişimimiz yok.
+    // Bu yüzden bu kontrolü UI tarafında veya user objesi üzerinden yapacağız.
+    return false; 
+  }
+
+  // Kullanıcı admin mi? (User objesi üzerinden)
+  bool isUserAdmin(User user) {
+    return user.email == 'selimyay123@gmail.com';
+  }
 
   // Şifreyi hashle
   String _hashPassword(String password) {
@@ -65,7 +91,15 @@ class AuthService {
     // Aktif kullanıcıyı ayarla
     await _db.setCurrentUser(userMap['id'] as String);
     
-    return User.fromJson(userMap);
+    final user = User.fromJson(userMap);
+
+    // Yasaklı mı kontrol et
+    if (user.isBanned) {
+      await logout();
+      return null;
+    }
+
+    return user;
   }
 
   // Yeni kullanıcı kaydı oluştur
@@ -75,6 +109,11 @@ class AuthService {
   }) async {
     if (username.trim().isEmpty || password.isEmpty) {
       return false;
+    }
+
+    // Küfür kontrolü
+    if (_profanityFilter.hasProfanity(username)) {
+      return false; // Uygunsuz kullanıcı adı
     }
 
     // Kullanıcı adı kontrolü
@@ -124,6 +163,12 @@ class AuthService {
       // Aktif kullanıcıyı ayarla
       await _db.setCurrentUser(user.id);
       
+      // Yasaklı mı kontrol et
+      if (user.isBanned) {
+        await logout();
+        return null;
+      }
+
       return user;
     } catch (e) {
       
@@ -144,6 +189,12 @@ class AuthService {
       // Aktif kullanıcıyı ayarla
       await _db.setCurrentUser(user.id);
       
+      // Yasaklı mı kontrol et
+      if (user.isBanned) {
+        await logout();
+        return null;
+      }
+
       return user;
     } catch (e) {
       return null;
@@ -192,6 +243,11 @@ class AuthService {
   }) async {
     // Yeni kullanıcı adı dolu mu kontrol et
     if (newUsername.trim().isEmpty) return false;
+
+    // Küfür kontrolü
+    if (_profanityFilter.hasProfanity(newUsername)) {
+      return false; // Uygunsuz kullanıcı adı
+    }
 
     // Kullanıcı adı zaten alınmış mı kontrol et
     final existingUser = await _db.getUserByUsername(newUsername.trim());
@@ -250,6 +306,15 @@ class AuthService {
   // Kullanıcı sayısı (debug için)
   Future<int> getUserCount() async {
     return await _db.getUserCount();
+  }
+  // Kullanıcıyı yasakla
+  Future<bool> banUser(String userId) async {
+    try {
+      return await _db.updateUser(userId, {'isBanned': true});
+    } catch (e) {
+      print('Error banning user: $e');
+      return false;
+    }
   }
 }
 

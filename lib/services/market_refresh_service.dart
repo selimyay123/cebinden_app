@@ -1354,6 +1354,11 @@ class MarketRefreshService {
       final randomImage = zornoImages[_random.nextInt(zornoImages.length)];
       imageUrl = 'assets/car_images/fialto/zorno/$randomImage';
       finalColor = 'Standart'; // Renk bilgisini gizlemek için standart değer
+    } else {
+      // Diğer araçlar için standart resim yolu
+      // Boşlukları alt çizgi ile değiştir (örn: "C Serisi" -> "C_Serisi")
+      final safeModelName = model.replaceAll(' ', '_');
+      imageUrl = 'assets/car_images/$brand/$safeModelName.png';
     }
 
     // Araç objesi oluştur

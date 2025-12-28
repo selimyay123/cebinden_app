@@ -21,6 +21,7 @@ import '../widgets/vehicle_top_view.dart';
 import '../widgets/level_up_dialog.dart';
 import 'my_offers_screen.dart';
 
+import '../widgets/vehicle_image.dart';
 import 'package:intl/intl.dart';
 import 'home_screen.dart';
 
@@ -171,10 +172,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   fit: StackFit.expand,
                   children: [
                     // Araç Resmi veya Placeholder
-                    if (_vehicle.imageUrl != null)
-                      Image.asset(
-                        _vehicle.imageUrl!,
-                        fit: BoxFit.cover,
+                    if (_vehicle.imageUrl != null && _vehicle.imageUrl!.isNotEmpty)
+                      Center(
+                        child: AspectRatio(
+                          aspectRatio: 120 / 140, // Liste ekranındaki gerçek oran (Container width: 120)
+                          child: VehicleImage(
+                            vehicle: _vehicle,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       )
                     else
                       Icon(
@@ -2227,6 +2233,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       ),
     );
   }
+
+
+
 }
 
 /// Binlik ayracı ekleyen TextInputFormatter

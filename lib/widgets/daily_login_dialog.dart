@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../services/daily_login_service.dart';
 import '../services/ad_service.dart';
+import '../services/localization_service.dart';
 
 class DailyLoginDialog extends StatefulWidget {
   final String userId;
@@ -56,6 +57,25 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
       if (success) {
         Navigator.pop(context); // Dialogu kapat
         widget.onClaim(); // Callback'i çağır (örn: konfeti patlat)
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 8,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: const Color(0xFF4CAF50),
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Text(
+                  'xp.source.dailyRewardClaimed'.tr(),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
