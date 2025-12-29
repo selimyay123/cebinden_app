@@ -1339,26 +1339,13 @@ class MarketRefreshService {
       horsepower: horsepower,
     );
     
-    // Fialto Zorno için özel resim ve renk mantığı
-    String? imageUrl;
-    String finalColor = _colors[_random.nextInt(_colors.length)];
+    // Araç resmini belirle (Ölçeklenebilir yapı)
+    String? imageUrl = _getVehicleImage(brand, model);
     
+    // Renk belirle (Fialto Zorno için özel durum)
+    String finalColor = _colors[_random.nextInt(_colors.length)];
     if (brand == 'Fialto' && model == 'Zorno') {
-      final zornoImages = [
-        'blue.png',
-        'grey.png',
-        'orange.png',
-        'red.png',
-        'white.png'
-      ];
-      final randomImage = zornoImages[_random.nextInt(zornoImages.length)];
-      imageUrl = 'assets/car_images/fialto/zorno/$randomImage';
-      finalColor = 'Standart'; // Renk bilgisini gizlemek için standart değer
-    } else {
-      // Diğer araçlar için standart resim yolu
-      // Boşlukları alt çizgi ile değiştir (örn: "C Serisi" -> "C_Serisi")
-      final safeModelName = model.replaceAll(' ', '_');
-      imageUrl = 'assets/car_images/$brand/$safeModelName.png';
+      finalColor = 'Standart';
     }
 
     // Araç objesi oluştur
@@ -1587,6 +1574,7 @@ class MarketRefreshService {
     yearFactor = yearFactor.clamp(0.10, 1.0);
     
     // MODEL-SPESİFİK DEĞER KAYBI ORANI
+
     if (brand == 'Renauva') {
       if (model == 'Flow') {
         // Fluence: Üretimi durmuş, daha hızlı değer kaybediyor
@@ -2574,6 +2562,145 @@ class MarketRefreshService {
   /// İlanı kaldır (Satın alma sonrası)
   void removeListing(String vehicleId) {
     _activeListings.removeWhere((l) => l.vehicle.id == vehicleId);
+  }
+
+  /// Marka ve modele göre araç resmi seç (Ölçeklenebilir yapı)
+  String? _getVehicleImage(String brand, String model) {
+    // 1. Özel Durumlar (Manuel tanımlamalar)
+
+    
+    // 2. Klasör Bazlı Yapı (Yeni Standart)
+    // Örn: assets/car_images/bavora/e_series/e_series_1.png
+    if (brand == 'Bavora') {
+      if (model == 'E Serisi') {
+        // 1-6 arası rastgele resim
+        final index = 1 + _random.nextInt(6);
+        return 'assets/car_images/bavora/e_series/e_series_$index.png';
+      } else if (model == 'A Serisi') {
+        // 1-6 arası rastgele resim
+        final index = 1 + _random.nextInt(6);
+        return 'assets/car_images/bavora/a_series/a_series_$index.png';
+      } else if (model == 'D Serisi') {
+        // 1-6 arası rastgele resim
+        final index = 1 + _random.nextInt(6);
+        return 'assets/car_images/bavora/d_series/d_series_$index.png';
+      } else {
+        // Diğer Bavora modelleri (şimdilik eski yapı - C Serisi vb.)
+        // Eski yapı: assets/car_images/bavora/bavora_X.png
+        final index = 1 + _random.nextInt(6);
+        return 'assets/car_images/bavora/bavora_$index.png';
+      }
+    }
+    
+    // 3. Renauva Slim (Yeni Yapı)
+    if (brand == 'Renauva' && model == 'Slim') {
+      // 1-6 arası rastgele resim (Refined Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/renauva/slim/slim_$index.png';
+    }
+    
+    // 4. Renauva Magna (Yeni Yapı)
+    if (brand == 'Renauva' && model == 'Magna') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/renauva/magna/magna_$index.png';
+    }
+
+    // 5. Renauva Flow (Yeni Yapı)
+    if (brand == 'Renauva' && model == 'Flow') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/renauva/flow/flow_$index.png';
+    }
+
+    // 6. Renauva Signa (Yeni Yapı)
+    if (brand == 'Renauva' && model == 'Signa') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/renauva/signa/signa_$index.png';
+    }
+
+    // 7. Renauva Tallion (Yeni Yapı)
+    if (brand == 'Renauva' && model == 'Tallion') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/renauva/tallion/tallion_$index.png';
+    }
+
+    // 8. Fortran Odak (Yeni Yapı)
+    if (brand == 'Fortran' && model == 'Odak') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/fortran/odak/odak_$index.png';
+    }
+
+    // 9. Fortran Vista (Yeni Yapı)
+    if (brand == 'Fortran' && model == 'Vista') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/fortran/vista/vista_$index.png';
+    }
+
+    // 10. Fortran Avger (Yeni Yapı)
+    if (brand == 'Fortran' && model == 'Avger') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/fortran/avger/avger_$index.png';
+    }
+
+    // 11. Fortran Tupa (Yeni Yapı)
+    if (brand == 'Fortran' && model == 'Tupa') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/fortran/tupa/tupa_$index.png';
+    }
+
+    // 12. Oplon Mornitia (Yeni Yapı)
+    if (brand == 'Oplon' && model == 'Mornitia') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/oplon/mornitia/mornitia_$index.png';
+    }
+
+    // 13. Oplon Lorisa (Yeni Yapı)
+    if (brand == 'Oplon' && model == 'Lorisa') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/oplon/lorisa/lorisa_$index.png';
+    }
+
+    // 14. Oplon Tasra (Yeni Yapı)
+    if (brand == 'Oplon' && model == 'Tasra') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/oplon/tasra/tasra_$index.png';
+    }
+
+    // 15. Fialto Agna (Yeni Yapı)
+    if (brand == 'Fialto' && model == 'Agna') {
+      // 1-4 arası rastgele resim (Smart Split - 2 merged row filtered)
+      final index = 1 + _random.nextInt(4);
+      return 'assets/car_images/fialto/agna/agna_$index.png';
+    }
+
+    // 16. Fialto Lagua (Yeni Yapı)
+    if (brand == 'Fialto' && model == 'Lagua') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/fialto/lagua/lagua_$index.png';
+    }
+
+    // 17. Fialto Zorno (Yeni Yapı)
+    if (brand == 'Fialto' && model == 'Zorno') {
+      // 1-6 arası rastgele resim (Smart Split)
+      final index = 1 + _random.nextInt(6);
+      return 'assets/car_images/fialto/zorno/zorno_$index.png';
+    }
+
+    // 18. Varsayılan Tek Resim Yapısı
+    // Örn: assets/car_images/Renauva/Slim.png
+    final safeModelName = model.replaceAll(' ', '_');
+    return 'assets/car_images/$brand/$safeModelName.png';
   }
 }
 

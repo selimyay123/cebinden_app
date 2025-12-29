@@ -111,18 +111,36 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/brands/
+    # - assets/car_images/fialto/zorno/
+    # - assets/car_images/Renauva/
+    # - assets/car_images/Volkstar/
+    # - assets/car_images/Fialto/
+    # - assets/car_images/Oplon/
+    - assets/car_images/bavora/
+    - assets/car_images/bavora/e_series/
+    - assets/car_images/bavora/a_series/
+    - assets/car_images/bavora/d_series/
+    - assets/car_images/renauva/slim/
+    - assets/car_images/renauva/magna/
+    - assets/car_images/renauva/flow/
+    - assets/car_images/renauva/signa/
+    - assets/car_images/renauva/tallion/
+    - assets/car_images/fortran/odak/
+    - assets/car_images/fortran/vista/
+    - assets/car_images/fortran/avger/
+    - assets/car_images/fortran/tupa/
+    - assets/car_images/oplon/mornitia/
+    - assets/car_images/oplon/lorisa/
+    - assets/car_images/oplon/tasra/
+    - assets/car_images/fialto/agna/
+    - assets/car_images/fialto/lagua/
     - assets/car_images/fialto/zorno/
-    - assets/car_images/Renauva/
-    - assets/car_images/Volkstar/
-    - assets/car_images/Fialto/
-    - assets/car_images/Oplon/
-    - assets/car_images/Bavora/
-    - assets/car_images/Fortran/
-    - assets/car_images/Mercurion/
-    - assets/car_images/Hundar/
-    - assets/car_images/Koyoro/
-    - assets/car_images/Audira/
-    - assets/car_images/Hanto/
+    # - assets/car_images/Fortran/
+    # - assets/car_images/Mercurion/
+    # - assets/car_images/Hundar/
+    # - assets/car_images/Koyoro/
+    # - assets/car_images/Audira/
+    # - assets/car_images/Hanto/
     - assets/images/app_logo/
     - assets/images/
     - assets/images/icons/

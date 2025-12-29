@@ -15,6 +15,7 @@ class User {
   final String? appleUserId; // Apple kullanıcı ID'si (Apple Sign In için)
   final String? email; // E-posta adresi (Google Sign-In için)
   final bool isBanned; // Kullanıcı yasaklı mı?
+  final bool isTutorialCompleted; // Tutorial tamamlandı mı?
   
   // ========== XP SİSTEMİ ==========
   final int xp; // Toplam deneyim puanı
@@ -58,6 +59,7 @@ class User {
     this.appleUserId,
     this.email,
     this.isBanned = false, // Varsayılan olarak yasaklı değil
+    this.isTutorialCompleted = false, // Varsayılan olarak tamamlanmadı
     // XP Sistemi
     this.xp = 0,
     this.level = 1,
@@ -169,6 +171,7 @@ class User {
       appleUserId: json['appleUserId'] as String?,
       email: json['email'] as String?,
       isBanned: json['isBanned'] as bool? ?? false,
+      isTutorialCompleted: json['isTutorialCompleted'] as bool? ?? true, // Eski kullanıcılar için varsayılan true
       // XP Sistemi
       xp: json['xp'] as int? ?? 0,
       level: json['level'] as int? ?? 1,
@@ -220,6 +223,7 @@ class User {
       'appleUserId': appleUserId,
       'email': email,
       'isBanned': isBanned,
+      'isTutorialCompleted': isTutorialCompleted,
       // XP Sistemi
       'xp': xp,
       'level': level,
@@ -262,6 +266,7 @@ class User {
     String? appleUserId,
     String? email,
     bool? isBanned,
+    bool? isTutorialCompleted,
     int? xp,
     int? level,
     int? totalVehiclesBought,
@@ -297,6 +302,7 @@ class User {
       appleUserId: appleUserId ?? this.appleUserId,
       email: email ?? this.email,
       isBanned: isBanned ?? this.isBanned,
+      isTutorialCompleted: isTutorialCompleted ?? this.isTutorialCompleted,
       xp: xp ?? this.xp,
       level: level ?? this.level,
       totalVehiclesBought: totalVehiclesBought ?? this.totalVehiclesBought,

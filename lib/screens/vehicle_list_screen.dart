@@ -34,9 +34,9 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   // Filtre durumları (Backend değerlerini saklayacağız)
   Set<String> selectedFuelTypes = {};
   Set<String> selectedTransmissions = {};
-  String? selectedMileageRange;
-  String? selectedPriceRange;
-  String? selectedYearRange;
+  Set<String> selectedMileageRanges = {};
+  Set<String> selectedPriceRanges = {};
+  Set<String> selectedYearRanges = {};
   String? _selectedSortOption; // 'price_asc', 'price_desc'
   double? _currentBalance; // Kullanıcının mevcut bakiyesi
   
@@ -95,27 +95,39 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         }
         
         // Kilometre filtresi
-        if (selectedMileageRange != null) {
-          if (selectedMileageRange == '0-50k' && vehicle.mileage > 50000) return false;
-          if (selectedMileageRange == '50k-100k' && (vehicle.mileage < 50000 || vehicle.mileage > 100000)) return false;
-          if (selectedMileageRange == '100k-150k' && (vehicle.mileage < 100000 || vehicle.mileage > 150000)) return false;
-          if (selectedMileageRange == '150k+' && vehicle.mileage < 150000) return false;
+        if (selectedMileageRanges.isNotEmpty) {
+          bool matchesAny = false;
+          for (final range in selectedMileageRanges) {
+            if (range == '0-50k' && vehicle.mileage <= 50000) matchesAny = true;
+            if (range == '50k-100k' && (vehicle.mileage > 50000 && vehicle.mileage <= 100000)) matchesAny = true;
+            if (range == '100k-150k' && (vehicle.mileage > 100000 && vehicle.mileage <= 150000)) matchesAny = true;
+            if (range == '150k+' && vehicle.mileage > 150000) matchesAny = true;
+          }
+          if (!matchesAny) return false;
         }
         
         // Fiyat filtresi
-        if (selectedPriceRange != null) {
-          if (selectedPriceRange == '0-300k' && vehicle.price > 300000) return false;
-          if (selectedPriceRange == '300k-500k' && (vehicle.price < 300000 || vehicle.price > 500000)) return false;
-          if (selectedPriceRange == '500k-700k' && (vehicle.price < 500000 || vehicle.price > 700000)) return false;
-          if (selectedPriceRange == '700k+' && vehicle.price < 700000) return false;
+        if (selectedPriceRanges.isNotEmpty) {
+          bool matchesAny = false;
+          for (final range in selectedPriceRanges) {
+            if (range == '0-300k' && vehicle.price <= 300000) matchesAny = true;
+            if (range == '300k-500k' && (vehicle.price > 300000 && vehicle.price <= 500000)) matchesAny = true;
+            if (range == '500k-700k' && (vehicle.price > 500000 && vehicle.price <= 700000)) matchesAny = true;
+            if (range == '700k+' && vehicle.price > 700000) matchesAny = true;
+          }
+          if (!matchesAny) return false;
         }
         
         // Yıl filtresi
-        if (selectedYearRange != null) {
-          if (selectedYearRange == '2024' && vehicle.year != 2024) return false;
-          if (selectedYearRange == '2020-2023' && (vehicle.year < 2020 || vehicle.year > 2023)) return false;
-          if (selectedYearRange == '2015-2019' && (vehicle.year < 2015 || vehicle.year > 2019)) return false;
-          if (selectedYearRange == '2015 öncesi' && vehicle.year >= 2015) return false;
+        if (selectedYearRanges.isNotEmpty) {
+          bool matchesAny = false;
+          for (final range in selectedYearRanges) {
+            if (range == '2024' && vehicle.year == 2024) matchesAny = true;
+            if (range == '2020-2023' && (vehicle.year >= 2020 && vehicle.year <= 2023)) matchesAny = true;
+            if (range == '2015-2019' && (vehicle.year >= 2015 && vehicle.year <= 2019)) matchesAny = true;
+            if (range == '2015 öncesi' && vehicle.year < 2015) matchesAny = true;
+          }
+          if (!matchesAny) return false;
         }
         
         return true;
@@ -135,9 +147,9 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     setState(() {
       selectedFuelTypes.clear();
       selectedTransmissions.clear();
-      selectedMileageRange = null;
-      selectedPriceRange = null;
-      selectedYearRange = null;
+      selectedMileageRanges.clear();
+      selectedPriceRanges.clear();
+      selectedYearRanges.clear();
       filteredVehicles = allVehicles;
     });
   }
@@ -201,8 +213,8 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       // Kilometre
                       _buildCategoryFilter(
                         'vehicles.filterMileage'.tr(),
-                        selectedMileageRange != null,
-                        selectedMileageRange != null ? 1 : 0,
+                        selectedMileageRanges.isNotEmpty,
+                        selectedMileageRanges.length,
                         () => _showMileageFilter(context),
                       ),
                       const SizedBox(width: 8),
@@ -210,8 +222,8 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       // Fiyat
                       _buildCategoryFilter(
                         'vehicles.filterPrice'.tr(),
-                        selectedPriceRange != null,
-                        selectedPriceRange != null ? 1 : 0,
+                        selectedPriceRanges.isNotEmpty,
+                        selectedPriceRanges.length,
                         () => _showPriceFilter(context),
                       ),
                       const SizedBox(width: 8),
@@ -219,17 +231,17 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                       // Yıl
                       _buildCategoryFilter(
                         'vehicles.filterYear'.tr(),
-                        selectedYearRange != null,
-                        selectedYearRange != null ? 1 : 0,
+                        selectedYearRanges.isNotEmpty,
+                        selectedYearRanges.length,
                         () => _showYearFilter(context),
                       ),
                       
                       // Temizle Butonu
                       if (selectedFuelTypes.isNotEmpty || 
                           selectedTransmissions.isNotEmpty || 
-                          selectedMileageRange != null || 
-                          selectedPriceRange != null || 
-                          selectedYearRange != null) ...[
+                          selectedMileageRanges.isNotEmpty || 
+                          selectedPriceRanges.isNotEmpty || 
+                          selectedYearRanges.isNotEmpty) ...[
                         const SizedBox(width: 16),
                         InkWell(
                           onTap: _clearFilters,
@@ -466,6 +478,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                           vehicle: vehicle,
                           width: 120,
                           height: 140,
+                          fit: BoxFit.contain,
                         ),
                       )
                     : Column(
@@ -1118,224 +1131,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     );
   }
 
-  // Genel Dropdown Filter (Single-select)
-  void _showSingleSelectFilter(
-    BuildContext context, {
-    required String title,
-    required Map<String, String> options,
-    required String? selectedValue,
-    required Function(String?) onUpdate,
-  }) {
-    String? tempSelectedValue = selectedValue;
-    
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.7,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Başlık
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: widget.categoryColor.withOpacity(0.1),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.filter_alt,
-                                color: widget.categoryColor,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                title,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[800],
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (tempSelectedValue != null)
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: widget.categoryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Seçenekler
-                    Flexible(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final entry = options.entries.elementAt(index);
-                          final isSelected = tempSelectedValue == entry.key;
-                          
-                          return InkWell(
-                            onTap: () {
-                              setDialogState(() {
-                                tempSelectedValue = isSelected ? null : entry.key;
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 14,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? widget.categoryColor.withOpacity(0.1)
-                                    : Colors.transparent,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    entry.value,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: isSelected
-                                          ? widget.categoryColor
-                                          : Colors.grey[700],
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    width: 24,
-                                    height: 24,
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? widget.categoryColor
-                                          : Colors.transparent,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? widget.categoryColor
-                                            : Colors.grey[400]!,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: isSelected
-                                        ? const Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 16,
-                                          )
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    
-                    // Alt Butonlar
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(16),
-                          bottomRight: Radius.circular(16),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          if (tempSelectedValue != null)
-                            Expanded(
-                              child: TextButton(
-                                onPressed: () {
-                                  setDialogState(() => tempSelectedValue = null);
-                                  onUpdate(null);
-                                  Navigator.pop(dialogContext);
-                                },
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                ),
-                                child: Text(
-                                  'vehicles.clearFilters'.tr(),
-                                  style: TextStyle(
-                                    color: Colors.red[700],
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          if (tempSelectedValue != null)
-                            const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                onUpdate(tempSelectedValue);
-                                Navigator.pop(dialogContext);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: widget.categoryColor,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: Text(
-                                'vehicles.apply'.tr(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+
 
   // Yakıt Tipi Filtresi
   void _showFuelTypeFilter(BuildContext context) {
@@ -1413,58 +1209,123 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   
   // Kilometre Filtresi
   void _showMileageFilter(BuildContext context) {
-    _showSingleSelectFilter(
+    // Backend değerlerinden çevrilmiş değerlere map
+    final Map<String, String> mileageOptions = {
+      '0-50k': 'vehicles.mileageRange1'.tr(),
+      '50k-100k': 'vehicles.mileageRange2'.tr(),
+      '100k-150k': 'vehicles.mileageRange3'.tr(),
+      '150k+': 'vehicles.mileageRange4'.tr(),
+    };
+    
+    final displayOptions = mileageOptions.values.toList();
+    final backendValues = mileageOptions.keys.toList();
+    
+    // Seçili backend değerlerini çevrilmiş değerlere dönüştür
+    final displaySelected = selectedMileageRanges.map((backendValue) {
+      return mileageOptions[backendValue] ?? backendValue;
+    }).toSet();
+    
+    _showDropdownFilterWithMapping(
       context,
       title: 'vehicles.filterMileage'.tr(),
-      options: {
-        '0-50k': 'vehicles.mileageRange1'.tr(),
-        '50k-100k': 'vehicles.mileageRange2'.tr(),
-        '100k-150k': 'vehicles.mileageRange3'.tr(),
-        '150k+': 'vehicles.mileageRange4'.tr(),
+      displayOptions: displayOptions,
+      backendValues: backendValues,
+      selectedDisplayValues: displaySelected,
+      onUpdate: (newDisplayValues) {
+        selectedMileageRanges.clear();
+        for (final displayValue in newDisplayValues) {
+          final backendValue = mileageOptions.entries
+              .firstWhere(
+                (entry) => entry.value == displayValue,
+                orElse: () => const MapEntry('', ''),
+              )
+              .key;
+          if (backendValue.isNotEmpty) {
+            selectedMileageRanges.add(backendValue);
+          }
+        }
+        setState(() => _applyFilters());
       },
-      selectedValue: selectedMileageRange,
-      onUpdate: (value) => setState(() {
-        selectedMileageRange = value;
-        _applyFilters();
-      }),
     );
   }
   
   // Fiyat Filtresi
   void _showPriceFilter(BuildContext context) {
-    _showSingleSelectFilter(
+    final Map<String, String> priceOptions = {
+      '0-300k': 'vehicles.priceRange1'.tr(),
+      '300k-500k': 'vehicles.priceRange2'.tr(),
+      '500k-700k': 'vehicles.priceRange3'.tr(),
+      '700k+': 'vehicles.priceRange4'.tr(),
+    };
+    
+    final displayOptions = priceOptions.values.toList();
+    final backendValues = priceOptions.keys.toList();
+    
+    final displaySelected = selectedPriceRanges.map((backendValue) {
+      return priceOptions[backendValue] ?? backendValue;
+    }).toSet();
+    
+    _showDropdownFilterWithMapping(
       context,
       title: 'vehicles.filterPrice'.tr(),
-      options: {
-        '0-300k': 'vehicles.priceRange1'.tr(),
-        '300k-500k': 'vehicles.priceRange2'.tr(),
-        '500k-700k': 'vehicles.priceRange3'.tr(),
-        '700k+': 'vehicles.priceRange4'.tr(),
+      displayOptions: displayOptions,
+      backendValues: backendValues,
+      selectedDisplayValues: displaySelected,
+      onUpdate: (newDisplayValues) {
+        selectedPriceRanges.clear();
+        for (final displayValue in newDisplayValues) {
+          final backendValue = priceOptions.entries
+              .firstWhere(
+                (entry) => entry.value == displayValue,
+                orElse: () => const MapEntry('', ''),
+              )
+              .key;
+          if (backendValue.isNotEmpty) {
+            selectedPriceRanges.add(backendValue);
+          }
+        }
+        setState(() => _applyFilters());
       },
-      selectedValue: selectedPriceRange,
-      onUpdate: (value) => setState(() {
-        selectedPriceRange = value;
-        _applyFilters();
-      }),
     );
   }
   
   // Yıl Filtresi
   void _showYearFilter(BuildContext context) {
-    _showSingleSelectFilter(
+    final Map<String, String> yearOptions = {
+      '2024': 'vehicles.yearRange1'.tr(),
+      '2020-2023': 'vehicles.yearRange2'.tr(),
+      '2015-2019': 'vehicles.yearRange3'.tr(),
+      '2015 öncesi': 'vehicles.yearRange4'.tr(),
+    };
+    
+    final displayOptions = yearOptions.values.toList();
+    final backendValues = yearOptions.keys.toList();
+    
+    final displaySelected = selectedYearRanges.map((backendValue) {
+      return yearOptions[backendValue] ?? backendValue;
+    }).toSet();
+    
+    _showDropdownFilterWithMapping(
       context,
       title: 'vehicles.filterYear'.tr(),
-      options: {
-        '2024': 'vehicles.yearRange1'.tr(),
-        '2020-2023': 'vehicles.yearRange2'.tr(),
-        '2015-2019': 'vehicles.yearRange3'.tr(),
-        '2015 öncesi': 'vehicles.yearRange4'.tr(),
+      displayOptions: displayOptions,
+      backendValues: backendValues,
+      selectedDisplayValues: displaySelected,
+      onUpdate: (newDisplayValues) {
+        selectedYearRanges.clear();
+        for (final displayValue in newDisplayValues) {
+          final backendValue = yearOptions.entries
+              .firstWhere(
+                (entry) => entry.value == displayValue,
+                orElse: () => const MapEntry('', ''),
+              )
+              .key;
+          if (backendValue.isNotEmpty) {
+            selectedYearRanges.add(backendValue);
+          }
+        }
+        setState(() => _applyFilters());
       },
-      selectedValue: selectedYearRange,
-      onUpdate: (value) => setState(() {
-        selectedYearRange = value;
-        _applyFilters();
-      }),
     );
   }
 

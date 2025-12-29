@@ -759,7 +759,12 @@
     "cancel": "Cancel",
     "submit": "Report",
     "success": "Report received. Thank you.",
-    "error": "An error occurred while sending the report."
+    "error": "An error occurred while sending the report.",
+    "reasons": {
+      "inappropriateUsername": "Inappropriate Username",
+      "other": "Other"
+    },
+    "alreadyReported": "You have already reported this user."
   },
   "profile": {
     "title": "Profile Information",

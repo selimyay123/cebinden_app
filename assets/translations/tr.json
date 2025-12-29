@@ -762,7 +762,12 @@
     "cancel": "İptal",
     "submit": "Raporla",
     "success": "Raporunuz alındı. Teşekkürler.",
-    "error": "Rapor gönderilirken bir hata oluştu."
+    "error": "Rapor gönderilirken bir hata oluştu.",
+    "reasons": {
+      "inappropriateUsername": "Uygunsuz Kullanıcı Adı",
+      "other": "Diğer"
+    },
+    "alreadyReported": "Bu kullanıcıyı zaten raporladınız."
   },
   "profile": {
     "title": "Profil Bilgileri",

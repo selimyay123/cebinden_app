@@ -178,7 +178,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                           aspectRatio: 120 / 140, // Liste ekranındaki gerçek oran (Container width: 120)
                           child: VehicleImage(
                             vehicle: _vehicle,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       )

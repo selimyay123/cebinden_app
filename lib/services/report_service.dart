@@ -38,4 +38,20 @@ class ReportService {
       return false;
     }
   }
+  /// Kullanıcının daha önce raporlayıp raporlamadığını kontrol et
+  Future<bool> hasReported(String reporterId, String reportedUserId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection(_collection)
+          .where('reporterId', isEqualTo: reporterId)
+          .where('reportedUserId', isEqualTo: reportedUserId)
+          .limit(1)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      print('Error checking report status: $e');
+      return false;
+    }
+  }
 }

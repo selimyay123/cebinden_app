@@ -8,6 +8,7 @@ import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import '../services/report_service.dart';
+import '../widgets/custom_snackbar.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -301,92 +302,159 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     return _currencyFormat.format(amount);
   }
 
-  void _showReportDialog({required String userId, required String username}) {
-    final TextEditingController reasonController = TextEditingController();
+  Future<void> _showReportDialog({required String userId, required String username}) async {
+    if (_currentUser == null) return;
+
+    // Önce rapor kontrolü yap
+    final hasReported = await ReportService().hasReported(_currentUser!.id, userId);
+    if (hasReported) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          CustomSnackBar(
+            content: Text('report.alreadyReported'.tr()),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (!mounted) return;
+
+    String? selectedReasonKey;
+    final TextEditingController otherReasonController = TextEditingController();
     
+    // Rapor nedenleri listesi (key'ler)
+    final List<String> reportReasons = [
+      'inappropriateUsername',
+      'other',
+    ];
+
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text(
-          'report.title'.tr(),
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'report.message'.trParams({'username': username}),
-              style: GoogleFonts.poppins(color: Colors.white70),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (innerContext, setState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF1E1E1E),
+            title: Text(
+              'report.title'.tr(),
+              style: GoogleFonts.poppins(color: Colors.white),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: reasonController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'report.reasonHint'.tr(),
-                hintStyle: const TextStyle(color: Colors.white38),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.white24),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.deepPurpleAccent),
-                  borderRadius: BorderRadius.circular(8),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'report.message'.trParams({'username': username}),
+                      style: GoogleFonts.poppins(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 16),
+                    ...reportReasons.map((reasonKey) {
+                      return RadioListTile<String>(
+                        title: Text(
+                          'report.reasons.$reasonKey'.tr(),
+                          style: GoogleFonts.poppins(color: Colors.white),
+                        ),
+                        value: reasonKey,
+                        groupValue: selectedReasonKey,
+                        activeColor: Colors.deepPurpleAccent,
+                        contentPadding: EdgeInsets.zero,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedReasonKey = value;
+                          });
+                        },
+                      );
+                    }).toList(),
+                    
+                    // "Diğer" seçildiyse açıklama alanı göster
+                    if (selectedReasonKey == 'other') ...[
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: otherReasonController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: 'report.reasonHint'.tr(),
+                          hintStyle: const TextStyle(color: Colors.white38),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.white24),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        maxLines: 3,
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              maxLines: 3,
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text('report.cancel'.tr(), style: const TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (_currentUser == null) return;
-              
-              final reason = reasonController.text.trim();
-              if (reason.isEmpty) return;
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text('report.cancel'.tr(), style: const TextStyle(color: Colors.white54)),
+              ),
+              ElevatedButton(
+                onPressed: selectedReasonKey == null 
+                    ? null // Seçim yapılmadıysa buton pasif
+                    : () async {
+                        if (_currentUser == null) return;
+                        
+                        String finalReason = 'report.reasons.$selectedReasonKey'.tr();
+                        
+                        // "Diğer" seçildiyse ve açıklama girildiyse onu ekle
+                        if (selectedReasonKey == 'other') {
+                          final otherText = otherReasonController.text.trim();
+                          if (otherText.isNotEmpty) {
+                            finalReason += ': $otherText';
+                          }
+                        }
 
-              Navigator.pop(dialogContext); // Dialog'u kapat
+                        Navigator.pop(dialogContext); // Dialog'u kapat
 
-              // Raporu gönder
-              final success = await ReportService().reportUser(
-                reporterId: _currentUser!.id,
-                reportedUserId: userId,
-                reportedUsername: username,
-                reason: reason,
-              );
+                        // Raporu gönder
+                        final success = await ReportService().reportUser(
+                          reporterId: _currentUser!.id,
+                          reportedUserId: userId,
+                          reportedUsername: username,
+                          reason: finalReason,
+                        );
 
-              if (mounted) {
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('report.success'.tr()),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('report.error'.tr()),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('report.submit'.tr()),
-          ),
-        ],
+                        if (mounted) {
+                          if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              CustomSnackBar(
+                                content: Text('report.success'.tr()),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              CustomSnackBar(
+                                content: Text('report.error'.tr()),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: Colors.redAccent.withOpacity(0.3),
+                  disabledForegroundColor: Colors.white38,
+                ),
+                child: Text('report.submit'.tr()),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -17,24 +17,37 @@ class VehicleImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget image = (vehicle.brand == 'Renauva' && vehicle.model == 'Slim')
-        ? Image.asset(
-            'assets/car_images/Renauva/Slim_fixed.png',
-            width: width,
-            height: height,
-            fit: fit,
-          )
-        : Image.asset(
-            vehicle.imageUrl!,
-            width: width,
-            height: height,
-            fit: fit,
-          );
+    // Renauva modelleri için sabitlenmiş (fixed) görselleri kullan
+    bool isRenauvaCustom = (vehicle.brand == 'Renauva' && (vehicle.model == 'Slim'));
+    
+    String imagePath = vehicle.imageUrl!;
+    // Legacy path fix for existing saved vehicles
+    if (imagePath.endsWith('Renauva/Slim.png') || imagePath.endsWith('Renauva/Slim_test.png')) {
+      imagePath = 'assets/car_images/renauva/slim/slim_1.png';
+    } else if (imagePath.endsWith('Renauva/Magna.png')) {
+      imagePath = 'assets/car_images/renauva/magna/magna_1.png';
+    } else if (imagePath.endsWith('Renauva/Flow.png')) {
+      imagePath = 'assets/car_images/renauva/flow/flow_1.png';
+    } else if (imagePath.endsWith('Renauva/Signa.png')) {
+      imagePath = 'assets/car_images/renauva/signa/signa_1.png';
+    } else if (imagePath.endsWith('Renauva/Tallion.png')) {
+      imagePath = 'assets/car_images/renauva/tallion/tallion_1.png';
+    }
 
-    // Sadece Renauva Slim için maske tabanlı boyama uygula
-    if (vehicle.brand == 'Renauva' && vehicle.model == 'Slim') {
+    Widget image = Image.asset(
+      imagePath,
+      width: width,
+      height: height,
+      fit: fit,
+    );
+
+    // Renauva modelleri için maske tabanlı boyama uygula
+    // TEST: Slim için maskelemeyi devre dışı bırak (çünkü yeni görselin maskesi yok)
+    if (isRenauvaCustom && vehicle.model != 'Slim') {
       final color = _getVehicleColor(vehicle.color);
       if (color != null) {
+        String maskName = (vehicle.model == 'Slim') ? 'Slim_mask_fixed.png' : 'Signa_mask_fixed.png';
+        
         return Stack(
           children: [
             image, // Orijinal resim (alt katman)
@@ -42,7 +55,7 @@ class VehicleImage extends StatelessWidget {
               child: ColorFiltered(
                 // 2. Adım: Maskeyi istenen renge boya
                 colorFilter: ColorFilter.mode(
-                  color.withOpacity(0.6), 
+                  color.withOpacity(0.85), 
                   BlendMode.srcIn,
                 ),
                 child: ColorFiltered(
@@ -54,7 +67,7 @@ class VehicleImage extends StatelessWidget {
                     1, 0, 0, 0, 0, // Alpha = Red kanalı
                   ]),
                   child: Image.asset(
-                    'assets/car_images/Renauva/Slim_mask_fixed.png',
+                    'assets/car_images/Renauva/$maskName',
                     width: width,
                     height: height,
                     fit: fit,

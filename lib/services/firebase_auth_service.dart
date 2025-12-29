@@ -224,7 +224,7 @@ class FirebaseAuthService {
         username: displayName,
         password: '', // Şifre yok (Apple ile giriş)
         registeredAt: DateTime.now(),
-        balance: 5000000.0, // Başlangıç parası
+        balance: 1000000.0, // Başlangıç parası
         level: 1,
         xp: 0,
         // garageLimit: 3, // Varsayılan değer (User modelinden gelir)
