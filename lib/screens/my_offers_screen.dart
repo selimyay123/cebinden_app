@@ -15,6 +15,7 @@ import '../services/market_refresh_service.dart'; // Araç detayları için
 import '../models/vehicle_model.dart'; // Vehicle modeli için
 import 'dart:math'; // Random için
 import 'home_screen.dart';
+import '../utils/vehicle_utils.dart';
 
 import 'package:lottie/lottie.dart'; // 🆕 Animasyon için
 
@@ -312,10 +313,21 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             Positioned(
               right: -20,
               bottom: -20,
-              child: Icon(
-                isIncoming ? Icons.inbox : Icons.send,
-                size: 100,
-                color: brandColor.withOpacity(0.1),
+              child: Opacity(
+                opacity: 0.1,
+                child: Image.asset(
+                  'assets/images/brands/${brand.toLowerCase()}.png',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      isIncoming ? Icons.inbox : Icons.send,
+                      size: 100,
+                      color: brandColor,
+                    );
+                  },
+                ),
               ),
             ),
             
@@ -673,7 +685,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   // Araç Resmi
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: _buildVehicleImage(firstOffer.vehicleImageUrl, 100, 75),
+                    child: _buildVehicleImage(
+                      firstOffer.vehicleImageUrl, 
+                      100, 
+                      75, 
+                      brand: firstOffer.vehicleBrand, 
+                      model: firstOffer.vehicleModel, 
+                      vehicleId: firstOffer.vehicleId
+                    ),
                   ),
                   const SizedBox(width: 16),
                   // Araç Bilgisi
@@ -766,7 +785,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             // Araç Resmi
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: _buildVehicleImage(offer.vehicleImageUrl, 120, 90),
+              child: _buildVehicleImage(
+                offer.vehicleImageUrl, 
+                120, 
+                90, 
+                brand: offer.vehicleBrand, 
+                model: offer.vehicleModel, 
+                vehicleId: offer.vehicleId
+              ),
             ),
             const SizedBox(width: 16),
             // Araç Bilgisi
@@ -1198,29 +1224,80 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
   }
 
-  Widget _buildVehicleImage(String imageUrl, double width, double height) {
-    if (imageUrl.isEmpty || !imageUrl.startsWith('http')) {
-      return Container(
-        width: width,
-        height: height,
-        color: Colors.grey[300],
-        child: Icon(Icons.directions_car, size: width * 0.4, color: Colors.grey),
-      );
+  Widget _buildVehicleImage(String imageUrl, double width, double height, {String? brand, String? model, String? vehicleId}) {
+    // 1. URL boşsa veya null ise fallback dene
+    if (imageUrl.isEmpty) {
+      if (brand != null && model != null) {
+        final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+        if (fallbackPath != null) {
+          return Image.asset(
+            fallbackPath,
+            width: width,
+            height: height,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+          );
+        }
+      }
+      return _buildGenericCarIcon(width, height);
     }
 
-    return Image.network(
+    // 2. HTTP URL ise (Network Image)
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          if (brand != null && model != null) {
+            final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+            if (fallbackPath != null) {
+              return Image.asset(
+                fallbackPath,
+                width: width,
+                height: height,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+              );
+            }
+          }
+          return _buildGenericCarIcon(width, height);
+        },
+      );
+    }
+    
+    // 3. Local Asset ise
+    return Image.asset(
       imageUrl,
       width: width,
       height: height,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) {
-        return Container(
-          width: width,
-          height: height,
-          color: Colors.grey[300],
-          child: Icon(Icons.directions_car, size: width * 0.4, color: Colors.grey),
-        );
+        if (brand != null && model != null) {
+          final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+          // Eğer fallback path farklıysa onu dene
+          if (fallbackPath != null && fallbackPath != imageUrl) {
+            return Image.asset(
+              fallbackPath,
+              width: width,
+              height: height,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+            );
+          }
+        }
+        return _buildGenericCarIcon(width, height);
       },
+    );
+  }
+
+  Widget _buildGenericCarIcon(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      color: Colors.grey[300],
+      child: Icon(Icons.directions_car, size: width * 0.4, color: Colors.grey),
     );
   }
 
@@ -2399,7 +2476,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             children: [
               // Dönen çekiç/tokmak animasyonu
               Lottie.asset(
-                'assets/animations/buying_car.json',
+                'assets/animations/satinal.json',
                 width: 300,
                 height: 300,
                 repeat: false, // Sadece 1 kez oynat

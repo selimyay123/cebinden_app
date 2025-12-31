@@ -8,7 +8,7 @@ class BrandColors {
     'Citronix': Colors.red[400]!,
     'Fialto': Colors.red[600]!,
     'Fortran': Colors.blue[900]!,
-    'Hundar': Colors.grey[700]!,
+    // 'Hundar': Colors.grey[700]!,
     'Hanto': Colors.red[700]!,
     'Mercurion': Colors.grey[600]!,
     'Oplon': Colors.yellow[700]!,

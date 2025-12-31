@@ -10,6 +10,7 @@ import '../utils/brand_colors.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
 import 'home_screen.dart';
+import '../utils/vehicle_utils.dart';
 
 class MyListingsScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın ilanlarını göster
@@ -445,7 +446,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             children: [
               Row(
                 children: [
-                  // Araç ikonu
+                  // Araç ikonu/resmi
                   Container(
                     width: 70,
                     height: 70,
@@ -453,10 +454,38 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                       color: brandColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
-                      Icons.directions_car,
-                      color: brandColor,
-                      size: 40,
+                    child: Builder(
+                      builder: (context) {
+                        final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
+                            ? vehicle.imageUrl
+                            : VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                        
+                        if (imageUrl != null) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              imageUrl,
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                                if (correctPath != null && correctPath != imageUrl) {
+                                  return Image.asset(
+                                    correctPath,
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) => Icon(Icons.directions_car, color: brandColor, size: 40),
+                                  );
+                                }
+                                return Icon(Icons.directions_car, color: brandColor, size: 40);
+                              },
+                            ),
+                          );
+                        }
+                        return Icon(Icons.directions_car, color: brandColor, size: 40);
+                      }
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -591,10 +620,38 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                    Icons.directions_car,
-                    color: Colors.green,
-                    size: 40,
+                  child: Builder(
+                    builder: (context) {
+                      final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
+                          ? vehicle.imageUrl
+                          : VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                      
+                      if (imageUrl != null) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            imageUrl,
+                            width: 70,
+                            height: 70,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                              if (correctPath != null && correctPath != imageUrl) {
+                                return Image.asset(
+                                  correctPath,
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.directions_car, color: Colors.green, size: 40),
+                                );
+                              }
+                              return const Icon(Icons.directions_car, color: Colors.green, size: 40);
+                            },
+                          ),
+                        );
+                      }
+                      return const Icon(Icons.directions_car, color: Colors.green, size: 40);
+                    }
                   ),
                 ),
                 const SizedBox(width: 16),

@@ -1072,7 +1072,7 @@
       "Bavora": "Bavarian engine",
       "Fialto": "Italian practicality",
       "Fortran": "American classic",
-      "Hundar": "Korean technology",
+      "_UNUSED_Hundar": "Korean technology",
       "Hanto": "Japanese reliability",
       "Mercurion": "German luxury",
       "Oplon": "German practicality",
@@ -1291,7 +1291,7 @@
       "4matic": "4MATIC four wheel drive, three differential locks.",
       "rwd": "Rear wheel drive (RWD), premium character."
     },
-    "Hundar": {
+    "_UNUSED_Hundar": {
       "A10": [
         "Reliable and economic hatchback.",
         "Wide equipment options.",
@@ -1441,7 +1441,7 @@
         "GJE": "4-Door Coupe, sporty elegant",
         "8 Serisi": "Legendary off-road, ultra luxury"
       },
-      "Hundar": {
+      "_UNUSED_Hundar": {
         "A10": "Reliable, economic hatchback",
         "Tecent Red": "Powerful diesel, economic sedan",
         "Tecent White": "Simple solid, cheap repair",
@@ -1697,27 +1697,27 @@
         "2": "G 63 AMG is the most powerful version.",
         "3": "3 differential locks, pure off-road capability."
       },
-      "Hundar_A10": {
+      "_UNUSED_Hundar_A10": {
         "1": "Reliable and economic hatchback.",
         "2": "Wide equipment options.",
         "3": "Spare parts are cheap and easy."
       },
-      "Hundar_Tecent Red": {
+      "_UNUSED_Hundar_Tecent Red": {
         "1": "Powerful 1.6 CRDi diesel engine.",
         "2": "Economic sedan, family car.",
         "3": "Torque converter automatic reliable."
       },
-      "Hundar_Tecent White": {
+      "_UNUSED_Hundar_Tecent White": {
         "1": "Simple and robust structure.",
         "2": "Cheap repair costs.",
         "3": "Economic daily use."
       },
-      "Hundar_A20": {
+      "_UNUSED_Hundar_A20": {
         "1": "C segment balanced vehicle.",
         "2": "Rich standard equipment.",
         "3": "N-Line sporty package is popular."
       },
-      "Hundar_Kascon": {
+      "_UNUSED_Hundar_Kascon": {
         "1": "Modern SUV, radical design.",
         "2": "Hybrid technology available.",
         "3": "Spacious interior volume, comfortable."
@@ -1790,8 +1790,8 @@
       "Fortran_Benzin": "EcoBoost turbo petrol, performance and efficiency.",
       "Mercurion_Dizel": "d engine, efficient and powerful diesel.",
       "Mercurion_Hybrid": "e engine, hybrid technology, high performance.",
-      "Hundar_CRDi": "CRDi diesel engine, powerful and economic.",
-      "Hundar_Hybrid": "Hybrid technology, high efficiency and low consumption.",
+      "_UNUSED_Hundar_CRDi": "CRDi diesel engine, powerful and economic.",
+      "_UNUSED_Hundar_Hybrid": "Hybrid technology, high efficiency and low consumption.",
       "Koyoro_Hybrid": "Hybrid technology, fuel economy is very high.",
       "Koyoro_Dizel": "D-4D diesel engine, efficient.",
       "Hanto_Hybrid_20": "2.0 Hybrid, fuel economy is superior.",
@@ -1814,8 +1814,8 @@
       "Fortran_Powershift": "Powershift automatic gear.",
       "Mercurion_DCT": "7G-DCT dual clutch automatic.",
       "Mercurion_Tronic": "7G/9G-Tronic, most reliable automatic transmission.",
-      "Hundar_DCT": "DCT dual clutch automatic, fast gear shift.",
-      "Hundar_Auto": "Torque converter full automatic, trouble-free.",
+      "_UNUSED_Hundar_DCT": "DCT dual clutch automatic, fast gear shift.",
+      "_UNUSED_Hundar_Auto": "Torque converter full automatic, trouble-free.",
       "Koyoro_CVT_Hybrid": "CVT automatic, perfect match with hybrid system.",
       "Koyoro_MMT": "MMT semi-automatic gear (requires careful use).",
       "Koyoro_CVT": "CVT automatic, most reliable transmission.",

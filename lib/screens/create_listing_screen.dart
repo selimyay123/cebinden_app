@@ -9,6 +9,7 @@ import '../services/skill_service.dart'; // Yetenek Servisi
 import '../models/user_model.dart';
 import '../utils/currency_input_formatter.dart';
 import 'home_screen.dart';
+import '../utils/vehicle_utils.dart';
 
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
@@ -281,10 +282,53 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 color: Colors.deepPurple.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
-                Icons.directions_car,
-                size: 40,
-                color: Colors.deepPurple,
+              child: Builder(
+                builder: (context) {
+                  final imageUrl = (widget.vehicle.imageUrl != null && widget.vehicle.imageUrl!.isNotEmpty)
+                      ? widget.vehicle.imageUrl
+                      : VehicleUtils.getVehicleImage(widget.vehicle.brand, widget.vehicle.model, vehicleId: widget.vehicle.id);
+                  
+                  if (imageUrl != null) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        imageUrl,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          final correctPath = VehicleUtils.getVehicleImage(widget.vehicle.brand, widget.vehicle.model, vehicleId: widget.vehicle.id);
+                          
+                          if (correctPath != null && correctPath != imageUrl) {
+                            return Image.asset(
+                              correctPath,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) => const Icon(
+                                Icons.directions_car,
+                                size: 40,
+                                color: Colors.deepPurple,
+                              ),
+                            );
+                          }
+                          
+                          return const Icon(
+                            Icons.directions_car,
+                            size: 40,
+                            color: Colors.deepPurple,
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return const Icon(
+                      Icons.directions_car,
+                      size: 40,
+                      color: Colors.deepPurple,
+                    );
+                  }
+                }
               ),
             ),
             const SizedBox(width: 16),

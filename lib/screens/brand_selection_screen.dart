@@ -50,13 +50,13 @@ class BrandSelectionScreen extends StatelessWidget {
             'icon': 'F',
             'imagePath': 'assets/images/brands/fortran.png',
           },
-          {
-            'name': 'Hundar', // Hyundai
-            'originalHint': 'Kore teknolojisi',
-            'color': Colors.grey[700]!,
-            'icon': 'H',
-            'imagePath': 'assets/images/brands/hundar.png',
-          },
+          // {
+          //   'name': 'Hundar', // Hyundai
+          //   'originalHint': 'Kore teknolojisi',
+          //   'color': Colors.grey[700]!,
+          //   'icon': 'H',
+          //   'imagePath': 'assets/images/brands/hundar.png',
+          // },
           {
             'name': 'Hanto',
             'originalHint': 'Japon güvenilirliği',

@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
 import '../services/skill_service.dart'; // Yetenek Servisi
 import 'home_screen.dart';
+import '../utils/vehicle_utils.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
@@ -71,32 +72,40 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     return ValueListenableBuilder<String>(
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
-        return Scaffold(
-          backgroundColor: Colors.grey[100],
-          appBar: AppBar(
-            title: Text(widget.selectedBrand != null 
-              ? widget.selectedBrand! 
-              : 'home.myVehicles'.tr()),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
+          return Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              title: Text(widget.selectedBrand != null 
+                ? widget.selectedBrand! 
+                : 'home.myVehicles'.tr()),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.home),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
+              backgroundColor: Colors.deepPurple.withOpacity(0.9), // Slightly transparent app bar
+              foregroundColor: Colors.white,
+              elevation: 0,
+            ),
+            body: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/garage_bg.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
-            ],
-            backgroundColor: Colors.deepPurple,
-            foregroundColor: Colors.white,
-            elevation: 0,
-          ),
-          body: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
+              child: SafeArea(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 600),
                     child: Column(
                       children: [
                         // Limit Göstergesi
@@ -113,8 +122,10 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                       ],
                     ),
                   ),
+                  ),
                 ),
-        );
+              ),
+          );
       },
     );
   }
@@ -129,9 +140,11 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     final isFull = currentCount >= totalLimit;
 
     return Container(
+      margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -253,7 +266,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -269,10 +282,21 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
             Positioned(
               right: -20,
               bottom: -20,
-              child: Icon(
-                Icons.directions_car,
-                size: 100,
-                color: brandColor.withOpacity(0.1),
+              child: Opacity(
+                opacity: 0.1,
+                child: Image.asset(
+                  'assets/images/brands/${brand.toLowerCase()}.png',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.directions_car,
+                      size: 100,
+                      color: brandColor,
+                    );
+                  },
+                ),
               ),
             ),
             
@@ -403,7 +427,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -429,21 +453,56 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     color: Colors.deepPurple.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
-                      ? ClipRRect(
+                  child: Builder(
+                    builder: (context) {
+                      final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
+                          ? vehicle.imageUrl
+                          : VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                      
+                      if (imageUrl != null) {
+                        return ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
-                            vehicle.imageUrl!,
+                            imageUrl,
                             width: 100,
                             height: 100,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Eğer yüklenen resim hatalıysa (örn: eski veritabanı kayıtları),
+                              // VehicleUtils ile doğrusunu bulmaya çalış
+                              final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                              
+                              if (correctPath != null && correctPath != imageUrl) {
+                                return Image.asset(
+                                  correctPath,
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) => const Icon(
+                                    Icons.directions_car,
+                                    size: 40,
+                                    color: Colors.deepPurple,
+                                  ),
+                                );
+                              }
+                              
+                              return const Icon(
+                                Icons.directions_car,
+                                size: 40,
+                                color: Colors.deepPurple,
+                              );
+                            },
                           ),
-                        )
-                      : const Icon(
+                        );
+                      } else {
+                        return const Icon(
                           Icons.directions_car,
                           size: 40,
                           color: Colors.deepPurple,
-                        ),
+                        );
+                      }
+                    }
+                  ),
                 ),
                 const SizedBox(width: 16),
                 

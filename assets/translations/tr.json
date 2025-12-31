@@ -1079,7 +1079,7 @@
       "Bavora": "Bavyera motoru",
       "Fialto": "İtalyan pratikliği",
       "Fortran": "Amerikan klasiği",
-      "Hundar": "Kore teknolojisi",
+      "_UNUSED_Hundar": "Kore teknolojisi",
       "Hanto": "Japon güvenilirliği",
       "Mercurion": "Alman lüksü",
       "Oplon": "Alman pratikliği",
@@ -1298,7 +1298,7 @@
       "4matic": "4MATIC dört çekiş, üç diferansiyel kilidi.",
       "rwd": "Arkadan çekişli (RWD), premium karakter."
     },
-    "Hundar": {
+    "_UNUSED_Hundar": {
       "A10": [
         "Güvenilir ve ekonomik hatchback.",
         "Geniş donanım seçenekleri.",
@@ -1448,7 +1448,7 @@
         "GJE": "4 Kapı Coupe, sportif şık",
         "8 Serisi": "Efsane arazi, ultra lüks"
       },
-      "Hundar": {
+      "_UNUSED_Hundar": {
         "A10": "Güvenilir, ekonomik hatchback",
         "Tecent Red": "Güçlü dizel, ekonomik sedan",
         "Tecent White": "Basit sağlam, ucuz onarım",
@@ -1696,27 +1696,27 @@
         "2": "G 63 AMG en güçlü versiyon.",
         "3": "3 diferansiyel kilidi, saf arazi yeteneği."
       },
-      "Hundar_A10": {
+      "_UNUSED_Hundar_A10": {
         "1": "Güvenilir ve ekonomik hatchback.",
         "2": "Geniş donanım seçenekleri.",
         "3": "Yedek parça ucuz ve kolay."
       },
-      "Hundar_Tecent Red": {
+      "_UNUSED_Hundar_Tecent Red": {
         "1": "Güçlü 1.6 CRDi dizel motor.",
         "2": "Ekonomik sedan, aile aracı.",
         "3": "Tork konvertörlü otomatik güvenilir."
       },
-      "Hundar_Tecent White": {
+      "_UNUSED_Hundar_Tecent White": {
         "1": "Basit ve sağlam yapı.",
         "2": "Ucuz onarım maliyetleri.",
         "3": "Ekonomik günlük kullanım."
       },
-      "Hundar_A20": {
+      "_UNUSED_Hundar_A20": {
         "1": "C segment dengeli araç.",
         "2": "Zengin standart donanım.",
         "3": "N-Line sportif paket popüler."
       },
-      "Hundar_Kascon": {
+      "_UNUSED_Hundar_Kascon": {
         "1": "Modern SUV, radikal tasarım.",
         "2": "Hibrit teknoloji mevcut.",
         "3": "Geniş iç hacim, konforlu."
@@ -1789,8 +1789,8 @@
       "Fortran_Benzin": "EcoBoost turbo benzin, performans ve verim.",
       "Mercurion_Dizel": "d motor, verimli ve güçlü dizel.",
       "Mercurion_Hybrid": "e motor, hibrit teknoloji, yüksek performans.",
-      "Hundar_CRDi": "CRDi dizel motor, güçlü ve ekonomik.",
-      "Hundar_Hybrid": "Hibrit teknoloji, yüksek verim ve düşük tüketim.",
+      "_UNUSED_Hundar_CRDi": "CRDi dizel motor, güçlü ve ekonomik.",
+      "_UNUSED_Hundar_Hybrid": "Hibrit teknoloji, yüksek verim ve düşük tüketim.",
       "Koyoro_Hybrid": "Hibrit teknoloji, yakıt ekonomisi çok yüksek.",
       "Koyoro_Dizel": "D-4D dizel motor, verimli.",
       "Hanto_Hybrid_20": "2.0 Hibrit, yakıt ekonomisi üstün.",
@@ -1813,8 +1813,8 @@
       "Fortran_Powershift": "Powershift otomatik vites.",
       "Mercurion_DCT": "7G-DCT çift kavramalı otomatik.",
       "Mercurion_Tronic": "7G/9G-Tronic, en güvenilir otomatik şanzıman.",
-      "Hundar_DCT": "DCT çift kavramalı otomatik, hızlı vites geçişi.",
-      "Hundar_Auto": "Tork konvertörlü tam otomatik, sorunsuz.",
+      "_UNUSED_Hundar_DCT": "DCT çift kavramalı otomatik, hızlı vites geçişi.",
+      "_UNUSED_Hundar_Auto": "Tork konvertörlü tam otomatik, sorunsuz.",
       "Koyoro_CVT_Hybrid": "CVT otomatik, hibrit sistemle mükemmel uyum.",
       "Koyoro_MMT": "MMT yarı otomatik vites (dikkatli kullanım gerektirir).",
       "Koyoro_CVT": "CVT otomatik, en güvenilir şanzıman.",

@@ -6,6 +6,7 @@ import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
 import 'home_screen.dart';
+import '../utils/vehicle_utils.dart';
 
 class SellVehicleScreen extends StatefulWidget {
   const SellVehicleScreen({super.key});
@@ -144,10 +145,53 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                     color: Colors.deepPurple.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                    Icons.directions_car,
-                    color: Colors.deepPurple,
-                    size: 40,
+                  child: Builder(
+                    builder: (context) {
+                      final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
+                          ? vehicle.imageUrl
+                          : VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                      
+                      if (imageUrl != null) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            imageUrl,
+                            width: 70,
+                            height: 70,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                              
+                              if (correctPath != null && correctPath != imageUrl) {
+                                return Image.asset(
+                                  correctPath,
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) => const Icon(
+                                    Icons.directions_car,
+                                    color: Colors.deepPurple,
+                                    size: 40,
+                                  ),
+                                );
+                              }
+                              
+                              return const Icon(
+                                Icons.directions_car,
+                                color: Colors.deepPurple,
+                                size: 40,
+                              );
+                            },
+                          ),
+                        );
+                      } else {
+                        return const Icon(
+                          Icons.directions_car,
+                          color: Colors.deepPurple,
+                          size: 40,
+                        );
+                      }
+                    }
                   ),
                 ),
                 const SizedBox(width: 16),

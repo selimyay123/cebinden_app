@@ -116,6 +116,6 @@ def split_smart(image_path, output_dir):
     print(f"Final total images: {image_count}")
 
 if __name__ == "__main__":
-    input_path = "/Users/selimyay/cebinden/assets/car_images/fialto/zorno/ZORNO.png"
-    output_dir = "/Users/selimyay/cebinden/assets/car_images/fialto/zorno/"
+    input_path = "/Users/selimyay/cebinden/assets/car_images/koyoro/lotus/lotos.png"
+    output_dir = "/Users/selimyay/cebinden/assets/car_images/koyoro/lotus/"
     split_smart(input_path, output_dir)

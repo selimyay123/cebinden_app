@@ -240,7 +240,7 @@ class AIBuyer {
     // Fictional brand names used in the app
     final allBrands = [
       'Bavora', 'Mercurion', 'Audira', 'Volkstar', 'Fortran',
-      'Renauva', 'Fialto', 'Koyoro', 'Hanto', 'Hundar', 'Oplon',
+      'Renauva', 'Fialto', 'Koyoro', 'Hanto', /* 'Hundar', */ 'Oplon',
     ];
     
     // 2-4 arası marka seç (daha geniş tercihler)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
+import '../utils/vehicle_utils.dart';
 import 'vehicle_list_screen.dart';
 import 'home_screen.dart';
 
@@ -198,6 +199,9 @@ class ModelSelectionScreen extends StatelessWidget {
     // Model açıklaması (isteğe bağlı)
     final modelDescription = _getModelDescription(modelName, currentLanguage);
     
+    // Model resmi (varsa)
+    final modelImage = _getModelImage(brandName, modelName);
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
@@ -230,19 +234,23 @@ class ModelSelectionScreen extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                // Model İkonu
+                // Model İkonu veya Resmi
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: modelImage != null ? 90 : 60, // Resim varsa daha geniş
+                  height: 60,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: categoryColor.withOpacity(0.3),
-                      width: 2,
+                      width: 1, // Daha ince çerçeve
                     ),
+                    image: modelImage != null ? DecorationImage(
+                      image: AssetImage(modelImage),
+                      fit: BoxFit.contain,
+                    ) : null,
                   ),
-                  child: Center(
+                  child: modelImage == null ? Center(
                     child: Text(
                       modelIcon,
                       style: TextStyle(
@@ -251,7 +259,7 @@ class ModelSelectionScreen extends StatelessWidget {
                         color: categoryColor,
                       ),
                     ),
-                  ),
+                  ) : null,
                 ),
                 const SizedBox(width: 16),
                 
@@ -298,6 +306,10 @@ class ModelSelectionScreen extends StatelessWidget {
 
   String? _getModelDescription(String modelName, String currentLanguage) {
     return 'models.descriptions.$brandName.$modelName'.tr();
+  }
+
+  String? _getModelImage(String brandName, String modelName) {
+    return VehicleUtils.getVehicleImage(brandName, modelName, index: 1);
   }
 }
 

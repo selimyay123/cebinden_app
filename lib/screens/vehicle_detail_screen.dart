@@ -1082,7 +1082,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       onWillPop: () async => false,
       child: Center(
         child: Lottie.asset(
-          'assets/animations/ekspertiz_animasyon.json',
+          'assets/animations/satinal.json',
           width: 300,
           height: 300,
           repeat: false,
@@ -1846,62 +1846,55 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         actions: [
           Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('common.ok'.tr()),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Dialog'u kapat
-                        // MyOffers sayfasına yönlendir (Gönderdiğim Teklifler sekmesi)
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MyOffersScreen(initialTab: 1),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: Text(
-                        'offer.viewOffers'.tr(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
               if (decision == 'counter' && counterOffer != null && offer != null) ...[
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Dialog'u kapat
-                      _handleAcceptCounterOffer(offer);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _showCounterOfferDialog(offer);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text('offers.accept'.tr()),
+                  ),
+                  child: Text('offer.sendCounterOffer'.tr()), // "Karşı Teklif Yap"
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _handleAcceptCounterOffer(offer);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text('offers.accept'.tr()),
+                ),
+                const SizedBox(height: 8),
+              ],
+              OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ],
+                child: Text('common.close'.tr()),
+              ),
             ],
           ),
+
         ],
       ),
     );
@@ -1978,8 +1971,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Dönen çekiç/tokmak animasyonu
-              Lottie.asset(
-                'assets/animations/buying_car.json',
+                Lottie.asset(
+                  'assets/animations/satinal.json',
                 width: 300,
                 height: 300,
                 repeat: false, // Sadece 1 kez oynat
@@ -2235,6 +2228,249 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
 
+
+  /// Karşı teklif gönderme dialogunu göster
+  void _showCounterOfferDialog(Offer offer) {
+    final TextEditingController counterOfferController = TextEditingController();
+    final minOffer = offer.offerPrice;
+    final maxOffer = offer.counterOfferAmount!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.local_offer, color: Colors.deepPurple),
+            const SizedBox(width: 8),
+            Text('offer.sendCounterOffer'.tr()),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${offer.vehicleBrand} ${offer.vehicleModel}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'offer.yourOffer'.tr(),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                        Text(
+                          '${_formatCurrency(minOffer)} TL',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'offer.sellerCounterOffer'.tr(),
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                        Text(
+                          '${_formatCurrency(maxOffer)} TL',
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: counterOfferController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // Sadece rakam
+                  _ThousandsSeparatorInputFormatter(), // Binlik ayırıcı
+                ],
+                decoration: InputDecoration(
+                  labelText: 'offer.yourCounterOffer'.tr(),
+                  hintText: '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} TL',
+                  suffixText: 'common.currency'.tr(),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.money),
+                  helperText: 'offer.counterOfferRange'.tr(),
+                  helperMaxLines: 2,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.blue[700], size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'offer.counterOfferInfo'.tr(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.blue[900],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final offerText = counterOfferController.text.trim();
+              if (offerText.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.enterAmountError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
+                );
+                return;
+              }
+
+              final newOffer = double.tryParse(offerText.replaceAll('.', ''));
+              if (newOffer == null || newOffer <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.invalidAmountError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
+                );
+                return;
+              }
+
+              // Aralık kontrolü
+              if (newOffer <= minOffer || newOffer >= maxOffer) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('offer.counterOfferRangeError'.tr()),
+                    backgroundColor: Colors.red.withOpacity(0.8),
+                  ),
+                );
+                return;
+              }
+
+              Navigator.pop(context);
+              _submitCounterOffer(offer, newOffer);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('offer.sendOffer'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Karşı teklif gönder
+  Future<void> _submitCounterOffer(Offer originalOffer, double newOfferAmount) async {
+    // Loading göster
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      final currentUser = await _authService.getCurrentUser();
+      if (currentUser == null) {
+        if (mounted) Navigator.pop(context);
+        return;
+      }
+
+      final result = await _offerService.submitCounterOfferResponse(
+        offer: originalOffer,
+        newOfferAmount: newOfferAmount,
+      );
+
+      // Loading kapat
+      if (mounted) Navigator.pop(context);
+
+      if (!result['success']) {
+        throw Exception(result['error'] ?? 'Unknown error');
+      }
+
+      // 🆕 Eğer teklif kabul edildiyse animasyon ve başarı dialogu göster
+      if (result['decision'] == 'accept' || result['status'] == OfferStatus.accepted) {
+        // 🎬 Satın alma animasyonunu oynat
+        await _playPurchaseAnimation();
+
+        // İlanı kaldır (Marketten sil)
+        _marketService.removeListing(originalOffer.vehicleId);
+
+        // Kullanıcıyı güncelle (bakiye değişti)
+        await _loadCurrentUser();
+
+        // Başarı dialogunu göster
+        if (mounted && _currentUser != null) {
+          _showPurchaseSuccessDialog(_currentUser!.balance);
+        }
+      } else {
+        // Normal karşı teklif gönderildi
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('offers.counterOfferSuccess'.tr()),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
 }
 

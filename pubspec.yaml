@@ -110,6 +110,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/images/
     - assets/images/brands/
     # - assets/car_images/fialto/zorno/
     # - assets/car_images/Renauva/
@@ -135,6 +136,25 @@ flutter:
     - assets/car_images/fialto/agna/
     - assets/car_images/fialto/lagua/
     - assets/car_images/fialto/zorno/
+    - assets/car_images/volkstar/paso/
+    - assets/car_images/volkstar/colo/
+    - assets/car_images/volkstar/jago/
+    - assets/car_images/volkstar/tenis/
+    - assets/car_images/mercurion/1/
+    - assets/car_images/mercurion/gje/
+    - assets/car_images/mercurion/3/
+    - assets/car_images/mercurion/5/
+    - assets/car_images/mercurion/8/
+    - assets/car_images/hanto/vice/
+    - assets/car_images/hanto/vhl/
+    - assets/car_images/hanto/caz/
+    - assets/car_images/audira/b3/
+    - assets/car_images/audira/b4/
+    - assets/car_images/audira/b5/
+    - assets/car_images/audira/b6/
+    - assets/car_images/koyoro/airoko/
+    - assets/car_images/koyoro/karma/
+    - assets/car_images/koyoro/lotus/
     # - assets/car_images/Fortran/
     # - assets/car_images/Mercurion/
     # - assets/car_images/Hundar/

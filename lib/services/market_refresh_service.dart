@@ -5,6 +5,7 @@ import '../models/vehicle_model.dart';
 import 'localization_service.dart';
 import 'game_time_service.dart';
 import 'settings_helper.dart';
+import '../utils/vehicle_utils.dart';
 
 /// Pazar yenileme ve ilan yaşam döngüsü yönetim servisi
 class MarketRefreshService {
@@ -32,7 +33,7 @@ class MarketRefreshService {
     'Bavora': 0.077,       // %7.7
     'Fortran': 0.070,      // %7.0
     'Mercurion': 0.064,    // %6.4
-    'Hundar': 0.058,     // %5.8
+    // 'Hundar': 0.058,     // %5.8
     'Koyoro': 0.055,       // %5.5
     'Audira': 0.044,       // %4.4
     'Hanto': 0.037,      // %3.7
@@ -82,13 +83,13 @@ class MarketRefreshService {
       'GJE': 0.0998,       // CLA - %9.98
       '8 Serisi': 0.0926,  // G-Class - %9.26
     },
-    'Hundar': {
-      'A10': 0.5215,       // i20 - %52.15
-      'Tecent Red': 0.1925, // Accent Blue - %19.25
-      'Tecent White': 0.1095, // Accent Era - %10.95
-      'A20': 0.0995,       // i30 - %9.95
-      'Kascon': 0.0769,    // Tucson - %7.69
-    },
+    // 'Hundar': {
+    //   'A10': 0.5215,       // i20 - %52.15
+    //   'Tecent Red': 0.1925, // Accent Blue - %19.25
+    //   'Tecent White': 0.1095, // Accent Era - %10.95
+    //   'A20': 0.0995,       // i30 - %9.95
+    //   'Kascon': 0.0769,    // Tucson - %7.69
+    // },
     'Koyoro': {
       'Airoko': 0.8193,    // Corolla - %81.93
       'Lotus': 0.1165,     // Auris - %11.65
@@ -119,7 +120,7 @@ class MarketRefreshService {
     'Bavora': ['C Serisi', 'E Serisi', 'A Serisi', 'D Serisi'],
     'Fortran': ['Odak', 'Vista', 'Avger', 'Tupa'],
     'Mercurion': ['3 Serisi', '5 Serisi', '1 Serisi', 'GJE', '8 Serisi'],
-    'Hundar': ['A10', 'Tecent Red', 'Tecent White', 'A20', 'Kascon'],
+    // 'Hundar': ['A10', 'Tecent Red', 'Tecent White', 'A20', 'Kascon'],
     'Koyoro': ['Airoko', 'Lotus', 'Karma'],
     'Audira': ['B3', 'B4', 'B6', 'B5'],
     'Hanto': ['Vice', 'VHL', 'Caz'],
@@ -187,13 +188,13 @@ class MarketRefreshService {
       'GJE': 3000000.0,       // CLA C118 (AMG Line, 4 Kapı Coupe) - ₺2.400.000-₺3.000.000 tavan
       '8 Serisi': 25000000.0, // G-Class (G 63 AMG) - ₺15.000.000-₺25.000.000+ tavan - OYUNUN EN PAHALI ARACI!
     },
-    'Hundar': {
-      'A10': 1100000.0,        // i20 III (Style Plus, Elite) - ₺900.000-₺1.100.000 tavan
-      'Tecent Red': 700000.0,  // Accent Blue (Mode Plus, Dizel Oto) - ₺550.000-₺700.000 tavan
-      'Tecent White': 520000.0, // Accent Era (Team, Dizel Oto) - ₺400.000-₺520.000 tavan
-      'A20': 1600000.0,        // i30 III (Elite, N-Line) - ₺1.250.000-₺1.600.000 tavan
-      'Kascon': 2500000.0,     // Tucson NX4 (Elite Plus, Hibrit) - ₺1.800.000-₺2.500.000 tavan
-    },
+    // 'Hundar': {
+    //   'A10': 1100000.0,        // i20 III (Style Plus, Elite) - ₺900.000-₺1.100.000 tavan
+    //   'Tecent Red': 700000.0,  // Accent Blue (Mode Plus, Dizel Oto) - ₺550.000-₺700.000 tavan
+    //   'Tecent White': 520000.0, // Accent Era (Team, Dizel Oto) - ₺400.000-₺520.000 tavan
+    //   'A20': 1600000.0,        // i30 III (Elite, N-Line) - ₺1.250.000-₺1.600.000 tavan
+    //   'Kascon': 2500000.0,     // Tucson NX4 (Elite Plus, Hibrit) - ₺1.800.000-₺2.500.000 tavan
+    // },
     'Koyoro': {
       'Airoko': 2000000.0,     // Corolla E210 (Passion, Flame X-Pack, Hibrit) - ₺1.550.000-₺2.000.000 tavan
       'Lotus': 950000.0,       // Auris (Premium, Elegant, Hibrit) - ₺750.000-₺950.000 tavan
@@ -787,6 +788,7 @@ class MarketRefreshService {
       'horsepower': {'min': 245, 'max': 585}, // 245-585 HP (OYUNUN EN GÜÇLÜ ARACI!)
     },
     
+    /*
     // HUNDAR A10 (i20) - %52.15 spawn
     'Hundar_A10': {
       'bodyTypes': {
@@ -886,6 +888,7 @@ class MarketRefreshService {
       'engineSize': {'min': 1.6, 'max': 2.0}, // 1.6 T-GDI/CRDi, 2.0
       'horsepower': {'min': 136, 'max': 230}, // 136-230 HP (Hibrit en yüksek)
     },
+    */
     
     // KOYORO AIROKO (Corolla) - %81.93 spawn
     'Koyoro_Airoko': {
@@ -2566,141 +2569,7 @@ class MarketRefreshService {
 
   /// Marka ve modele göre araç resmi seç (Ölçeklenebilir yapı)
   String? _getVehicleImage(String brand, String model) {
-    // 1. Özel Durumlar (Manuel tanımlamalar)
-
-    
-    // 2. Klasör Bazlı Yapı (Yeni Standart)
-    // Örn: assets/car_images/bavora/e_series/e_series_1.png
-    if (brand == 'Bavora') {
-      if (model == 'E Serisi') {
-        // 1-6 arası rastgele resim
-        final index = 1 + _random.nextInt(6);
-        return 'assets/car_images/bavora/e_series/e_series_$index.png';
-      } else if (model == 'A Serisi') {
-        // 1-6 arası rastgele resim
-        final index = 1 + _random.nextInt(6);
-        return 'assets/car_images/bavora/a_series/a_series_$index.png';
-      } else if (model == 'D Serisi') {
-        // 1-6 arası rastgele resim
-        final index = 1 + _random.nextInt(6);
-        return 'assets/car_images/bavora/d_series/d_series_$index.png';
-      } else {
-        // Diğer Bavora modelleri (şimdilik eski yapı - C Serisi vb.)
-        // Eski yapı: assets/car_images/bavora/bavora_X.png
-        final index = 1 + _random.nextInt(6);
-        return 'assets/car_images/bavora/bavora_$index.png';
-      }
-    }
-    
-    // 3. Renauva Slim (Yeni Yapı)
-    if (brand == 'Renauva' && model == 'Slim') {
-      // 1-6 arası rastgele resim (Refined Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/renauva/slim/slim_$index.png';
-    }
-    
-    // 4. Renauva Magna (Yeni Yapı)
-    if (brand == 'Renauva' && model == 'Magna') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/renauva/magna/magna_$index.png';
-    }
-
-    // 5. Renauva Flow (Yeni Yapı)
-    if (brand == 'Renauva' && model == 'Flow') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/renauva/flow/flow_$index.png';
-    }
-
-    // 6. Renauva Signa (Yeni Yapı)
-    if (brand == 'Renauva' && model == 'Signa') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/renauva/signa/signa_$index.png';
-    }
-
-    // 7. Renauva Tallion (Yeni Yapı)
-    if (brand == 'Renauva' && model == 'Tallion') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/renauva/tallion/tallion_$index.png';
-    }
-
-    // 8. Fortran Odak (Yeni Yapı)
-    if (brand == 'Fortran' && model == 'Odak') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/fortran/odak/odak_$index.png';
-    }
-
-    // 9. Fortran Vista (Yeni Yapı)
-    if (brand == 'Fortran' && model == 'Vista') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/fortran/vista/vista_$index.png';
-    }
-
-    // 10. Fortran Avger (Yeni Yapı)
-    if (brand == 'Fortran' && model == 'Avger') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/fortran/avger/avger_$index.png';
-    }
-
-    // 11. Fortran Tupa (Yeni Yapı)
-    if (brand == 'Fortran' && model == 'Tupa') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/fortran/tupa/tupa_$index.png';
-    }
-
-    // 12. Oplon Mornitia (Yeni Yapı)
-    if (brand == 'Oplon' && model == 'Mornitia') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/oplon/mornitia/mornitia_$index.png';
-    }
-
-    // 13. Oplon Lorisa (Yeni Yapı)
-    if (brand == 'Oplon' && model == 'Lorisa') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/oplon/lorisa/lorisa_$index.png';
-    }
-
-    // 14. Oplon Tasra (Yeni Yapı)
-    if (brand == 'Oplon' && model == 'Tasra') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/oplon/tasra/tasra_$index.png';
-    }
-
-    // 15. Fialto Agna (Yeni Yapı)
-    if (brand == 'Fialto' && model == 'Agna') {
-      // 1-4 arası rastgele resim (Smart Split - 2 merged row filtered)
-      final index = 1 + _random.nextInt(4);
-      return 'assets/car_images/fialto/agna/agna_$index.png';
-    }
-
-    // 16. Fialto Lagua (Yeni Yapı)
-    if (brand == 'Fialto' && model == 'Lagua') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/fialto/lagua/lagua_$index.png';
-    }
-
-    // 17. Fialto Zorno (Yeni Yapı)
-    if (brand == 'Fialto' && model == 'Zorno') {
-      // 1-6 arası rastgele resim (Smart Split)
-      final index = 1 + _random.nextInt(6);
-      return 'assets/car_images/fialto/zorno/zorno_$index.png';
-    }
-
-    // 18. Varsayılan Tek Resim Yapısı
-    // Örn: assets/car_images/Renauva/Slim.png
-    final safeModelName = model.replaceAll(' ', '_');
-    return 'assets/car_images/$brand/$safeModelName.png';
+    return VehicleUtils.getVehicleImage(brand, model);
   }
 }
 
