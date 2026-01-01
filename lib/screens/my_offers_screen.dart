@@ -158,7 +158,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     
     // Aksi takdirde, tab view ile marka listelerini göster
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('offers.title'.tr()),
         actions: [
@@ -172,7 +172,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             },
           ),
         ],
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
@@ -192,59 +192,69 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ],
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController!,
-              children: [
-                // Gelen Teklifler - Marka Listesi
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    child: Column(
-                      children: [
-                        // 🆕 Uyarı Mesajı
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          color: Colors.deepPurple.shade50,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.info_outline, color: Colors.deepPurple),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'offers.limitWarning'.tr(),
-                                  style: TextStyle(
-                                    color: Colors.deepPurple.shade900,
-                                    fontSize: 13,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : TabBarView(
+                  controller: _tabController!,
+                  children: [
+                    // Gelen Teklifler - Marka Listesi
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        child: Column(
+                          children: [
+                            // 🆕 Uyarı Mesajı
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              color: Colors.deepPurple.shade50.withValues(alpha: 0.9),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.info_outline, color: Colors.deepPurple),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'offers.limitWarning'.tr(),
+                                      style: TextStyle(
+                                        color: Colors.deepPurple.shade900,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            Expanded(
+                              child: _incomingOffersByBrand.isEmpty
+                                  ? _buildEmptyState(isIncoming: true)
+                                  : _buildBrandList(isIncoming: true),
+                            ),
+                          ],
                         ),
-                        Expanded(
-                          child: _incomingOffersByBrand.isEmpty
-                              ? _buildEmptyState(isIncoming: true)
-                              : _buildBrandList(isIncoming: true),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
 
-                // Gönderilen Teklifler - Marka Listesi
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    child: _sentOffersByBrand.isEmpty
-                        ? _buildEmptyState(isIncoming: false)
-                        : _buildBrandList(isIncoming: false),
-                  ),
+                    // Gönderilen Teklifler - Marka Listesi
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        child: _sentOffersByBrand.isEmpty
+                            ? _buildEmptyState(isIncoming: false)
+                            : _buildBrandList(isIncoming: false),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+        ),
+      ),
     );
   }
 
@@ -297,7 +307,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -428,9 +438,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     }
     
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('${widget.selectedBrand} ${'myVehicles.myVehicles'.tr()}'),
+        title: Text('${widget.selectedBrand} ${'offers.title'.tr()}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.home),
@@ -442,60 +452,84 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             },
           ),
         ],
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: activeVehicles.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.check_circle_outline,
-                              size: 80,
-                              color: Colors.grey[300],
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: activeVehicles.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_outline,
+                                  size: 80,
+                                  color: Colors.white70,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'myVehicles.noActiveOffers'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(0, 1),
+                                        blurRadius: 2,
+                                        color: Colors.black54,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'myVehicles.noPendingOffersForBrand'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white70,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(0, 1),
+                                        blurRadius: 2,
+                                        color: Colors.black54,
+                                      ),
+                                    ],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'myVehicles.noActiveOffers'.tr(),
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[700],
-                              ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _loadOffers,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: activeVehicles.length,
+                              itemBuilder: (context, index) {
+                                final vehicleId = activeVehicles.keys.elementAt(index);
+                                final offers = activeVehicles[vehicleId]!;
+                                return _buildVehicleSelectionCard(vehicleId, offers);
+                              },
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'myVehicles.noPendingOffersForBrand'.tr(),
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[500],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _loadOffers,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: activeVehicles.length,
-                          itemBuilder: (context, index) {
-                            final vehicleId = activeVehicles.keys.elementAt(index);
-                            final offers = activeVehicles[vehicleId]!;
-                            return _buildVehicleSelectionCard(vehicleId, offers);
-                          },
-                        ),
-                      ),
-              ),
-            ),
+                          ),
+                  ),
+                ),
+        ),
+      ),
     );
   }
 
@@ -515,7 +549,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final firstOffer = vehicleOffers.isNotEmpty ? vehicleOffers.first : null;
     
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(firstOffer != null 
           ? '${firstOffer.vehicleBrand} ${firstOffer.vehicleModel}'
@@ -531,71 +565,81 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             },
           ),
         ],
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: vehicleOffers.isEmpty
-                    ? _buildEmptyState(isIncoming: isIncoming)
-                    : RefreshIndicator(
-                        onRefresh: _loadOffers,
-                        child: ListView(
-                          padding: const EdgeInsets.all(16),
-                          children: [
-                            // Araç Bilgi Kartı
-                            if (firstOffer != null) _buildVehicleInfoCard(firstOffer),
-                            const SizedBox(height: 16),
-                            
-                            // "Tüm Teklifleri Reddet" Butonu (Sadece gelen tekliflerde ve bekleyen teklif varsa)
-                            if (isIncoming && vehicleOffers.any((o) => o.isPending))
-                              Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                child: Center(
-                                  child: SizedBox(
-                                    height: 36,
-                                    child: ElevatedButton.icon(
-                                      onPressed: () => _rejectAllOffers(vehicleOffers),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red.shade50,
-                                        foregroundColor: Colors.red,
-                                        elevation: 0,
-                                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18),
-                                          side: BorderSide(color: Colors.red.shade200),
-                                        ),
-                                      ),
-                                      icon: const Icon(Icons.delete_sweep, size: 18),
-                                      label: Text(
-                                        'myVehicles.rejectAll'.tr(),
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: vehicleOffers.isEmpty
+                        ? _buildEmptyState(isIncoming: isIncoming)
+                        : RefreshIndicator(
+                            onRefresh: _loadOffers,
+                            child: ListView(
+                              padding: const EdgeInsets.all(16),
+                              children: [
+                                // Araç Bilgi Kartı
+                                if (firstOffer != null) _buildVehicleInfoCard(firstOffer),
+                                const SizedBox(height: 16),
+                                
+                                // "Tüm Teklifleri Reddet" Butonu (Sadece gelen tekliflerde ve bekleyen teklif varsa)
+                                if (isIncoming && vehicleOffers.any((o) => o.isPending))
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 16),
+                                    child: Center(
+                                      child: SizedBox(
+                                        height: 36,
+                                        child: ElevatedButton.icon(
+                                          onPressed: () => _rejectAllOffers(vehicleOffers),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red.shade50.withValues(alpha: 0.9),
+                                            foregroundColor: Colors.red,
+                                            elevation: 0,
+                                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(18),
+                                              side: BorderSide(color: Colors.red.shade200),
+                                            ),
+                                          ),
+                                          icon: const Icon(Icons.delete_sweep, size: 18),
+                                          label: Text(
+                                            'myVehicles.rejectAll'.tr(),
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            
-                            // Teklif Listesi
-                            ...vehicleOffers.map((offer) {
-                              if (isIncoming) {
-                                return _buildIncomingOfferCard(offer);
-                              } else {
-                                return _buildSentOfferCard(offer);
-                              }
-                            }).toList(),
-                          ],
-                        ),
-                      ),
-              ),
-            ),
+                                
+                                // Teklif Listesi
+                                ...vehicleOffers.map((offer) {
+                                  if (isIncoming) {
+                                    return _buildIncomingOfferCard(offer);
+                                  } else {
+                                    return _buildSentOfferCard(offer);
+                                  }
+                                }).toList(),
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
+        ),
+      ),
     );
   }
 
@@ -607,15 +651,22 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           Icon(
             Icons.local_offer_outlined, // Changed icon to match style
             size: 80, // Adjusted size
-            color: Colors.grey[300],
+            color: Colors.white70,
           ),
           const SizedBox(height: 16),
           Text(
             isIncoming ? 'myVehicles.noIncomingOffers'.tr() : 'myVehicles.noSentOffers'.tr(), // Hardcoded for now or use tr() if keys exist
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  offset: Offset(0, 1),
+                  blurRadius: 2,
+                  color: Colors.black54,
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),
@@ -624,9 +675,16 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 ? 'myVehicles.noIncomingOffersDesc'.tr()
                 : 'myVehicles.noSentOffersDesc'.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
-              color: Colors.grey[500],
+              color: Colors.white70,
+              shadows: [
+                Shadow(
+                  offset: Offset(0, 1),
+                  blurRadius: 2,
+                  color: Colors.black54,
+                ),
+              ],
             ),
           ),
         ],
@@ -642,6 +700,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     final rejectedOffers = offers.where((o) => o.status == OfferStatus.rejected).toList();
 
     return Card(
+      color: Colors.white.withValues(alpha: 0.9),
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -674,7 +733,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.deepPurple.shade50,
+                color: Colors.deepPurple.shade50.withValues(alpha: 0.9),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
@@ -774,7 +833,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.deepPurple.shade50, Colors.white],
+            colors: [
+              Colors.deepPurple.shade50.withValues(alpha: 0.9),
+              Colors.white.withValues(alpha: 0.9)
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -896,18 +958,32 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         children: [
                           Text(
                             offer.buyerName,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade600,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 2,
+                                  color: Colors.black54,
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             _getTimeAgo(offer.offerDate),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
-                              color: Colors.grey.shade400,
+                              color: Colors.white70,
+                              shadows: [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 2,
+                                  color: Colors.black54,
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -1109,20 +1185,21 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   // Karşı Teklif
                   Expanded(
                     flex: 2, // Daha geniş
-                    child: OutlinedButton.icon(
+                    child: ElevatedButton.icon(
                       onPressed: () => _showCounterOfferDialogForIncoming(offer, null),
                       icon: const Icon(Icons.swap_horiz, size: 16),
                       label: Text(
                         'offers.counter'.tr(),
-                        style: const TextStyle(fontSize: 13),
-                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                       ),
-                      style: OutlinedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple.shade50.withOpacity(0.9),
                         foregroundColor: Colors.deepPurple,
-                        side: BorderSide(color: Colors.deepPurple.shade200),
+                        elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.deepPurple.withOpacity(0.5)),
                         ),
                         visualDensity: VisualDensity.compact,
                       ),
@@ -1132,14 +1209,16 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   
                   // Reddet
                   Expanded(
-                    child: OutlinedButton(
+                    child: ElevatedButton(
                       onPressed: () => _handleRejectOffer(offer),
-                      style: OutlinedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade50.withOpacity(0.9),
                         foregroundColor: Colors.red,
-                        side: BorderSide(color: Colors.red.shade200),
+                        elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.red.withOpacity(0.5)),
                         ),
                         visualDensity: VisualDensity.compact,
                       ),
@@ -1630,13 +1709,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   Color _getOfferBackgroundColor(Offer offer) {
     if (offer.status == OfferStatus.accepted) {
-      return Colors.green.shade50;
+      return Colors.green.shade50.withValues(alpha: 0.9);
     } else if (offer.status == OfferStatus.rejected) {
-      return Colors.red.shade50;
+      return Colors.red.shade50.withValues(alpha: 0.9);
     } else if (offer.offerPercentage >= -10) {
-      return Colors.deepPurple.shade50;
+      return Colors.deepPurple.shade50.withValues(alpha: 0.9);
     } else {
-      return Colors.grey.shade50;
+      return Colors.grey.shade50.withValues(alpha: 0.9);
     }
   }
 
@@ -1985,18 +2064,32 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         children: [
                           Text(
                             _getTimeAgo(offer.offerDate),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
-                              color: Colors.grey.shade400,
+                              color: Colors.white70,
+                              shadows: [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 2,
+                                  color: Colors.black54,
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             'offers.you'.tr(), // "Siz"
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade600,
+                              color: Colors.white,
+                              shadows: [
+                                Shadow(
+                                  offset: Offset(0, 1),
+                                  blurRadius: 2,
+                                  color: Colors.black54,
+                                ),
+                              ],
                             ),
                           ),
                         ],

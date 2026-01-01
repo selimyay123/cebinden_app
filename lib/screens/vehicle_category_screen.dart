@@ -108,7 +108,7 @@ class VehicleCategoryScreen extends StatelessWidget {
         shadowColor: Colors.black.withOpacity(0.1),
         child: InkWell(
           onTap: () async {
-            // Otomobil kategorisi için marka seçimi, diğerleri için direkt liste
+            // isi için marka seçimi, diğerleri için direkt liste
             if (categoryKey == 'auto') {
               final purchased = await Navigator.push(
                 context,

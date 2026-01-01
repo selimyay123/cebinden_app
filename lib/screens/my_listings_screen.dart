@@ -100,34 +100,42 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
       builder: (context, currentLanguage, child) {
         // Eğer belirli bir marka seçilmişse, eski davranışı koru
         if (widget.selectedBrand != null) {
-          return Scaffold(
-            backgroundColor: Colors.grey[100],
-            appBar: AppBar(
-              title: Text(widget.selectedBrand!),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.home),
-                  onPressed: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      (route) => false,
-                    );
-                  },
+            return Scaffold(
+              // backgroundColor: Colors.grey[100],
+              appBar: AppBar(
+                title: Text(widget.selectedBrand!),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.home),
+                    onPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                        (route) => false,
+                      );
+                    },
+                  ),
+                ],
+                elevation: 0,
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+              ),
+              body: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/general_bg.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ],
-              elevation: 0,
-              backgroundColor: Colors.deepPurple,
-              foregroundColor: Colors.white,
-            ),
-            body: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _buildListingList(),
-          );
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _buildListingList(),
+              ),
+            );
         }
         
         // Yeni TabBar'lı görünüm
         return Scaffold(
-          backgroundColor: Colors.grey[100],
+          // backgroundColor: Colors.grey[100],
           appBar: AppBar(
             title: Text('listings.title'.tr()),
             actions: [
@@ -155,23 +163,31 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               ],
             ),
           ),
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              // Tab 1: İlanlarım
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _userListedVehicles.isEmpty
-                      ? _buildEmptyState()
-                      : _buildBrandList(),
-              
-              // Tab 2: Favori İlanlarım
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _favoriteListings.isEmpty
-                      ? _buildEmptyFavoritesState()
-                      : _buildFavoritesList(),
-            ],
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/general_bg.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Tab 1: İlanlarım
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _userListedVehicles.isEmpty
+                        ? _buildEmptyState()
+                        : _buildBrandList(),
+                
+                // Tab 2: Favori İlanlarım
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _favoriteListings.isEmpty
+                        ? _buildEmptyFavoritesState()
+                        : _buildFavoritesList(),
+              ],
+            ),
           ),
         );
       },
@@ -248,12 +264,23 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
           children: [
             // Arkaplan dekoratif eleman
             Positioned(
-              right: -20,
-              bottom: -20,
-              child: Icon(
-                Icons.store,
-                size: 100,
-                color: brandColor.withOpacity(0.1),
+              right: -10,
+              bottom: -10,
+              child: Opacity(
+                opacity: 0.15,
+                child: Image.asset(
+                  'assets/images/brands/${brand.toLowerCase()}.png',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.store,
+                      size: 100,
+                      color: brandColor.withOpacity(0.1),
+                    );
+                  },
+                ),
               ),
             ),
             

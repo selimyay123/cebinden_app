@@ -68,21 +68,29 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadUserVehicles,
-              child: _userVehicles.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _userVehicles.length,
-                      itemBuilder: (context, index) {
-                        final vehicle = _userVehicles[index];
-                        return _buildVehicleCard(vehicle);
-                      },
-                    ),
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: _loadUserVehicles,
+                child: _userVehicles.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _userVehicles.length,
+                        itemBuilder: (context, index) {
+                          final vehicle = _userVehicles[index];
+                          return _buildVehicleCard(vehicle);
+                        },
+                      ),
+              ),
+      ),
     );
   }
 

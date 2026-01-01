@@ -161,7 +161,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
         return Scaffold(
-      backgroundColor: Colors.grey[100],
+      // backgroundColor: Colors.grey[100], // Arka plan resmi kullanıldığı için kaldırıldı
       appBar: AppBar(
         title: Text(widget.categoryName),
         actions: [
@@ -179,238 +179,246 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          // Filtreler (Üstte sabit)
-          Container(
-            color: Colors.white,
-            child: Column(
-              children: [
-                // Ana Filtre Kategorileri
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      // Yakıt Tipi
-                      _buildCategoryFilter(
-                        'vehicles.filterFuelType'.tr(),
-                        selectedFuelTypes.isNotEmpty,
-                        selectedFuelTypes.length,
-                        () => _showFuelTypeFilter(context),
-                      ),
-                      const SizedBox(width: 8),
-                      
-                      // Vites
-                      _buildCategoryFilter(
-                        'vehicles.filterTransmission'.tr(),
-                        selectedTransmissions.isNotEmpty,
-                        selectedTransmissions.length,
-                        () => _showTransmissionFilter(context),
-                      ),
-                      const SizedBox(width: 8),
-                      
-                      // Kilometre
-                      _buildCategoryFilter(
-                        'vehicles.filterMileage'.tr(),
-                        selectedMileageRanges.isNotEmpty,
-                        selectedMileageRanges.length,
-                        () => _showMileageFilter(context),
-                      ),
-                      const SizedBox(width: 8),
-                      
-                      // Fiyat
-                      _buildCategoryFilter(
-                        'vehicles.filterPrice'.tr(),
-                        selectedPriceRanges.isNotEmpty,
-                        selectedPriceRanges.length,
-                        () => _showPriceFilter(context),
-                      ),
-                      const SizedBox(width: 8),
-                      
-                      // Yıl
-                      _buildCategoryFilter(
-                        'vehicles.filterYear'.tr(),
-                        selectedYearRanges.isNotEmpty,
-                        selectedYearRanges.length,
-                        () => _showYearFilter(context),
-                      ),
-                      
-                      // Temizle Butonu
-                      if (selectedFuelTypes.isNotEmpty || 
-                          selectedTransmissions.isNotEmpty || 
-                          selectedMileageRanges.isNotEmpty || 
-                          selectedPriceRanges.isNotEmpty || 
-                          selectedYearRanges.isNotEmpty) ...[
-                        const SizedBox(width: 16),
-                        InkWell(
-                          onTap: _clearFilters,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.red[50],
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.red[300]!),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.clear, size: 16, color: Colors.red[700]),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'vehicles.clearFilters'.tr(),
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.red[700],
-                                    fontWeight: FontWeight.w600,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          children: [
+            // Filtreler (Üstte sabit)
+            Container(
+              color: Colors.white.withOpacity(0.9), // Hafif şeffaflık
+              child: Column(
+                children: [
+                  // Ana Filtre Kategorileri
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        // Yakıt Tipi
+                        _buildCategoryFilter(
+                          'vehicles.filterFuelType'.tr(),
+                          selectedFuelTypes.isNotEmpty,
+                          selectedFuelTypes.length,
+                          () => _showFuelTypeFilter(context),
+                        ),
+                        const SizedBox(width: 8),
+                        
+                        // Vites
+                        _buildCategoryFilter(
+                          'vehicles.filterTransmission'.tr(),
+                          selectedTransmissions.isNotEmpty,
+                          selectedTransmissions.length,
+                          () => _showTransmissionFilter(context),
+                        ),
+                        const SizedBox(width: 8),
+                        
+                        // Kilometre
+                        _buildCategoryFilter(
+                          'vehicles.filterMileage'.tr(),
+                          selectedMileageRanges.isNotEmpty,
+                          selectedMileageRanges.length,
+                          () => _showMileageFilter(context),
+                        ),
+                        const SizedBox(width: 8),
+                        
+                        // Fiyat
+                        _buildCategoryFilter(
+                          'vehicles.filterPrice'.tr(),
+                          selectedPriceRanges.isNotEmpty,
+                          selectedPriceRanges.length,
+                          () => _showPriceFilter(context),
+                        ),
+                        const SizedBox(width: 8),
+                        
+                        // Yıl
+                        _buildCategoryFilter(
+                          'vehicles.filterYear'.tr(),
+                          selectedYearRanges.isNotEmpty,
+                          selectedYearRanges.length,
+                          () => _showYearFilter(context),
+                        ),
+                        
+                        // Temizle Butonu
+                        if (selectedFuelTypes.isNotEmpty || 
+                            selectedTransmissions.isNotEmpty || 
+                            selectedMileageRanges.isNotEmpty || 
+                            selectedPriceRanges.isNotEmpty || 
+                            selectedYearRanges.isNotEmpty) ...[
+                          const SizedBox(width: 16),
+                          InkWell(
+                            onTap: _clearFilters,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.red[50],
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.red[300]!),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.clear, size: 16, color: Colors.red[700]),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'vehicles.clearFilters'.tr(),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.red[700],
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  
+                  // Sonuç Sayısı Banner
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    color: widget.categoryColor.withOpacity(0.1),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.directions_car,
+                          color: widget.categoryColor,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${filteredVehicles.length} ${'vehicles.foundVehicles'.tr()}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
-                    ],
-                  ),
-                ),
-                
-                // Sonuç Sayısı Banner
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  color: widget.categoryColor.withOpacity(0.1),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.directions_car,
-                        color: widget.categoryColor,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${filteredVehicles.length} ${'vehicles.foundVehicles'.tr()}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Sıralama Filtresi
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(color: Colors.grey[200]!),
-                bottom: BorderSide(color: Colors.grey[200]!),
-              ),
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Icon(Icons.sort, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 8),
-                  Text(
-                    'vehicles.sortBy'.tr(),
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  _buildSortChip(
-                    'vehicles.sortPriceLowToHigh'.tr(),
-                    'price_asc',
-                  ),
-                  const SizedBox(width: 8),
-                  _buildSortChip(
-                    'vehicles.sortPriceHighToLow'.tr(),
-                    'price_desc',
                   ),
                 ],
               ),
             ),
-          ),
 
-          // Bakiye Göstergesi
-          if (_currentBalance != null)
+            // Sıralama Filtresi
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: Colors.green.withOpacity(0.1),
-              child: Row(
-                children: [
-                  const Icon(Icons.account_balance_wallet, size: 18, color: Colors.green),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${'purchase.currentBalance'.tr()}:',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.green[800],
-                      fontWeight: FontWeight.w500,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9), // Hafif şeffaflık
+                border: Border(
+                  top: BorderSide(color: Colors.grey[200]!),
+                  bottom: BorderSide(color: Colors.grey[200]!),
+                ),
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Icon(Icons.sort, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Text(
+                      'vehicles.sortBy'.tr(),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[700],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${_formatCurrency(_currentBalance!)} TL',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.green[800],
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(width: 12),
+                    _buildSortChip(
+                      'vehicles.sortPriceLowToHigh'.tr(),
+                      'price_asc',
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    _buildSortChip(
+                      'vehicles.sortPriceHighToLow'.tr(),
+                      'price_desc',
+                    ),
+                  ],
+                ),
               ),
             ),
-          
-          // Araç Listesi
-          Expanded(
-            child: filteredVehicles.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 80,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'vehicles.noVehiclesFiltered'.tr(),
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: _clearFilters,
-                          child: Text('vehicles.clearFilters'.tr()),
-                        ),
-                      ],
+
+            // Bakiye Göstergesi
+            if (_currentBalance != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                color: Colors.green.withOpacity(0.1),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_balance_wallet, size: 18, color: Colors.green),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${'purchase.currentBalance'.tr()}:',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.green[800],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredVehicles.length,
-                    itemBuilder: (context, index) {
-                      final vehicle = filteredVehicles[index];
-                      return _buildVehicleCard(vehicle);
-                    },
-                  ),
-          ),
-        ],
+                    const SizedBox(width: 4),
+                    Text(
+                      '${_formatCurrency(_currentBalance!)} TL',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.green[800],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
+            // Araç Listesi
+            Expanded(
+              child: filteredVehicles.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 80,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'vehicles.noVehiclesFiltered'.tr(),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextButton(
+                            onPressed: _clearFilters,
+                            child: Text('vehicles.clearFilters'.tr()),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: filteredVehicles.length,
+                      itemBuilder: (context, index) {
+                        final vehicle = filteredVehicles[index];
+                        return _buildVehicleCard(vehicle);
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
       },

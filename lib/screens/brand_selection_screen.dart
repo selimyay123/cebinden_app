@@ -107,7 +107,8 @@ class BrandSelectionScreen extends StatelessWidget {
         );
 
         return Scaffold(
-          backgroundColor: Colors.grey[100],
+          backgroundColor: Colors.transparent, // Gradient için transparent yapıyoruz
+          extendBodyBehindAppBar: true, // Gradient'in AppBar arkasına geçmesi için (isteğe bağlı, şimdilik normal bırakalım)
           appBar: AppBar(
             title: Text('vehicles.selectBrand'.tr()),
             actions: [
@@ -125,56 +126,67 @@ class BrandSelectionScreen extends StatelessWidget {
             foregroundColor: Colors.white,
             elevation: 0,
           ),
-          body: Column(
-            children: [
-              // Bilgilendirme Banner
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                color: categoryColor.withOpacity(0.1),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: categoryColor, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '${'vehicles.categoryInfoAuto'.tr()} $categoryName',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/general_bg.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Column(
+              children: [
+                // AppBar ve Status Bar yüksekliği kadar boşluk bırak
+                SizedBox(height: kToolbarHeight + MediaQuery.of(context).padding.top),
+                
+                // Bilgilendirme Banner
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  color: categoryColor.withOpacity(0.1),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.deepPurpleAccent, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '${'vehicles.categoryInfoAuto'.tr()} $categoryName',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              // Marka Listesi
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: brands.length + 1, // +1 for "Tüm Modeller"
-                  itemBuilder: (context, index) {
-                    // İlk item "Tüm Modeller"
-                    if (index == 0) {
-                      return _buildAllBrandsCard(context);
-                    }
+                // Marka Listesi
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: brands.length + 1, // +1 for "Tüm Modeller"
+                    itemBuilder: (context, index) {
+                      // İlk item "Tüm Modeller"
+                      if (index == 0) {
+                        return _buildAllBrandsCard(context);
+                      }
 
-                    // Diğer markalar
-                    final brand = brands[index - 1];
-                    return _buildBrandCard(
-                      context,
-                      name: brand['name'] as String,
-                      hint: 'brands.hints.${brand['name']}'.tr(),
-                      color: brand['color'] as Color,
-                      icon: brand['icon'] as String,
-                      imagePath: brand['imagePath'] as String?,
-                    );
-                  },
+                      // Diğer markalar
+                      final brand = brands[index - 1];
+                      return _buildBrandCard(
+                        context,
+                        name: brand['name'] as String,
+                        hint: 'brands.hints.${brand['name']}'.tr(),
+                        color: brand['color'] as Color,
+                        icon: brand['icon'] as String,
+                        imagePath: brand['imagePath'] as String?,
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

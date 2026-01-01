@@ -212,54 +212,62 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Araç Bilgisi Kartı
-            _buildVehicleInfoCard(),
-            const SizedBox(height: 24),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // Araç Bilgisi Kartı
+              _buildVehicleInfoCard(),
+              const SizedBox(height: 24),
 
-            // Fiyat Girişi
-            _buildPriceInput(),
-            const SizedBox(height: 16),
+              // Fiyat Girişi
+              _buildPriceInput(),
+              const SizedBox(height: 16),
 
-            // Açıklama Girişi
-            _buildDescriptionInput(),
-            const SizedBox(height: 24),
+              // Açıklama Girişi
+              _buildDescriptionInput(),
+              const SizedBox(height: 24),
 
-            // Araç Özellikleri (Otomatik Dolu)
-            _buildVehicleDetails(),
-            const SizedBox(height: 32),
+              // Araç Özellikleri (Otomatik Dolu)
+              _buildVehicleDetails(),
+              const SizedBox(height: 32),
 
-            // Satışa Çıkar Butonu
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : _createListing,
-                icon: _isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.check_circle),
-                label: Text(_isLoading ? 'sell.creatingListing'.tr() : 'sell.listForSaleButton'.tr()),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              // Satışa Çıkar Butonu
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _createListing,
+                  icon: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.check_circle),
+                  label: Text(_isLoading ? 'sell.creatingListing'.tr() : 'sell.listForSaleButton'.tr()),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

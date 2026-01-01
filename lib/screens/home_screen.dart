@@ -1249,7 +1249,7 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(
               builder: (context) => BrandSelectionScreen(
                 categoryName: 'vehicles.categoryAuto'.tr(),
-                categoryColor: Colors.blue,
+                categoryColor: Colors.deepPurple,
               ),
             ),
           );
@@ -1640,7 +1640,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(
                           builder: (context) => BrandSelectionScreen(
                             categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
-                            categoryColor: Colors.blue,
+                            categoryColor: Colors.deepPurple,
                           ),
                         ),
                       );
@@ -2967,7 +2967,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(
                           builder: (context) => BrandSelectionScreen(
                             categoryName: 'vehicles.categoryAuto'.tr(), // Otomobil kategorisi
-                            categoryColor: Colors.blue,
+                            categoryColor: Colors.deepPurple,
                           ),
                         ),
                       );
