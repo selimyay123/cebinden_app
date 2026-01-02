@@ -7,6 +7,7 @@ import '../../services/database_helper.dart';
 import '../../models/user_model.dart';
 import '../../services/localization_service.dart';
 import 'chat_screen.dart';
+import '../../widgets/user_profile_avatar.dart';
 
 class FriendsTab extends StatefulWidget {
   const FriendsTab({super.key});
@@ -171,16 +172,12 @@ class _FriendsTabState extends State<FriendsTab> {
               ),
               child: ListTile(
                 onTap: () => _openChat(friendId, friendName, friendImage),
-                leading: CircleAvatar(
+                leading: UserProfileAvatar(
+                  imageUrl: friendImage,
+                  username: friendName,
+                  radius: 20,
                   backgroundColor: Colors.grey[800],
-                  backgroundImage: friendImage != null
-                      ? (friendImage.startsWith('assets/') 
-                          ? AssetImage(friendImage) 
-                          : NetworkImage(friendImage)) as ImageProvider
-                      : null,
-                  child: friendImage == null
-                      ? Text(friendName.isNotEmpty ? friendName[0].toUpperCase() : '?')
-                      : null,
+                  textColor: Colors.white,
                 ),
                 title: Text(
                   friendName,

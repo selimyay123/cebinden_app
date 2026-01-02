@@ -126,6 +126,9 @@ class MarketRefreshService {
     'Hanto': ['Vice', 'VHL', 'Caz'],
   };
 
+  /// Markalara göre modelleri getirir
+  Map<String, List<String>> get modelsByBrand => _modelsByBrand;
+
   // Sabit veriler
   final List<String> _cities = [
     'İstanbul', 'Ankara', 'İzmir', 'Antalya', 'Bursa',

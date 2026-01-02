@@ -42,6 +42,9 @@ import 'leaderboard_screen.dart';
 import '../services/leaderboard_service.dart';
 import '../widgets/city_skyline_painter.dart';
 import '../mixins/auto_refresh_mixin.dart';
+import 'collection_screen.dart';
+import '../widgets/user_profile_avatar.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   int _pendingOffersCount = 0; // Bekleyen teklif sayısı
   List<UserVehicle> _userVehicles = [];
   List<UserVehicle> _userListedVehicles = []; // Satışa çıkarılan araçlar
+  List<DailyQuest> _dailyQuests = []; // Günlük görevler
   
   // Tutorial için GlobalKey'ler
   final GlobalKey _marketButtonKey = GlobalKey();
@@ -195,6 +199,21 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       // Günlük kar/zarar sıfırlama kontrolü
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
+      
+      // Günlük görevleri yükle
+      final quests = await _questService.checkAndGenerateQuests(user.id);
+
+      if (mounted) {
+        setState(() {
+          _currentUser = user;
+          _userVehicles = vehicles;
+          _userListedVehicles = listedVehicles;
+          _vehicleCount = vehicleCount;
+          _pendingOffersCount = pendingOffers;
+          _dailyQuests = quests;
+          _isLoading = false;
+        });
+      }
       
       User updatedUser = user;
       
@@ -526,6 +545,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                   ),
                                   const SizedBox(height: 16),
                                   
+                                  // Günlük Görevler
+                                  _buildDailyQuestsCard(),
+                                  
                                   // Hızlı İşlemler
                                   // _buildQuickActions(), // YORUM: SliverGrid olarak aşağıya taşındı
                                   
@@ -721,21 +743,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                     color: Colors.white,
                                     shape: BoxShape.circle,
                                   ),
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.deepPurple.shade100,
-                                    backgroundImage: (_currentUser?.profileImageUrl != null && _currentUser!.profileImageUrl!.isNotEmpty)
-                                        ? AssetImage(_currentUser!.profileImageUrl!)
-                                        : null,
-                                    child: _currentUser?.profileImageUrl == null
-                                        ? Text(
-                                            _currentUser!.username[0].toUpperCase(),
-                                            style: TextStyle(
-                                              fontSize: 32,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.deepPurple.shade700,
-                                            ),
-                                          )
-                                        : null,
+                                  child: UserProfileAvatar(
+                                    imageUrl: _currentUser?.profileImageUrl,
+                                    username: _currentUser?.username,
+                                    radius: 35,
+                                    fontSize: 32,
                                   ),
                                 ),
                               ),
@@ -1175,6 +1187,102 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   }
 
   // Hızlı İşlemler (SliverGrid Versiyonu - Optimize Edilmiş)
+  // Günlük Görevler Kartı
+  Widget _buildDailyQuestsCard() {
+    if (_dailyQuests.isEmpty) return const SizedBox.shrink();
+
+    final completedCount = _dailyQuests.where((q) => q.isCompleted).length;
+    final claimedCount = _dailyQuests.where((q) => q.isClaimed).length;
+    final totalCount = _dailyQuests.length;
+    final hasRewardsToClaim = _dailyQuests.any((q) => q.isCompleted && !q.isClaimed);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GestureDetector(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const DailyQuestsScreen(),
+            ),
+          );
+          _loadCurrentUser(); // Geri dönünce yenile
+        },
+        child: _buildGlassContainer(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // İkon
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.assignment_outlined,
+                  color: Colors.blue,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              // Metinler
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'quests.title'.tr(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasRewardsToClaim 
+                          ? 'quests.rewardClaimed'.tr().split('!')[0] + '!' // "Ödül Alındı!" veya benzeri bir dikkat çekici metin
+                          : '$completedCount/$totalCount ${'common.done'.tr()}',
+                      style: TextStyle(
+                        color: hasRewardsToClaim ? Colors.green : Colors.grey[600],
+                        fontSize: 13,
+                        fontWeight: hasRewardsToClaim ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Sağ taraf (Badge veya Ok)
+              if (hasRewardsToClaim)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              else
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildQuickActionsSliver() {
     final quickActions = _getQuickActions();
 
@@ -2094,7 +2202,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
             ],
           ),
           
-          const SizedBox(height: 20),
+          const SizedBox(height: 5),
           
           // Kiraya Ver Butonu
           SizedBox(
@@ -2841,23 +2949,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         width: 3,
                       ),
                     ),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.deepPurple.shade100,
-                      backgroundImage: _currentUser?.profileImageUrl != null
-                          ? AssetImage(_currentUser!.profileImageUrl!)
-                          : null,
-                      child: _currentUser?.profileImageUrl == null
-                          ? (_currentUser != null
-                              ? Text(
-                                  _currentUser!.username[0].toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.deepPurple.shade700,
-                                  ),
-                                )
-                              : const Icon(Icons.person, size: 40))
-                          : null,
+                    child: UserProfileAvatar(
+                      imageUrl: _currentUser?.profileImageUrl,
+                      username: _currentUser?.username,
+                      radius: 36,
+                      fontSize: 32,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -2933,6 +3029,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         ),
                       );
                       await _loadCurrentUser();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.collections,
+                    title: 'drawer.collection'.tr(),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CollectionScreen(),
+                        ),
+                      );
                     },
                   ),
 

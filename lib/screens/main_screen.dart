@@ -38,6 +38,7 @@ class _MainScreenState extends State<MainScreen> {
     4: GlobalKey<NavigatorState>(),
     5: GlobalKey<NavigatorState>(),
     6: GlobalKey<NavigatorState>(),
+    3: GlobalKey<NavigatorState>(), // Home tab navigator key
   };
 
   @override
@@ -92,7 +93,10 @@ class _MainScreenState extends State<MainScreen> {
         navigatorKey: _navigatorKeys[2],
         child: const MyVehiclesScreen(),
       ),      // 2: Garage
-      const HomeScreen(),            // 3: Home (Center)
+      TabNavigator(
+        navigatorKey: _navigatorKeys[3],
+        child: const HomeScreen(),
+      ),            // 3: Home (Center)
       TabNavigator(
         navigatorKey: _navigatorKeys[4],
         child: const MyListingsScreen(),

@@ -270,8 +270,18 @@ class DatabaseHelper {
       
       return userVehicles;
     } catch (e) {
-      
       return [];
+    }
+  }
+
+  /// Kullanıcının sahip olduğu (veya olmuş olduğu) tüm model anahtarlarını getirir
+  /// Format: "Brand_Model"
+  Future<Set<String>> getOwnedModelKeys(String userId) async {
+    try {
+      final vehicles = await getUserVehicles(userId);
+      return vehicles.map((v) => '${v.brand}_${v.model}').toSet();
+    } catch (e) {
+      return {};
     }
   }
 

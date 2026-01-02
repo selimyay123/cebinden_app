@@ -14,6 +14,7 @@ import 'main_screen.dart';
 import 'statistics_screen.dart';
 import 'admin_panel_screen.dart';
 import '../services/database_helper.dart';
+import '../widgets/user_profile_avatar.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -167,6 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       'assets/pp/women1.png',
       'assets/pp/women2.png',
       'assets/pp/women3.png',
+      'assets/animations/pp/MEMEWE.json',
     ];
 
     String? selectedImage = _currentUser?.profileImageUrl;
@@ -208,8 +210,9 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
                             ? Border.all(color: Colors.deepPurpleAccent, width: 3)
                             : null,
                       ),
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage(imagePath),
+                      child: UserProfileAvatar(
+                        imageUrl: imagePath,
+                        radius: 30,
                       ),
                     ),
                   );

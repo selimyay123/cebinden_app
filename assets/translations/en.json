@@ -873,6 +873,14 @@
     "myOffers": "My Offers",
     "tasks": "Tasks",
     "settings": "Settings",
+    "collection": "Collection",
+    "collectionRewards": {
+      "collect": "Collect",
+      "collected": "Collected",
+      "rewardTitle": "Congratulations!",
+      "rewardMessage": "You've collected all models of {0}! You earned {1} TL and {2} XP.",
+      "alreadyCollected": "You've already collected this reward!"
+    },
     "tasksComingSoon": "Tasks page coming soon...",
     "rentComingSoon": "Vehicle rental page coming soon...",
     "vehicle": "vehicle",

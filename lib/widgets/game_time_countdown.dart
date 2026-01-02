@@ -71,114 +71,93 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
     final Color textColor = Colors.white;
     final Color progressColor = isDay ? Colors.orangeAccent : Colors.purpleAccent;
 
-    return Container(
-      height: 90,
-      margin: widget.margin ?? const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradientColors,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: gradientColors.last.withOpacity(0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SettingsScreen()),
+        );
+      },
+      child: Container(
+        height: 90,
+        margin: widget.margin ?? const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: gradientColors,
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Arkaplan desenleri (opsiyonel, hafif opaklıkta)
-          Positioned(
-            right: -20,
-            top: -20,
-            child: Opacity(
-              opacity: 0.1,
-              child: Lottie.asset(
-                'assets/animations/day  night.json',
-                width: 100,
-                height: 100,
-                fit: BoxFit.contain,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: gradientColors.last.withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Arkaplan desenleri (opsiyonel, hafif opaklıkta)
+            Positioned(
+              right: -20,
+              top: -20,
+              child: Opacity(
+                opacity: 0.1,
+                child: Lottie.asset(
+                  'assets/animations/day  night.json',
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
-          ),
-          
-          Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
-            child: Row(
-              children: [
-                // Animasyon
-                Lottie.asset(
-                  'assets/animations/day  night.json',
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                ),
-                
-                const SizedBox(width: 6),
-                
-                // Metinler
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'home.nextDayIn'.tr(),
-                        style: TextStyle(
-                          color: textColor.withOpacity(0.9),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _formatDuration(_remainingTime),
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Courier',
-                          letterSpacing: 0.5,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+            
+            Padding(
+              padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+              child: Row(
+                children: [
+                  // Animasyon
+                  Lottie.asset(
+                    'assets/animations/day  night.json',
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
                   ),
-                ),
-                
-                const SizedBox(width: 8),
-
-                // Ayarlar Butonu (Küçültülmüş)
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SettingsScreen()),
-                    );
-                  },
-                  borderRadius: BorderRadius.circular(6),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(6),
+                  
+                  const SizedBox(width: 6),
+                  
+                  // Metinler
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _formatDuration(_remainingTime),
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Courier',
+                            letterSpacing: 1.5,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Icon(Icons.settings, color: Colors.white, size: 18),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

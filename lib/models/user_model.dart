@@ -29,6 +29,7 @@ class User {
   final DateTime? lastLoginDate; // Son giriş tarihi
   final DateTime? lastDailyRewardDate; // Son günlük ödül alınan tarih
   final int garageLimit; // Garaj limiti
+  final List<String> collectedBrandRewards; // Toplanan marka ödülleri
 
   // ========== GÜNLÜK İSTATİSTİKLER ==========
   final double dailyStartingBalance; // Gün başlangıcındaki bakiye
@@ -87,6 +88,7 @@ class User {
     this.skills = const {},
     this.dailySkillUses = const {},
     this.lastSkillUseDay = 0,
+    this.collectedBrandRewards = const [],
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -215,6 +217,7 @@ class User {
           ) ??
           const {},
       lastSkillUseDay: json['lastSkillUseDay'] as int? ?? 0,
+      collectedBrandRewards: (json['collectedBrandRewards'] as List?)?.cast<String>() ?? const [],
     );
   }
 
@@ -261,6 +264,7 @@ class User {
       'skills': skills,
       'dailySkillUses': dailySkillUses,
       'lastSkillUseDay': lastSkillUseDay,
+      'collectedBrandRewards': collectedBrandRewards,
     };
   }
 
@@ -302,6 +306,7 @@ class User {
     Map<String, int>? skills,
     Map<String, int>? dailySkillUses,
     int? lastSkillUseDay,
+    List<String>? collectedBrandRewards,
   }) {
     return User(
       id: id ?? this.id,
@@ -340,6 +345,7 @@ class User {
       skills: skills ?? this.skills,
       dailySkillUses: dailySkillUses ?? this.dailySkillUses,
       lastSkillUseDay: lastSkillUseDay ?? this.lastSkillUseDay,
+      collectedBrandRewards: collectedBrandRewards ?? this.collectedBrandRewards,
     );
   }
 

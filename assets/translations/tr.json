@@ -872,6 +872,14 @@
     "myOffers": "Tekliflerim",
     "tasks": "Görevler",
     "settings": "Ayarlar",
+    "collection": "Koleksiyon",
+    "collectionRewards": {
+      "collect": "Topla",
+      "collected": "Alındı",
+      "rewardTitle": "Tebrikler!",
+      "rewardMessage": "{0} markasının tüm modellerini topladın! {1} TL ve {2} XP kazandın.",
+      "alreadyCollected": "Bu ödülü zaten aldın!"
+    },
     "tasksComingSoon": "Görevler sayfası yakında...",
     "rentComingSoon": "Araç kiralama sayfası yakında...",
     "vehicle": "araç",

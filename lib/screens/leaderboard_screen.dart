@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import '../services/report_service.dart';
 import '../widgets/custom_snackbar.dart';
+import '../widgets/user_profile_avatar.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -191,28 +192,22 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                       ),
                                 ),
                                 const SizedBox(width: 12),
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.grey[800]!, width: 1),
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.grey[800]!, width: 1),
+                                    ),
+                                    child: UserProfileAvatar(
+                                      imageUrl: player['profileImageUrl'],
+                                      username: player['username'],
+                                      radius: 19,
+                                      backgroundColor: Colors.grey[800],
+                                      textColor: Colors.white,
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.grey[800],
-                                    backgroundImage: player['profileImageUrl'] != null
-                                        ? (player['profileImageUrl'].startsWith('assets/')
-                                            ? AssetImage(player['profileImageUrl'])
-                                            : NetworkImage(player['profileImageUrl'])) as ImageProvider
-                                        : null,
-                                    child: player['profileImageUrl'] == null
-                                        ? Text(
-                                            (player['username'] ?? '?')[0].toUpperCase(),
-                                            style: const TextStyle(color: Colors.white),
-                                          )
-                                        : null,
-                                  ),
-                                ),
                               ],
                             ),
                             title: Text(

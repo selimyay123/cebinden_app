@@ -264,6 +264,16 @@ class OfferService {
     String? message,
   }) async {
     try {
+      // 🆕 GARAGE LIMIT CHECK
+      final userVehicles = await _db.getUserActiveVehicles(userId);
+      final userMapCheck = await _db.getUserById(userId);
+      if (userMapCheck != null) {
+        final user = User.fromJson(userMapCheck);
+        if (userVehicles.length >= user.garageLimit) {
+          return {'success': false, 'error': 'Garaj limitiniz dolu (${user.garageLimit} araç). Yeni araç alamazsınız.'};
+        }
+      }
+
       // AI satıcı profili oluştur
       final sellerProfile = SellerProfile.generateRandom();
       
@@ -357,6 +367,16 @@ class OfferService {
     required double newOfferAmount,
   }) async {
     try {
+      // 🆕 GARAGE LIMIT CHECK
+      final userVehicles = await _db.getUserActiveVehicles(offer.buyerId);
+      final userMapCheck = await _db.getUserById(offer.buyerId);
+      if (userMapCheck != null) {
+        final user = User.fromJson(userMapCheck);
+        if (userVehicles.length >= user.garageLimit) {
+          return {'success': false, 'error': 'Garaj limitiniz dolu (${user.garageLimit} araç). Yeni araç alamazsınız.'};
+        }
+      }
+
       // 🆕 PATIENCE METER: Tur sayısını artır
       final newRounds = offer.negotiationRounds + 1;
       
@@ -474,6 +494,16 @@ class OfferService {
   /// Kullanıcı AI satıcının karşı teklifini kabul eder
   Future<Map<String, dynamic>> acceptCounterOffer(Offer offer) async {
     try {
+      // 🆕 GARAGE LIMIT CHECK
+      final userVehicles = await _db.getUserActiveVehicles(offer.buyerId);
+      final userMapCheck = await _db.getUserById(offer.buyerId);
+      if (userMapCheck != null) {
+        final user = User.fromJson(userMapCheck);
+        if (userVehicles.length >= user.garageLimit) {
+          return {'success': false, 'error': 'Garaj limitiniz dolu (${user.garageLimit} araç). Yeni araç alamazsınız.'};
+        }
+      }
+
       if (offer.counterOfferAmount == null) {
         return {'success': false, 'error': 'Karşı teklif bulunamadı'};
       }

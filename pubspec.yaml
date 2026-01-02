@@ -167,6 +167,7 @@ flutter:
     - assets/translations/
     - assets/translations/
     - assets/animations/
+    - assets/animations/pp/
     - assets/pp/
     - assets/home_images/
 

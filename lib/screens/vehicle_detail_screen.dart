@@ -1689,28 +1689,51 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     if (_currentUser == null) return;
 
     // Loading göster
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
+      // 10 saniye timeout ekle
       final result = await _offerService.submitUserOffer(
         userId: _currentUser!.id,
         userName: _currentUser!.username,
         vehicle: _vehicle,
         offerPrice: offerAmount,
         message: null,
-      );
+      ).timeout(const Duration(seconds: 10));
 
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
 
       if (!result['success']) {
-        throw Exception(result['error'] ?? 'Unknown error');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 6,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: Colors.red.shade600,
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      result['error'] ?? 'Unknown error',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return;
       }
       
       // 💎 XP Kazandır (Teklif Gönderme)
@@ -1749,14 +1772,34 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       }
     } catch (e) {
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${'offer.sendError'.tr()}\n$e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 6,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            backgroundColor: Colors.red.shade600,
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    e.toString(),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -1926,17 +1969,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   /// Karşı teklifi kabul et
   Future<void> _handleAcceptCounterOffer(Offer offer) async {
     // Loading göster
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
-      final result = await _offerService.acceptCounterOffer(offer);
+      final result = await _offerService.acceptCounterOffer(offer).timeout(const Duration(seconds: 10));
       
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
 
       if (result['success']) {
         if (mounted) {
@@ -1958,21 +2003,53 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result['error'] ?? 'common.error'.tr()),
-              backgroundColor: Colors.red,
+              elevation: 6,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: Colors.red.shade600,
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      result['error'] ?? 'common.error'.tr(),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }
       }
     } catch (e) {
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('errors.errorWithDetail'.trParams({'detail': e.toString()})),
-            backgroundColor: Colors.red,
+            elevation: 6,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            backgroundColor: Colors.red.shade600,
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'errors.errorWithDetail'.trParams({'detail': e.toString()}),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }
@@ -2478,28 +2555,32 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   /// Karşı teklif gönder
   Future<void> _submitCounterOffer(Offer originalOffer, double newOfferAmount) async {
     // Loading göster
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
       final currentUser = await _authService.getCurrentUser();
       if (currentUser == null) {
-        if (mounted) Navigator.pop(context);
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
         return;
       }
 
       final result = await _offerService.submitCounterOfferResponse(
         offer: originalOffer,
         newOfferAmount: newOfferAmount,
-      );
+      ).timeout(const Duration(seconds: 10));
 
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
 
       if (!result['success']) {
         throw Exception(result['error'] ?? 'Unknown error');
@@ -2525,19 +2606,54 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('offers.counterOfferSuccess'.tr()),
-              backgroundColor: Colors.green,
+              elevation: 6,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: Colors.green.shade600,
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'offers.counterOfferSuccess'.tr(),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }
       }
 
     } catch (e) {
+      // Loading kapat
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
+            elevation: 6,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            backgroundColor: Colors.red.shade600,
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    e.toString(),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }

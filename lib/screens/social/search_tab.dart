@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../services/friend_service.dart';
 import '../../services/database_helper.dart';
 import '../../services/localization_service.dart';
+import '../../widgets/user_profile_avatar.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -142,16 +143,12 @@ class _SearchTabState extends State<SearchTab> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: ListTile(
-                            leading: CircleAvatar(
+                            leading: UserProfileAvatar(
+                              imageUrl: user.profileImageUrl,
+                              username: user.username,
+                              radius: 20,
                               backgroundColor: Colors.grey[800],
-                              backgroundImage: user.profileImageUrl != null
-                                  ? (user.profileImageUrl!.startsWith('assets/')
-                                      ? AssetImage(user.profileImageUrl!)
-                                      : NetworkImage(user.profileImageUrl!)) as ImageProvider
-                                  : null,
-                              child: user.profileImageUrl == null
-                                  ? Text(user.username.isNotEmpty ? user.username[0].toUpperCase() : '?')
-                                  : null,
+                              textColor: Colors.white,
                             ),
                             title: Text(
                               user.username,
