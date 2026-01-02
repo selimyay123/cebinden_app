@@ -5,7 +5,7 @@ import '../services/activity_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
@@ -90,15 +90,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
       appBar: AppBar(
         title: Text('activity.title'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
           if (_activities.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_outline),

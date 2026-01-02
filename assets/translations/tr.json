@@ -13,12 +13,19 @@
     "rentSuccess": "Araçlar başarıyla kiralandı!",
     "noRentedVehicles": "Şu anda kirada araç yok."
   },
+  "market": {
+    "title": "Market"
+  },
+  "garage": {
+    "title": "Garaj"
+  },
   "common": {
     "yes": "Evet",
     "no": "Hayır",
     "ok": "Tamam",
     "pleaseWait": "Lütfen bekleyiniz...",
     "cancel": "İptal",
+    "userNotFound": "Kullanıcı bulunamadı",
     "save": "Kaydet",
     "delete": "Sil",
     "edit": "Düzenle",
@@ -27,7 +34,7 @@
     "next": "İleri",
     "ads": {
       "clickToWin": "5000 TL kazanmak için tıkla",
-      "freeMoney": "Bedava 5000 TL"
+      "freeMoney": "+5000 TL"
     },
     "done": "Tamamla",
     "loading": "Yükleniyor...",
@@ -138,7 +145,7 @@
     "rentVehicle": "Araç Kirala",
     "buyGallery": "Galeri Satın Al",
     "professionalBusiness": "Profesyonel İşletme",
-    "tasks": "YETENEKLER",
+    "tasks": "Yetenek Ağacı",
     "noRecentActivity": "Henüz işlem yok",
     "startBuying": "Hemen alışverişe başlayın!",
     "bonusAwarded": "🎉 Özel bonus! Bakiyeniz 5,000,000 TL'ye yükseltildi!",
@@ -364,7 +371,7 @@
     "great": "Harika!",
     "vehicle": "Araç",
     "missing": "eksik",
-    "congratulations": "TEBRİKLER! 🎉",
+    "congratulations": "Tebrikler!",
     "successfullyPurchased": "başarıyla satın alındı!",
     "successMessage": "Artık bu araç sizin!",
     "errorMessage": "Araç satın alınırken bir hata oluştu:",
@@ -372,6 +379,7 @@
     "makeOffer": "Teklif Ver"
   },
   "offers": {
+    "processing": "İşlem Yapılıyor...",
     "counter": "Karşı Teklif",
     "title": "Tekliflerim",
     "limitWarning": "Her araç için en fazla 10 teklif alabilirsiniz. Yeni teklifler için mevcutları reddedebilirsiniz.",
@@ -737,7 +745,38 @@
     "selectProfilePicture": "Profil Resmi Seç",
     "profilePictureUpdated": "Profil resmi güncellendi!",
     "admin": "Admin",
-    "adminPanel": "Admin Paneli"
+    "adminPanel": "Admin Paneli",
+    "devBonus": "Geliştirici Bonusu (100 Altın + 1000 SP)",
+    "devBonusSuccess": "Geliştirici bonusu başarıyla tanımlandı!"
+  },
+  "skills": {
+    "availablePoints": "Kullanılabilir Puan",
+    "activeSkills": "Aktif Yetenekler",
+    "quickBuy": "Hızlı Al",
+    "quickBuyDesc": "Belirli skor aralığındaki araçları anında bulup detaylarını görüntülemenizi sağlar. Seviye arttıkça daha yüksek skorlu araçlar bulabilirsiniz.",
+    "quickSell": "Hızlı Sat",
+    "quickSellDesc": "Sahip olduğunuz araçları anında kar payı ile satmanızı sağlar. Seviye arttıkça kar oranınız artar.",
+    "quickSellProfit": "Kar: {percent}",
+    "sweetTalk": "Tatlı Dil",
+    "sweetTalkDesc": "Pazarlık sırasında müşterilerin teklifinizi kabul etme ihtimalini artırır.",
+    "sweetTalkBonus": "Kabul Şansı: +{percent}",
+    "lowballer": "Ölücü",
+    "lowballerDesc": "Araç alırken pazarlık sırasında satıcıların teklifinizi kabul etme ihtimalini artırır.",
+    "lowballerBonus": "Kabul Şansı: +{percent}",
+    "expertiseExpert": "Ekspertiz Uzmanı",
+    "expertiseExpertDesc": "Her oyun gününde 3 adet ücretsiz ekspertiz yapmanızı sağlar.",
+    "freeExpertise": "Ücretsiz Ekspertiz",
+    "quickSellConfirm": "Hızlı Satış Onayı",
+    "quickSellConfirmDesc": "Aracı {price} fiyatına satmak istiyor musunuz? Bu işlem geri alınamaz.",
+    "quickSellSuccess": "Araç başarıyla satıldı!",
+    "level": "Seviye",
+    "upgrade": "Yükselt",
+    "maxLevel": "Maksimum Seviye",
+    "upgradeSuccess": "Yetenek başarıyla yükseltildi!",
+    "upgradeFailed": "Yetenek yükseltilemedi. Yetersiz puan veya maksimum seviye.",
+    "dailyLimitReached": "Günlük kullanım limitine ulaştınız.",
+    "remainingUses": "Kalan Kullanım",
+    "noVehicleFound": "Bu skor aralığında uygun araç bulunamadı. Lütfen daha sonra tekrar deneyin."
   },
   "admin": {
     "title": "Admin Paneli",
@@ -882,7 +921,8 @@
     "dailyLoginDesc": "Günlük giriş ödülü",
     "clearAll": "Tümünü Temizle",
     "clearAllConfirm": "Tüm aktivite geçmişini silmek istediğinize emin misiniz?",
-    "cleared": "Geçmiş temizlendi"
+    "cleared": "Geçmiş temizlendi",
+    "questReward": "Günlük Görev Ödülü"
   },
   "listing": {
     "listing": "ilan",
@@ -1546,7 +1586,19 @@
     "enterAmount": "Lütfen bir miktar girin",
     "invalidNumber": "Geçersiz sayı formatı",
     "minAmount": "Minimum miktar",
-    "maxAmount": "Maksimum miktar"
+    "maxAmount": "Maksimum miktar",
+    "garageExpansion": "Garaj Genişletme",
+    "garageCapacity": "Garaj Kapasitesi",
+    "currentLimit": "Mevcut Limit: {limit} Araç",
+    "plusOneSlot": "+1 Slot",
+    "expandGarageTitle": "Garajı Genişlet",
+    "currentLimitLabel": "Mevcut Limit: {limit}",
+    "newLimitLabel": "Yeni Limit: {limit}",
+    "costLabel": "Bedel: {amount} {currency}",
+    "garageExpandSuccess": "Garaj başarıyla genişletildi! 🎉",
+    "minGoldError": "En az 0.1 altın girmelisiniz",
+    "insufficientGoldError": "Yetersiz altın! Mevcut: {amount} altın",
+    "securePaymentMessage": "Güvenli ödeme ile satın almak üzeresiniz."
   },
   "seller_notes": {
     "base": {
@@ -1880,41 +1932,6 @@
     "editListing": "İlanı Düzenle",
     "profitStatus": "Kâr",
     "lossStatus": "Zarar"
-  },
-  "skills": {
-    "title": "Yetenek Ağacı",
-    "info": "Level atladıkça yetenek puanı kazan ve özel yetenekleri aç!",
-    "cost": "Maliyet",
-    "unlock": "AÇ",
-    "unlocked": "açıldı!",
-    "active": "Aktif",
-    "cannotUnlock": "Bu yeteneği açamazsınız! Yetersiz puan.",
-    "negotiation": "Pazarlık Ustası",
-    "negotiationDesc": "Teklif yaparken %10 daha düşük fiyat öner",
-    "quickSale": "Hızlı Satış",
-    "quickSaleDesc": "Araçlarına %20 daha hızlı teklif gelir",
-    "marketAnalyst": "Piyasa Analisti",
-    "marketAnalystDesc": "Araç alırken gerçek değer gösterilir",
-    "reputation": "İtibar",
-    "reputationDesc": "Gelen teklifler %10 daha yüksek",
-    "garageExpansion": "Garaj Genişletme",
-    "garageExpansionDesc": "+2 araç kapasitesi",
-    "goldMiner": "Altın Madenci",
-    "goldMinerDesc": "Günlük görevlerden %50 daha fazla altın",
-    "fastLearner": "Hızlı Öğrenen",
-    "fastLearnerDesc": "Tüm işlemlerden %25 daha fazla XP kazan",
-    "negotiationPower": "Pazarlık Gücü",
-    "negotiationPowerDesc": "Müzakerede %15 daha fazla indirim yap",
-    "marketInsider": "Piyasa Kurdu",
-    "marketInsiderDesc": "Araçların tahmini piyasa değerini gör",
-    "quickFlipper": "Hızlı Satıcı",
-    "quickFlipperDesc": "İlanlarına %15 daha hızlı teklif gelir",
-    "rentalTycoon": "Filo Yöneticisi",
-    "rentalTycoonDesc": "Kira gelirlerin %10 artar",
-    "influencer": "Reklam Yıldızı",
-    "influencerDesc": "Reklam ödüllerin %20 artar",
-    "charismaticSeller": "İkna Kabiliyeti",
-    "charismaticSellerDesc": "Karşı tekliflerinin kabul edilme şansı %10 artar"
   },
   "changeUsername": {
     "title": "Kullanıcı Adı Değiştir",

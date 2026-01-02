@@ -13,8 +13,8 @@ import 'xp_service.dart';
 import 'daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
 import 'activity_service.dart';
-import '../services/skill_service.dart'; // Yetenek Servisi
 import 'market_refresh_service.dart'; // Araç detayları için
+import 'skill_service.dart';
 
 /// Teklif servisi - AI alıcılar ve teklif yönetimi
 class OfferService {
@@ -63,7 +63,8 @@ class OfferService {
     try {
       // 🆕 LIMIT KONTROLÜ: Bir araç için maksimum 10 bekleyen teklif olabilir
       final existingOffers = await _db.getOffersByVehicleId(listing.id);
-      final pendingCount = existingOffers.where((o) => o.isPending).length;
+      final now = DateTime.now();
+      final pendingCount = existingOffers.where((o) => o.isPending(now)).length;
       
       if (pendingCount >= 10) {
 
@@ -77,7 +78,7 @@ class OfferService {
       final sellerMap = await _db.getUserById(listing.userId);
       if (sellerMap != null) {
         final seller = User.fromJson(sellerMap);
-        final multiplier = SkillService.getSellingMultiplier(seller);
+        final multiplier = 1.0;
         // Adil fiyatı artır (AI alıcılar daha yüksek teklif vermeye meyilli olur)
         fairPrice *= multiplier;
       }
@@ -266,11 +267,19 @@ class OfferService {
       // AI satıcı profili oluştur
       final sellerProfile = SellerProfile.generateRandom();
       
+      // Alıcı kullanıcıyı getir (skill kontrolü için)
+      final userMap = await _db.getUserById(userId);
+      User? buyerUser;
+      if (userMap != null) {
+        buyerUser = User.fromJson(userMap);
+      }
+
       // Teklifi değerlendir (ilk tur, currentRounds = 0)
       final evaluation = sellerProfile.evaluateOffer(
         offerPrice: offerPrice,
         listingPrice: vehicle.price,
         currentRounds: 0, // 🆕 İlk teklif
+        buyerUser: buyerUser,
       );
       
       final decision = evaluation['decision'] as String;
@@ -357,11 +366,19 @@ class OfferService {
       // Yeni bir AI satıcı profili oluştur
       final sellerProfile = SellerProfile.generateRandom();
       
+      // Alıcı kullanıcıyı getir (skill kontrolü için)
+      final userMap = await _db.getUserById(offer.buyerId);
+      User? buyerUser;
+      if (userMap != null) {
+        buyerUser = User.fromJson(userMap);
+      }
+
       // 🆕 Orijinal ilan fiyatına göre değerlendir (sabır kontrolü ile)
       final evaluation = sellerProfile.evaluateOffer(
         offerPrice: newOfferAmount,
         listingPrice: offer.listingPrice,
         currentRounds: newRounds, // 🆕 Tur sayısını geç
+        buyerUser: buyerUser,
       );
       
       final decision = evaluation['decision'] as String;
@@ -501,12 +518,23 @@ class OfferService {
       // AI alıcıyı getir/yeniden oluştur
       final aiBuyer = AIBuyer.generateRandom();
       
+      // Tatlı Dil yeteneği bonusunu hesapla
+      double sweetTalkBonus = 0.0;
+      final sellerMap = await _db.getUserById(originalOffer.sellerId);
+      if (sellerMap != null) {
+        final seller = User.fromJson(sellerMap);
+        final skillService = SkillService();
+        final level = skillService.getSkillLevel(seller, SkillService.skillSweetTalk);
+        sweetTalkBonus = SkillService.sweetTalkBonuses[level] ?? 0.0;
+      }
+      
       // AI alıcının karşı teklifi değerlendirmesi
       final decision = await _evaluateCounterOfferByBuyer(
         aiBuyer: aiBuyer,
         originalOfferPrice: originalOffer.offerPrice,
         counterOfferAmount: counterOfferAmount,
         listingPrice: originalOffer.listingPrice,
+        successBonus: sweetTalkBonus,
       );
       
       // Karar tipine göre işle
@@ -560,16 +588,9 @@ class OfferService {
     required double originalOfferPrice, // AI'nın önceki teklifi
     required double counterOfferAmount, // Kullanıcının istediği fiyat (User's Ask)
     required double listingPrice,
+    double successBonus = 0.0,
   }) async {
     final random = Random();
-    
-    // İkna Kabiliyeti yeteneği
-    double successBonus = 0.0;
-    final userMap = await _db.getCurrentUser();
-    if (userMap != null) {
-      final user = User.fromJson(userMap);
-      successBonus = SkillService.getCounterOfferSuccessBonus(user);
-    }
     
     // Karşı teklifin orijinal teklife göre artış yüzdesi
     // (Kullanıcı ne kadar inmiş veya çıkmış? Genelde kullanıcı iner, ama AI teklifinden yüksek ister)
@@ -953,7 +974,7 @@ class OfferService {
       final seller = User.fromJson(sellerMap);
       
       // Hız çarpanını al (örn: 0.85 -> %15 daha hızlı)
-      final speedMultiplier = SkillService.getOfferSpeedMultiplier(seller);
+      final speedMultiplier = 1.0;
       
       if (speedMultiplier < 1.0) {
         // Hız arttıkça (çarpan düştükçe) alıcı sayısı artmalı
@@ -985,9 +1006,7 @@ class OfferService {
       // Ballı Dil yeteneği varsa tolerans artar
       // (Burada basitçe yetenek kontrolü yapıyoruz, detaylı ID kontrolü skill_service'de olmalı ama
       // şimdilik hardcode 'charisma' kontrolü yapıyoruz)
-      if (seller.unlockedSkills.any((s) => s.startsWith('charisma'))) {
-        maxTolerance = 1.50; // %50 kâra kadar tolerans
-      }
+
     }
     
     if (priceRatio > maxTolerance) {

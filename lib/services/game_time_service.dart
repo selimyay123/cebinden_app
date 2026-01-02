@@ -148,7 +148,14 @@ class GameTimeService with WidgetsBindingObserver {
     if (!_isAppActive) {
       _isAppActive = true;
       _sessionStartTime = DateTime.now();
-
+    }
+    
+    // Timer çalışmıyorsa başlat (Hot reload veya hata durumlarına karşı)
+    if (_updateTimer == null || !_updateTimer!.isActive) {
+      _updateTimer?.cancel();
+      _updateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        _updateCurrentTime();
+      });
     }
   }
   
@@ -163,12 +170,11 @@ class GameTimeService with WidgetsBindingObserver {
         
         // Kaydet
         SettingsHelper.setTotalPlayedMinutes(_totalPlayedMinutes);
-        
-
       }
       
       _isAppActive = false;
       _sessionStartTime = null;
+      _updateTimer?.cancel();
     }
   }
   
@@ -184,6 +190,7 @@ class GameTimeService with WidgetsBindingObserver {
   
   /// Mevcut oyun gününü al
   int getCurrentDay() => currentGameDay.value;
+  int get currentDay => currentGameDay.value;
   
   /// Mevcut oyun saatini al (0-23)
   int getCurrentHour() => currentGameHour.value;

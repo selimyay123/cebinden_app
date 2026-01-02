@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
@@ -33,13 +34,24 @@ class DatabaseHelper {
     final dailyQuestsBoxInstance = await Hive.openBox<Map>(dailyQuestsBox);
     final activitiesBoxInstance = await Hive.openBox<Map>(activitiesBox);
     
-                
     // Debug: Tüm kullanıcıları listele
     if (usersBoxInstance.isNotEmpty) {
             for (var entry in usersBoxInstance.toMap().entries) {
               }
     } else {
           }
+  }
+
+  // Stream controller for vehicle updates
+  final _vehicleUpdateController = StreamController<void>.broadcast();
+  Stream<void> get onVehicleUpdate => _vehicleUpdateController.stream;
+
+  // Stream controller for offer updates
+  final _offerUpdateController = StreamController<void>.broadcast();
+  Stream<void> get onOfferUpdate => _offerUpdateController.stream;
+
+  void notifyOfferUpdate() {
+    _offerUpdateController.add(null);
   }
 
   // Users box'ını al
@@ -230,6 +242,7 @@ class DatabaseHelper {
       final vehicleMap = Map<dynamic, dynamic>.from(vehicle.toJson());
       await _userVehiclesBox.put(vehicle.id, vehicleMap);
       await _userVehiclesBox.flush();
+      _vehicleUpdateController.add(null);
       
       return true;
     } catch (e) {
@@ -297,6 +310,11 @@ class DatabaseHelper {
     }
   }
 
+  // Alias for getAllUserVehicles to match SkillService usage
+  Future<List<UserVehicle>> getAllVehicles() async {
+    return await getAllUserVehicles();
+  }
+
   // Kullanıcının satışa çıkardığı araçları getir
   Future<List<UserVehicle>> getUserListedVehicles(String userId) async {
     try {
@@ -348,6 +366,7 @@ class DatabaseHelper {
       final vehicleMap = Map<dynamic, dynamic>.from(updatedVehicleJson);
       await _userVehiclesBox.put(vehicleId, vehicleMap);
       await _userVehiclesBox.flush();
+      _vehicleUpdateController.add(null);
       
       return true;
     } catch (e) {
@@ -394,6 +413,7 @@ class DatabaseHelper {
     try {
       await _userVehiclesBox.delete(vehicleId);
       await _userVehiclesBox.flush();
+      _vehicleUpdateController.add(null);
       
       return true;
     } catch (e) {
@@ -441,6 +461,7 @@ class DatabaseHelper {
       await _offersBox.put(offer.offerId, offerMap);
       await _offersBox.flush();
       
+      notifyOfferUpdate(); // 🔔 UI'ı bilgilendir
       return true;
     } catch (e) {
 
@@ -499,8 +520,10 @@ class DatabaseHelper {
   // Satıcının bekleyen tekliflerini getir
   Future<List<Offer>> getPendingOffersBySellerId(String sellerId) async {
     try {
+      final now = DateTime.now();
       final offers = await getOffersBySellerId(sellerId);
-      return offers.where((offer) => offer.isPending).toList();
+      // SADECE gelen teklifleri say (isUserOffer == false)
+      return offers.where((offer) => offer.isPending(now) && !offer.isUserOffer).toList();
     } catch (e) {
       
       return [];
@@ -553,6 +576,7 @@ class DatabaseHelper {
       await _offersBox.put(offerId, updatedMap);
       await _offersBox.flush();
       
+      notifyOfferUpdate(); // 🔔 UI'ı bilgilendir
       return true;
     } catch (e) {
       
@@ -576,6 +600,7 @@ class DatabaseHelper {
       await _offersBox.delete(offerId);
       await _offersBox.flush();
       
+      notifyOfferUpdate(); // 🔔 UI'ı bilgilendir
       return true;
     } catch (e) {
       
@@ -610,7 +635,7 @@ class DatabaseHelper {
           .toList();
       
       for (var offer in allOffers) {
-        if (offer.isExpired) {
+        if (offer.isExpired()) {
           await updateOfferStatus(offer.offerId, OfferStatus.expired);
         }
       }

@@ -3,7 +3,6 @@ import '../services/auth_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import 'activity_service.dart';
-import 'skill_service.dart';
 
 /// Galeri sahipleri için araç kiralama hizmeti
 class RentalService {
@@ -34,12 +33,7 @@ class RentalService {
         if (vehicle.isRented) {
           double rentalIncome = vehicle.purchasePrice * dailyRentalRate;
           
-          // Filo Yöneticisi yeteneği
-          final userMap = await _db.getUserById(userId);
-          if (userMap != null) {
-            final user = User.fromJson(userMap);
-            rentalIncome *= SkillService.getRentalIncomeMultiplier(user);
-          }
+
           
           totalRental += rentalIncome;
         }

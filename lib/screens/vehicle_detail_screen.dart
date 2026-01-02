@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import '../models/vehicle_model.dart';
@@ -14,16 +15,15 @@ import '../services/xp_service.dart';
 import '../services/activity_service.dart';
 import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
-import '../services/skill_service.dart'; // Yetenek Servisi
-
 import '../services/market_refresh_service.dart'; // Market Servisi (Fiyat hesaplama için)
 import '../widgets/vehicle_top_view.dart';
 import '../widgets/level_up_dialog.dart';
 import 'my_offers_screen.dart';
+import '../services/skill_service.dart';
 
 import '../widgets/vehicle_image.dart';
 import 'package:intl/intl.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
   final Vehicle vehicle;
@@ -47,6 +47,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   final XPService _xpService = XPService();
   final DailyQuestService _questService = DailyQuestService();
   final MarketRefreshService _marketService = MarketRefreshService();
+  final SkillService _skillService = SkillService();
   User? _currentUser;
   bool _isFavorite = false;
   bool _isLoading = false;
@@ -143,15 +144,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             pinned: true,
             backgroundColor: Colors.deepPurple,
             actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-              ),
+
               // Favori Butonu
               if (_currentUser != null)
                 IconButton(
@@ -265,7 +258,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            _buildPriceDisplay(),
+                            Flexible(
+                              child: _buildPriceDisplay(),
+                            ),
                           ],
                         ),
                       ),
@@ -402,12 +397,13 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final bool priceDropped = _vehicle.isExpertiseDone && _vehicle.price < _vehicle.declaredPrice;
     
     // Yetenek indirimi
-    final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
-    final discountedPrice = _vehicle.price * multiplier;
-    final hasSkillDiscount = multiplier < 1.0;
+    // Yetenek indirimi
+    final multiplier = 1.0;
+    final discountedPrice = _vehicle.price;
+    final hasSkillDiscount = false;
 
     // Piyasa Kurdu yeteneği kontrolü
-    final hasMarketInsider = SkillService.canSeeMarketValue(_currentUser!);
+    final hasMarketInsider = false;
 
     if (!priceDropped && !hasSkillDiscount) {
       // Hiçbir indirim yok
@@ -556,8 +552,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     final currentBalance = _currentUser!.balance;
     // Yetenek indirimi uygula
-    final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
-    final vehiclePrice = _vehicle.price * multiplier;
+    final vehiclePrice = _vehicle.price;
     
     final remainingBalance = currentBalance - vehiclePrice;
     final canAfford = remainingBalance >= 0;
@@ -722,8 +717,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     try {
       // 1️⃣ Bakiyeyi düş (İndirimli fiyat)
-      final multiplier = SkillService.getBuyingMultiplier(_currentUser!);
-      final finalPrice = _vehicle.price * multiplier;
+      final finalPrice = _vehicle.price;
       
       final newBalance = _currentUser!.balance - finalPrice;
       final balanceUpdateSuccess = await _db.updateUser(
@@ -935,15 +929,25 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _currentUser != null ? _showExpertiseDialog : null,
-                icon: const Icon(Icons.search),
-                label: Text('expertise.performAction'.tr()),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
+              child: Builder(
+                builder: (context) {
+                  final hasSkill = _currentUser != null && _skillService.getSkillLevel(_currentUser!, SkillService.skillExpertiseExpert) > 0;
+                  final remainingUses = _currentUser != null ? _skillService.getRemainingDailyUses(_currentUser!, SkillService.skillExpertiseExpert) : 0;
+                  final isFree = hasSkill && remainingUses > 0;
+                  
+                  return ElevatedButton.icon(
+                    onPressed: _currentUser != null ? () => _showExpertiseDialog(isFree: isFree) : null,
+                    icon: Icon(isFree ? Icons.auto_awesome : Icons.search),
+                    label: Text(isFree 
+                      ? '${'skills.freeExpertise'.tr()} ($remainingUses/3)' 
+                      : 'expertise.performAction'.tr()),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isFree ? Colors.indigo : Colors.deepPurple,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  );
+                }
               ),
             ),
           ] else ...[
@@ -1011,33 +1015,38 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     );
   }
 
-  Future<void> _showExpertiseDialog() async {
+  Future<void> _showExpertiseDialog({bool isFree = false}) async {
     if (_currentUser == null) return;
     
-    final cost = 3000.0;
+    final cost = isFree ? 0.0 : 3000.0;
     final canAfford = _currentUser!.balance >= cost;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('expertise.dialogTitle'.tr()),
+        title: Text(isFree ? 'skills.freeExpertise'.tr() : 'expertise.dialogTitle'.tr()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('expertise.dialogMessage'.tr()),
+            Text(isFree 
+              ? 'skills.expertiseExpertDesc'.tr() 
+              : 'expertise.dialogMessage'.tr()),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('expertise.fee'.tr()),
                 Text(
-                  '${_formatCurrency(cost)} TL',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                  isFree ? 'common.free'.tr() : '${_formatCurrency(cost)} TL',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    color: isFree ? Colors.green : Colors.red
+                  ),
                 ),
               ],
             ),
-            if (!canAfford)
+            if (!canAfford && !isFree)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
@@ -1053,48 +1062,62 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
-            onPressed: canAfford 
+            onPressed: (canAfford || isFree)
                 ? () {
                     Navigator.pop(context);
-                    _performExpertise(cost);
+                    _performExpertise(cost, isFree: isFree);
                   }
                 : null,
-            child: Text('expertise.confirmAndPay'.tr()),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isFree ? Colors.indigo : null,
+              foregroundColor: isFree ? Colors.white : null,
+            ),
+            child: Text(isFree ? 'common.continue'.tr() : 'expertise.confirmAndPay'.tr()),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _performExpertise(double cost) async {
-    // 1. Ödemeyi al
-    final newBalance = _currentUser!.balance - cost;
-    await _db.updateUser(_currentUser!.id, {'balance': newBalance});
-    await _loadCurrentUser(); // Bakiyeyi güncelle
+  Future<void> _performExpertise(double cost, {bool isFree = false}) async {
+    // 1. Ödemeyi al veya kullanım kaydet
+    if (isFree) {
+      await _skillService.recordSkillUsage(_currentUser!.id, SkillService.skillExpertiseExpert);
+    } else {
+      final newBalance = _currentUser!.balance - cost;
+      await _db.updateUser(_currentUser!.id, {'balance': newBalance});
+    }
+    await _loadCurrentUser(); // Bakiyeyi veya yetenek kullanımını güncelle
 
-    // 2. Animasyon göster (Opsiyonel, şimdilik loading)
+    // 2. Animasyon göster
     if (!mounted) return;
+    
+    bool isDialogShowing = true;
     showDialog(
-    context: context,
-    barrierDismissible: false,
-    barrierColor: Colors.black.withValues(alpha: 0.8),
-    builder: (context) => WillPopScope(
-      onWillPop: () async => false,
-      child: Center(
-        child: Lottie.asset(
-          'assets/animations/satinal.json',
-          width: 300,
-          height: 300,
-          repeat: false,
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.8),
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: Center(
+          child: Lottie.asset(
+            'assets/animations/satinal.json',
+            width: 300,
+            height: 300,
+            repeat: false,
+          ),
         ),
       ),
-    ),
-  );
+    ).then((_) => isDialogShowing = false);
   
-  await Future.delayed(const Duration(seconds: 3)); // Animasyon süresi
+    await Future.delayed(const Duration(seconds: 3)); // Animasyon süresi
     
     if (!mounted) return;
-    Navigator.pop(context); // Loading kapat
+    
+    // Sadece dialog hala açıksa kapat
+    if (isDialogShowing) {
+      Navigator.of(context, rootNavigator: true).pop(); 
+    }
 
     // 3. Gerçek değerleri hesapla ve güncelle
     // Eğer yalan varsa, fiyatı gerçek değerlere göre güncelle
@@ -1999,132 +2022,181 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Glassmorphism Background
+            ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.5),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 80), // Space for the floating image
+                      
+                      // Congratulations Title
+                      Text(
+                        'purchase.congratulations'.tr(),
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      
+                      // Vehicle Name
+                      Text(
+                        _vehicle.fullName,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      
+                      // Successfully Purchased Text
+                      Text(
+                        'purchase.successfullyPurchased'.tr(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Success Info Card
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.green.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.stars, color: Colors.amber, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'This vehicle is now yours!',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // Modern Gradient Button
+                      Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Colors.deepPurple, Color(0xFF8E24AA)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.deepPurple.withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context, true);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            'purchase.great'.tr(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Başarı ikonu
-              Container(
-                width: 100,
+            ),
+            
+            // Floating Vehicle Image or Icon
+            Positioned(
+              top: 0,
+              child: SizedBox(
+                width: 150,
                 height: 100,
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 60,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'purchase.congratulations'.tr(),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Text(
-              //   '${_vehicle.brand} ${_vehicle.model}',
-              //   style: const TextStyle(
-              //     fontSize: 18,
-              //     fontWeight: FontWeight.bold,
-              //     color: Colors.deepPurple,
-              //   ),
-              // ),
-              const SizedBox(height: 12),
-              Text(
-                _vehicle.fullName,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'purchase.successfullyPurchased'.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.celebration,
-                      color: Colors.green,
-                      size: 40,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'purchase.successMessage'.tr(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.green,
+                child: _vehicle.imageUrl != null
+                    ? Image.asset(
+                        _vehicle.imageUrl!,
+                        fit: BoxFit.contain,
+                      )
+                    : const Icon(
+                        Icons.directions_car,
+                        size: 60,
+                        color: Colors.deepPurple,
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Dialog'u kapat
-                  Navigator.pop(context, true); // Detail sayfasından çık ve "satın alma başarılı" bilgisi gönder
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'purchase.great'.tr(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

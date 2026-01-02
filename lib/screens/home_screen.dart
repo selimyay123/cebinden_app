@@ -31,8 +31,8 @@ import '../widgets/level_up_dialog.dart';
 import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
 import 'taxi_game_screen.dart';
-import 'skill_tree_screen.dart'; // Yetenek Ağacı Ekranı
 import 'package:lottie/lottie.dart';
+import 'skill_tree_screen.dart';
 import '../services/rental_service.dart'; // Kiralama Servisi
 
 import '../widgets/game_time_countdown.dart'; // 🆕 Game Time Countdown
@@ -41,6 +41,7 @@ import 'leaderboard_screen.dart';
 // import 'social/social_hub_screen.dart';
 import '../services/leaderboard_service.dart';
 import '../widgets/city_skyline_painter.dart';
+import '../mixins/auto_refresh_mixin.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -49,7 +50,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMixin {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
   final AdService _adService = AdService();
@@ -77,7 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey _storeButtonKey = GlobalKey(); // Mağaza butonu için key
   final GlobalKey _taxiGameButtonKey = GlobalKey();
   final GlobalKey _myListingsButtonKey = GlobalKey(); // İlanlarım butonu için key
-  final GlobalKey _skillTreeButtonKey = GlobalKey(); // Yetenek ağacı butonu için key
   
   // Kiralama geliri animasyonu için
   double _lastRentalIncome = 0.0;
@@ -90,6 +90,14 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isTutorialActive = false;
   
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  int? get tabIndex => 3; // MainScreen'deki index
+
+  @override
+  void refresh() {
+    _loadCurrentUser();
+  }
 
   @override
   void initState() {
@@ -496,20 +504,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                   // Profil ve Bakiye Kartı
                                   _buildProfileCard(),
 
-                                  // 🆕 Reklam Kartı (Loot Box) - Profilin hemen altına taşındı
+                                  // 🆕 Reklam ve Sayaç (Yan Yana)
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                                    child: _buildWatchAdCard(),
+                                    child: Row(
+                                      children: [
+                                        // Reklam Kartı
+                                        Expanded(
+                                          child: _buildWatchAdCard(),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // Oyun Zamanı Sayacı
+                                        Expanded(
+                                          child: GameTimeCountdown(
+                                            key: _gameTimeKey,
+                                            margin: EdgeInsets.zero,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 16),
-
-                                  // XP Progress Kartı - Kaldırıldı (Profile entegre edildi)
-                                  // _buildXPCard(),
-                                  
-                                  // const SizedBox(height: 16),
-
-                                  // 🆕 Oyun Zamanı Sayacı - XP'nin altına taşındı
-                                  GameTimeCountdown(key: _gameTimeKey),
                                   const SizedBox(height: 16),
                                   
                                   // Hızlı İşlemler
@@ -531,7 +545,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               constraints: const BoxConstraints(maxWidth: 800),
                               child: Column(
                                 children: [
-                                  const SizedBox(height: 16),
                                   
                                   // Galeri Satın Al (sadece galeri sahibi değilse göster)
                                   if (_currentUser != null && !_currentUser!.ownsGallery)
@@ -666,143 +679,148 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Profil Resmi ve Çerçeve
-                    const SizedBox(height: 10),
-                    Stack(
-                      alignment: Alignment.center,
+                    // Profil Resmi ve Bilgiler (Yan Yana ve Ortalı)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Glow Efekti
-                        Container(
-                          width: 90,
-                          height: 90,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: rankColor.withOpacity(0.5),
-                                blurRadius: 20,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Çerçeve
-                        Container(
-                          width: 86,
-                          height: 86,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [rankColor, rankColor.withOpacity(0.5)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(3), // Çerçeve kalınlığı
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
+                        // Profil Resmi ve Çerçeve
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Glow Efekti
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                              ),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.deepPurple.shade100,
-                                backgroundImage: (_currentUser?.profileImageUrl != null && _currentUser!.profileImageUrl!.isNotEmpty)
-                                    ? AssetImage(_currentUser!.profileImageUrl!)
-                                    : null,
-                                child: _currentUser?.profileImageUrl == null
-                                    ? Text(
-                                        _currentUser!.username[0].toUpperCase(),
-                                        style: TextStyle(
-                                          fontSize: 36,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.deepPurple.shade700,
-                                        ),
-                                      )
-                                    : null,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: rankColor.withOpacity(0.5),
+                                    blurRadius: 15,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ),
-                        // Seviye Rozeti (Avatarın altında)
-                        Positioned(
-                          bottom: 0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: rankColor,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.3),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
+                            // Çerçeve
+                            Container(
+                              width: 76,
+                              height: 76,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [rankColor, rankColor.withOpacity(0.5)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                 ),
-                              ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.5), // Çerçeve kalınlığı
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.deepPurple.shade100,
+                                    backgroundImage: (_currentUser?.profileImageUrl != null && _currentUser!.profileImageUrl!.isNotEmpty)
+                                        ? AssetImage(_currentUser!.profileImageUrl!)
+                                        : null,
+                                    child: _currentUser?.profileImageUrl == null
+                                        ? Text(
+                                            _currentUser!.username[0].toUpperCase(),
+                                            style: TextStyle(
+                                              fontSize: 32,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.deepPurple.shade700,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              ),
                             ),
-                            child: Text(
-                              'Lv. ${_currentUser!.level}',
+                            // Seviye Rozeti (Avatarın altında)
+                            Positioned(
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: rankColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  'Lv. ${_currentUser!.level}',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(width: 16),
+                        
+                        // Kullanıcı Bilgileri
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Kullanıcı Adı
+                            Text(
+                              _currentUser!.username,
                               style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 10,
+                                color: Colors.white,
+                                fontSize: 22,
                                 fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
+                            
+                            const SizedBox(height: 4),
+                            
+                            // Rütbe Başlığı
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: rankColor.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                _getRankTitle(_currentUser!.level).toUpperCase(),
+                                style: TextStyle(
+                                  color: rankColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     
-                    const SizedBox(height: 12),
-                    
-                    // Kullanıcı Bilgileri
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Kullanıcı Adı
-                        Text(
-                          _currentUser!.username,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black26,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 4),
-                        
-                        // Rütbe Başlığı
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: rankColor.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            _getRankTitle(_currentUser!.level).toUpperCase(),
-                            style: TextStyle(
-                              color: rankColor,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                         
                         // Toplam Para (Animasyonlu)
                         Text(
@@ -813,7 +831,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.center,
@@ -883,7 +901,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         
                         // Kar/Zarar Göstergesi
                         Container(
@@ -913,7 +931,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         
                         // XP Bölümü
                         Column(
@@ -927,7 +945,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 2),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
@@ -937,7 +955,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 minHeight: 8,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 1),
                             Align(
                               alignment: Alignment.centerRight,
                               child: Text(
@@ -951,7 +969,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 12),
                         
                         // Altın Al Butonu
                         Row(
@@ -1026,8 +1044,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildWatchAdCard() {
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      height: 90, // Biraz daha yüksek
+      height: 90, // Sayaç ile tam uyum için hafifçe artırıldı
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -1040,7 +1057,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 gradient: LinearGradient(
                   colors: [
                     const Color(0xFF2E003E), // Dark Purple
-                    Colors.deepPurple.shade700,
+                    Colors.deepPurple.shade700.withOpacity(0.7),
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -1053,8 +1070,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.deepPurple.withOpacity(0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -1062,20 +1079,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   // Sol Taraf - Chest Animasyonu
                   Padding(
-                    padding: const EdgeInsets.only(left: 16),
+                    padding: const EdgeInsets.only(left: 8),
                     child: SizedBox(
                       width: 70,
                       height: 70,
-                      child: Transform.scale(
-                        scale: 1.2, // Animasyonu biraz büyüt
-                        child: Lottie.asset(
-                          'assets/animations/ad_chest.json',
-                          fit: BoxFit.contain,
-                        ),
+                      child: Lottie.asset(
+                        'assets/animations/ad_chest.json',
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
                   
+                  const SizedBox(width: 8),
+
                   // Orta Kısım - Yazılar
                   Expanded(
                     child: Column(
@@ -1083,56 +1099,34 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'common.ads.freeMoney'.tr(), // Kısaltılmış metin
+                          'common.ads.freeMoney'.tr(),
                           style: const TextStyle(
                             color: Colors.amberAccent,
-                            fontSize: 18,
+                            fontSize: 12,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black,
-                                blurRadius: 2,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
+                            letterSpacing: 0.1,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            'ads.watchAd'.tr().toUpperCase(), // "REKLAM İZLE" -> "KUTUYU AÇ" olarak değişmeli çeviride veya burada override edilebilir
+                            'home.watchAd'.tr().toUpperCase(),
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 11,
+                              fontSize: 9,
                               fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
+                              letterSpacing: 0.4,
                             ),
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  
-                  // Sağ Taraf - Ok İkonu
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Colors.amber,
-                        size: 16,
-                      ),
                     ),
                   ),
                 ],
@@ -1140,25 +1134,25 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           
-          // FREE Badge (Sağ Üst Köşe - Wiggle Animation)
+          // FREE Badge (Sağ Üst Köşe)
           Positioned(
             top: -6,
-            right: 20,
+            right: -6,
             child: WiggleBadge(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Colors.redAccent, Colors.red],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.red.withOpacity(0.4),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                   border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
@@ -1167,9 +1161,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   'common.free'.tr(),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 9,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 1,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ),
@@ -1199,35 +1193,23 @@ class _HomeScreenState extends State<HomeScreen> {
             
             // Tutorial için key'leri atıyoruz
             Key? buttonKey;
-            if (index == 0) {
-              buttonKey = _marketButtonKey;
-            } else if (index == 1) {
-              buttonKey = _sellVehicleButtonKey;
-            } else if (index == 2) {
-              buttonKey = _myVehiclesButtonKey;
-            } else if (index == 3) { // İlanlarım butonu
-              buttonKey = _myListingsButtonKey;
-            } else if (index == 4) {
-              buttonKey = _offersButtonKey;
-            } else if (index == 5) { // Yetenek Ağacı butonu
-              buttonKey = _skillTreeButtonKey;
-            } else if (index == 6) { // Mağaza butonu
-              buttonKey = _storeButtonKey;
-            } else if (index == 7) {
+            final label = quickActions[index]['label'] as String;
+            
+            if (label == 'home.taxi'.tr()) {
               buttonKey = _taxiGameButtonKey;
             }
             
             return _buildActionButton(
               key: buttonKey,
-              icon: action['icon'] as IconData?,
-              imagePath: action['imagePath'] as String?,
-              label: action['label'] as String,
-              color: action['color'] as Color,
-              onTap: action['onTap'] as VoidCallback,
-              badge: action['badge'] as int?,
-              reward: action['reward'] as String?,
-              animationPath: action['animationPath'] as String?,
-              showAnimation: action['showAnimation'] as bool? ?? false,
+              icon: quickActions[index]['icon'] as IconData?,
+              imagePath: quickActions[index]['imagePath'] as String?,
+              label: label,
+              color: quickActions[index]['color'] as Color,
+              onTap: quickActions[index]['onTap'] as VoidCallback,
+              badge: quickActions[index]['badge'] as int?,
+              reward: quickActions[index]['reward'] as String?,
+              animationPath: quickActions[index]['animationPath'] as String?,
+              showAnimation: quickActions[index]['showAnimation'] as bool? ?? false,
             );
           },
           childCount: quickActions.length,
@@ -1239,6 +1221,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Hızlı İşlemler Listesi
   List<Map<String, dynamic>> _getQuickActions() {
     return [
+      /*
       {
         'imagePath': 'assets/home_images/buy.png',
         'label': 'home.buyVehicle'.tr(),
@@ -1317,21 +1300,9 @@ class _HomeScreenState extends State<HomeScreen> {
           await _loadCurrentUser();
         },
       },
-      {
-        'imagePath': 'assets/home_images/skills.png',
-        'label': 'home.tasks'.tr(),
-        'color': Colors.indigo,
-        'badge': (_currentUser?.skillPoints ?? 0) > 0 ? (_currentUser!.skillPoints) : null,
-        'onTap': () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SkillTreeScreen(),
-            ),
-          );
-          await _loadCurrentUser();
-        },
-      },
+      */
+
+      /*
       {
         'imagePath': 'assets/home_images/store.png',
         'label': 'store.title'.tr(),
@@ -1346,6 +1317,8 @@ class _HomeScreenState extends State<HomeScreen> {
           await _loadCurrentUser();
         },
       },
+      */
+      /*
       {
         'imagePath': 'assets/home_images/taxi.png',
         'label': 'home.taxi'.tr(),
@@ -1360,6 +1333,7 @@ class _HomeScreenState extends State<HomeScreen> {
           await _loadCurrentUser();
         },
       },
+      */
     ];
   }
 
@@ -1773,7 +1747,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () => _showGalleryInfoDialog(),
           borderRadius: BorderRadius.circular(16),
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.deepPurple.shade800, Colors.deepPurple.shade600],
@@ -1811,9 +1785,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Sol taraf - Animasyon
                     Lottie.asset(
                       'assets/animations/gallery.json',
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.contain,
+                      width: 70,
+                      height: 70,
+                      fit: BoxFit.cover,
                     ),
                     const SizedBox(width: 16),
                     
@@ -1825,7 +1799,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             'home.buyGallery'.tr(),
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -1837,20 +1811,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text(
                             'home.professionalBusiness'.tr(),
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
-                              fontSize: 13,
+                              fontSize: 12,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 4),
                           // Fiyat Etiketi
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.amber.shade700,
+                              color: Colors.deepPurple,
                               borderRadius: BorderRadius.circular(8),
                               boxShadow: [
                                 BoxShadow(
@@ -1865,7 +1839,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                                fontSize: 11,
                               ),
                             ),
                           ),
@@ -2948,18 +2922,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   _buildDrawerItem(
+                    icon: Icons.psychology,
+                    title: 'home.tasks'.tr(),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SkillTreeScreen(),
+                        ),
+                      );
+                      await _loadCurrentUser();
+                    },
+                  ),
+
+                  /*
+                  _buildDrawerItem(
                     icon: Icons.shopping_cart,
                     title: 'drawer.buyVehicle'.tr(),
                     onTap: () async {
                       Navigator.pop(context); // Drawer'ı kapat
-                      
-                      // YORUM: Kategori seçim sayfası devre dışı, doğrudan otomobil kategorisi
-                      // final purchased = await Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const VehicleCategoryScreen(),
-                      //   ),
-                      // );
                       
                       // Doğrudan marka seçim sayfasına git (Otomobil kategorisi)
                       final purchased = await Navigator.push(
@@ -3010,10 +2992,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => const MyOffersScreen(),
                         ),
                       );
-                      // Sayfa kapanınca dashboard'u yenile
                       await _loadCurrentUser();
                     },
                   ),
+                  */
+
                   _buildDrawerItem(
                     icon: Icons.leaderboard,
                     title: 'drawer.leaderboard'.tr(),
@@ -3394,7 +3377,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '1/11',
+                        '1/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3447,7 +3430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '2/11',
+                        '2/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3508,7 +3491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '4/11',
+                        '4/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3561,7 +3544,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '5/11',
+                        '5/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3614,7 +3597,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '6/11',
+                        '6/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3667,7 +3650,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '7/11',
+                        '7/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3725,7 +3708,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '8/11',
+                        '8/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3740,58 +3723,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      // ADIM 9: Yetenek Ağacı
-      TargetFocus(
-        identify: "skill_tree_button",
-        keyTarget: _skillTreeButtonKey,
-        alignSkip: Alignment.topRight,
-        shape: ShapeLightFocus.RRect,
-        radius: 15,
-        focusAnimationDuration: const Duration(milliseconds: 600),
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) => Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'tutorial.step9_title'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'tutorial.step9_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '9/11',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+
 
       // ADIM 10: Mağaza
       TargetFocus(
@@ -3831,7 +3763,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '10/11',
+                        '9/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -3884,7 +3816,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '11/11',
+                        '10/10',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,

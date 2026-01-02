@@ -5,7 +5,7 @@ import '../services/auth_service.dart';
 import '../models/vehicle_model.dart';
 import '../widgets/vehicle_image.dart';
 import 'vehicle_detail_screen.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class VehicleListScreen extends StatefulWidget {
   final String categoryName;
@@ -165,15 +165,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       appBar: AppBar(
         title: Text(widget.categoryName),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
         backgroundColor: widget.categoryColor,
         foregroundColor: Colors.white,
@@ -430,7 +422,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       height: 140,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(

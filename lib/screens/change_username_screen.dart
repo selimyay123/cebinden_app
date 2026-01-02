@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class ChangeUsernameScreen extends StatefulWidget {
   final String userId;
@@ -111,15 +111,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
       appBar: AppBar(
         title: Text('changeUsername.title'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,

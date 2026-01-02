@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
 import 'model_selection_screen.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
-class BrandSelectionScreen extends StatelessWidget {
+import '../models/user_model.dart';
+import '../models/vehicle_model.dart';
+import '../services/database_helper.dart';
+import '../services/skill_service.dart';
+import 'vehicle_detail_screen.dart';
+
+import 'package:lottie/lottie.dart';
+import '../services/game_time_service.dart';
+
+class BrandSelectionScreen extends StatefulWidget {
   final String categoryName;
   final Color categoryColor;
 
@@ -15,11 +24,68 @@ class BrandSelectionScreen extends StatelessWidget {
   });
 
   @override
+  State<BrandSelectionScreen> createState() => _BrandSelectionScreenState();
+}
+
+class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
+  final DatabaseHelper _db = DatabaseHelper();
+  final SkillService _skillService = SkillService();
+  final GameTimeService _gameTime = GameTimeService();
+  User? _currentUser;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+    // Gün değişimini dinle (Hızlı Al hakkını güncellemek için)
+    _gameTime.currentGameDay.addListener(_onDayChanged);
+  }
+
+  @override
+  void dispose() {
+    _gameTime.currentGameDay.removeListener(_onDayChanged);
+    super.dispose();
+  }
+
+  void _onDayChanged() {
+    // Gün değiştiğinde UI'ı güncelle
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadUser() async {
+    final userMap = await _db.getCurrentUser();
+    if (userMap != null) {
+      if (mounted) {
+        setState(() {
+          _currentUser = User.fromJson(userMap);
+          _isLoading = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // ValueListenableBuilder ile dil değişikliklerini dinle
     return ValueListenableBuilder<String>(
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
+        return WillPopScope(
+          onWillPop: () async {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+              return false;
+            }
+            return true;
+          },
+          child: Builder(builder: (context) {
         // Simülasyon araç markaları (telif riski olmayan isimler)
         final brands = [
           {
@@ -112,17 +178,9 @@ class BrandSelectionScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text('vehicles.selectBrand'.tr()),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-              ),
+
             ],
-            backgroundColor: categoryColor,
+            backgroundColor: widget.categoryColor,
             foregroundColor: Colors.white,
             elevation: 0,
           ),
@@ -133,7 +191,9 @@ class BrandSelectionScreen extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            child: Column(
+            child: _isLoading 
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
               children: [
                 // AppBar ve Status Bar yüksekliği kadar boşluk bırak
                 SizedBox(height: kToolbarHeight + MediaQuery.of(context).padding.top),
@@ -142,17 +202,17 @@ class BrandSelectionScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
-                  color: categoryColor.withOpacity(0.1),
+                  color: widget.categoryColor.withOpacity(0.1),
                   child: Row(
                     children: [
                       Icon(Icons.info_outline, color: Colors.deepPurpleAccent, size: 20),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          '${'vehicles.categoryInfoAuto'.tr()} $categoryName',
+                          '${'vehicles.categoryInfoAuto'.tr()} ${widget.categoryName}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white,
+                            color: Colors.black,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -169,7 +229,14 @@ class BrandSelectionScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       // İlk item "Tüm Modeller"
                       if (index == 0) {
-                        return _buildAllBrandsCard(context);
+                        return Column(
+                          children: [
+                            _buildAllBrandsCard(context),
+                            if (_currentUser != null && 
+                                _skillService.getSkillLevel(_currentUser!, SkillService.skillQuickBuy) > 0)
+                              _buildQuickBuyCard(context),
+                          ],
+                        );
                       }
 
                       // Diğer markalar
@@ -189,6 +256,8 @@ class BrandSelectionScreen extends StatelessWidget {
             ),
           ),
         );
+          }),
+        );
       },
     );
   }
@@ -197,18 +266,18 @@ class BrandSelectionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: categoryColor,
+        color: Colors.deepPurpleAccent.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
-        shadowColor: categoryColor.withOpacity(0.3),
+        shadowColor: widget.categoryColor.withOpacity(0.3),
         child: InkWell(
           onTap: () async {
             final purchased = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
-                  categoryName: '$categoryName - ${'vehicles.allModels'.tr()}',
-                  categoryColor: categoryColor,
+                  categoryName: '${widget.categoryName} - ${'vehicles.allModels'.tr()}',
+                  categoryColor: widget.categoryColor,
                   brandName: null, // null = tüm markalar
                   modelName: null, // null = tüm modeller
                 ),
@@ -281,7 +350,7 @@ class BrandSelectionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 1,
         shadowColor: Colors.black.withOpacity(0.05),
@@ -292,8 +361,8 @@ class BrandSelectionScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => ModelSelectionScreen(
-                  categoryName: categoryName,
-                  categoryColor: categoryColor,
+                  categoryName: widget.categoryName,
+                  categoryColor: widget.categoryColor,
                   brandName: name,
                 ),
               ),
@@ -397,6 +466,198 @@ class BrandSelectionScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildQuickBuyCard(BuildContext context) {
+    final level = _skillService.getSkillLevel(_currentUser!, SkillService.skillQuickBuy);
+    final remainingUses = _skillService.getRemainingDailyUses(_currentUser!, SkillService.skillQuickBuy);
+    
+    // DEBUG: Durumu görmek için
+    // print('DEBUG: CurrentDay: ${_gameTime.currentDay}, LastUseDay: ${_currentUser!.lastSkillUseDay}, Remaining: $remainingUses');
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        children: [
+          Material(
+        color: Colors.orange.shade800.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(12),
+        elevation: 3,
+        shadowColor: Colors.orange.withOpacity(0.3),
+        child: InkWell(
+          onTap: () async {
+            if (remainingUses <= 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.white),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text('skills.dailyLimitReached'.tr())),
+                    ],
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.red.shade700,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  margin: const EdgeInsets.all(16),
+                ),
+              );
+              return;
+            }
+
+            // Animasyonu göster
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (c) => Center(
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Lottie.asset(
+                    'assets/animations/Hizli.Alici.json',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            );
+
+            // Animasyon süresi kadar bekle (örneğin 2.5 saniye)
+            await Future.delayed(const Duration(milliseconds: 2500));
+
+            try {
+              final vehicle = await _skillService.findQuickBuyVehicle(_currentUser!);
+              
+              if (mounted) Navigator.of(context, rootNavigator: true).pop(); // Dialog'u kapat
+
+              if (vehicle != null) {
+                // Kullanım hakkını düş
+                await _skillService.recordSkillUsage(_currentUser!.id, SkillService.skillQuickBuy);
+                await _loadUser(); // Kullanıcıyı güncelle
+
+                if (mounted) {
+                  // Detay sayfasına git
+                  final purchased = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VehicleDetailScreen(vehicle: vehicle),
+                    ),
+                  );
+                  
+                  if (purchased == true && mounted) {
+                    Navigator.pop(context, true);
+                  }
+                }
+              } else {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.search_off, color: Colors.white),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text('skills.noVehicleFound'.tr())),
+                        ],
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.orange.shade800,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.all(16),
+                    ),
+                  );
+                }
+              }
+            } catch (e) {
+              if (mounted) Navigator.of(context, rootNavigator: true).pop(); // Dialog'u kapat
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text('Error: $e')),
+                      ],
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: Colors.red.shade900,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    margin: const EdgeInsets.all(16),
+                  ),
+                );
+              }
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Icon
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.flash_on, color: Colors.white, size: 32),
+                ),
+                const SizedBox(width: 16),
+                // Text
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'skills.quickBuy'.tr(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${'skills.level'.tr()} $level',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Remaining Uses
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$remainingUses/3',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Arrow
+                Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+              ],
+            ),
+          ),
+        ),
+      ),
+        ],
       ),
     );
   }

@@ -5,7 +5,7 @@ import '../services/notification_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -99,15 +99,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       appBar: AppBar(
         title: Text('notifications.title'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
           if (_notifications.isNotEmpty) ...[
             IconButton(
               icon: const Icon(Icons.done_all),

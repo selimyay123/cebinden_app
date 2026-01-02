@@ -3,6 +3,8 @@ import '../models/daily_quest_model.dart';
 import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'xp_service.dart';
+import 'localization_service.dart';
+import '../models/activity_model.dart';
 
 class DailyQuestService {
   final DatabaseHelper _db = DatabaseHelper();
@@ -203,6 +205,15 @@ class DailyQuestService {
     await _db.updateDailyQuest(questId, {
       'isClaimed': true,
     });
+    
+    // 4. Aktivite Geçmişine Ekle
+    await _db.addActivity(Activity.create(
+      userId: userId,
+      type: ActivityType.income,
+      title: 'activity.questReward'.tr(),
+      description: quest.description.tr(),
+      amount: quest.rewardMoney,
+    ));
     
     return true;
   }

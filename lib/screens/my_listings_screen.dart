@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/user_vehicle_model.dart';
@@ -9,8 +10,9 @@ import '../services/localization_service.dart';
 import '../utils/brand_colors.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
+import '../mixins/auto_refresh_mixin.dart';
 
 class MyListingsScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın ilanlarını göster
@@ -26,7 +28,7 @@ class MyListingsScreen extends StatefulWidget {
   State<MyListingsScreen> createState() => _MyListingsScreenState();
 }
 
-class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerProviderStateMixin {
+class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerProviderStateMixin, RouteAware, AutoRefreshMixin {
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   final FavoriteService _favoriteService = FavoriteService();
@@ -37,6 +39,18 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   
   // Marka bazında gruplandırılmış ilanlar
   Map<String, List<UserVehicle>> _listingsByBrand = {};
+  StreamSubscription? _vehicleUpdateSubscription;
+
+  @override
+
+  @override
+  int? get tabIndex => 4; // MainScreen'deki index
+
+  @override
+  void refresh() {
+    _loadUserListedVehicles();
+    _loadFavoriteListings();
+  }
 
   @override
   void initState() {
@@ -44,10 +58,16 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
     _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTab);
     _loadUserListedVehicles();
     _loadFavoriteListings();
+    
+    // Araç güncellemelerini dinle
+    _vehicleUpdateSubscription = _db.onVehicleUpdate.listen((_) {
+      _loadUserListedVehicles();
+    });
   }
 
   @override
   void dispose() {
+    _vehicleUpdateSubscription?.cancel();
     _tabController.dispose();
     super.dispose();
   }
@@ -100,20 +120,20 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
       builder: (context, currentLanguage, child) {
         // Eğer belirli bir marka seçilmişse, eski davranışı koru
         if (widget.selectedBrand != null) {
-            return Scaffold(
+            return WillPopScope(
+              onWillPop: () async {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                  return false;
+                }
+                return true;
+              },
+              child: Scaffold(
               // backgroundColor: Colors.grey[100],
               appBar: AppBar(
                 title: Text(widget.selectedBrand!),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.home),
-                    onPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                        (route) => false,
-                      );
-                    },
-                  ),
+
                 ],
                 elevation: 0,
                 backgroundColor: Colors.deepPurple,
@@ -130,24 +150,25 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     ? const Center(child: CircularProgressIndicator())
                     : _buildListingList(),
               ),
+              ),
             );
         }
         
         // Yeni TabBar'lı görünüm
-        return Scaffold(
+        return WillPopScope(
+          onWillPop: () async {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+              return false;
+            }
+            return true;
+          },
+          child: Scaffold(
           // backgroundColor: Colors.grey[100],
           appBar: AppBar(
             title: Text('listings.title'.tr()),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-              ),
+
             ],
             elevation: 0,
             backgroundColor: Colors.deepPurple,
@@ -189,6 +210,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               ],
             ),
           ),
+        ),
         );
       },
     );
@@ -364,7 +386,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             Icon(
               Icons.store_outlined,
               size: 80,
-              color: Colors.grey[400],
+              color: Colors.black,
             ),
             const SizedBox(height: 24),
             Text(
@@ -372,7 +394,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),
@@ -381,7 +403,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               'listings.noListingsDesc'.tr(),
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),
@@ -401,7 +423,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             Icon(
               Icons.favorite_border,
               size: 80,
-              color: Colors.grey[400],
+              color: Colors.black,
             ),
             const SizedBox(height: 24),
             Text(
@@ -409,7 +431,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),
@@ -418,7 +440,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               'favorites.noFavoritesDesc'.tr(),
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),

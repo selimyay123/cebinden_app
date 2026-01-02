@@ -34,15 +34,17 @@ class User {
   final double dailyStartingBalance; // Gün başlangıcındaki bakiye
   final DateTime? lastDailyResetDate; // Son günlük sıfırlama tarihi
 
-  // ========== YETENEK SİSTEMİ ==========
-  final int skillPoints; // Harcanabilir yetenek puanı
-  final List<String> unlockedSkills; // Açılan yeteneklerin ID listesi
-
   // ========== GALERİ SİSTEMİ ==========
   final bool ownsGallery; // Galeri sahibi mi?
   final DateTime? galleryPurchaseDate; // Galeri satın alma tarihi
   final double totalRentalIncome; // Toplam kiralama geliri
   final double lastDailyRentalIncome; // Son günlük kiralama geliri
+
+  // ========== YETENEK SİSTEMİ ==========
+  final int skillPoints; // Mevcut yetenek puanı
+  final Map<String, int> skills; // Yetenek ID -> Seviye
+  final Map<String, int> dailySkillUses; // Yetenek ID -> Günlük kullanım sayısı
+  final int lastSkillUseDay; // Son kullanım günü (sıfırlama için)
 
   User({
     required this.id,
@@ -75,14 +77,16 @@ class User {
     // Günlük İstatistikler
     this.dailyStartingBalance = 1000000.0,
     this.lastDailyResetDate,
-    // Yetenek Sistemi
-    this.skillPoints = 0,
-    this.unlockedSkills = const [],
     // Galeri Sistemi
     this.ownsGallery = false,
     this.galleryPurchaseDate,
     this.totalRentalIncome = 0.0,
     this.lastDailyRentalIncome = 0.0,
+    // Yetenek Sistemi
+    this.skillPoints = 0,
+    this.skills = const {},
+    this.dailySkillUses = const {},
+    this.lastSkillUseDay = 0,
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -193,9 +197,6 @@ class User {
       lastDailyResetDate: json['lastDailyResetDate'] != null 
           ? DateTime.parse(json['lastDailyResetDate']) 
           : null,
-      // Yetenek Sistemi - Migration Logic: Eğer skillPoints null ise ve level > 1 ise, puan ver.
-      skillPoints: json['skillPoints'] as int? ?? ((json['level'] as int? ?? 1) - 1),
-      unlockedSkills: (json['unlockedSkills'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       // Galeri Sistemi
       ownsGallery: json['ownsGallery'] as bool? ?? false,
       galleryPurchaseDate: json['galleryPurchaseDate'] != null 
@@ -203,6 +204,17 @@ class User {
           : null,
       totalRentalIncome: (json['totalRentalIncome'] as num?)?.toDouble() ?? 0.0,
       lastDailyRentalIncome: (json['lastDailyRentalIncome'] as num?)?.toDouble() ?? 0.0,
+      // Yetenek Sistemi
+      skillPoints: json['skillPoints'] as int? ?? 0,
+      skills: (json['skills'] as Map?)?.map(
+            (k, v) => MapEntry(k.toString(), v as int),
+          ) ??
+          const {},
+      dailySkillUses: (json['dailySkillUses'] as Map?)?.map(
+            (k, v) => MapEntry(k.toString(), v as int),
+          ) ??
+          const {},
+      lastSkillUseDay: json['lastSkillUseDay'] as int? ?? 0,
     );
   }
 
@@ -239,14 +251,16 @@ class User {
       // Günlük İstatistikler
       'dailyStartingBalance': dailyStartingBalance,
       'lastDailyResetDate': lastDailyResetDate?.toIso8601String(),
-      // Yetenek Sistemi
-      'skillPoints': skillPoints,
-      'unlockedSkills': unlockedSkills,
       // Galeri Sistemi
       'ownsGallery': ownsGallery,
       'galleryPurchaseDate': galleryPurchaseDate?.toIso8601String(),
       'totalRentalIncome': totalRentalIncome,
       'lastDailyRentalIncome': lastDailyRentalIncome,
+      // Yetenek Sistemi
+      'skillPoints': skillPoints,
+      'skills': skills,
+      'dailySkillUses': dailySkillUses,
+      'lastSkillUseDay': lastSkillUseDay,
     };
   }
 
@@ -280,12 +294,14 @@ class User {
     int? garageLimit,
     double? dailyStartingBalance,
     DateTime? lastDailyResetDate,
-    int? skillPoints,
-    List<String>? unlockedSkills,
     bool? ownsGallery,
     DateTime? galleryPurchaseDate,
     double? totalRentalIncome,
     double? lastDailyRentalIncome,
+    int? skillPoints,
+    Map<String, int>? skills,
+    Map<String, int>? dailySkillUses,
+    int? lastSkillUseDay,
   }) {
     return User(
       id: id ?? this.id,
@@ -316,12 +332,14 @@ class User {
       garageLimit: garageLimit ?? this.garageLimit,
       dailyStartingBalance: dailyStartingBalance ?? this.dailyStartingBalance,
       lastDailyResetDate: lastDailyResetDate ?? this.lastDailyResetDate,
-      skillPoints: skillPoints ?? this.skillPoints,
-      unlockedSkills: unlockedSkills ?? this.unlockedSkills,
       ownsGallery: ownsGallery ?? this.ownsGallery,
       galleryPurchaseDate: galleryPurchaseDate ?? this.galleryPurchaseDate,
       totalRentalIncome: totalRentalIncome ?? this.totalRentalIncome,
       lastDailyRentalIncome: lastDailyRentalIncome ?? this.lastDailyRentalIncome,
+      skillPoints: skillPoints ?? this.skillPoints,
+      skills: skills ?? this.skills,
+      dailySkillUses: dailySkillUses ?? this.dailySkillUses,
+      lastSkillUseDay: lastSkillUseDay ?? this.lastSkillUseDay,
     );
   }
 

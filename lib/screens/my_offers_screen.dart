@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter/services.dart'; // 🆕 Input formatters için
 import 'package:intl/intl.dart';
 import '../models/offer_model.dart';
@@ -14,8 +16,9 @@ import '../utils/brand_colors.dart';
 import '../services/market_refresh_service.dart'; // Araç detayları için
 import '../models/vehicle_model.dart'; // Vehicle modeli için
 import 'dart:math'; // Random için
-import 'home_screen.dart';
+import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
+import '../mixins/auto_refresh_mixin.dart';
 
 import 'package:lottie/lottie.dart'; // 🆕 Animasyon için
 
@@ -38,7 +41,7 @@ class MyOffersScreen extends StatefulWidget {
 }
 
 class _MyOffersScreenState extends State<MyOffersScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, RouteAware, AutoRefreshMixin {
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
@@ -57,6 +60,15 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   bool _isLoading = true;
   bool _shouldRefreshParent = false; // Üst ekrana güncelleme sinyali göndermek için
+  StreamSubscription? _offerUpdateSubscription;
+
+  @override
+  int? get tabIndex => 5; // MainScreen'deki index
+
+  @override
+  void refresh() {
+    _loadOffers();
+  }
 
   @override
   void initState() {
@@ -70,11 +82,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       );
     }
     _loadOffers();
+
+    // Teklif güncellemelerini dinle (alt ekranlardan gelen değişimler için)
+    _offerUpdateSubscription = _db.onOfferUpdate.listen((_) {
+      _loadOffers();
+    });
   }
 
   @override
   void dispose() {
     _tabController?.dispose();
+    _offerUpdateSubscription?.cancel();
     super.dispose();
   }
 
@@ -103,8 +121,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       // Markaya göre grupla (gelen teklifler) - SADECE BEKLEYENLERİ AL
       _incomingOffersByBrand = {};
       for (var offer in _incomingOffers) {
-        // Sadece bekleyen (pending) teklifleri ekle
-        if (offer.isPending) {
+        // Sadece bekleyen (pending) ve gelen (isUserOffer == false) teklifleri ekle
+        if (offer.isPending() && !offer.isUserOffer) {
           if (!_incomingOffersByBrand.containsKey(offer.vehicleBrand)) {
             _incomingOffersByBrand[offer.vehicleBrand] = [];
           }
@@ -120,7 +138,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       for (var offer in _sentOffers) {
         // Sadece bekleyen (pending) teklifleri ekle
         // Kabul edilmiş veya reddedilmiş teklifler listede görünmemeli
-        if (offer.isPending) {
+        if (offer.isPending()) {
           if (!_sentOffersByBrand.containsKey(offer.vehicleBrand)) {
             _sentOffersByBrand[offer.vehicleBrand] = [];
           }
@@ -138,8 +156,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pop(context, _shouldRefreshParent);
-        return false;
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context, _shouldRefreshParent);
+          return false;
+        }
+        return true;
       },
       child: _buildContent(),
     );
@@ -162,15 +183,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       appBar: AppBar(
         title: Text('offers.title'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
         backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
@@ -432,7 +445,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     for (var entry in offersByVehicle.entries) {
       final vehicleOffers = entry.value;
       // En az 1 bekleyen teklif varsa bu aracı göster
-      if (vehicleOffers.any((o) => o.isPending)) {
+      if (vehicleOffers.any((o) => o.isPending())) {
         activeVehicles[entry.key] = vehicleOffers;
       }
     }
@@ -442,15 +455,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       appBar: AppBar(
         title: Text('${widget.selectedBrand} ${'offers.title'.tr()}'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
         backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
@@ -477,7 +482,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 Icon(
                                   Icons.check_circle_outline,
                                   size: 80,
-                                  color: Colors.white70,
+                                  color: Colors.black,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
@@ -485,7 +490,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     shadows: [
                                       Shadow(
                                         offset: Offset(0, 1),
@@ -500,7 +505,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                   'myVehicles.noPendingOffersForBrand'.tr(),
                                   style: const TextStyle(
                                     fontSize: 14,
-                                    color: Colors.white70,
+                                    color: Colors.black,
                                     shadows: [
                                       Shadow(
                                         offset: Offset(0, 1),
@@ -555,15 +560,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ? '${firstOffer.vehicleBrand} ${firstOffer.vehicleModel}'
           : 'myVehicles.offers'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
         backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
@@ -594,7 +591,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 const SizedBox(height: 16),
                                 
                                 // "Tüm Teklifleri Reddet" Butonu (Sadece gelen tekliflerde ve bekleyen teklif varsa)
-                                if (isIncoming && vehicleOffers.any((o) => o.isPending))
+                                if (isIncoming && vehicleOffers.any((o) => o.isPending()))
                                   Container(
                                     margin: const EdgeInsets.only(bottom: 16),
                                     child: Center(
@@ -651,7 +648,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           Icon(
             Icons.local_offer_outlined, // Changed icon to match style
             size: 80, // Adjusted size
-            color: Colors.white70,
+            color: Colors.black,
           ),
           const SizedBox(height: 16),
           Text(
@@ -659,14 +656,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  offset: Offset(0, 1),
-                  blurRadius: 2,
-                  color: Colors.black54,
-                ),
-              ],
+              color: Colors.black,
+              
             ),
           ),
           const SizedBox(height: 8),
@@ -677,7 +668,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
-              color: Colors.white70,
+              color: Colors.black,
               shadows: [
                 Shadow(
                   offset: Offset(0, 1),
@@ -695,7 +686,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   // Araç seçimi kartı (YENİ) - Ara ekran için
   Widget _buildVehicleSelectionCard(String vehicleId, List<Offer> offers) {
     final firstOffer = offers.first;
-    final pendingOffers = offers.where((o) => o.isPending).toList();
+    final pendingOffers = offers.where((o) => o.isPending()).toList();
     final acceptedOffers = offers.where((o) => o.status == OfferStatus.accepted).toList();
     final rejectedOffers = offers.where((o) => o.status == OfferStatus.rejected).toList();
 
@@ -1100,7 +1091,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ),
           
           // 2. Kullanıcı Cevabı (Sağ - Renkli Balon)
-          if (!offer.isPending || offer.counterOfferAmount != null) ...[
+          if (!offer.isPending() || offer.counterOfferAmount != null) ...[
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -1157,7 +1148,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ],
           
           // 3. Aksiyon Butonları (Hızlı Cevap Barı)
-          if (offer.isPending) ...[
+          if (offer.isPending()) ...[
             const SizedBox(height: 12),
             Container(
               margin: const EdgeInsets.only(left: 48), // Avatar hizasından başla
@@ -1624,7 +1615,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ],
 
           // Aksiyon Butonları (Sadece bekleyen teklifler için)
-          if (offer.isPending && !compact) ...[
+          if (offer.isPending() && !compact) ...[
             const SizedBox(height: 12),
             // Kabul Et Butonu
             SizedBox(
@@ -1682,7 +1673,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ],
 
           // Durum Badge (Kabul/Red edilmiş için)
-          if (!offer.isPending) ...[
+          if (!offer.isPending()) ...[
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1823,24 +1814,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
 
     if (confirmed == true) {
-      // 🎬 Satış animasyonunu oynat
-      await _playSellingAnimation();
-
-      // Loading göster
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-
-      // Teklifi kabul et
-      final xpResult = await _offerService.acceptOffer(offer);
+      // 🎬 Satış animasyonunu oynat ve teklifi kabul et (paralel)
+      final xpResult = await _playSellingAnimation(_offerService.acceptOffer(offer));
 
       if (mounted) {
-        Navigator.pop(context); // Loading'i kapat
-
         if (xpResult != null) {
           // Başarı mesajı
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1871,11 +1848,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
           if (widget.selectedVehicleId != null) {
             final remainingOffers = _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
-            final hasPendingOffers = remainingOffers.any((o) => o.isPending);
+            final hasPendingOffers = remainingOffers.any((o) => o.isPending());
             
             if (!hasPendingOffers) {
-              // Artık bekleyen teklif yok, araç listesine dön ve güncelleme sinyali gönder
-              Navigator.pop(context, true);
+              // Artık bekleyen teklif yok, en başa (marka listesine) dön
+              Navigator.of(context).popUntil((route) => route.isFirst);
             }
           }
         } else {
@@ -1956,18 +1933,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
 
     if (confirmed == true) {
-      // Loading
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
+      // 🎬 Satış animasyonunu oynat ve teklifi kabul et (paralel)
+      final result = await _playSellingAnimation(_offerService.acceptCounterOffer(offer));
 
-      final result = await _offerService.acceptCounterOffer(offer);
-
-      if (mounted) {
-        Navigator.pop(context); // Loading kapat
-
+      if (mounted && result != null) {
         if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -2034,6 +2003,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         );
         _loadOffers();
         _shouldRefreshParent = true;
+        
+        // Badge'i güncelle
+        // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
+
       }
     }
   }
@@ -2198,7 +2171,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           
           // 2. Satıcı Cevabı (Sol - Gri Balon)
           // Eğer cevap geldiyse veya durum değiştiyse
-          if (offer.sellerResponse != null || !offer.isPending) ...[
+          if (offer.sellerResponse != null || !offer.isPending()) ...[
             const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2368,7 +2341,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   // Tüm bekleyen teklifleri reddet (YENİ)
   Future<void> _rejectAllOffers(List<Offer> offers) async {
     // Sadece bekleyen teklifleri filtrele
-    final pendingOffers = offers.where((o) => o.isPending).toList();
+    final pendingOffers = offers.where((o) => o.isPending()).toList();
     
     if (pendingOffers.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2417,13 +2390,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
     if (confirmed == true) {
       // Loading göster
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      _showLoadingDialog();
 
       // Tüm teklifleri reddet
       int successCount = 0;
@@ -2434,7 +2401,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       }
 
       if (mounted) {
-        Navigator.pop(context); // Loading'i kapat
+        Navigator.of(context, rootNavigator: true).pop(); // Loading'i kapat
 
         if (successCount == pendingOffers.length) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -2462,10 +2429,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         await _loadOffers();
         _shouldRefreshParent = true;
         
-        // Eğer tüm bekleyen teklifler silindiyse, bir önceki ekrana dön ve güncelleme sinyali gönder
+        // Badge'i güncelle
+        // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
+
+        
+        // Eğer tüm bekleyen teklifler silindiyse, en başa (marka listesine) dön
         if (successCount > 0 && widget.selectedVehicleId != null) {
-          // Araç detay ekranındayız, araç listesine geri dönüp güncelleme yap
-          Navigator.pop(context, true);
+          // Araç detay ekranındayız, en başa dön
+          Navigator.of(context).popUntil((route) => route.isFirst);
         }
       }
     }
@@ -2494,18 +2465,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
     if (confirmed == true) {
       // Loading göster
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      _showLoadingDialog();
 
       bool success = await _offerService.rejectOffer(offer);
 
       if (mounted) {
-        Navigator.pop(context); // Loading'i kapat
+        Navigator.of(context, rootNavigator: true).pop(); // Loading'i kapat
 
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -2524,14 +2489,18 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           await _loadOffers();
           _shouldRefreshParent = true;
           
+          // Badge'i güncelle
+          // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
+
+          
           // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
           if (widget.selectedVehicleId != null) {
             final remainingOffers = _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
-            final hasPendingOffers = remainingOffers.any((o) => o.isPending);
+            final hasPendingOffers = remainingOffers.any((o) => o.isPending());
             
             if (!hasPendingOffers) {
-              // Artık bekleyen teklif yok, araç listesine dön ve güncelleme sinyali gönder
-              Navigator.pop(context, true);
+              // Artık bekleyen teklif yok, en başa (marka listesine) dön
+              Navigator.of(context).popUntil((route) => route.isFirst);
             }
           }
         } else {
@@ -2584,43 +2553,125 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     await Future.delayed(const Duration(milliseconds: 2000));
 
     if (mounted) {
-      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+      Navigator.of(context, rootNavigator: true).pop(); // Animasyon overlay'ini kapat
     }
   }
 
   /// Satış animasyonunu oynat (YENİ)
-  Future<void> _playSellingAnimation() async {
-    if (!mounted) return;
+  Future<T?> _playSellingAnimation<T>(Future<T> work) async {
+    if (!mounted) return null;
     
+    T? result;
+    bool workDone = false;
+    
+    // İşlemi başlat
+    final workFuture = work.then((value) {
+      result = value;
+      workDone = true;
+      return value;
+    });
+
     showDialog(
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black.withOpacity(0.85),
-      builder: (context) => PopScope(
-        canPop: false, // Geri tuşunu devre dışı bırak
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Satış animasyonu
-              Lottie.asset(
-                'assets/animations/selling_car.json',
-                width: 300,
-                height: 300,
-                repeat: false, // Sadece 1 kez oynat
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          // İşlem bittiğinde diyalogu güncellemek için periyodik kontrol
+          if (!workDone) {
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (context.mounted) setDialogState(() {});
+            });
+          }
+
+          return PopScope(
+            canPop: false,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Satış animasyonu
+                  Lottie.asset(
+                    'assets/animations/selling_car.json',
+                    width: 300,
+                    height: 300,
+                    repeat: false,
+                  ),
+                  const SizedBox(height: 20),
+                  // Eğer animasyon bitmiş ama iş hala devam ediyorsa loader göster
+                  if (!workDone) ...[
+                    const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'offers.processing'.tr(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
+            ),
+          );
+        },
+      ),
+    );
+
+    // En az 2 saniye animasyon için bekle
+    final animationDelay = Future.delayed(const Duration(milliseconds: 2000));
+    
+    // Hem animasyonun hem de işin bitmesini bekle
+    await Future.wait([animationDelay, workFuture]);
+
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).pop(); // Animasyon overlay'ini kapat
+    }
+    
+    return result;
+  }
+
+  /// Şık bir loading dialogu göster
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'offers.processing'.tr(),
+                  style: const TextStyle(
+                    color: Colors.deepPurple,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
-
-    // Animasyon süresi kadar bekle (~2 saniye)
-    await Future.delayed(const Duration(milliseconds: 2000));
-
-    if (mounted) {
-      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
-    }
   }
 
   /// Satın alma başarılı dialogunu göster
@@ -2631,122 +2682,180 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Glassmorphism Background
+            ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.5),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 80), // Space for the floating image
+                      
+                      // Congratulations Title
+                      Text(
+                        'purchase.congratulations'.tr(),
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      
+                      // Vehicle Name
+                      Text(
+                        '${offer.vehicleBrand} ${offer.vehicleModel}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      
+                      // Successfully Purchased Text
+                      Text(
+                        'purchase.successfullyPurchased'.tr(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Success Info Card
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.green.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.stars, color: Colors.amber, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'This vehicle is now yours!',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // Modern Gradient Button
+                      Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Colors.deepPurple, Color(0xFF8E24AA)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.deepPurple.withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            'purchase.great'.tr(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Başarı ikonu
-              Container(
-                width: 100,
+            ),
+            
+            // Floating Vehicle Image or Icon
+            Positioned(
+              top: 0,
+              child: SizedBox(
+                width: 150,
                 height: 100,
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 60,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'purchase.congratulations'.tr(),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Text(
-              //   '${offer.vehicleBrand} ${offer.vehicleModel}',
-              //   style: const TextStyle(
-              //     fontSize: 18,
-              //     fontWeight: FontWeight.bold,
-              //     color: Colors.deepPurple,
-              //   ),
-              // ),
-              const SizedBox(height: 8),
-              Text(
-                'purchase.successfullyPurchased'.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.celebration,
-                      color: Colors.green,
-                      size: 40,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'purchase.'.tr(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.green,
+                child: offer.vehicleImageUrl.isNotEmpty
+                    ? Image.asset(
+                        offer.vehicleImageUrl,
+                        fit: BoxFit.contain,
+                      )
+                    : const Icon(
+                        Icons.directions_car,
+                        size: 60,
+                        color: Colors.deepPurple,
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ],
-                ),
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context); // Dialog'u kapat
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'purchase.great'.tr(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -2867,7 +2976,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
             child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
@@ -2914,7 +3023,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 return;
               }
 
-              Navigator.pop(context);
+              Navigator.of(context, rootNavigator: true).pop();
               _submitCounterOffer(offer, newOffer);
             },
             style: ElevatedButton.styleFrom(
@@ -2942,7 +3051,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     try {
       final currentUser = await _authService.getCurrentUser();
       if (currentUser == null) {
-        if (mounted) Navigator.pop(context);
+        if (mounted) Navigator.of(context, rootNavigator: true).pop();
         return;
       }
 
@@ -2952,7 +3061,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       );
 
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (!result['success']) {
         throw Exception(result['error'] ?? 'Unknown error');
@@ -2960,14 +3069,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
       // 🆕 Eğer teklif kabul edildiyse animasyon ve başarı dialogu göster
       if (result['decision'] == 'accept' || result['status'] == OfferStatus.accepted) {
-        // 🎬 Satış animasyonunu oynat
-        await _playSellingAnimation();
+        // 🎬 Satış animasyonunu oynat ve post-processing yap
+        final updatedUser = await _playSellingAnimation(Future(() async {
+          // İlanı kaldır (Marketten sil)
+          _marketService.removeListing(originalOffer.vehicleId);
+          // Kullanıcıyı güncelle (bakiye değişti)
+          return await _authService.getCurrentUser();
+        }));
 
-        // İlanı kaldır (Marketten sil)
-        _marketService.removeListing(originalOffer.vehicleId);
-
-        // Kullanıcıyı güncelle (bakiye değişti)
-        final updatedUser = await _authService.getCurrentUser();
 
         // Başarı dialogunu göster
         if (mounted && updatedUser != null) {
@@ -2984,7 +3093,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       _loadOffers();
     } catch (e) {
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -3100,7 +3209,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         ),
         actions: [
           ElevatedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
               foregroundColor: Colors.white,
@@ -3152,7 +3261,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       );
 
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (!result['success']) {
         throw Exception(result['error'] ?? 'Unknown error');
@@ -3167,7 +3276,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       _loadOffers();
     } catch (e) {
       // Loading kapat
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -3294,7 +3403,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         ),
         actions: [
           ElevatedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
               foregroundColor: Colors.white,
@@ -3367,6 +3476,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
         return false;
       }
+
+      // Badge'i güncelle
+      // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
+
 
       return true;
     } catch (e) {
@@ -3636,13 +3749,13 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
           child: Text('common.cancel'.tr()),
         ),
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              Navigator.pop(context);
+              Navigator.of(context, rootNavigator: true).pop();
               final newOffer = double.parse(_amountController.text.replaceAll('.', ''));
               widget.onSend(newOffer);
             }

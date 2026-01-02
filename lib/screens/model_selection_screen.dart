@@ -3,7 +3,7 @@ import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
 import '../utils/vehicle_utils.dart';
 import 'vehicle_list_screen.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class ModelSelectionScreen extends StatelessWidget {
   final String categoryName;
@@ -28,75 +28,74 @@ class ModelSelectionScreen extends StatelessWidget {
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
         return Scaffold(
-          backgroundColor: Colors.grey[100],
+          extendBodyBehindAppBar: true,
           appBar: AppBar(
             title: Text('vehicles.selectModel'.tr()),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-              ),
-            ],
-            backgroundColor: categoryColor,
+            backgroundColor: categoryColor.withOpacity(0.9),
             foregroundColor: Colors.white,
             elevation: 0,
           ),
-          body: Column(
-            children: [
-              // Bilgilendirme Banner
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                color: categoryColor.withOpacity(0.1),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: categoryColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'vehicles.whichModelPrefer'.trParams({'brand': brandName}),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
+          body: Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/general_bg.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // Bilgilendirme Banner
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    color: categoryColor.withOpacity(0.1),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: categoryColor,
+                          size: 20,
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'vehicles.whichModelPrefer'.trParams({'brand': brandName}),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  
+                  // Model Listesi
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: models.length + 1, // +1 for "Tüm Modeller"
+                      itemBuilder: (context, index) {
+                        // İlk item "Tüm Modeller"
+                        if (index == 0) {
+                          return _buildAllModelsCard(context, currentLanguage);
+                        }
+                        
+                        // Diğer modeller
+                        final model = models[index - 1];
+                        return _buildModelCard(
+                          context,
+                          modelName: model,
+                          currentLanguage: currentLanguage,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-              
-              // Model Listesi
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: models.length + 1, // +1 for "Tüm Modeller"
-                  itemBuilder: (context, index) {
-                    // İlk item "Tüm Modeller"
-                    if (index == 0) {
-                      return _buildAllModelsCard(context, currentLanguage);
-                    }
-                    
-                    // Diğer modeller
-                    final model = models[index - 1];
-                    return _buildModelCard(
-                      context,
-                      modelName: model,
-                      currentLanguage: currentLanguage,
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -107,7 +106,7 @@ class ModelSelectionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: categoryColor,
+        color: Colors.deepPurpleAccent.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
         shadowColor: categoryColor.withOpacity(0.3),
@@ -205,7 +204,7 @@ class ModelSelectionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 1,
         shadowColor: Colors.black.withOpacity(0.05),

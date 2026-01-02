@@ -13,12 +13,19 @@
     "rentSuccess": "Vehicles successfully rented!",
     "noRentedVehicles": "No vehicles currently rented."
   },
+  "market": {
+    "title": "Market"
+  },
+  "garage": {
+    "title": "Garage"
+  },
   "common": {
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
     "pleaseWait": "Please wait...",
     "cancel": "Cancel",
+    "userNotFound": "User not found",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
@@ -27,7 +34,7 @@
     "next": "Next",
     "ads": {
       "clickToWin": "Click to win 5000 TL",
-      "freeMoney": "Free 5000 TL"
+      "freeMoney": "+5000 TL"
     },
     "done": "Done",
     "loading": "Loading...",
@@ -117,7 +124,7 @@
     "rentVehicle": "Rent Vehicle",
     "buyGallery": "Buy Gallery",
     "professionalBusiness": "Professional Business",
-    "tasks": "SKILLS",
+    "tasks": "Talent Tree",
     "noRecentActivity": "No recent activity",
     "startBuying": "Start shopping now!",
     "bonusAwarded": "🎉 Special bonus! Your balance has been increased to 5,000,000 ₺!",
@@ -339,7 +346,7 @@
     "great": "Great!",
     "vehicle": "Vehicle",
     "missing": "missing",
-    "congratulations": "Congrats! 🎉",
+    "congratulations": "Congrats!",
     "successfullyPurchased": "successfully purchased!",
     "successMessage": "This vehicle is now yours!",
     "errorMessage": "An error occurred while purchasing the vehicle:",
@@ -352,6 +359,7 @@
     "appleLoginError": "An error occurred during Apple sign in"
   },
   "offers": {
+    "processing": "Processing...",
     "counter": "Counter",
     "title": "My Offers",
     "limitWarning": "You can receive a maximum of 10 offers per vehicle. You can reject existing offers to receive new ones.",
@@ -734,7 +742,38 @@
     "selectProfilePicture": "Select Profile Picture",
     "profilePictureUpdated": "Profile picture updated!",
     "admin": "Admin",
-    "adminPanel": "Admin Panel"
+    "adminPanel": "Admin Panel",
+    "devBonus": "Developer Bonus (100 Gold + 1000 SP)",
+    "devBonusSuccess": "Developer bonus applied successfully!"
+  },
+  "skills": {
+    "availablePoints": "Available Points",
+    "activeSkills": "Active Skills",
+    "quickBuy": "Quick Buy",
+    "quickBuyDesc": "Allows you to instantly find and view details of vehicles within a specific score range. Higher levels unlock higher score vehicles.",
+    "quickSell": "Quick Sell",
+    "quickSellDesc": "Allows you to instantly sell your owned vehicles with a profit margin. Profit rate increases as level increases.",
+    "quickSellProfit": "Profit: {percent}",
+    "sweetTalk": "Sweet Talk",
+    "sweetTalkDesc": "Increases the probability of customers accepting your offer during negotiation.",
+    "sweetTalkBonus": "Acceptance Chance: +{percent}",
+    "lowballer": "Lowballer",
+    "lowballerDesc": "Increases the probability of sellers accepting your offer during negotiation when buying a vehicle.",
+    "lowballerBonus": "Acceptance Chance: +{percent}",
+    "expertiseExpert": "Expertise Expert",
+    "expertiseExpertDesc": "Allows you to perform 3 free expertises every game day.",
+    "freeExpertise": "Free Expertise",
+    "quickSellConfirm": "Quick Sell Confirmation",
+    "quickSellConfirmDesc": "Do you want to sell the vehicle for {price}? This action cannot be undone.",
+    "quickSellSuccess": "Vehicle sold successfully!",
+    "level": "Level",
+    "upgrade": "Upgrade",
+    "maxLevel": "Max Level",
+    "upgradeSuccess": "Skill successfully upgraded!",
+    "upgradeFailed": "Could not upgrade skill. Insufficient points or max level reached.",
+    "dailyLimitReached": "You have reached the daily usage limit.",
+    "remainingUses": "Remaining Uses",
+    "noVehicleFound": "No suitable vehicle found in this score range. Please try again later."
   },
   "admin": {
     "title": "Admin Panel",
@@ -883,9 +922,13 @@
     "dailyLoginDesc": "Daily login reward",
     "clearAll": "Clear All",
     "clearAllConfirm": "Are you sure you want to clear all activity history?",
-    "cleared": "History cleared"
+    "cleared": "History cleared",
+    "questReward": "Daily Quest Reward"
   },
   "myVehicles": {
+    "buildCollection": "Build your collection by buying your first vehicle!",
+    "garageFull": "Garage Full!",
+    "garageLimitReached": "You have reached your garage limit.",
     "expandGarageHint": "You need to expand your garage to buy new vehicles.",
     "goToStore": "Go to Store",
     "noVehiclesDesc": "You can list vehicles from your garage for sale.",
@@ -1540,7 +1583,19 @@
     "enterAmount": "Please enter an amount",
     "invalidNumber": "Invalid number format",
     "minAmount": "Minimum amount",
-    "maxAmount": "Maximum amount"
+    "maxAmount": "Maximum amount",
+    "garageExpansion": "Garage Expansion",
+    "garageCapacity": "Garage Capacity",
+    "currentLimit": "Current Limit: {limit} Vehicles",
+    "plusOneSlot": "+1 Slot",
+    "expandGarageTitle": "Expand Garage",
+    "currentLimitLabel": "Current Limit: {limit}",
+    "newLimitLabel": "New Limit: {limit}",
+    "costLabel": "Cost: {amount} {currency}",
+    "garageExpandSuccess": "Garage successfully expanded! 🎉",
+    "minGoldError": "You must enter at least 0.1 gold",
+    "insufficientGoldError": "Insufficient gold! Available: {amount} gold",
+    "securePaymentMessage": "You are about to purchase with secure payment."
   },
   "seller_notes": {
     "base": {
@@ -1881,41 +1936,6 @@
     "editListing": "Edit Listing",
     "profitStatus": "Profit",
     "lossStatus": "Loss"
-  },
-  "skills": {
-    "title": "Skill Tree",
-    "info": "Earn skill points as you level up and unlock special abilities!",
-    "cost": "Cost",
-    "unlock": "UNLOCK",
-    "unlocked": "unlocked!",
-    "active": "Active",
-    "cannotUnlock": "Cannot unlock this skill! Insufficient points.",
-    "negotiation": "Master Negotiator",
-    "negotiationDesc": "Make offers 10% lower",
-    "quickSale": "Quick Sale",
-    "quickSaleDesc": "Receive 20% more offers on your vehicles",
-    "marketAnalyst": "Market Analyst",
-    "marketAnalystDesc": "See real value when buying vehicles",
-    "reputation": "Reputation",
-    "reputationDesc": "Receive 10% higher offers",
-    "garageExpansion": "Garage Expansion",
-    "garageExpansionDesc": "+2 vehicle capacity",
-    "goldMiner": "Gold Miner",
-    "goldMinerDesc": "Earn 50% more gold from daily quests",
-    "fastLearner": "Fast Learner",
-    "fastLearnerDesc": "Earn 25% more XP from all actions",
-    "negotiationPower": "Negotiation Power",
-    "negotiationPowerDesc": "Get 15% better deals in negotiations",
-    "marketInsider": "Market Insider",
-    "marketInsiderDesc": "See estimated market value range of vehicles",
-    "quickFlipper": "Quick Flipper",
-    "quickFlipperDesc": "Get offers 15% faster for your listings",
-    "rentalTycoon": "Rental Tycoon",
-    "rentalTycoonDesc": "Earn 10% more from rentals",
-    "influencer": "Influencer",
-    "influencerDesc": "Earn 20% more from ad rewards",
-    "charismaticSeller": "Charismatic Seller",
-    "charismaticSellerDesc": "10% higher chance of counter-offer acceptance"
   },
   "changeUsername": {
     "title": "Change Username",

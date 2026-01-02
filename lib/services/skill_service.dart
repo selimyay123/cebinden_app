@@ -1,270 +1,225 @@
-import 'package:flutter/material.dart';
+import 'dart:math';
 import '../models/user_model.dart';
-
-/// Basitleştirilmiş Yetenek Modeli
-class Skill {
-  final String id;
-  final String nameKey; // Localization key
-  final String descKey; // Localization key
-  final int cost;
-  final String emoji; // Emoji icon
-  final Color primaryColor;
-  final Color secondaryColor;
-  final int maxLevel; // Maksimum seviye (1 = tek seviye)
-  
-  const Skill({
-    required this.id,
-    required this.nameKey,
-    required this.descKey,
-    required this.cost,
-    required this.emoji,
-    required this.primaryColor,
-    required this.secondaryColor,
-    this.maxLevel = 1,
-  });
-}
+import '../models/vehicle_model.dart';
+import 'database_helper.dart';
+import 'game_time_service.dart';
+import 'market_refresh_service.dart';
 
 class SkillService {
-  // ============================================================================
-  // YENİ YETENEK LİSTESİ (6 Yetenek)
-  // ============================================================================
-  
-  static const List<Skill> skills = [
-    // ============================================================================
-    // TAMAMEN ENTEGRE VE ÇALIŞAN YETENEKLER
-    // ============================================================================
-    
-    // 1. İtibar - Gelen teklifler %10 daha yüksek
-    Skill(
-      id: 'reputation',
-      nameKey: 'skills.reputation',
-      descKey: 'skills.reputationDesc',
-      cost: 1,
-      emoji: '🏆',
-      primaryColor: Color(0xFF9C27B0),
-      secondaryColor: Color(0xFFAB47BC),
-    ),
-    
-    // 2. Garaj Genişletme - +2 araç kapasitesi
-    Skill(
-      id: 'garage_expansion',
-      nameKey: 'skills.garageExpansion',
-      descKey: 'skills.garageExpansionDesc',
-      cost: 3,
-      emoji: '🚗',
-      primaryColor: Color(0xFFE91E63),
-      secondaryColor: Color(0xFFF06292),
-    ),
-    
-    // 3. Hızlı Öğrenen - Tüm işlemlerden %25 daha fazla XP
-    Skill(
-      id: 'fast_learner',
-      nameKey: 'skills.fastLearner',
-      descKey: 'skills.fastLearnerDesc',
-      cost: 1,
-      emoji: '⚡',
-      primaryColor: Color(0xFF00BCD4),
-      secondaryColor: Color(0xFF26C6DA),
-    ),
-    
-    // 5. Piyasa Kurdu - Araç piyasa değeri aralığını gösterir
-    Skill(
-      id: 'market_insider',
-      nameKey: 'skills.marketInsider',
-      descKey: 'skills.marketInsiderDesc',
-      cost: 2,
-      emoji: '📊',
-      primaryColor: Color(0xFF607D8B),
-      secondaryColor: Color(0xFF78909C),
-    ),
+  static final SkillService _instance = SkillService._internal();
+  factory SkillService() => _instance;
+  SkillService._internal();
 
-    // 6. Hızlı Satıcı - Teklifler %15 daha hızlı gelir
-    Skill(
-      id: 'quick_flipper',
-      nameKey: 'skills.quickFlipper',
-      descKey: 'skills.quickFlipperDesc',
-      cost: 3,
-      emoji: '⚡',
-      primaryColor: Color(0xFFFF9800),
-      secondaryColor: Color(0xFFFFB74D),
-    ),
+  final DatabaseHelper _db = DatabaseHelper();
+  final GameTimeService _gameTime = GameTimeService();
 
-    // 7. Filo Yöneticisi - Kira geliri %10 artar
-    Skill(
-      id: 'rental_tycoon',
-      nameKey: 'skills.rentalTycoon',
-      descKey: 'skills.rentalTycoonDesc',
-      cost: 2,
-      emoji: '🏢',
-      primaryColor: Color(0xFF3F51B5),
-      secondaryColor: Color(0xFF5C6BC0),
-    ),
+  // Yetenek ID'leri
+  static const String skillQuickBuy = 'quick_buy';
+  static const String skillQuickSell = 'quick_sell';
+  static const String skillSweetTalk = 'sweet_talk';
+  static const String skillLowballer = 'lowballer';
+  static const String skillExpertiseExpert = 'expertise_expert';
 
-    // 8. Reklam Yıldızı - Reklam ödülleri %20 artar
-    Skill(
-      id: 'influencer',
-      nameKey: 'skills.influencer',
-      descKey: 'skills.influencerDesc',
-      cost: 1,
-      emoji: '🌟',
-      primaryColor: Color(0xFFFFC107),
-      secondaryColor: Color(0xFFFFD54F),
-    ),
+  // Yetenek Tanımları
+  static const Map<String, Map<String, dynamic>> skillDefinitions = {
+    skillQuickBuy: {
+      'maxLevel': 3,
+      'costs': [1, 2, 3], // Seviye 1, 2, 3 maliyetleri
+      'dailyLimit': 3,
+    },
+    skillQuickSell: {
+      'maxLevel': 3,
+      'costs': [1, 2, 3],
+      'dailyLimit': 3,
+    },
+    skillSweetTalk: {
+      'maxLevel': 3,
+      'costs': [1, 2, 3],
+    },
+    skillLowballer: {
+      'maxLevel': 3,
+      'costs': [1, 2, 3],
+    },
+    skillExpertiseExpert: {
+      'maxLevel': 1,
+      'costs': [1],
+      'dailyLimit': 3,
+    },
+  };
 
-    // 9. İkna Kabiliyeti - Karşı teklif kabul şansı %10 artar
-    Skill(
-      id: 'charismatic_seller',
-      nameKey: 'skills.charismaticSeller',
-      descKey: 'skills.charismaticSellerDesc',
-      cost: 3,
-      emoji: '🤝',
-      primaryColor: Color(0xFFE91E63),
-      secondaryColor: Color(0xFFF06292),
-    ),
-  ];
+  // Tatlı Dil Bonusu
+  static const Map<int, double> sweetTalkBonuses = {
+    1: 0.05, // %5
+    2: 0.10, // %10
+    3: 0.15, // %15
+  };
 
-  // ============================================================================
-  // YARDIMCI METODLAR
-  // ============================================================================
+  // Ölücü Bonusu
+  static const Map<int, double> lowballerBonuses = {
+    1: 0.05, // %5
+    2: 0.10, // %10
+    3: 0.15, // %15
+  };
 
-  /// Bir yeteneği ID'sine göre getir
-  static Skill? getSkillById(String id) {
-    try {
-      return skills.firstWhere((s) => s.id == id);
-    } catch (e) {
-      return null;
-    }
+  // Hızlı Sat Kar Marjları
+  static const Map<int, double> quickSellMargins = {
+    1: 0.03, // %3
+    2: 0.04, // %4
+    3: 0.05, // %5
+  };
+
+  /// Kullanıcının yetenek seviyesini getir
+  int getSkillLevel(User user, String skillId) {
+    return user.skills[skillId] ?? 0;
   }
 
-  /// Kullanıcının bir yeteneği açıp açamayacağını kontrol et
-  static bool canUnlock(User user, String skillId) {
-    final skill = getSkillById(skillId);
-    if (skill == null) return false;
+  /// Yeteneği yükselt
+  Future<bool> upgradeSkill(String userId, String skillId) async {
+    final userMap = await _db.getUserById(userId);
+    if (userMap == null) return false;
+    final user = User.fromJson(userMap);
 
-    // Zaten açıksa tekrar açamaz
-    if (user.unlockedSkills.contains(skillId)) return false;
+    final currentLevel = getSkillLevel(user, skillId);
+    final def = skillDefinitions[skillId];
+    if (def == null) return false;
 
-    // Puanı yetiyor mu?
-    if (user.skillPoints < skill.cost) return false;
+    final maxLevel = def['maxLevel'] as int;
+    if (currentLevel >= maxLevel) return false;
 
+    final costs = def['costs'] as List<int>;
+    final cost = costs[currentLevel]; // currentLevel 0 ise index 0 (1. seviye maliyeti)
+
+    if (user.skillPoints < cost) return false;
+
+    // Yeni yetenek haritası
+    final newSkills = Map<String, int>.from(user.skills);
+    newSkills[skillId] = currentLevel + 1;
+
+    // Kullanıcıyı güncelle
+    final updatedUser = user.copyWith(
+      skillPoints: user.skillPoints - cost,
+      skills: newSkills,
+    );
+
+    await _db.updateUser(userId, updatedUser.toJson());
     return true;
   }
 
-  /// Kullanıcının bir yeteneği olup olmadığını kontrol et
-  static bool hasSkill(User user, String skillId) {
-    return user.unlockedSkills.contains(skillId);
-  }
+  /// Yetenek kullanılabilir mi? (Günlük limit kontrolü)
+  bool canUseSkill(User user, String skillId) {
+    final currentLevel = getSkillLevel(user, skillId);
+    if (currentLevel == 0) return false;
 
-  // ============================================================================
-  // YETENEK ETKİLERİ
-  // ============================================================================
+    final def = skillDefinitions[skillId];
+    if (def == null) return false;
 
-  /// Pazarlık Ustası: Teklif yaparken indirim oranı
-  static double getNegotiationDiscount(User user) {
-    if (hasSkill(user, 'negotiation')) {
-      return 0.10; // %10 daha düşük teklif
+    final dailyLimit = def['dailyLimit'] as int;
+    
+    // Gün kontrolü
+    if (user.lastSkillUseDay != _gameTime.currentDay) {
+      return true; // Farklı gün (yeni veya resetlenmiş), limit sıfırlandı
     }
-    return 0.0;
+
+    final usageCount = user.dailySkillUses[skillId] ?? 0;
+    return usageCount < dailyLimit;
   }
 
-  /// Hızlı Satış: Teklif gelme hızı çarpanı
-  static double getOfferSpeedMultiplier(User user) {
-    if (hasSkill(user, 'quick_flipper')) {
-      return 0.85; // %15 daha hızlı (süre çarpanı)
+  /// Yetenek kullanımını kaydet
+  Future<void> recordSkillUsage(String userId, String skillId) async {
+    final userMap = await _db.getUserById(userId);
+    if (userMap == null) return;
+    final user = User.fromJson(userMap);
+
+    final currentDay = _gameTime.currentDay;
+    Map<String, int> newDailyUses;
+
+    if (user.lastSkillUseDay != currentDay) {
+      // Farklı gün, sayaçları sıfırla
+      newDailyUses = {skillId: 1};
+    } else {
+      // Aynı gün, sayacı artır
+      newDailyUses = Map<String, int>.from(user.dailySkillUses);
+      newDailyUses[skillId] = (newDailyUses[skillId] ?? 0) + 1;
     }
-    return 1.0;
+
+    final updatedUser = user.copyWith(
+      dailySkillUses: newDailyUses,
+      lastSkillUseDay: currentDay,
+    );
+
+    await _db.updateUser(userId, updatedUser.toJson());
   }
 
-  /// Piyasa Analisti: Araç değeri gösterilsin mi?
-  static bool canSeeMarketValue(User user) {
-    return hasSkill(user, 'market_insider');
-  }
+  /// Hızlı Al yeteneği için araç bul
+  Future<Vehicle?> findQuickBuyVehicle(User user) async {
+    final level = getSkillLevel(user, skillQuickBuy);
+    if (level == 0) return null;
 
-  /// İtibar: Gelen tekliflere bonus
-  static double getReputationBonus(User user) {
-    if (hasSkill(user, 'reputation')) {
-      return 0.10; // %10 daha yüksek teklifler
+    int minScore, maxScore;
+
+    switch (level) {
+      case 1:
+        minScore = 0;
+        maxScore = 70;
+        break;
+      case 2:
+        minScore = 50;
+        maxScore = 85;
+        break;
+      case 3:
+        minScore = 75;
+        maxScore = 100;
+        break;
+      default:
+        return null;
     }
-    return 0.0;
+
+    // MarketRefreshService'den aktif ilanları al
+    final marketService = MarketRefreshService();
+    final allListings = marketService.getActiveListings();
+    
+    final candidates = allListings.where((v) {
+      // Skor aralığında olsun
+      return v.score >= minScore && v.score <= maxScore;
+    }).toList();
+
+    if (candidates.isEmpty) return null;
+
+    // Rastgele birini seç
+    return candidates[Random().nextInt(candidates.length)];
+  }
+  
+  /// Kalan kullanım hakkını getir
+  int getRemainingDailyUses(User user, String skillId) {
+    final def = skillDefinitions[skillId];
+    if (def == null) return 0;
+    
+    final dailyLimit = def['dailyLimit'] as int;
+    
+    if (user.lastSkillUseDay != _gameTime.currentDay) {
+      return dailyLimit;
+    }
+    
+    final usage = user.dailySkillUses[skillId] ?? 0;
+    return (dailyLimit - usage).clamp(0, dailyLimit);
   }
 
-  /// Garaj Genişletme: Ekstra kapasite
-  static int getGarageLimitBonus(User user) {
-    if (hasSkill(user, 'garage_expansion')) {
-      return 2; // +2 araç
-    }
-    return 0;
-  }
+  /// Hızlı Satış fiyatını hesapla
+  int calculateQuickSellPrice(User user, Vehicle vehicle) {
+    final level = getSkillLevel(user, skillQuickSell);
+    if (level == 0) return 0;
 
-  /// Altın Madenci: Görev ödülü çarpanı
-  static double getGoldMinerMultiplier(User user) {
-    if (hasSkill(user, 'gold_miner')) {
-      return 1.50; // %50 daha fazla altın
-    }
-    return 1.0;
-  }
-
-  /// Hızlı Öğrenen: XP kazanım çarpanı
-  static double getFastLearnerMultiplier(User user) {
-    if (hasSkill(user, 'fast_learner')) {
-      return 1.25; // %25 daha fazla XP
-    }
-    return 1.0;
-  }
-
-  /// Pazarlık Gücü: Müzakerede indirim bonusu
-  static double getNegotiationPowerBonus(User user) {
-    if (hasSkill(user, 'negotiation_power')) {
-      return 0.15; // %15 daha fazla indirim yapabilir
-    }
-    return 0.0;
-  }
-
-  /// Filo Yöneticisi: Kira geliri çarpanı
-  static double getRentalIncomeMultiplier(User user) {
-    if (hasSkill(user, 'rental_tycoon')) {
-      return 1.10; // %10 daha fazla kira geliri
-    }
-    return 1.0;
-  }
-
-  /// Reklam Yıldızı: Reklam ödülü çarpanı
-  static double getAdRewardMultiplier(User user) {
-    if (hasSkill(user, 'influencer')) {
-      return 1.20; // %20 daha fazla ödül
-    }
-    return 1.0;
-  }
-
-  /// İkna Kabiliyeti: Karşı teklif kabul şansı bonusu
-  static double getCounterOfferSuccessBonus(User user) {
-    if (hasSkill(user, 'charismatic_seller')) {
-      return 0.10; // %10 ekstra şans
-    }
-    return 0.0;
-  }
-
-  // ============================================================================
-  // BACKWARD COMPATIBILITY (Eski sistem için)
-  // ============================================================================
-
-  /// Araç ALIM fiyatı çarpanını hesapla (Eski sistem uyumluluğu)
-  /// Şimdilik etkisiz, gelecekte "negotiation" skill'i ile entegre edilebilir
-  static double getBuyingMultiplier(User user) {
-    // Pazarlık Ustası varsa %10 indirim
-    if (hasSkill(user, 'negotiation')) {
-      return 0.90; // %10 indirim
-    }
-    return 1.0;
-  }
-
-  /// Araç SATIŞ fiyatı çarpanını hesapla (Eski sistem uyumluluğu)
-  /// İtibar skill'i ile entegre
-  static double getSellingMultiplier(User user) {
-    // İtibar varsa %10 daha yüksek
-    if (hasSkill(user, 'reputation')) {
-      return 1.10; // %10 daha yüksek
-    }
-    return 1.0;
+    final margin = quickSellMargins[level] ?? 0.0;
+    // Araç fiyatı üzerinden kar marjı ekle
+    // Not: Burada aracın piyasa değerini mi yoksa alış fiyatını mı baz alacağız?
+    // Genelde "kar" dendiğinde alış fiyatı üzerine eklenir.
+    // Ancak Vehicle modelinde purchasePrice yok (UserVehicle'da var).
+    // Bu metod Vehicle alıyor ama UserVehicle olması daha mantıklı olabilir.
+    // Şimdilik Vehicle.price (piyasa değeri) üzerinden hesaplayalım, çünkü "Hızlı Sat" genelde piyasa değerine yakın veya üstünde satmak demektir.
+    // VEYA: Kullanıcı isteği "kar payı" diyor.
+    // Eğer UserVehicle ise purchasePrice var.
+    
+    // Basitlik için: Piyasa değeri * (1 + margin)
+    return (vehicle.price * (1 + margin)).round();
   }
 }

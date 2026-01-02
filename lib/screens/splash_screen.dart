@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (userExists) {
         // Aktif kullanıcı varsa ana sayfaya yönlendir (tüm geçmişi temizle)
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false, // Tüm önceki route'ları temizle
         );
       } else {

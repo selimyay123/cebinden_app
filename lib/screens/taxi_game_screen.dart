@@ -7,7 +7,7 @@ import '../models/user_model.dart';
 import '../services/localization_service.dart';
 import '../services/ad_service.dart';
 import '../services/activity_service.dart';
-import '../services/skill_service.dart';
+import '../services/activity_service.dart';
 
 enum ObstacleType { car, pedestrian }
 
@@ -330,9 +330,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                             if (userMap != null) {
                               final user = User.fromJson(userMap);
                               
-                              // Reklam Yıldızı yeteneği
-                              final multiplier = SkillService.getAdRewardMultiplier(user);
-                              final finalReward = _moneyEarned * multiplier;
+                              final finalReward = _moneyEarned;
                               
                               await _db.updateUser(user.id, {
                                 'balance': user.balance + finalReward, // Ekstra kazanç (zaten ilk kazanç eklendi)

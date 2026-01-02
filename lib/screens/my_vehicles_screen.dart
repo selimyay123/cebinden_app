@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
@@ -7,9 +8,13 @@ import '../services/localization_service.dart';
 import '../utils/brand_colors.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
-import '../services/skill_service.dart'; // Yetenek Servisi
-import 'home_screen.dart';
+import 'create_listing_screen.dart';
+import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
+import '../mixins/auto_refresh_mixin.dart';
+import '../services/skill_service.dart';
+import 'package:lottie/lottie.dart';
+import '../services/game_time_service.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
@@ -23,7 +28,7 @@ class MyVehiclesScreen extends StatefulWidget {
   State<MyVehiclesScreen> createState() => _MyVehiclesScreenState();
 }
 
-class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
+class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, AutoRefreshMixin {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
   
@@ -32,12 +37,31 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
   bool _isLoading = true;
   
   // Marka bazında gruplandırılmış araçlar
+  // Marka bazında gruplandırılmış araçlar
   Map<String, List<UserVehicle>> _vehiclesByBrand = {};
+  StreamSubscription? _vehicleUpdateSubscription;
+
+  @override
+  int? get tabIndex => 2; // MainScreen'deki index
+
+  @override
+  void refresh() {
+    _loadMyVehicles();
+  }
 
   @override
   void initState() {
     super.initState();
     _loadMyVehicles();
+    _vehicleUpdateSubscription = _db.onVehicleUpdate.listen((_) {
+      _loadMyVehicles();
+    });
+  }
+
+  @override
+  void dispose() {
+    _vehicleUpdateSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadMyVehicles() async {
@@ -72,22 +96,22 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     return ValueListenableBuilder<String>(
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
-          return Scaffold(
+        return WillPopScope(
+          onWillPop: () async {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+              return false;
+            }
+            return true;
+          },
+          child: Scaffold(
             extendBodyBehindAppBar: true,
             appBar: AppBar(
               title: Text(widget.selectedBrand != null 
                 ? widget.selectedBrand! 
                 : 'home.myVehicles'.tr()),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.home),
-                  onPressed: () {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                      (route) => false,
-                    );
-                  },
-                ),
+
               ],
               backgroundColor: Colors.deepPurple.withOpacity(0.9), // Slightly transparent app bar
               foregroundColor: Colors.white,
@@ -96,7 +120,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
             body: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/garage_bg.png'),
+                  image: AssetImage('assets/images/general_bg.png'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -106,26 +130,27 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                     : Center(
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 600),
-                    child: Column(
-                      children: [
-                        // Limit Göstergesi
-                        _buildLimitIndicator(),
-                        
-                        // İçerik
-                        Expanded(
-                          child: _myVehicles.isEmpty
-                              ? _buildEmptyState()
-                              : widget.selectedBrand != null
-                                  ? _buildVehicleList()
-                                  : _buildBrandList(),
+                          child: Column(
+                            children: [
+                              // Limit Göstergesi
+                              _buildLimitIndicator(),
+                              
+                              // İçerik
+                              Expanded(
+                                child: _myVehicles.isEmpty
+                                    ? _buildEmptyState()
+                                    : widget.selectedBrand != null
+                                        ? _buildVehicleList()
+                                        : _buildBrandList(),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                  ),
-                ),
+                      ),
               ),
-          );
+            ),
+          ),
+        );
       },
     );
   }
@@ -134,8 +159,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     if (_currentUser == null) return const SizedBox.shrink();
 
     final baseLimit = _currentUser!.garageLimit;
-    final bonusLimit = SkillService.getGarageLimitBonus(_currentUser!);
-    final totalLimit = baseLimit + bonusLimit;
+    final totalLimit = baseLimit;
     final currentCount = _myVehicles.length;
     final isFull = currentCount >= totalLimit;
 
@@ -379,8 +403,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
           children: [
             Icon(
               Icons.directions_car_outlined,
-              size: 120,
-              color: Colors.grey[400],
+              size: 100,
+              color: Colors.black,
             ),
             const SizedBox(height: 24),
             Text(
@@ -388,7 +412,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 12),
@@ -397,26 +421,26 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.shopping_cart),
-              label: Text('misc.buyVehicleButton'.tr()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
+            // ElevatedButton.icon(
+            //   onPressed: () => Navigator.pop(context),
+            //   icon: const Icon(Icons.shopping_cart),
+            //   label: Text('misc.buyVehicleButton'.tr()),
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Colors.deepPurple,
+            //     foregroundColor: Colors.white,
+            //     padding: const EdgeInsets.symmetric(
+            //       horizontal: 32,
+            //       vertical: 16,
+            //     ),
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(12),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -733,31 +757,93 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                 if (!vehicle.isListedForSale) ...[
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        // Satışa çıkarma ekranına git
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CreateListingScreen(vehicle: vehicle),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              // Satışa çıkarma ekranına git
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CreateListingScreen(vehicle: vehicle),
+                                ),
+                              );
+                              
+                              // Eğer satışa çıkarma başarılıysa listeyi yenile
+                              if (result == true) {
+                                await _loadMyVehicles();
+                              }
+                            },
+                            icon: const Icon(Icons.sell, size: 18),
+                            label: Text(
+                              'misc.sellVehicle'.tr(),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(0, 48),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
-                        );
-                        
-                        // Eğer satışa çıkarma başarılıysa listeyi yenile
-                        if (result == true) {
-                          await _loadMyVehicles();
-                        }
-                      },
-                      icon: const Icon(Icons.sell, size: 18),
-                      label: Text('misc.sellVehicle'.tr()),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ),
+                        
+                        // Hızlı Sat Butonu (Eğer yetenek açıksa)
+                        if (_currentUser != null)
+                          Builder(
+                            builder: (context) {
+                              final level = SkillService().getSkillLevel(_currentUser!, SkillService.skillQuickSell);
+                              if (level > 0) {
+                                final margin = SkillService.quickSellMargins[level] ?? 0.0;
+                                return Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: ElevatedButton(
+                                      onPressed: () => _showQuickSellConfirmation(vehicle),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange.shade800,
+                                        foregroundColor: Colors.white,
+                                        minimumSize: const Size(0, 48),
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      child: FittedBox(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(Icons.flash_on, size: 16),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'skills.quickSell'.tr(),
+                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '(${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.white.withOpacity(0.9),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }
+                          ),
+                      ],
                     ),
                   ),
                 ],
@@ -836,9 +922,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                             ),
                           ),
                           Text(
-                            '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
+                            '${vehicle.year} • ${vehicle.brand}',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withOpacity(0.8),
                               fontSize: 14,
                             ),
                           ),
@@ -846,81 +932,56 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
               ),
               
               // Content
-              Expanded(
+              Flexible(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Satın Alma Bilgileri
-                      _buildSectionTitle('vehicles.purchaseDate'.tr()),
-                      const SizedBox(height: 12),
-                      _buildInfoCard([
+                      _buildSimpleDetailRow('vehicles.mileage'.tr(), '${_formatNumber(vehicle.mileage)} km'),
+                      _buildSimpleDetailRow('vehicles.fuelType'.tr(), 'vehicles.${vehicle.fuelType}'.tr()),
+                      _buildSimpleDetailRow('vehicles.transmission'.tr(), 'vehicles.${vehicle.transmission}'.tr()),
+                      _buildSimpleDetailRow('vehicles.engineSize'.tr(), '${vehicle.engineSize} L'),
+                      _buildSimpleDetailRow('vehicles.driveType'.tr(), 'vehicles.${vehicle.driveType}'.tr()),
+                      _buildSimpleDetailRow('vehicles.color'.tr(), 'colors.${vehicle.color}'.tr()),
+                      const Divider(height: 24),
+                      _buildSimpleDetailRow('vehicles.purchasePrice'.tr(), '${_formatCurrency(vehicle.purchasePrice)} TL'),
+                      _buildSimpleDetailRow('vehicles.purchaseDate'.tr(), _formatDate(vehicle.purchaseDate)),
+                      _buildSimpleDetailRow('vehicles.daysOwned'.tr(), '${vehicle.daysOwned} ${'misc.days'.tr()}'),
+                      
+                      if (vehicle.hasAccidentRecord) ...[
+                        const SizedBox(height: 16),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey[100]!),
-                            ),
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red.withOpacity(0.3)),
                           ),
                           child: Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.deepPurple.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(Icons.shopping_cart, size: 20, color: Colors.deepPurple),
-                              ),
+                              const Icon(Icons.warning, color: Colors.red, size: 20),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'vehicles.purchasePrice'.tr(),
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '${_formatCurrency(vehicle.purchasePrice)} TL',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  'vehicles.hasAccidentRecord'.tr(),
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        _buildDetailRow(
-                          Icons.calendar_today,
-                          'vehicles.purchaseDate'.tr(),
-                          _formatDate(vehicle.purchaseDate),
-                          Colors.blue,
-                        ),
-                        _buildDetailRow(
-                          Icons.access_time,
-                          'vehicles.daysOwned'.tr(),
-                          '${vehicle.daysOwned} ${'misc.days'.tr()}',
-                          Colors.green,
-                        ),
-                      ]),
+                      ],
                       
                       const SizedBox(height: 20),
                       
@@ -928,35 +989,28 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                       _buildSectionTitle('vehicles.technicalSpecs'.tr()),
                       const SizedBox(height: 12),
                       _buildInfoCard([
-                        if (vehicle.color != 'Standart')
-                          _buildDetailRow(
-                            Icons.color_lens,
-                            'vehicles.color'.tr(),
-                            'colors.${vehicle.color}'.tr(),
-                            Colors.pink,
-                          ),
                         _buildDetailRow(
                           Icons.local_gas_station,
                           'vehicles.fuelType'.tr(),
-                          'vehicleAttributes.${vehicle.fuelType}'.tr(),
+                          'vehicles.${vehicle.fuelType}'.tr(),
                           Colors.orange,
                         ),
                         _buildDetailRow(
                           Icons.settings,
                           'vehicles.transmission'.tr(),
-                          'vehicleAttributes.${vehicle.transmission}'.tr(),
+                          'vehicles.${vehicle.transmission}'.tr(),
                           Colors.teal,
                         ),
                         _buildDetailRow(
                           Icons.speed,
                           'vehicles.engineSize'.tr(),
-                          vehicle.engineSize,
+                          '${vehicle.engineSize} L',
                           Colors.red,
                         ),
                         _buildDetailRow(
                           Icons.compare_arrows,
                           'vehicles.driveType'.tr(),
-                          'vehicleAttributes.${vehicle.driveType}'.tr(),
+                          'vehicles.${vehicle.driveType}'.tr(),
                           Colors.indigo,
                         ),
                       ]),
@@ -970,13 +1024,13 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
                         _buildDetailRow(
                           Icons.verified_user,
                           'vehicles.warrantyStatus'.tr(),
-                          vehicle.hasWarranty ? 'vehicles.yes'.tr() : 'vehicles.no'.tr(),
+                          vehicle.hasWarranty ? 'common.yes'.tr() : 'common.no'.tr(),
                           vehicle.hasWarranty ? Colors.green : Colors.grey,
                         ),
                         _buildDetailRow(
                           Icons.car_crash,
                           'vehicles.accidentRecord'.tr(),
-                          vehicle.hasAccidentRecord ? 'vehicles.yes'.tr() : 'vehicles.no'.tr(),
+                          vehicle.hasAccidentRecord ? 'common.yes'.tr() : 'common.no'.tr(),
                           vehicle.hasAccidentRecord ? Colors.red : Colors.green,
                         ),
                         _buildDetailRow(
@@ -1070,6 +1124,31 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
     );
   }
 
+  Widget _buildSimpleDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionTitle(String title) {
     return Row(
       children: [
@@ -1153,6 +1232,157 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _playSoldAnimation() async {
+    if (!mounted) return;
+    
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.85),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Lottie.asset(
+          'assets/animations/selling_car.json',
+          width: 300,
+          height: 300,
+          repeat: false,
+          onLoaded: (composition) {
+            Future.delayed(composition.duration, () {
+              if (mounted && Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showQuickSellConfirmation(UserVehicle vehicle) async {
+    if (_currentUser == null) return;
+
+    final skillService = SkillService();
+    final remainingUses = skillService.getRemainingDailyUses(_currentUser!, SkillService.skillQuickSell);
+
+    if (remainingUses <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text('skills.dailyLimitReached'.tr())),
+            ],
+          ),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
+
+    final level = skillService.getSkillLevel(_currentUser!, SkillService.skillQuickSell);
+    final margin = SkillService.quickSellMargins[level] ?? 0.0;
+    final sellPrice = (vehicle.purchasePrice * (1 + margin)).round();
+    final profit = sellPrice - vehicle.purchasePrice;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('skills.quickSellConfirm'.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('skills.quickSellConfirmDesc'.trParams({'price': _formatCurrency(sellPrice.toDouble())})),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.trending_up, color: Colors.green),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'}),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                      ),
+                      Text(
+                        '+${_formatCurrency(profit.toDouble())} TL',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${'skills.remainingUses'.tr()}: $remainingUses/3',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _processQuickSell(vehicle, sellPrice);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+            child: Text('skills.quickSell'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _processQuickSell(UserVehicle vehicle, int sellPrice) async {
+    setState(() => _isLoading = true);
+    try {
+      // 1. Bakiyeyi güncelle
+      final newBalance = _currentUser!.balance + sellPrice;
+      await _db.updateUser(_currentUser!.id, {'balance': newBalance});
+
+      // 2. Aracı satıldı olarak işaretle
+      await _db.sellUserVehicle(vehicle.id, sellPrice.toDouble());
+
+      // 3. Yetenek kullanımını kaydet
+      await SkillService().recordSkillUsage(_currentUser!.id, SkillService.skillQuickSell);
+
+      // 4. Animasyon
+      await _playSoldAnimation();
+
+      // 5. Listeyi yenile
+      await _loadMyVehicles();
+      
+      // Kullanıcıyı güncelle (bakiye için)
+      final updatedUser = await _authService.getCurrentUser();
+      if (updatedUser != null) {
+        setState(() => _currentUser = updatedUser);
+      }
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hata: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 }
 

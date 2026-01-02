@@ -10,9 +10,10 @@ import 'change_password_screen.dart';
 import 'change_username_screen.dart';
 import 'about_screen.dart';
 import 'login_screen.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 import 'statistics_screen.dart';
 import 'admin_panel_screen.dart';
+import '../services/database_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -380,53 +381,47 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
           appBar: AppBar(
             title: Text('settings.title'.tr()),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-              ),
+
             ],
             elevation: 0,
           ),
       body: ListView(
         children: [
-          // TEST BUTONU - GEÇİCİ
-          // Container(
-          //   margin: const EdgeInsets.all(16),
-          //   child: ElevatedButton.icon(
-          //     onPressed: () async {
-          //       if (_currentUser != null) {
-          //         final db = DatabaseHelper();
-          //         await db.updateUser(_currentUser!.id, {
-          //           'gold': _currentUser!.gold + 100.0,
-          //         });
+          // Geliştirici Bonusu (Sadece Admin)
+          if (_currentUser != null && _authService.isUserAdmin(_currentUser!))
+            Container(
+              margin: const EdgeInsets.all(16),
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final db = DatabaseHelper();
+                  final success = await db.updateUser(_currentUser!.id, {
+                    'gold': _currentUser!.gold + 100.0,
+                    'skillPoints': _currentUser!.skillPoints + 1000,
+                  });
                   
-          //         // Kullanıcıyı yeniden yükle
-          //         await _loadSettings();
-                  
-          //         if (mounted) {
-          //           ScaffoldMessenger.of(context).showSnackBar(
-          //             const SnackBar(
-          //               content: Text('✅ Test: 100 Altın eklendi!'),
-          //               backgroundColor: Colors.green,
-          //             ),
-          //           );
-          //         }
-          //       }
-          //     },
-          //     icon: const Icon(Icons.stars),
-          //     label: const Text('TEST: 100 Altın Ekle'),
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: Colors.amber,
-          //       foregroundColor: Colors.white,
-          //       padding: const EdgeInsets.symmetric(vertical: 16),
-          //     ),
-          //   ),
-          // ),
+                  if (success) {
+                    await _loadSettings();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('settings.devBonusSuccess'.tr()),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  }
+                },
+                icon: const Icon(Icons.auto_awesome),
+                label: Text('settings.devBonus'.tr()),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber[700],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
           
           // Profil Bölümü
           _buildSection(

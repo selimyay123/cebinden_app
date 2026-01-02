@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
       // Başarılı giriş - Tüm route geçmişini temizle
       
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const MainScreen()),
         (route) => false, // Tüm önceki ekranları temizle
       );
     } else {
@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
         // Başarılı Google girişi
         
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
         );
       } else {
@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
         // Başarılı Apple girişi
         
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
         );
       } else {

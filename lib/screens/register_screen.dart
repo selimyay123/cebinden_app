@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -110,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
       // Başarılı kayıt - Tüm route geçmişini temizle ve ana sayfaya yönlendir
       
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const MainScreen()),
         (route) => false, // Tüm önceki ekranları temizle
       );
     } else {

@@ -9,7 +9,7 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../services/iap_service.dart';
 import '../models/user_model.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
@@ -101,20 +101,20 @@ class _StoreScreenState extends State<StoreScreen> {
     return ValueListenableBuilder<String>(
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
-        return Scaffold(
+        return WillPopScope(
+          onWillPop: () async {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+              return false;
+            }
+            return true;
+          },
+          child: Scaffold(
           // backgroundColor: Colors.grey[100],
           appBar: AppBar(
             title: Text('store.title'.tr()),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.home),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-              ),
+
             ],
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
@@ -130,7 +130,7 @@ class _StoreScreenState extends State<StoreScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _currentUser == null
-                    ? const Center(child: Text('Kullanıcı bulunamadı'))
+                    ? Center(child: Text('common.userNotFound'.tr()))
                     : RefreshIndicator(
                         onRefresh: _loadCurrentUser,
                         child: SingleChildScrollView(
@@ -147,7 +147,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                   const SizedBox(height: 24),
                                   
                                   // Garaj Genişletme
-                                  _buildSectionTitle('Garaj Genişletme'),
+                                  _buildSectionTitle('store.garageExpansion'.tr()),
                                   const SizedBox(height: 12),
                                   _buildGarageExpansionCard(),
                                   
@@ -188,7 +188,8 @@ class _StoreScreenState extends State<StoreScreen> {
                         ),
                       ),
           ),
-        );
+        ),
+      );
       },
     );
   }
@@ -310,16 +311,16 @@ class _StoreScreenState extends State<StoreScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Garaj Kapasitesi',
-                  style: TextStyle(
+                Text(
+                  'store.garageCapacity'.tr(),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Mevcut Limit: ${_currentUser!.garageLimit} Araç',
+                  'store.currentLimit'.trParams({'limit': _currentUser!.garageLimit.toString()}),
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey[600],
@@ -340,9 +341,9 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
             child: Column(
               children: [
-                const Text(
-                  '+1 Slot',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  'store.plusOneSlot'.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   '1 ${'store.gold'.tr()}',
@@ -751,18 +752,18 @@ class _StoreScreenState extends State<StoreScreen> {
                       const SizedBox(height: 24),
                       
                       if (isPending)
-                        const Column(
+                        Column(
                           children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text('İşlem yapılıyor, lütfen bekleyin...'),
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 16),
+                            Text('common.pleaseWait'.tr()),
                           ],
                         )
                       else
                         Column(
                           children: [
                             Text(
-                              'Güvenli ödeme ile satın almak üzeresiniz.',
+                              'store.securePaymentMessage'.tr(),
                               style: TextStyle(color: Colors.grey[600], fontSize: 12),
                               textAlign: TextAlign.center,
                             ),
@@ -813,21 +814,21 @@ class _StoreScreenState extends State<StoreScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Garajı Genişlet'),
+        title: Text('store.expandGarageTitle'.tr()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.garage, size: 64, color: Colors.blue),
             const SizedBox(height: 16),
             Text(
-              'Mevcut Limit: ${_currentUser!.garageLimit}',
+              'store.currentLimitLabel'.trParams({'limit': _currentUser!.garageLimit.toString()}),
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             const Icon(Icons.arrow_downward, color: Colors.grey),
             const SizedBox(height: 8),
             Text(
-              'Yeni Limit: ${_currentUser!.garageLimit + 1}',
+              'store.newLimitLabel'.trParams({'limit': (_currentUser!.garageLimit + 1).toString()}),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -836,7 +837,10 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Bedel: 1 ${'store.gold'.tr()}',
+              'store.costLabel'.trParams({
+                'amount': '1',
+                'currency': 'store.gold'.tr()
+              }),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -868,7 +872,7 @@ class _StoreScreenState extends State<StoreScreen> {
                       elevation: 8,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       behavior: SnackBarBehavior.floating,
-                      content: Text('Garaj başarıyla genişletildi! 🎉'),
+                      content: Text('store.garageExpandSuccess'.tr()),
                       backgroundColor: Colors.green.withOpacity(0.8),
                     ),
                   );
@@ -890,7 +894,7 @@ class _StoreScreenState extends State<StoreScreen> {
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Satın Al'),
+            child: Text('store.buy'.tr()),
           ),
         ],
       ),
@@ -1220,11 +1224,11 @@ class _StoreScreenState extends State<StoreScreen> {
     }
 
     if (parsed < 0.1) {
-      return 'En az 0.1 altın girmelisiniz';
+      return 'store.minGoldError'.tr();
     }
 
     if (parsed > maxGold) {
-      return 'Yetersiz altın! Mevcut: ${maxGold.toStringAsFixed(1)} altın';
+      return 'store.insufficientGoldError'.trParams({'amount': maxGold.toStringAsFixed(1)});
     }
 
     return null;

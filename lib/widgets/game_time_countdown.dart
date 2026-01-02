@@ -8,7 +8,8 @@ import '../services/game_time_service.dart';
 import '../screens/settings_screen.dart';
 
 class GameTimeCountdown extends StatefulWidget {
-  const GameTimeCountdown({Key? key}) : super(key: key);
+  final EdgeInsetsGeometry? margin;
+  const GameTimeCountdown({Key? key, this.margin}) : super(key: key);
 
   @override
   State<GameTimeCountdown> createState() => _GameTimeCountdownState();
@@ -71,7 +72,8 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
     final Color progressColor = isDay ? Colors.orangeAccent : Colors.purpleAccent;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 90,
+      margin: widget.margin ?? const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -105,18 +107,18 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
           ),
           
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
             child: Row(
               children: [
                 // Animasyon
                 Lottie.asset(
                   'assets/animations/day  night.json',
-                  width: 60,
-                  height: 60,
+                  width: 50,
+                  height: 50,
                   fit: BoxFit.cover,
                 ),
                 
-                const SizedBox(width: 16),
+                const SizedBox(width: 6),
                 
                 // Metinler
                 Expanded(
@@ -127,7 +129,7 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                         'home.nextDayIn'.tr(),
                         style: TextStyle(
                           color: textColor.withOpacity(0.9),
-                          fontSize: 12,
+                          fontSize: 10,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -136,10 +138,10 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                         _formatDuration(_remainingTime),
                         style: TextStyle(
                           color: textColor,
-                          fontSize: 24,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Courier',
-                          letterSpacing: 1.5,
+                          letterSpacing: 0.5,
                           shadows: [
                             Shadow(
                               color: Colors.black.withOpacity(0.3),
@@ -153,21 +155,24 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                   ),
                 ),
                 
+                const SizedBox(width: 8),
+
                 // Ayarlar Butonu (Küçültülmüş)
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.settings, color: Colors.white),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const SettingsScreen()),
-                      );
-                    },
-                    tooltip: 'home.changeTimeZone'.tr(),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(Icons.settings, color: Colors.white, size: 18),
                   ),
                 ),
               ],

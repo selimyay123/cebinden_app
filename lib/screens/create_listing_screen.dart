@@ -5,10 +5,9 @@ import 'dart:math'; // Random için
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
-import '../services/skill_service.dart'; // Yetenek Servisi
 import '../models/user_model.dart';
 import '../utils/currency_input_formatter.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
 
 class CreateListingScreen extends StatefulWidget {
@@ -52,34 +51,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       final user = User.fromJson(userMap);
       setState(() => _currentUser = user);
       
-      final multiplier = SkillService.getSellingMultiplier(user);
-      
-      // Ballı Dil yeteneği varsa toleransı artır
-      if (user.unlockedSkills.any((s) => s.startsWith('charisma'))) {
-        // Tolerans mantığı kaldırıldı
-      }
-      
-      if (multiplier > 1.0) {
-        final baseSuggested = widget.vehicle.purchasePrice * 1.1;
-        final bonusSuggested = baseSuggested * multiplier;
-        
-        setState(() {
-          _priceController.text = CurrencyInputFormatter.format(bonusSuggested);
-        });
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              behavior: SnackBarBehavior.floating,
-              content: Text('sell.skillBonus'.trParams({'percent': ((multiplier - 1) * 100).toStringAsFixed(0)})),
-              backgroundColor: Colors.indigo.withOpacity(0.8),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      }
+
     }
   }
 
@@ -120,7 +92,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     await Future.delayed(const Duration(milliseconds: 2500));
 
     if (mounted) {
-      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
+      Navigator.of(context, rootNavigator: true).pop(); // Animasyon overlay'ini kapat
     }
   }
 
@@ -198,15 +170,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       appBar: AppBar(
         title: Text('sell.title'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
         elevation: 0,
         backgroundColor: Colors.deepPurple,
@@ -381,10 +345,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     // Standart limit: %15
     double profitMargin = 0.15;
     
-    // Yetenek bonusu (İtibar)
-    if (_currentUser != null) {
-      profitMargin += SkillService.getReputationBonus(_currentUser!);
-    }
+
 
     double discountRate = 0.0;
 
@@ -598,8 +559,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             _buildDetailRow('sell.transmission'.tr(), 'vehicleAttributes.${widget.vehicle.transmission}'.tr()),
             _buildDetailRow('sell.engine'.tr(), widget.vehicle.engineSize),
             _buildDetailRow('sell.drive'.tr(), 'vehicleAttributes.${widget.vehicle.driveType}'.tr()),
-            if (widget.vehicle.color != 'Standart')
-              _buildDetailRow('sell.color'.tr(), 'colors.${widget.vehicle.color}'.tr()),
             _buildDetailRow('sell.warranty'.tr(), widget.vehicle.hasWarranty ? 'sell.var'.tr() : 'sell.yok'.tr()),
             _buildDetailRow('sell.accidentRecord'.tr(), widget.vehicle.hasAccidentRecord ? 'sell.var'.tr() : 'sell.yok'.tr()),
           ],

@@ -11,6 +11,7 @@ import 'services/ad_service.dart';
 import 'services/game_time_service.dart';
 import 'services/market_refresh_service.dart';
 import 'services/offer_service.dart';
+import 'utils/route_observer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,6 +60,7 @@ class CebindenApp extends StatelessWidget {
         
         return MaterialApp(
           title: 'Cebinden',
+          navigatorObservers: [routeObserver],
           debugShowCheckedModeBanner: false,
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,

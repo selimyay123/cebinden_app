@@ -1,5 +1,7 @@
 import 'dart:math';
 import '../services/localization_service.dart';
+import '../services/skill_service.dart';
+import '../models/user_model.dart';
 
 /// AI Satıcı tipleri
 enum SellerType {
@@ -144,19 +146,12 @@ class SellerProfile {
   }) {
     final random = Random();
     
-    // 🆕 SKILL CHECK: Pazarlık Gücü yeteneği var mı?
+    // 🆕 SKILL CHECK: Ölücü yeteneği var mı?
     double negotiationPowerBonus = 0.0;
-    if (buyerUser != null) {
-      // SkillService import edilmeli ama circular dependency olmaması için dynamic kullanıyoruz
-      try {
-        // Eğer user'ın negotiation_power skill'i varsa %15 bonus
-        if (buyerUser.unlockedSkills != null && 
-            (buyerUser.unlockedSkills as List).contains('negotiation_power')) {
-          negotiationPowerBonus = 0.15; // %15 daha iyi anlaşma
-        }
-      } catch (e) {
-        // Hata durumunda bonus yok
-      }
+    if (buyerUser != null && buyerUser is User) {
+      final skillService = SkillService();
+      final level = skillService.getSkillLevel(buyerUser, SkillService.skillLowballer);
+      negotiationPowerBonus = SkillService.lowballerBonuses[level] ?? 0.0;
     }
     
     

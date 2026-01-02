@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
@@ -5,8 +6,11 @@ import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
 import 'create_listing_screen.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
+import '../services/skill_service.dart';
+import '../models/user_model.dart';
+import 'package:lottie/lottie.dart';
 
 class SellVehicleScreen extends StatefulWidget {
   const SellVehicleScreen({super.key});
@@ -19,50 +23,85 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   List<UserVehicle> _userVehicles = [];
+  User? _currentUser;
   bool _isLoading = true;
+  StreamSubscription? _vehicleUpdateSubscription;
 
   @override
   void initState() {
     super.initState();
     _loadUserVehicles();
+    
+    // Veritabanı güncellemelerini dinle
+    _vehicleUpdateSubscription = _db.onVehicleUpdate.listen((_) {
+      _loadUserVehicles();
+    });
+  }
+
+  @override
+  void dispose() {
+    _vehicleUpdateSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadUserVehicles() async {
+    if (!mounted) return;
+    
     setState(() {
       _isLoading = true;
     });
-    final currentUser = await _authService.getCurrentUser();
-    if (currentUser != null) {
-      // Sadece satılmamış ve satışa çıkarılmamış araçları getir
-      final allVehicles = await _db.getUserActiveVehicles(currentUser.id);
-      final availableVehicles = allVehicles.where((v) => !v.isListedForSale).toList();
-      setState(() {
-        _userVehicles = availableVehicles;
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _userVehicles = [];
-        _isLoading = false;
-      });
+
+    try {
+      final currentUser = await _authService.getCurrentUser();
+      if (currentUser != null) {
+        // Sadece satılmamış ve satışa çıkarılmamış araçları getir
+        final allVehicles = await _db.getUserActiveVehicles(currentUser.id);
+        final availableVehicles = allVehicles.where((v) => !v.isListedForSale).toList();
+        
+        if (mounted) {
+          setState(() {
+            _userVehicles = availableVehicles;
+            _currentUser = currentUser;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _userVehicles = [];
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading user vehicles: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading vehicles: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
       appBar: AppBar(
         title: Text('sell.title'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
         elevation: 0,
         backgroundColor: Colors.deepPurple,
@@ -91,6 +130,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                       ),
               ),
       ),
+    ),
     );
   }
 
@@ -104,7 +144,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
             Icon(
               Icons.sell_outlined,
               size: 80,
-              color: Colors.grey[400],
+              color: Colors.black,
             ),
             const SizedBox(height: 24),
             Text(
@@ -112,7 +152,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),
@@ -121,7 +161,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
               'sell.noVehiclesDesc'.tr(),
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),
@@ -289,28 +329,92 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CreateListingScreen(vehicle: vehicle),
-                    ),
-                  );
-                  if (result == true && context.mounted) {
-                    _loadUserVehicles(); // İlan oluşturulduysa listeyi yenile
-                  }
-                },
-                icon: const Icon(Icons.sell),
-                label: Text('sell.listForSaleButton'.tr()),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CreateListingScreen(vehicle: vehicle),
+                              ),
+                            );
+                            if (result == true && context.mounted) {
+                              _loadUserVehicles(); // İlan oluşturulduysa listeyi yenile
+                            }
+                          },
+                          icon: const Icon(Icons.sell, size: 18),
+                          label: Text(
+                            'sell.listForSaleButton'.tr(),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.withOpacity(0.7),
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(0, 48),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      // Hızlı Sat Butonu (Eğer yetenek açıksa)
+                      if (_currentUser != null)
+                        Builder(
+                          builder: (context) {
+                            final level = SkillService().getSkillLevel(_currentUser!, SkillService.skillQuickSell);
+                            if (level > 0) {
+                              final margin = SkillService.quickSellMargins[level] ?? 0.0;
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: ElevatedButton(
+                                    onPressed: () => _showQuickSellConfirmation(vehicle),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange.shade800.withOpacity(0.7),
+                                      foregroundColor: Colors.white,
+                                      minimumSize: const Size(0, 48),
+                                      padding: const EdgeInsets.symmetric(vertical: 8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: FittedBox(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.flash_on, size: 16),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'skills.quickSell'.tr(),
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '(${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.white.withOpacity(0.9),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                    ],
                   ),
-                ),
+                ],
               ),
             ),
           ],
@@ -352,6 +456,157 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
+  }
+
+  Future<void> _playSoldAnimation() async {
+    if (!mounted) return;
+    
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.85),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Lottie.asset(
+          'assets/animations/selling_car.json',
+          width: 300,
+          height: 300,
+          repeat: false,
+          onLoaded: (composition) {
+            Future.delayed(composition.duration, () {
+              if (mounted && Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showQuickSellConfirmation(UserVehicle vehicle) async {
+    if (_currentUser == null) return;
+
+    final skillService = SkillService();
+    final remainingUses = skillService.getRemainingDailyUses(_currentUser!, SkillService.skillQuickSell);
+
+    if (remainingUses <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text('skills.dailyLimitReached'.tr())),
+            ],
+          ),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
+
+    final level = skillService.getSkillLevel(_currentUser!, SkillService.skillQuickSell);
+    final margin = SkillService.quickSellMargins[level] ?? 0.0;
+    final sellPrice = (vehicle.purchasePrice * (1 + margin)).round();
+    final profit = sellPrice - vehicle.purchasePrice;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('skills.quickSellConfirm'.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('skills.quickSellConfirmDesc'.trParams({'price': _formatCurrency(sellPrice.toDouble())})),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.trending_up, color: Colors.green),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'}),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                      ),
+                      Text(
+                        '+${_formatCurrency(profit.toDouble())} TL',
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${'skills.remainingUses'.tr()}: $remainingUses/3',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _processQuickSell(vehicle, sellPrice);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+            child: Text('skills.quickSell'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _processQuickSell(UserVehicle vehicle, int sellPrice) async {
+    setState(() => _isLoading = true);
+    try {
+      // 1. Bakiyeyi güncelle
+      final newBalance = _currentUser!.balance + sellPrice;
+      await _db.updateUser(_currentUser!.id, {'balance': newBalance});
+
+      // 2. Aracı satıldı olarak işaretle
+      await _db.sellUserVehicle(vehicle.id, sellPrice.toDouble());
+
+      // 3. Yetenek kullanımını kaydet
+      await SkillService().recordSkillUsage(_currentUser!.id, SkillService.skillQuickSell);
+
+      // 4. Animasyon
+      await _playSoldAnimation();
+
+      // 5. Listeyi yenile
+      await _loadUserVehicles();
+      
+      // Kullanıcıyı güncelle (bakiye için)
+      final updatedUser = await _authService.getCurrentUser();
+      if (updatedUser != null) {
+        setState(() => _currentUser = updatedUser);
+      }
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hata: $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 }
 

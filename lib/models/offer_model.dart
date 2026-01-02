@@ -72,13 +72,14 @@ class Offer {
   }
 
   /// Teklif süresi doldu mu?
-  bool get isExpired {
-    return DateTime.now().isAfter(expirationDate) && status == OfferStatus.pending;
+  bool isExpired([DateTime? now]) {
+    final referenceTime = now ?? DateTime.now();
+    return referenceTime.isAfter(expirationDate) && status == OfferStatus.pending;
   }
 
   /// Teklif hala beklemede mi?
-  bool get isPending {
-    return status == OfferStatus.pending && !isExpired;
+  bool isPending([DateTime? now]) {
+    return status == OfferStatus.pending && !isExpired(now);
   }
 
   /// Teklifin yaşı (saat cinsinden)

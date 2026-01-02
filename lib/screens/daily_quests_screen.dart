@@ -4,7 +4,7 @@ import '../models/daily_quest_model.dart';
 import '../services/daily_quest_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class DailyQuestsScreen extends StatefulWidget {
   const DailyQuestsScreen({super.key});
@@ -86,15 +86,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
       appBar: AppBar(
         title: Text('quests.title'.tr()),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
+
         ],
       ),
       body: _isLoading
