@@ -43,6 +43,7 @@ import '../services/leaderboard_service.dart';
 import '../widgets/city_skyline_painter.dart';
 import '../mixins/auto_refresh_mixin.dart';
 import 'collection_screen.dart';
+import '../services/market_refresh_service.dart';
 import '../widgets/user_profile_avatar.dart';
 
 
@@ -63,10 +64,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   final DailyLoginService _loginService = DailyLoginService();
   final GameTimeService _gameTime = GameTimeService();
   final RentalService _rentalService = RentalService();
+  final MarketRefreshService _marketService = MarketRefreshService();
   User? _currentUser;
   bool _isLoading = true;
   int _vehicleCount = 0;
   int _pendingOffersCount = 0; // Bekleyen teklif sayısı
+  int _collectedCount = 0;
+  int _totalCollectionCount = 0;
   List<UserVehicle> _userVehicles = [];
   List<UserVehicle> _userListedVehicles = []; // Satışa çıkarılan araçlar
   List<DailyQuest> _dailyQuests = []; // Günlük görevler
@@ -148,24 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     
     // Galeri sahibiyse kiralama geliri işle
     if (_currentUser != null && _currentUser!.ownsGallery) {
-      final rentalIncome = await _rentalService.processDailyRental(_currentUser!.id);
-      
-      if (rentalIncome > 0 && mounted) {
-        // Kiralama geliri animasyonunu tetikle
-        setState(() {
-          _lastRentalIncome = rentalIncome;
-          _showRentalIncomeAnimation = true;
-        });
-        
-        // 3 saniye sonra animasyonu gizle
-        Future.delayed(const Duration(seconds: 3), () {
-          if (mounted) {
-            setState(() {
-              _showRentalIncomeAnimation = false;
-            });
-          }
-        });
-      }
+      await _rentalService.processDailyRental(_currentUser!.id);
     }
     
     // Tekliflerin oluşması için biraz bekle ve yenile
@@ -203,6 +190,16 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       // Günlük görevleri yükle
       final quests = await _questService.checkAndGenerateQuests(user.id);
 
+      // Koleksiyon verilerini hesapla
+      final allModels = _marketService.modelsByBrand;
+      int totalModels = 0;
+      allModels.forEach((key, value) {
+        totalModels += value.length;
+      });
+      
+      final ownedModelKeys = await _db.getOwnedModelKeys(user.id);
+      final collectedCount = ownedModelKeys.length;
+
       if (mounted) {
         setState(() {
           _currentUser = user;
@@ -211,6 +208,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           _vehicleCount = vehicleCount;
           _pendingOffersCount = pendingOffers;
           _dailyQuests = quests;
+          _collectedCount = collectedCount;
+          _totalCollectionCount = totalModels;
           _isLoading = false;
         });
       }
@@ -489,11 +488,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   );
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.logout),
-                tooltip: 'auth.logout'.tr(),
-                onPressed: _logout,
-              ),
+              // IconButton(
+              //   icon: const Icon(Icons.logout),
+              //   tooltip: 'auth.logout'.tr(),
+              //   onPressed: _logout,
+              // ),
             ],
           ),
           drawer: _buildDrawer(context),
@@ -545,8 +544,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                   ),
                                   const SizedBox(height: 16),
                                   
-                                  // Günlük Görevler
-                                  _buildDailyQuestsCard(),
+                                  // Günlük Görevler ve Koleksiyon (Yan Yana)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: Row(
+                                      children: [
+                                        Expanded(child: _buildDailyQuestsCard()),
+                                        const SizedBox(width: 12),
+                                        Expanded(child: _buildCollectionCard()),
+                                      ],
+                                    ),
+                                  ),
                                   
                                   // Hızlı İşlemler
                                   // _buildQuickActions(), // YORUM: SliverGrid olarak aşağıya taşındı
@@ -1196,9 +1204,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     final totalCount = _dailyQuests.length;
     final hasRewardsToClaim = _dailyQuests.any((q) => q.isCompleted && !q.isClaimed);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GestureDetector(
+    return GestureDetector(
         onTap: () async {
           await Navigator.push(
             context,
@@ -1208,79 +1214,181 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           );
           _loadCurrentUser(); // Geri dönünce yenile
         },
-        child: _buildGlassContainer(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              // İkon
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  shape: BoxShape.circle,
+        child: SizedBox(
+          height: 100, // Sabit yükseklik
+          child: _buildGlassContainer(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Başlık (Üstte)
+                Text(
+                  'quests.title'.tr(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14, // Biraz küçülttük
+                  ),
                 ),
-                child: const Icon(
-                  Icons.assignment_outlined,
-                  color: Colors.blue,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              
-              // Metinler
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                
+                const Spacer(), // Aradaki boşluğu doldur
+                
+                // Alt Kısım (İkon ve İstatistik)
+                Row(
                   children: [
-                    Text(
-                      'quests.title'.tr(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    // İkon
+                    Container(
+                      padding: const EdgeInsets.all(8), // Padding azaltıldı
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.assignment_outlined,
+                        color: Colors.blue,
+                        size: 20, // İkon küçültüldü
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      hasRewardsToClaim 
-                          ? 'quests.rewardClaimed'.tr().split('!')[0] + '!' // "Ödül Alındı!" veya benzeri bir dikkat çekici metin
-                          : '$completedCount/$totalCount ${'common.done'.tr()}',
-                      style: TextStyle(
-                        color: hasRewardsToClaim ? Colors.green : Colors.grey[600],
-                        fontSize: 13,
-                        fontWeight: hasRewardsToClaim ? FontWeight.bold : FontWeight.normal,
+                    const SizedBox(width: 8),
+                    
+                    // Metinler
+                    Expanded(
+                      child: Text(
+                        hasRewardsToClaim 
+                            ? 'quests.rewardClaimed'.tr().split('!')[0] + '!'
+                            : '$completedCount/$totalCount ${'common.done'.tr()}',
+                        style: TextStyle(
+                          color: hasRewardsToClaim ? Colors.green : Colors.grey[600],
+                          fontSize: 12, // Font küçültüldü
+                          fontWeight: hasRewardsToClaim ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    
+                    // Sağ taraf (Badge veya Ok)
+                    if (hasRewardsToClaim)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          '!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      )
+                    else
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
                   ],
                 ),
-              ),
-              
-              // Sağ taraf (Badge veya Ok)
-              if (hasRewardsToClaim)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    '!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                )
-              else
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+  }
+
+  // Koleksiyon Kartı
+  Widget _buildCollectionCard() {
+    if (_totalCollectionCount == 0) return const SizedBox.shrink();
+
+    return GestureDetector(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CollectionScreen(),
+            ),
+          );
+          _loadCurrentUser(); // Geri dönünce yenile
+        },
+        child: SizedBox(
+          height: 100, // Sabit yükseklik
+          child: _buildGlassContainer(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Başlık (Üstte)
+                Text(
+                  'drawer.collection'.tr(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14, // Biraz küçülttük
+                  ),
+                ),
+                
+                const Spacer(), // Aradaki boşluğu doldur
+                
+                // Alt Kısım
+                Row(
+                  children: [
+                    // İkon
+                    Container(
+                      padding: const EdgeInsets.all(8), // Padding azaltıldı
+                      decoration: BoxDecoration(
+                        color: Colors.purple.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.collections_bookmark_outlined,
+                        color: Colors.purple,
+                        size: 20, // İkon küçültüldü
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    
+                    // Metinler ve Progress
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min, // Minimum yer kapla
+                        children: [
+                          Text(
+                            '$_collectedCount/$_totalCollectionCount ${'vehicles.title'.tr()}', 
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12, // Font küçültüldü
+                            ),
+                          ),
+                          // İlerleme çubuğu
+                          const SizedBox(height: 4),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: _totalCollectionCount > 0 ? _collectedCount / _totalCollectionCount : 0,
+                              backgroundColor: Colors.grey[300],
+                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.purple),
+                              minHeight: 4, // Biraz incelttik
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right, color: Colors.grey, size: 16),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
   }
 
   Widget _buildQuickActionsSliver() {
@@ -2125,7 +2233,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.deepPurple.shade700.withOpacity(0.9), Colors.deepPurple.shade500.withOpacity(0.9)],
+          colors: [Colors.deepPurple.shade700.withOpacity(0.7), Colors.deepPurple.shade500.withOpacity(0.7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -2212,8 +2320,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               icon: const Icon(Icons.key),
               label: Text('gallery.rentOut'.tr()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.green.shade700,
+                backgroundColor: Colors.white.withOpacity(0.8),
+                foregroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -2234,7 +2342,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
   Widget _buildRentedVehiclesList() {
     // Kiradaki araçları filtrele
-    final rentedVehicles = _userVehicles.where((v) => v.isRented).toList();
+    final rentedVehicles = _userVehicles.where((v) => v.isRented || v.canCollectRentalIncome).toList();
 
     if (rentedVehicles.isEmpty) {
       return Center(
@@ -2294,7 +2402,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                           ),
                         ),
                         Text(
-                          '${'gallery.dailyIncome'.tr()}: ${_formatCurrency(dailyIncome)} TL',
+                          vehicle.isRented 
+                            ? '${'gallery.dailyIncome'.tr()}: ${_formatCurrency(dailyIncome)} TL'
+                            : '${'gallery.collectIncome'.tr()}: ${_formatCurrency(vehicle.pendingRentalIncome)} TL',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 12,
@@ -2303,14 +2413,75 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.stop_circle_outlined, color: Colors.white),
-                    tooltip: 'gallery.stopRenting'.tr(),
-                    onPressed: () async {
-                      await _rentalService.stopRentingVehicle(vehicle.id);
-                      _loadCurrentUser(); // Listeyi yenile
-                    },
+                  const SizedBox(width: 8),
+                  // Topla Butonu
+                  SizedBox(
+                    height: 32,
+                    child: ElevatedButton(
+                      onPressed: vehicle.canCollectRentalIncome
+                          ? () async {
+                              final incomeToCollect = vehicle.pendingRentalIncome;
+                              final success = await _rentalService.collectRentalIncome(
+                                _currentUser!.id,
+                                vehicle.id,
+                              );
+                              if (success && mounted) {
+                                // Kiralama geliri animasyonunu tetikle
+                                setState(() {
+                                  _lastRentalIncome = incomeToCollect;
+                                  _showRentalIncomeAnimation = true;
+                                });
+                                
+                                // 3 saniye sonra animasyonu gizle
+                                Future.delayed(const Duration(seconds: 3), () {
+                                  if (mounted) {
+                                    setState(() {
+                                      _showRentalIncomeAnimation = false;
+                                    });
+                                  }
+                                });
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('gallery.incomeCollected'.tr()),
+                                    backgroundColor: Colors.green,
+                                    behavior: SnackBarBehavior.floating,
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                                _loadCurrentUser(); // Listeyi yenile
+                              }
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: Colors.white.withValues(alpha: 0.1),
+                        disabledForegroundColor: Colors.white.withValues(alpha: 0.3),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'gallery.collectIncome'.tr(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
+                  if (vehicle.isRented)
+                    IconButton(
+                      icon: const Icon(Icons.stop_circle_outlined, color: Colors.white),
+                      tooltip: 'gallery.stopRenting'.tr(),
+                      onPressed: () async {
+                        await _rentalService.stopRentingVehicle(vehicle.id);
+                        _loadCurrentUser(); // Listeyi yenile
+                      },
+                    ),
                 ],
               ),
             );
@@ -2398,8 +2569,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('gallery.rentSuccess'.tr()),
-                            backgroundColor: Colors.green,
+                            elevation: 8,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            behavior: SnackBarBehavior.floating,
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check_circle, color: Colors.white),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text('gallery.rentSuccess'.tr())),
+                              ],
+                            ),
+                            backgroundColor: Colors.green.withOpacity(0.9),
                           ),
                         );
                       }

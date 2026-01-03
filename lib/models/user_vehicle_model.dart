@@ -37,6 +37,10 @@ class UserVehicle {
   final DateTime? saleDate;
 
   final double? originalListingPrice; // Satın alındığındaki ilan fiyatı (Kâr limiti hesabı için)
+  
+  // Manuel kiralama geliri toplama
+  final double pendingRentalIncome; // Toplanmayı bekleyen kira geliri
+  final bool canCollectRentalIncome; // Gelir toplanabilir mi? (Gün bittiğinde true olur)
 
   UserVehicle({
     required this.id,
@@ -66,6 +70,8 @@ class UserVehicle {
     this.salePrice,
     this.saleDate,
     this.originalListingPrice,
+    this.pendingRentalIncome = 0.0,
+    this.canCollectRentalIncome = false,
   });
 
   // Factory constructor: Yeni araç satın alma
@@ -107,8 +113,9 @@ class UserVehicle {
       hasAccidentRecord: hasAccidentRecord,
       imageUrl: imageUrl,
       score: score,
-      isRented: false,
       originalListingPrice: originalListingPrice,
+      pendingRentalIncome: 0.0,
+      canCollectRentalIncome: false,
     );
   }
 
@@ -142,6 +149,8 @@ class UserVehicle {
       salePrice: json['salePrice'] != null ? (json['salePrice'] as num).toDouble() : null,
       saleDate: json['saleDate'] != null ? DateTime.parse(json['saleDate'] as String) : null,
       originalListingPrice: json['originalListingPrice'] != null ? (json['originalListingPrice'] as num).toDouble() : null,
+      pendingRentalIncome: json['pendingRentalIncome'] != null ? (json['pendingRentalIncome'] as num).toDouble() : 0.0,
+      canCollectRentalIncome: json['canCollectRentalIncome'] as bool? ?? false,
     );
   }
 
@@ -175,6 +184,8 @@ class UserVehicle {
       'salePrice': salePrice,
       'saleDate': saleDate?.toIso8601String(),
       'originalListingPrice': originalListingPrice,
+      'pendingRentalIncome': pendingRentalIncome,
+      'canCollectRentalIncome': canCollectRentalIncome,
     };
   }
 
@@ -239,6 +250,8 @@ class UserVehicle {
       saleDate: saleDate,
       isRented: false, // Satışa çıkınca kiralama biter (veya kontrol edilir)
       originalListingPrice: originalListingPrice,
+      pendingRentalIncome: pendingRentalIncome,
+      canCollectRentalIncome: canCollectRentalIncome,
     );
   }
 
@@ -275,6 +288,8 @@ class UserVehicle {
       saleDate: saleDate,
       isRented: false, // Satılınca kiralama biter
       originalListingPrice: originalListingPrice,
+      pendingRentalIncome: pendingRentalIncome,
+      canCollectRentalIncome: canCollectRentalIncome,
     );
   }
 
@@ -310,6 +325,73 @@ class UserVehicle {
       saleDate: saleDate,
       isRented: isRented,
       originalListingPrice: originalListingPrice,
+      pendingRentalIncome: pendingRentalIncome,
+      canCollectRentalIncome: canCollectRentalIncome,
+    );
+  }
+
+  // Genel kopyalama
+  UserVehicle copyWith({
+    String? id,
+    String? userId,
+    String? vehicleId,
+    String? brand,
+    String? model,
+    int? year,
+    int? mileage,
+    double? purchasePrice,
+    DateTime? purchaseDate,
+    String? color,
+    String? fuelType,
+    String? transmission,
+    String? engineSize,
+    String? driveType,
+    bool? hasWarranty,
+    bool? hasAccidentRecord,
+    String? imageUrl,
+    int? score,
+    bool? isListedForSale,
+    double? listingPrice,
+    String? listingDescription,
+    DateTime? listedDate,
+    bool? isRented,
+    bool? isSold,
+    double? salePrice,
+    DateTime? saleDate,
+    double? originalListingPrice,
+    double? pendingRentalIncome,
+    bool? canCollectRentalIncome,
+  }) {
+    return UserVehicle(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      vehicleId: vehicleId ?? this.vehicleId,
+      brand: brand ?? this.brand,
+      model: model ?? this.model,
+      year: year ?? this.year,
+      mileage: mileage ?? this.mileage,
+      purchasePrice: purchasePrice ?? this.purchasePrice,
+      purchaseDate: purchaseDate ?? this.purchaseDate,
+      color: color ?? this.color,
+      fuelType: fuelType ?? this.fuelType,
+      transmission: transmission ?? this.transmission,
+      engineSize: engineSize ?? this.engineSize,
+      driveType: driveType ?? this.driveType,
+      hasWarranty: hasWarranty ?? this.hasWarranty,
+      hasAccidentRecord: hasAccidentRecord ?? this.hasAccidentRecord,
+      imageUrl: imageUrl ?? this.imageUrl,
+      score: score ?? this.score,
+      isListedForSale: isListedForSale ?? this.isListedForSale,
+      listingPrice: listingPrice ?? this.listingPrice,
+      listingDescription: listingDescription ?? this.listingDescription,
+      listedDate: listedDate ?? this.listedDate,
+      isRented: isRented ?? this.isRented,
+      isSold: isSold ?? this.isSold,
+      salePrice: salePrice ?? this.salePrice,
+      saleDate: saleDate ?? this.saleDate,
+      originalListingPrice: originalListingPrice ?? this.originalListingPrice,
+      pendingRentalIncome: pendingRentalIncome ?? this.pendingRentalIncome,
+      canCollectRentalIncome: canCollectRentalIncome ?? this.canCollectRentalIncome,
     );
   }
 }

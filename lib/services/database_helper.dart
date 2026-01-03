@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uuid/uuid.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
@@ -19,6 +20,8 @@ class DatabaseHelper {
   static const String offersBox = 'offers'; // Teklifler
   static const String notificationsBox = 'notifications'; // Bildirimler
   static const String favoritesBox = 'favorites'; // Favori ilanlar
+  static const String dailyQuestsBox = 'daily_quests'; // Günlük görevler
+  static const String missionsBox = 'missions'; // Başarımlar/Görevler
 
   // Initialize Hive
   static Future<void> init() async {
@@ -33,6 +36,7 @@ class DatabaseHelper {
     final favoritesBoxInstance = await Hive.openBox<Map>(favoritesBox);
     final dailyQuestsBoxInstance = await Hive.openBox<Map>(dailyQuestsBox);
     final activitiesBoxInstance = await Hive.openBox<Map>(activitiesBox);
+    final missionsBoxInstance = await Hive.openBox<Map>(missionsBox);
     
     // Debug: Tüm kullanıcıları listele
     if (usersBoxInstance.isNotEmpty) {
@@ -49,6 +53,10 @@ class DatabaseHelper {
   // Stream controller for offer updates
   final _offerUpdateController = StreamController<void>.broadcast();
   Stream<void> get onOfferUpdate => _offerUpdateController.stream;
+
+  // Stream controller for user updates
+  final _userUpdateController = StreamController<void>.broadcast();
+  Stream<void> get onUserUpdate => _userUpdateController.stream;
 
   void notifyOfferUpdate() {
     _offerUpdateController.add(null);
@@ -77,6 +85,7 @@ class DatabaseHelper {
         print('Firestore sync error: $e');
       }
 
+      _userUpdateController.add(null);
       return 1;
     } catch (e) {
       return -1;
@@ -113,6 +122,7 @@ class DatabaseHelper {
   Future<void> setCurrentUser(String userId) async {
     await _currentUserBox.put('current_user_id', userId);
     await _currentUserBox.flush(); // Verileri diske yaz
+    _userUpdateController.add(null);
   }
 
   // Aktif kullanıcıyı getir
@@ -182,6 +192,7 @@ class DatabaseHelper {
         }
       }
       
+      _userUpdateController.add(null);
       return true;
     } catch (e) {
       
@@ -250,6 +261,64 @@ class DatabaseHelper {
       return false;
     }
   }
+
+  // --- Görevler (Missions) İşlemleri ---
+
+  // Missions box'ını al
+  Box<Map> get _missionsBox => Hive.box<Map>(missionsBox);
+
+  Future<List<Map<String, dynamic>>> getUserMissions(String userId) async {
+    try {
+      final missions = _missionsBox.values
+          .map((m) => Map<String, dynamic>.from(m))
+          .where((m) => m['userId'] == userId)
+          .toList();
+      return missions;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<void> addMissionProgress(String userId, String missionId, bool isCompleted, bool isClaimed) async {
+    try {
+      final id = const Uuid().v4();
+      final missionData = {
+        'id': id,
+        'userId': userId,
+        'missionId': missionId,
+        'isCompleted': isCompleted ? 1 : 0,
+        'isClaimed': isClaimed ? 1 : 0,
+      };
+      // Hive'da unique key olarak missionId + userId kullanabiliriz veya id
+      // Ancak sorgulama kolaylığı için id ile kaydedip filtreliyoruz.
+      // Daha iyisi: key olarak "userId_missionId" kullanmak.
+      final key = '${userId}_$missionId';
+      await _missionsBox.put(key, missionData);
+      await _missionsBox.flush();
+    } catch (e) {
+      print('Error adding mission: $e');
+    }
+  }
+
+  Future<void> updateMissionProgress(String userId, String missionId, bool isCompleted, bool isClaimed) async {
+    try {
+      final key = '${userId}_$missionId';
+      final existing = _missionsBox.get(key);
+
+      if (existing == null) {
+        await addMissionProgress(userId, missionId, isCompleted, isClaimed);
+      } else {
+        final updated = Map<String, dynamic>.from(existing);
+        updated['isCompleted'] = isCompleted ? 1 : 0;
+        updated['isClaimed'] = isClaimed ? 1 : 0;
+        await _missionsBox.put(key, updated);
+        await _missionsBox.flush();
+      }
+    } catch (e) {
+      print('Error updating mission: $e');
+    }
+  }
+
 
   // Kullanıcının tüm araçlarını getir
   Future<List<UserVehicle>> getUserVehicles(String userId) async {
@@ -786,7 +855,7 @@ class DatabaseHelper {
   // DAILY QUESTS (Günlük Görevler)
   // ============================================================================
 
-  static const String dailyQuestsBox = 'daily_quests';
+  // static const String dailyQuestsBox = 'daily_quests'; // Already declared at top
 
   // Daily Quests box'ını al
   Box<Map> get _dailyQuestsBox => Hive.box<Map>(dailyQuestsBox);

@@ -19,6 +19,7 @@ class DailyQuest {
   final double rewardMoney; // Örn: 50.000 TL
   final bool isClaimed;     // Ödül alındı mı?
   final DateTime date;      // Görevin ait olduğu gün
+  final String? targetBrand; // Hedef marka (opsiyonel)
 
   DailyQuest({
     required this.id,
@@ -31,6 +32,7 @@ class DailyQuest {
     required this.rewardMoney,
     this.isClaimed = false,
     required this.date,
+    this.targetBrand,
   });
 
   factory DailyQuest.create({
@@ -40,6 +42,7 @@ class DailyQuest {
     required int targetCount,
     required int rewardXP,
     required double rewardMoney,
+    String? targetBrand,
   }) {
     return DailyQuest(
       id: const Uuid().v4(),
@@ -50,6 +53,7 @@ class DailyQuest {
       rewardXP: rewardXP,
       rewardMoney: rewardMoney,
       date: DateTime.now(),
+      targetBrand: targetBrand,
     );
   }
 
@@ -68,6 +72,7 @@ class DailyQuest {
       rewardMoney: (json['rewardMoney'] as num).toDouble(),
       isClaimed: json['isClaimed'] as bool,
       date: DateTime.parse(json['date'] as String),
+      targetBrand: json['targetBrand'] as String?,
     );
   }
 
@@ -83,6 +88,7 @@ class DailyQuest {
       'rewardMoney': rewardMoney,
       'isClaimed': isClaimed,
       'date': date.toIso8601String(),
+      'targetBrand': targetBrand,
     };
   }
 
@@ -97,6 +103,7 @@ class DailyQuest {
     double? rewardMoney,
     bool? isClaimed,
     DateTime? date,
+    String? targetBrand,
   }) {
     return DailyQuest(
       id: id ?? this.id,
@@ -109,6 +116,7 @@ class DailyQuest {
       rewardMoney: rewardMoney ?? this.rewardMoney,
       isClaimed: isClaimed ?? this.isClaimed,
       date: date ?? this.date,
+      targetBrand: targetBrand ?? this.targetBrand,
     );
   }
 }

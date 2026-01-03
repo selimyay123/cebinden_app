@@ -44,8 +44,8 @@ class SellerProfile {
   });
 
   /// Random satıcı profili oluştur
-  factory SellerProfile.generateRandom() {
-    final random = Random();
+  factory SellerProfile.generateRandom({int? seed}) {
+    final random = seed != null ? Random(seed) : Random();
     
     // Tip seç (ağırlıklı random)
     SellerType type;
@@ -135,6 +135,62 @@ class SellerProfile {
       maxPatience: patience,
       reservePriceRatio: reserveRatio, // 🆕
     );
+  }
+
+  /// Teklifin kabul edilme olasılığını hesapla (0.0 - 1.0)
+  double calculateAcceptanceChance({
+    required double offerPrice,
+    required double listingPrice,
+    dynamic buyerUser,
+  }) {
+    // 🆕 SKILL CHECK: Ölücü yeteneği var mı?
+    double negotiationPowerBonus = 0.0;
+    if (buyerUser != null && buyerUser is User) {
+      final skillService = SkillService();
+      final level = skillService.getSkillLevel(buyerUser, SkillService.skillLowballer);
+      negotiationPowerBonus = SkillService.lowballerBonuses[level] ?? 0.0;
+    }
+    
+    // 🆕 RESERVE PRICE: Satıcının kafasındaki gerçek minimum fiyat
+    final reservePrice = listingPrice * reservePriceRatio;
+    
+    // 🆕 PRICE BAND ADJUSTMENT
+    final priceBandMultiplier = _calculatePriceBandMultiplier(listingPrice);
+    final priceBandBonus = _calculatePriceBandBonus(listingPrice);
+    
+    // Oran hesapla (fuzzy logic olmadan, saf oran)
+    final ratio = offerPrice / reservePrice;
+    
+    // Eşikler
+    final adjustedInsultZone = insultZoneThreshold * priceBandMultiplier;
+    final adjustedNegotiationZone = negotiationZoneThreshold + (1.0 - priceBandMultiplier) * 0.05;
+    final adjustedMinAcceptable = (minAcceptableRatio + priceBandBonus) - negotiationPowerBonus;
+    
+    // Olasılık Hesabı
+    if (ratio < adjustedInsultZone) {
+      return 0.0; // Hakaret bölgesi -> %0 şans
+    } else if (ratio < adjustedNegotiationZone) {
+      // Müzakere bölgesi -> Düşük şans (karşı teklif gelir)
+      // Oran arttıkça şans artar (0.0 -> 0.3)
+      final range = adjustedNegotiationZone - adjustedInsultZone;
+      final progress = (ratio - adjustedInsultZone) / range;
+      return 0.05 + (progress * 0.25); // %5 - %30 arası
+    } else if (ratio < adjustedMinAcceptable) {
+      // Kabul bölgesine yakın ama altında -> Orta şans (0.3 -> 0.7)
+      final range = adjustedMinAcceptable - adjustedNegotiationZone;
+      final progress = (ratio - adjustedNegotiationZone) / range;
+      return 0.30 + (progress * 0.40); // %30 - %70 arası
+    } else {
+      // Kabul bölgesi -> Yüksek şans (0.7 -> 1.0)
+      // Oran arttıkça şans artar
+      // Eğer adjustedMinAcceptable'ın %5 üzerindeyse kesin kabul (%100)
+      final upperLimit = adjustedMinAcceptable * 1.05;
+      if (ratio >= upperLimit) return 1.0;
+      
+      final range = upperLimit - adjustedMinAcceptable;
+      final progress = (ratio - adjustedMinAcceptable) / range;
+      return 0.70 + (progress * 0.30); // %70 - %100 arası
+    }
   }
 
   /// Teklifi değerlendir (🆕 ALL SYSTEMS: ZONE + FUZZY + PRICE BANDS + PATIENCE + RESERVE + SKILL)

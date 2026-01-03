@@ -146,13 +146,6 @@ class _StoreScreenState extends State<StoreScreen> {
                                   _buildBalanceCard(),
                                   const SizedBox(height: 24),
                                   
-                                  // Garaj Genişletme
-                                  _buildSectionTitle('store.garageExpansion'.tr()),
-                                  const SizedBox(height: 12),
-                                  _buildGarageExpansionCard(),
-                                  
-                                  const SizedBox(height: 32),
-
                                   // Altın Satın Alma Paketleri
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,13 +167,15 @@ class _StoreScreenState extends State<StoreScreen> {
                                   ),
                                   const SizedBox(height: 12),
                                   _buildGoldPackages(),
-                                  
+
                                   const SizedBox(height: 32),
-                                  
-                                  // Altın Bozdurma
-                                  _buildSectionTitle('store.convertGold'.tr()),
+
+                                  // Garaj Genişletme
+                                  _buildSectionTitle('store.garageExpansion'.tr()),
                                   const SizedBox(height: 12),
-                                  _buildConvertGoldSection(),
+                                  _buildGarageExpansionCard(),
+                                  
+
                                 ],
                               ),
                             ),
@@ -216,6 +211,7 @@ class _StoreScreenState extends State<StoreScreen> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,6 +240,30 @@ class _StoreScreenState extends State<StoreScreen> {
                     ),
                   ),
                 ],
+              ),
+              // Convert Gold Button
+              ElevatedButton(
+                onPressed: _currentUser!.gold > 0 ? () => _showConvertGoldDialog() : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white.withOpacity(0.2),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.currency_exchange, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      'store.convertGold'.tr(),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -284,9 +304,9 @@ class _StoreScreenState extends State<StoreScreen> {
 
   Widget _buildGarageExpansionCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.8),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -299,12 +319,13 @@ class _StoreScreenState extends State<StoreScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+            padding: const EdgeInsets.only(right: 24), // Reduced padding for animation
+            child: Lottie.asset(
+              'assets/animations/GARAGEV2.json',
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
             ),
-            child: const Icon(Icons.garage, color: Colors.blue, size: 32),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -332,24 +353,16 @@ class _StoreScreenState extends State<StoreScreen> {
           ElevatedButton(
             onPressed: () => _showExpandGarageDialog(),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.amber,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Column(
-              children: [
-                Text(
-                  'store.plusOneSlot'.tr(),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '1 ${'store.gold'.tr()}',
-                  style: const TextStyle(fontSize: 10),
-                ),
-              ],
+            child: Text(
+              '1 ${'store.gold'.tr()}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -465,7 +478,7 @@ class _StoreScreenState extends State<StoreScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               child: Material(
-                color: Colors.white,
+                color: Colors.white.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(16),
                 elevation: 2,
                 child: InkWell(
@@ -537,110 +550,7 @@ class _StoreScreenState extends State<StoreScreen> {
     );
   }
 
-  Widget _buildConvertGoldSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.currency_exchange,
-                  color: Colors.amber,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'store.convertGoldTitle'.tr(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'store.convertGoldDesc'.tr(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                '1 ${'store.gold'.tr()} = 1.000.000 TL',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: _currentUser!.gold > 0
-                  ? () => _showConvertGoldDialog()
-                  : null,
-              icon: const Icon(Icons.swap_horiz),
-              label: Text('store.convertNow'.tr()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                disabledBackgroundColor: Colors.grey[300],
-              ),
-            ),
-          ),
-          if (_currentUser!.gold == 0) ...[
-            const SizedBox(height: 8),
-            Text(
-              'store.needGoldToConvert'.tr(),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontStyle: FontStyle.italic,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
+
 
   void _showPurchaseDialog(ProductDetails product, int gold, int bonus) {
     showDialog(
@@ -818,7 +728,12 @@ class _StoreScreenState extends State<StoreScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.garage, size: 64, color: Colors.blue),
+            Lottie.asset(
+              'assets/animations/GARAGEV2.json',
+              width: 80,
+              height: 80,
+              fit: BoxFit.contain,
+            ),
             const SizedBox(height: 16),
             Text(
               'store.currentLimitLabel'.trParams({'limit': _currentUser!.garageLimit.toString()}),
@@ -891,7 +806,7 @@ class _StoreScreenState extends State<StoreScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.amber,
               foregroundColor: Colors.white,
             ),
             child: Text('store.buy'.tr()),

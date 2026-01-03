@@ -129,6 +129,12 @@ class _MainScreenState extends State<MainScreen> {
         child: NavigationBar(
           selectedIndex: _currentIndex,
           onDestinationSelected: (index) {
+            // Eğer Dashboard (Home) seçildiyse ve zaten oradaysak veya başka tabdan geliyorsak
+            // Her durumda Dashboard'un stack'ini sıfırla
+            if (index == 3) {
+              _navigatorKeys[3]?.currentState?.popUntil((route) => route.isFirst);
+            }
+
             setState(() {
               _currentIndex = index;
             });

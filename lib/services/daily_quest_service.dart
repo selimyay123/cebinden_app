@@ -38,6 +38,13 @@ class DailyQuestService {
     return newQuests;
   }
 
+  /// Bugünün görevlerini getir
+  Future<List<DailyQuest>> getTodayQuests(String userId) async {
+    final now = DateTime.now();
+    final questsMap = await _db.getUserDailyQuests(userId, now);
+    return questsMap.map((map) => DailyQuest.fromJson(map)).toList();
+  }
+
   /// Rastgele 3 görev oluştur
   List<DailyQuest> _generateRandomQuests(String userId) {
     final quests = <DailyQuest>[];
@@ -118,6 +125,16 @@ class DailyQuestService {
         baseMoney: 40000,
         step: 50000,
       ),
+      // --- Marka Spesifik Araç Alma Görevleri ---
+      _QuestTemplate(
+        type: QuestType.buyVehicle,
+        description: "quests.descriptions.buyVehicleBrand",
+        minCount: 1,
+        maxCount: 2,
+        baseXP: 150,
+        baseMoney: 30000,
+        useBrand: true,
+      ),
     ];
     
     // Havuzdan rastgele 3 farklı şablon seç
@@ -147,6 +164,12 @@ class DailyQuestService {
       // Eğer maxCount'a yakınsa ödül biraz artabilir, şimdilik base değerleri kullanıyoruz
       // İleride buraya daha karmaşık formül eklenebilir.
       
+      String? targetBrand;
+      if (template.useBrand) {
+        final brands = ['Renauva', 'Volkstar', 'Fialto', 'Oplon', 'Bavora', 'Fortran', 'Mercurion', 'Koyoro', 'Audira', 'Hanto'];
+        targetBrand = brands[random.nextInt(brands.length)];
+      }
+
       quests.add(DailyQuest.create(
         userId: userId,
         type: template.type,
@@ -154,6 +177,7 @@ class DailyQuestService {
         targetCount: targetCount,
         rewardXP: template.baseXP,
         rewardMoney: template.baseMoney.toDouble(),
+        targetBrand: targetBrand,
       ));
     }
     
@@ -161,7 +185,7 @@ class DailyQuestService {
   }
 
   /// Görev ilerlemesini güncelle
-  Future<void> updateProgress(String userId, QuestType type, int amount) async {
+  Future<void> updateProgress(String userId, QuestType type, int amount, {String? brand}) async {
     final now = DateTime.now();
     final questsMap = await _db.getUserDailyQuests(userId, now);
     
@@ -170,6 +194,13 @@ class DailyQuestService {
       
       // İlgili tipte ve tamamlanmamış/ödülü alınmamış görevleri bul
       if (quest.type == type && !quest.isClaimed && !quest.isCompleted) {
+        // Marka kontrolü
+        if (quest.targetBrand != null && brand != null) {
+          if (quest.targetBrand != brand) continue;
+        } else if (quest.targetBrand != null && brand == null) {
+          continue; // Marka gerektiren göreve markasız işlem sayılmaz
+        }
+        
         final newCount = quest.currentCount + amount;
         
         // Güncelle
@@ -228,6 +259,7 @@ class _QuestTemplate {
   final int baseXP;
   final int baseMoney;
   final int step; // Rastgele sayı üretirken adım aralığı (örn: 10000'er artış)
+  final bool useBrand;
 
   _QuestTemplate({
     required this.type,
@@ -237,5 +269,6 @@ class _QuestTemplate {
     required this.baseXP,
     required this.baseMoney,
     this.step = 1,
+    this.useBrand = false,
   });
 }

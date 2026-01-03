@@ -47,7 +47,7 @@ class RentalService {
   }
 
   /// Günlük kiralama işlemini gerçekleştir
-  /// Returns: Kazanılan kiralama geliri (bildirim için)
+  /// Artık bakiyeye eklemez, araç bazında "toplanabilir" olarak işaretler
   Future<double> processDailyRental(String userId) async {
     try {
       // Kullanıcıyı al
@@ -59,31 +59,70 @@ class RentalService {
       // Galeri sahibi değilse kiralama yok
       if (!user.ownsGallery) return 0.0;
 
-      // Kiralama gelirini hesapla
-      final rentalIncome = await calculateDailyRentalIncome(userId);
+      // Kullanıcının aktif araçlarını al
+      final vehicles = await _db.getUserActiveVehicles(userId);
       
-      if (rentalIncome <= 0) return 0.0;
+      double totalNewPending = 0.0;
+      
+      for (var vehicle in vehicles) {
+        // Sadece kirada olan ve henüz toplanmamış geliri olmayan araçlar yeni gelir üretir
+        if (vehicle.isRented && !vehicle.canCollectRentalIncome) {
+          double rentalIncome = vehicle.purchasePrice * dailyRentalRate;
+          
+          // Aracı güncelle: Gelir beklemede ve toplanabilir
+          final updatedVehicle = vehicle.copyWith(
+            pendingRentalIncome: rentalIncome,
+            canCollectRentalIncome: true,
+          );
+          
+          await _db.updateUserVehicle(vehicle.id, updatedVehicle.toJson());
+          totalNewPending += rentalIncome;
+        }
+      }
 
-      // Kullanıcının bakiyesini ve istatistiklerini güncelle
-      final newBalance = user.balance + rentalIncome;
-      final newTotalRental = user.totalRentalIncome + rentalIncome;
+      return totalNewPending;
+    } catch (e) {
+      return 0.0;
+    }
+  }
+
+  /// Bekleyen kira gelirini topla
+  Future<bool> collectRentalIncome(String userId, String vehicleId) async {
+    try {
+      final vehicle = await _db.getUserVehicleById(vehicleId);
+      if (vehicle == null || !vehicle.canCollectRentalIncome) return false;
+
+      final income = vehicle.pendingRentalIncome;
+      if (income <= 0) return false;
+
+      // Kullanıcıyı al
+      final userJson = await _db.getUserById(userId);
+      if (userJson == null) return false;
+      final user = User.fromJson(userJson);
+
+      // Bakiyeyi güncelle
+      final newBalance = user.balance + income;
+      final newTotalRental = user.totalRentalIncome + income;
 
       await _db.updateUser(userId, {
         'balance': newBalance,
         'totalRentalIncome': newTotalRental,
-        'lastDailyRentalIncome': rentalIncome,
+        'lastDailyRentalIncome': income,
       });
 
+      // Aracı güncelle: Bekleyen geliri sıfırla ve toplanabilirliği kapat
+      final updatedVehicle = vehicle.copyWith(
+        pendingRentalIncome: 0.0,
+        canCollectRentalIncome: false,
+      );
+      await _db.updateUserVehicle(vehicleId, updatedVehicle.toJson());
+
       // Aktivite kaydı
-      // Kiradaki araç sayısını bul
-      final vehicles = await _db.getUserActiveVehicles(userId);
-      final rentedCount = vehicles.where((v) => v.isRented).length;
-      await ActivityService().logRentalIncome(userId, rentalIncome, rentedCount);
+      await ActivityService().logRentalIncome(userId, income, 1);
 
-      return rentalIncome;
+      return true;
     } catch (e) {
-
-      return 0.0;
+      return false;
     }
   }
 

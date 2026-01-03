@@ -11,7 +11,9 @@
     "noRentableVehicles": "Kiralanabilecek araç bulunamadı.",
     "stopRenting": "Kiralamayı Durdur",
     "rentSuccess": "Araçlar başarıyla kiralandı!",
-    "noRentedVehicles": "Şu anda kirada araç yok."
+    "noRentedVehicles": "Şu anda kirada araç yok.",
+    "collectIncome": "Topla",
+    "incomeCollected": "Gelir toplandı!"
   },
   "market": {
     "title": "Market"
@@ -454,7 +456,8 @@
     "sendOffer": "Teklif Gönder",
     "enterAmountError": "Lütfen teklif tutarını girin",
     "invalidAmountError": "Geçersiz tutar",
-    "offerTooHighError": "Teklifiniz ilan fiyatından düşük olmalıdır",
+    "offerTooHighError": "Teklifiniz ilan fiyatından yüksek olamaz.",
+    "acceptanceChance": "Kabul Edilme İhtimali",
     "sendError": "Teklif gönderilirken bir hata oluştu",
     "accepted": "Teklif Kabul Edildi",
     "rejected": "Teklif Reddedildi",
@@ -979,17 +982,94 @@
     "listingScore": "İlan Skoru"
   },
   "quests": {
-    "title": "Günlük Görevler",
+    "title": "Görevler",
     "noQuests": "Bugün için görev bulunamadı.",
     "rewardClaimed": "Ödül Alındı! +{xp} XP, +{money} TL",
     "claimFailed": "Ödül alınamadı.",
     "claimReward": "Ödülü Al",
     "descriptions": {
       "buyVehicle": "Bugün {count} araç satın al",
+      "buyVehicleBrand": "Bugün {count} adet {brand} marka araç satın al",
       "sellVehicle": "Bugün {count} araç sat",
       "makeOffer": "Bugün {count} teklif gönder",
       "earnProfit": "Bugün {amount} TL kar et",
       "login": "Oyuna giriş yap"
+    }
+  },
+  "missions": {
+    "title": "Görevler",
+    "noMissions": "Henüz görev yok.",
+    "tutorial": {
+      "title": "Hoş Geldin Şoför!",
+      "desc": "Temel bilgileri öğrenmek için eğitimi tamamla."
+    },
+    "firstBuy": {
+      "title": "İlk Satın Alma",
+      "desc": "Marketten ilk aracını satın al."
+    },
+    "firstSell": {
+      "title": "İlk Satış",
+      "desc": "İlk aracını sat ve kar et."
+    },
+    "garage5": {
+      "title": "Garaj Genişletme",
+      "desc": "Garaj limitini 5 araca çıkar."
+    },
+    "balance1m": {
+      "title": "Milyoner",
+      "desc": "2.000.000 TL bakiyeye ulaş."
+    },
+    "balance5m": {
+      "title": "Milyoner II",
+      "desc": "5.000.000 TL bakiyeye ulaş."
+    },
+    "balance10m": {
+      "title": "Milyoner III",
+      "desc": "10.000.000 TL bakiyeye ulaş."
+    },
+    "level5": {
+      "title": "Yükselen Yıldız",
+      "desc": "5. Seviyeye ulaş."
+    },
+    "level10": {
+      "title": "Yükselen Yıldız II",
+      "desc": "10. Seviyeye ulaş."
+    },
+    "level20": {
+      "title": "Yükselen Yıldız III",
+      "desc": "20. Seviyeye ulaş."
+    },
+    "negotiation10": {
+      "title": "Usta Pazarlıkçı",
+      "desc": "10 kez başarılı pazarlık yap."
+    },
+    "negotiation20": {
+      "title": "Usta Pazarlıkçı II",
+      "desc": "20 kez başarılı pazarlık yap."
+    },
+    "negotiation50": {
+      "title": "Usta Pazarlıkçı III",
+      "desc": "50 kez başarılı pazarlık yap."
+    },
+    "fleet10": {
+      "title": "Filo Yöneticisi",
+      "desc": "Garajında 10 araca sahip ol."
+    },
+    "fleet20": {
+      "title": "Filo Yöneticisi II",
+      "desc": "Garajında 20 araca sahip ol."
+    },
+    "fleet50": {
+      "title": "Filo Yöneticisi III",
+      "desc": "Garajında 50 araca sahip ol."
+    },
+    "gallery": {
+      "title": "İş Yeri Sahibi",
+      "desc": "Kendi galerini satın al."
+    },
+    "collectionMaster": {
+      "title": "Usta Koleksiyoncu",
+      "desc": "Tüm araç koleksiyonlarını tamamla."
     }
   },
   "myListings": {
@@ -1595,7 +1675,7 @@
     "invalidNumber": "Geçersiz sayı formatı",
     "minAmount": "Minimum miktar",
     "maxAmount": "Maksimum miktar",
-    "garageExpansion": "Garaj Genişletme",
+    "garageExpansion": "Yükseltmeler",
     "garageCapacity": "Garaj Kapasitesi",
     "currentLimit": "Mevcut Limit: {limit} Araç",
     "plusOneSlot": "+1 Slot",

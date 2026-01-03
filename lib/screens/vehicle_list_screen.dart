@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
 import '../services/auth_service.dart';
+import '../services/database_helper.dart';
 import '../models/vehicle_model.dart';
 import '../widgets/vehicle_image.dart';
 import 'vehicle_detail_screen.dart';
@@ -52,11 +54,24 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     'Otomatik': 'vehicles.transmissionAutomatic',
   };
 
+  StreamSubscription? _userUpdateSubscription;
+
   @override
   void initState() {
     super.initState();
     _loadVehicles();
     _loadUserBalance();
+    
+    // Bakiye güncellemelerini dinle
+    _userUpdateSubscription = DatabaseHelper().onUserUpdate.listen((_) {
+      _loadUserBalance();
+    });
+  }
+  
+  @override
+  void dispose() {
+    _userUpdateSubscription?.cancel();
+    super.dispose();
   }
 
   // Kullanıcı bakiyesini yükle

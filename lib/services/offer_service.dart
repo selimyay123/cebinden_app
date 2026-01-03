@@ -274,8 +274,8 @@ class OfferService {
         }
       }
 
-      // AI satıcı profili oluştur
-      final sellerProfile = SellerProfile.generateRandom();
+      // AI satıcı profili oluştur (Deterministic seed based on vehicle ID)
+      final sellerProfile = SellerProfile.generateRandom(seed: vehicle.id.hashCode);
       
       // Alıcı kullanıcıyı getir (skill kontrolü için)
       final userMap = await _db.getUserById(userId);
@@ -359,6 +359,29 @@ class OfferService {
       debugPrint('Stack trace: $stackTrace');
       return {'success': false, 'error': e.toString()};
     }
+  }
+
+  /// Teklif kabul edilme olasılığını hesapla
+  Future<double> getAcceptanceProbability({
+    required Vehicle vehicle,
+    required double offerPrice,
+    required String userId,
+  }) async {
+    // AI satıcı profili oluştur (aynı seed ile)
+    final sellerProfile = SellerProfile.generateRandom(seed: vehicle.id.hashCode);
+    
+    // Kullanıcıyı getir (skill kontrolü için)
+    final userMap = await _db.getUserById(userId);
+    User? buyerUser;
+    if (userMap != null) {
+      buyerUser = User.fromJson(userMap);
+    }
+    
+    return sellerProfile.calculateAcceptanceChance(
+      offerPrice: offerPrice,
+      listingPrice: vehicle.price,
+      buyerUser: buyerUser,
+    );
   }
 
   /// Kullanıcı karşı teklife cevap verir
@@ -622,10 +645,6 @@ class OfferService {
   }) async {
     final random = Random();
     
-    // Karşı teklifin orijinal teklife göre artış yüzdesi
-    // (Kullanıcı ne kadar inmiş veya çıkmış? Genelde kullanıcı iner, ama AI teklifinden yüksek ister)
-    // final increasePercent = ((counterOfferAmount - originalOfferPrice) / originalOfferPrice) * 100;
-    
     // Karşı teklifin ilan fiyatına göre oranı
     final priceRatio = counterOfferAmount / listingPrice;
     
@@ -645,7 +664,6 @@ class OfferService {
     // 2. Fiyat Oranına Göre Değerlendirme
     
     // 🆕 YENİ MANTIK: Alıcının ilk teklifi ile satıcının istediği arasındaki uçurum kontrolü
-    // Eğer alıcı çok düşükten başladıysa (örn: %85), satıcının yüksek isteğini (örn: %95) kabul etmemeli.
     final initialOfferRatio = originalOfferPrice / listingPrice;
     
     // Eğer satıcı ilana çok yakın bir fiyat istiyorsa (%90 üzeri)
@@ -659,24 +677,11 @@ class OfferService {
             'response': _generateAcceptanceResponse(),
           };
         } else {
-          // Reddet veya küçük bir artış yap
-          if (random.nextDouble() < 0.4) {
-             return {
-              'decision': 'reject',
-              'response': _generateRejectionResponse(),
-            };
-          } else {
-            // Küçük artış (İnatçı pazarlık)
-            final diff = counterOfferAmount - originalOfferPrice;
-            final increase = diff * (0.05 + random.nextDouble() * 0.15); // Farkın %5-%20'si
-            final newCounter = originalOfferPrice + increase;
-            
-            return {
-              'decision': 'counter',
-              'counterAmount': newCounter,
-              'response': _generateCounterOfferResponse(newCounter),
-            };
-          }
+          // Reddet
+           return {
+            'decision': 'reject',
+            'response': _generateRejectionResponse(),
+          };
         }
       }
     }
@@ -690,25 +695,11 @@ class OfferService {
           'response': _generateAcceptanceResponse(),
         };
       } else {
-        // Reddetme ihtimali yüksek ama pazarlık da yapabilir
-        if (random.nextDouble() < 0.5) {
-           return {
-            'decision': 'reject',
-            'response': _generateRejectionResponse(),
-          };
-        } else {
-          // Yeni teklif ver: AI'nın önceki teklifi ile Kullanıcının isteği arasında
-          // Örn: AI: 270, User: 295 -> Yeni: 275-280 arası
-          final diff = counterOfferAmount - originalOfferPrice;
-          final increase = diff * (0.1 + random.nextDouble() * 0.2); // Farkın %10-%30'u kadar artır
-          final newCounter = originalOfferPrice + increase;
-          
-          return {
-            'decision': 'counter',
-            'counterAmount': newCounter,
-            'response': _generateCounterOfferResponse(newCounter),
-          };
-        }
+        // Reddet
+         return {
+          'decision': 'reject',
+          'response': _generateRejectionResponse(),
+        };
       }
     } else if (priceRatio >= 0.85) {
       // Makul seviye (%85-95)
@@ -719,43 +710,25 @@ class OfferService {
           'response': _generateAcceptanceResponse(),
         };
       } else {
-        // Karşı teklif ver
-        // Farkın %30-%60'ı kadar artır (Ortada buluşmaya çalış)
-        final diff = counterOfferAmount - originalOfferPrice;
-        final increase = diff * (0.3 + random.nextDouble() * 0.3);
-        final newCounter = originalOfferPrice + increase;
-        
+        // Reddet (Artık karşı teklif yok)
         return {
-          'decision': 'counter',
-          'counterAmount': newCounter,
-          'response': _generateCounterOfferResponse(newCounter),
+          'decision': 'reject',
+          'response': _generateRejectionResponse(),
         };
       }
     } else if (priceRatio >= 0.70) {
       // İyi fiyat (%70-85)
-      // Kabul şansı yüksek ama AI daha da düşürmek isteyebilir
-      if (random.nextDouble() < 0.8 + successBonus) { // DÜZELTİLDİ: %80 şansla kabul (Fiyat iyi düştü)
+      // Kabul şansı yüksek
+      if (random.nextDouble() < 0.8 + successBonus) { // %80 şansla kabul
         return {
           'decision': 'accept',
           'response': _generateAcceptanceResponse(),
-        };
-      } else if (random.nextDouble() < 0.7) {
-        // Yine de biraz daha kırmak isteyebilir (Mezarcı AI)
-        final diff = counterOfferAmount - originalOfferPrice;
-        final increase = diff * (0.5 + random.nextDouble() * 0.4); // Farkın %50-%90'ı (Neredeyse kabul edecek)
-        final newCounter = originalOfferPrice + increase;
-        
-        return {
-          'decision': 'counter',
-          'counterAmount': newCounter,
-          'response': _generateCounterOfferResponse(newCounter),
         };
       } else {
-        // Çok nadiren reddet (belki de kullanıcı çok düşük istediği için şüphelendi?)
-        // Şimdilik kabul et diyelim
+        // Nadiren reddet
          return {
-          'decision': 'accept',
-          'response': _generateAcceptanceResponse(),
+          'decision': 'reject',
+          'response': _generateRejectionResponse(),
         };
       }
     } else {
@@ -843,7 +816,6 @@ class OfferService {
       'offerService.responses.rejection.3',
       'offerService.responses.rejection.4',
       'offerService.responses.rejection.5',
-      'offerService.responses.rejection.6',
     ];
     return responses[Random().nextInt(responses.length)];
   }

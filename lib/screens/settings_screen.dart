@@ -169,6 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       'assets/pp/women2.png',
       'assets/pp/women3.png',
       'assets/animations/pp/MEMEWE.json',
+      'assets/animations/pp/Money.json',
     ];
 
     String? selectedImage = _currentUser?.profileImageUrl;

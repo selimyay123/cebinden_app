@@ -11,6 +11,7 @@ enum XPSource {
   counterOfferSuccess,  // Başarılı karşı teklif
   dailyLogin,           // Günlük giriş bonusu
   profitBonus,          // Kâr bonusu
+  achievement,          // Başarım/Görev tamamlam
 }
 
 /// XP Kazanım Sonucu
