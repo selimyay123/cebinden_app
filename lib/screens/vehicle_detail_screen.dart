@@ -750,6 +750,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         hasWarranty: _vehicle.hasWarranty,
         hasAccidentRecord: _vehicle.hasAccidentRecord,
         score: _vehicle.score, // İlan skoru (Vehicle'dan alınır)
+        bodyType: _vehicle.bodyType,
+        horsepower: _vehicle.horsepower,
         imageUrl: _vehicle.imageUrl,
         originalListingPrice: _vehicle.price, // 🆕 Orijinal ilan fiyatını kaydet
       );
@@ -1923,122 +1925,143 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(icon, color: iconColor),
-            const SizedBox(width: 8),
-            Text(title),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              response,
-              style: const TextStyle(fontSize: 16),
-            ),
-            if (counterOffer != null) ...[
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false, // Geri tuşu ile kapatmayı engelle
+        child: AlertDialog(
+          title: Row(
+            children: [
+              Icon(icon, color: iconColor),
+              const SizedBox(width: 8),
+              Text(title),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                response,
+                style: const TextStyle(fontSize: 16),
+              ),
+              if (counterOffer != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.local_offer, color: Colors.orange),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'offer.counterOfferAmount'.tr(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          Text(
+                            '${_formatCurrency(counterOffer)} TL',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepOrange,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
+                  color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.shade200),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.local_offer, color: Colors.orange),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'offer.counterOfferAmount'.tr(),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[700],
-                          ),
+                    Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'offer.viewInMyOffers'.tr(),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.blue[900],
                         ),
-                        Text(
-                          '${_formatCurrency(counterOffer)} TL',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepOrange,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'offer.viewInMyOffers'.tr(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue[900],
+          ),
+          actions: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (decision == 'counter' && counterOffer != null && offer != null) ...[
+                  // Accept Button
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _handleAcceptCounterOffer(offer);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
+                    child: Text('offers.accept'.tr()),
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Reject Button (Instead of Close)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _handleRejectCounterOffer(offer);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade100,
+                      foregroundColor: Colors.red.shade900,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text('offers.reject'.tr()),
+                  ),
+                ] else ...[
+                  // Close Button (Only for Accept/Reject/Error cases)
+                  OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text('common.close'.tr()),
                   ),
                 ],
-              ),
+              ],
             ),
           ],
         ),
-        actions: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (decision == 'counter' && counterOffer != null && offer != null) ...[
-                // Counter offer button removed as per user request
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _handleAcceptCounterOffer(offer);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text('offers.accept'.tr()),
-                ),
-                const SizedBox(height: 8),
-              ],
-              OutlinedButton(
-                onPressed: () => Navigator.pop(context),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text('common.close'.tr()),
-              ),
-            ],
-          ),
-
-        ],
       ),
     );
   }
@@ -2204,7 +2227,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(height: 80), // Space for the floating image
+                      const SizedBox(height: 110), // Space for the floating image
                       
                       // Congratulations Title
                       Text(
@@ -2261,9 +2284,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                 const Icon(Icons.stars, color: Colors.amber, size: 20),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'This vehicle is now yours!',
+                                  '${'purchase.successMessage'.tr()}',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.green[700],
                                   ),
@@ -2274,7 +2297,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             Text(
                               '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey[800],
                               ),
@@ -2334,7 +2357,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             
             // Floating Vehicle Image or Icon
             Positioned(
-              top: 0,
+              top: 24,
               child: SizedBox(
                 width: 150,
                 height: 100,
@@ -2457,6 +2480,103 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
   /// Karşı teklif gönderme dialogunu göster
 
+
+  /// Karşı teklifi reddet
+  Future<void> _handleRejectCounterOffer(Offer offer) async {
+    // Loading göster
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final success = await _offerService.rejectCounterOffer(offer);
+      
+      // Loading kapat
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 6,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: Colors.orange.shade600,
+              content: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'offer.rejected'.tr(),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 6,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: Colors.red.shade600,
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'common.error'.tr(),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Loading kapat
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 6,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            backgroundColor: Colors.red.shade600,
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    e.toString(),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+  }
 
 }
 

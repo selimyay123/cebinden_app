@@ -13,7 +13,16 @@
     "rentSuccess": "Vehicles successfully rented!",
     "noRentedVehicles": "No vehicles currently rented.",
     "collectIncome": "Collect",
-    "incomeCollected": "Income collected!"
+    "incomeCollected": "Income collected!",
+    "opportunityPurchases": "Opportunity Purchases"
+  },
+  "opportunity": {
+    "title": "Opportunity Purchases",
+    "emptyTitle": "No opportunity vehicles available at the moment.",
+    "emptySubtitle": "Check again tomorrow!",
+    "tag": "OPPORTUNITY",
+    "buyConfirmation": "Do you want to purchase this vehicle?",
+    "inspect": "Inspect"
   },
   "market": {
     "title": "Market"
@@ -61,6 +70,7 @@
   "errors": {
     "balanceUpdateFailed": "Balance could not be updated",
     "vehicleAddFailed": "Vehicle could not be added to your garage",
+    "garageFull": "Your garage is full!",
     "errorWithDetail": "Error: {detail}"
   },
   "auth": {
@@ -1683,7 +1693,25 @@
     "garageExpandSuccess": "Garage successfully expanded! 🎉",
     "minGoldError": "You must enter at least 0.1 gold",
     "insufficientGoldError": "Insufficient gold! Available: {amount} gold",
-    "securePaymentMessage": "You are about to purchase with secure payment."
+    "securePaymentMessage": "You are about to purchase with secure payment.",
+    "animatedPP": {
+      "title": "Animated Profile Pictures",
+      "buy": "Buy",
+      "activate": "Activate",
+      "active": "Active",
+      "price": "1 Gold",
+      "insufficientGold": "Insufficient gold to buy this animation.",
+      "purchaseSuccess": "Animation purchased successfully!",
+      "activationSuccess": "Profile picture updated!",
+      "names": {
+        "MEMEWE": "MEMEWE",
+        "Money": "Money",
+        "PEPE": "PEPE",
+        "CoolEmoji": "Cool Emoji",
+        "PepeMusic": "Pepe Sticker Music",
+        "NyanCat": "The Nyan Cat"
+      }
+    }
   },
   "seller_notes": {
     "base": {

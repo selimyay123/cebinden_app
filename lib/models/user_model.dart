@@ -45,6 +45,8 @@ class User {
   final int skillPoints; // Mevcut yetenek puanı
   final Map<String, int> skills; // Yetenek ID -> Seviye
   final Map<String, int> dailySkillUses; // Yetenek ID -> Günlük kullanım sayısı
+  final List<String> purchasedAnimatedPPs; // Satın alınan animasyonlu profil resimleri
+  final String? activeAnimatedPP; // Aktif animasyonlu profil resmi
   final int lastSkillUseDay; // Son kullanım günü (sıfırlama için)
 
   User({
@@ -89,6 +91,8 @@ class User {
     this.dailySkillUses = const {},
     this.lastSkillUseDay = 0,
     this.collectedBrandRewards = const [],
+    this.purchasedAnimatedPPs = const [],
+    this.activeAnimatedPP,
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -218,6 +222,8 @@ class User {
           const {},
       lastSkillUseDay: json['lastSkillUseDay'] as int? ?? 0,
       collectedBrandRewards: (json['collectedBrandRewards'] as List?)?.cast<String>() ?? const [],
+      purchasedAnimatedPPs: (json['purchasedAnimatedPPs'] as List?)?.cast<String>() ?? const [],
+      activeAnimatedPP: json['activeAnimatedPP'] as String?,
     );
   }
 
@@ -265,6 +271,8 @@ class User {
       'dailySkillUses': dailySkillUses,
       'lastSkillUseDay': lastSkillUseDay,
       'collectedBrandRewards': collectedBrandRewards,
+      'purchasedAnimatedPPs': purchasedAnimatedPPs,
+      'activeAnimatedPP': activeAnimatedPP,
     };
   }
 
@@ -307,6 +315,8 @@ class User {
     Map<String, int>? dailySkillUses,
     int? lastSkillUseDay,
     List<String>? collectedBrandRewards,
+    List<String>? purchasedAnimatedPPs,
+    String? activeAnimatedPP,
   }) {
     return User(
       id: id ?? this.id,
@@ -346,6 +356,8 @@ class User {
       dailySkillUses: dailySkillUses ?? this.dailySkillUses,
       lastSkillUseDay: lastSkillUseDay ?? this.lastSkillUseDay,
       collectedBrandRewards: collectedBrandRewards ?? this.collectedBrandRewards,
+      purchasedAnimatedPPs: purchasedAnimatedPPs ?? this.purchasedAnimatedPPs,
+      activeAnimatedPP: activeAnimatedPP ?? this.activeAnimatedPP,
     );
   }
 

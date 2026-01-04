@@ -137,10 +137,10 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                           _formatDuration(_remainingTime),
                           style: TextStyle(
                             color: textColor,
-                            fontSize: 24,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Courier',
-                            letterSpacing: 1.5,
+                            // fontFamily: 'Courier',
+                            letterSpacing: 1.2,
                             shadows: [
                               Shadow(
                                 color: Colors.black.withOpacity(0.3),

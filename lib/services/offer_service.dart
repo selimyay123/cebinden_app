@@ -15,6 +15,7 @@ import '../models/daily_quest_model.dart';
 import 'activity_service.dart';
 import 'market_refresh_service.dart'; // Araç detayları için
 import 'skill_service.dart';
+import '../services/localization_service.dart'; // For .tr() extension
 
 /// Teklif servisi - AI alıcılar ve teklif yönetimi
 class OfferService {
@@ -78,7 +79,14 @@ class OfferService {
       final sellerMap = await _db.getUserById(listing.userId);
       if (sellerMap != null) {
         final seller = User.fromJson(sellerMap);
-        final multiplier = 1.0;
+        var multiplier = 1.0;
+        
+        // 🆕 GALERİ AVANTAJI: Yüksek Kar Marjı
+        // Galeri sahiplerinin araçları %10 daha değerli algılanır
+        if (seller.ownsGallery) {
+          multiplier = 1.10;
+        }
+        
         // Adil fiyatı artır (AI alıcılar daha yüksek teklif vermeye meyilli olur)
         fairPrice *= multiplier;
       }
@@ -248,8 +256,9 @@ class OfferService {
   /// Satıcının karşı teklifini reddet
   Future<bool> rejectCounterOffer(Offer offer) async {
     try {
-      // Reddedilen teklifi sil
-      return await _db.deleteOffer(offer.offerId);
+      // Reddedilen teklifi silmek yerine durumunu güncelle
+      // Böylece kullanıcının bu ilanı reddettiğini bilebiliriz
+      return await _db.updateOfferStatus(offer.offerId, OfferStatus.rejected);
     } catch (e) {
       return false;
     }
@@ -272,6 +281,20 @@ class OfferService {
         if (userVehicles.length >= user.garageLimit) {
           return {'success': false, 'error': 'Garaj limitiniz dolu (${user.garageLimit} araç). Yeni araç alamazsınız.'};
         }
+      }
+
+      // 🆕 REJECTION CHECK: Kullanıcı daha önce bu araç için bir karşı teklifi reddetti mi?
+      final existingOffers = await _db.getOffersByVehicleId(vehicle.id);
+      final hasRejectedOffer = existingOffers.any((o) => 
+        o.buyerId == userId && 
+        o.status == OfferStatus.rejected
+      );
+
+      if (hasRejectedOffer) {
+        return {
+          'success': false, 
+          'error': 'offer.previouslyRejected'.tr(), // "Bu araç için yapılan karşı teklifi reddettiniz. Tekrar teklif veremezsiniz."
+        };
       }
 
       // AI satıcı profili oluştur (Deterministic seed based on vehicle ID)
@@ -568,17 +591,26 @@ class OfferService {
     String? sellerMessage,
   }) async {
     try {
-      // AI alıcıyı getir/yeniden oluştur
-      final aiBuyer = AIBuyer.generateRandom();
+      // AI alıcıyı getir/yeniden oluştur (Deterministic seed based on offer ID)
+      final aiBuyer = AIBuyer.generateRandom(seed: originalOffer.offerId.hashCode);
       
       // Tatlı Dil yeteneği bonusunu hesapla
+      // Tatlı Dil yeteneği bonusunu hesapla
       double sweetTalkBonus = 0.0;
+      User? seller;
+      
       final sellerMap = await _db.getUserById(originalOffer.sellerId);
       if (sellerMap != null) {
-        final seller = User.fromJson(sellerMap);
+        seller = User.fromJson(sellerMap);
         final skillService = SkillService();
         final level = skillService.getSkillLevel(seller, SkillService.skillSweetTalk);
         sweetTalkBonus = SkillService.sweetTalkBonuses[level] ?? 0.0;
+        
+        // 🆕 GALERİ AVANTAJI: Yüksek Kar Marjı
+        // Galeri sahiplerinin karşı tekliflerinin kabul edilme şansı %15 artar
+        if (seller.ownsGallery) {
+          sweetTalkBonus += 0.15;
+        }
       }
       
       // AI alıcının karşı teklifi değerlendirmesi
@@ -588,6 +620,7 @@ class OfferService {
         counterOfferAmount: counterOfferAmount,
         listingPrice: originalOffer.listingPrice,
         successBonus: sweetTalkBonus,
+        seller: seller,
       );
       
       // Karar tipine göre işle
@@ -642,6 +675,7 @@ class OfferService {
     required double counterOfferAmount, // Kullanıcının istediği fiyat (User's Ask)
     required double listingPrice,
     double successBonus = 0.0,
+    User? seller,
   }) async {
     final random = Random();
     
@@ -649,7 +683,7 @@ class OfferService {
     final priceRatio = counterOfferAmount / listingPrice;
     
     // Alıcının tipine göre agresiflik seviyesi
-    final aggressiveness = _getAggressivenessFromBuyerType(aiBuyer.buyerType);
+    final aggressiveness = _getAggressivenessFromBuyerType(aiBuyer.buyerType, seller: seller);
     
     // Karar verme mantığı
     
@@ -898,6 +932,8 @@ class OfferService {
         hasWarranty: sourceVehicle?.hasWarranty ?? false,
         hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
         score: sourceVehicle?.score ?? 75,
+        bodyType: sourceVehicle?.bodyType ?? 'Sedan',
+        horsepower: sourceVehicle?.horsepower ?? 100,
         imageUrl: offer.vehicleImageUrl,
         originalListingPrice: offer.listingPrice, // 🆕 Orijinal ilan fiyatını kaydet
       );
@@ -919,17 +955,31 @@ class OfferService {
   // ============================================================================
 
   /// Alıcı tipinden agresiflik seviyesi çıkar
-  double _getAggressivenessFromBuyerType(BuyerType type) {
+  /// Alıcı tipinden agresiflik seviyesi çıkar
+  double _getAggressivenessFromBuyerType(BuyerType type, {User? seller}) {
+    double aggressiveness;
     switch (type) {
       case BuyerType.bargainer:
-        return 0.8; // Yüksek agresiflik - pazarlığa devam etmeye eğilimli
+        aggressiveness = 0.8; // Yüksek agresiflik - pazarlığa devam etmeye eğilimli
+        break;
       case BuyerType.realistic:
-        return 0.5; // Orta agresiflik - dengeli yaklaşım
+        aggressiveness = 0.5; // Orta agresiflik - dengeli yaklaşım
+        break;
       case BuyerType.urgent:
-        return 0.2; // Düşük agresiflik - hızlı kabul etme eğilimi
+        aggressiveness = 0.2; // Düşük agresiflik - hızlı kabul etme eğilimi
+        break;
       case BuyerType.generous:
-        return 0.1; // Çok düşük agresiflik - kolayca kabul eder
+        aggressiveness = 0.1; // Çok düşük agresiflik - kolayca kabul eder
+        break;
     }
+    
+    // 🆕 GALERİ AVANTAJI: Prestij & İtibar
+    // Galeri sahiplerine karşı alıcılar daha az agresif olur (Daha kolay ikna olurlar)
+    if (seller != null && seller.ownsGallery) {
+      aggressiveness = (aggressiveness - 0.2).clamp(0.0, 1.0);
+    }
+    
+    return aggressiveness;
   }
 
   /// Adil fiyatı hesapla (FMV - Fair Market Value)
@@ -982,6 +1032,12 @@ class OfferService {
         // Hız arttıkça (çarpan düştükçe) alıcı sayısı artmalı
         // Örn: 0.85 çarpanı -> 1 / 0.85 = 1.17 kat alıcı
         baseCount = (baseCount / speedMultiplier).round();
+      }
+      
+      // 🆕 GALERİ AVANTAJI: Prestij & İtibar
+      // Galeri sahipleri daha fazla müşteri çeker (%50 artış)
+      if (seller.ownsGallery) {
+        baseCount = (baseCount * 1.5).round();
       }
     }
     

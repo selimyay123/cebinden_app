@@ -174,7 +174,14 @@ class _StoreScreenState extends State<StoreScreen> {
                                   _buildSectionTitle('store.garageExpansion'.tr()),
                                   const SizedBox(height: 12),
                                   _buildGarageExpansionCard(),
-                                  
+
+                                  const SizedBox(height: 32),
+
+                                  // Animasyonlu Profil Resimleri
+                                  _buildSectionTitle('store.animatedPP.title'.tr()),
+                                  const SizedBox(height: 12),
+                                  _buildAnimatedPPSection(),
+                                  const SizedBox(height: 32),
 
                                 ],
                               ),
@@ -1296,6 +1303,158 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
         );
       }
+    }
+  }
+
+  Widget _buildAnimatedPPSection() {
+    final animations = [
+      {'name': 'MEMEWE', 'key': 'store.animatedPP.names.MEMEWE', 'path': 'assets/animations/pp/MEMEWE.json'},
+      {'name': 'Money', 'key': 'store.animatedPP.names.Money', 'path': 'assets/animations/pp/Money.json'},
+      {'name': 'PEPE', 'key': 'store.animatedPP.names.PEPE', 'path': 'assets/animations/pp/PEPE.json'},
+      {'name': 'Cool emoji', 'key': 'store.animatedPP.names.CoolEmoji', 'path': 'assets/animations/pp/Cool emoji.json'},
+      {'name': 'Pepe Sticker Music', 'key': 'store.animatedPP.names.PepeMusic', 'path': 'assets/animations/pp/Pepe Sticker Music.json'},
+      {'name': 'The Nyan Cat', 'key': 'store.animatedPP.names.NyanCat', 'path': 'assets/animations/pp/The Nyan Cat.json'},
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: animations.length,
+      itemBuilder: (context, index) {
+        final anim = animations[index];
+        final isPurchased = _currentUser!.purchasedAnimatedPPs.contains(anim['name']);
+        final isActive = _currentUser!.activeAnimatedPP == anim['name'];
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[200],
+                ),
+                child: ClipOval(
+                  child: Lottie.asset(
+                    anim['path']!,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              // const SizedBox(height: 12),
+              Text(
+                anim['key']!.tr(),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              // const SizedBox(height: 5),
+              if (isActive)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.green),
+                  ),
+                  child: Text(
+                    'store.animatedPP.active'.tr(),
+                    style: const TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                )
+              else if (isPurchased)
+                ElevatedButton(
+                  onPressed: () => _activatePP(anim['name']!, anim['path']!),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    minimumSize: const Size(0, 32),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  child: Text('store.animatedPP.activate'.tr(), style: const TextStyle(fontSize: 12)),
+                )
+              else
+                ElevatedButton(
+                  onPressed: () => _purchasePP(anim['name']!),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    minimumSize: const Size(0, 32),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  child: Text('store.animatedPP.price'.tr(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _purchasePP(String name) async {
+    if (_currentUser!.gold < 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('store.animatedPP.insufficientGold'.tr()), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('store.animatedPP.buy'.tr()),
+        content: Text('${name} ${'store.animatedPP.price'.tr()}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('common.cancel'.tr())),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('store.animatedPP.buy'.tr())),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final newList = List<String>.from(_currentUser!.purchasedAnimatedPPs)..add(name);
+      await _db.updateUser(_currentUser!.id, {
+        'gold': _currentUser!.gold - 1,
+        'purchasedAnimatedPPs': newList,
+      });
+      await _loadCurrentUser();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('store.animatedPP.purchaseSuccess'.tr()), backgroundColor: Colors.green),
+        );
+      }
+    }
+  }
+
+  Future<void> _activatePP(String name, String path) async {
+    await _db.updateUser(_currentUser!.id, {
+      'activeAnimatedPP': name,
+      'profileImageUrl': path,
+    });
+    await _loadCurrentUser();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('store.animatedPP.activationSuccess'.tr()), backgroundColor: Colors.green),
+      );
     }
   }
 

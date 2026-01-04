@@ -29,8 +29,8 @@ class AIBuyer {
   });
 
   /// Random AI alıcı oluştur
-  factory AIBuyer.generateRandom() {
-    final random = Random();
+  factory AIBuyer.generateRandom({int? seed}) {
+    final random = seed != null ? Random(seed) : Random();
     
     // Tip seç (ağırlıklı random)
     BuyerType type;
@@ -128,6 +128,54 @@ class AIBuyer {
     
     // 1000'e yuvarla
     return (offerPrice / 1000).round() * 1000.0;
+  }
+
+  /// Karşı teklifin kabul edilme olasılığını hesapla (0.0 - 1.0)
+  double calculateAcceptanceChance({
+    required double counterOfferAmount,
+    required double originalOfferPrice,
+    required double listingPrice,
+    double sweetTalkBonus = 0.0,
+  }) {
+    // 1. Kullanıcı, AI'nın teklifinden DAHA DÜŞÜK veya EŞİT bir şey istediyse -> DİREKT KABUL
+    if (counterOfferAmount <= originalOfferPrice) return 1.0;
+
+    final priceRatio = counterOfferAmount / listingPrice;
+    final initialOfferRatio = originalOfferPrice / listingPrice;
+    
+    // Alıcının tipine göre agresiflik seviyesi
+    double aggressiveness;
+    switch (buyerType) {
+      case BuyerType.bargainer:
+        aggressiveness = 0.8;
+        break;
+      case BuyerType.realistic:
+        aggressiveness = 0.5;
+        break;
+      case BuyerType.urgent:
+        aggressiveness = 0.2;
+        break;
+      case BuyerType.generous:
+        aggressiveness = 0.1;
+        break;
+    }
+
+    // 2. Fiyat Oranına Göre Değerlendirme (OfferService._evaluateCounterOfferByBuyer ile uyumlu)
+    
+    // Eğer satıcı ilana çok yakın bir fiyat istiyorsa (%90 üzeri) ve alıcı düşükten başladıysa
+    if (priceRatio >= 0.90 && initialOfferRatio < 0.90) {
+      return (0.1 + sweetTalkBonus).clamp(0.0, 1.0);
+    }
+
+    if (priceRatio >= 0.95) {
+      return (0.3 + sweetTalkBonus).clamp(0.0, 1.0);
+    } else if (priceRatio >= 0.85) {
+      return (0.6 + (aggressiveness * 0.2) + sweetTalkBonus).clamp(0.0, 1.0);
+    } else if (priceRatio >= 0.70) {
+      return (0.8 + sweetTalkBonus).clamp(0.0, 1.0);
+    } else {
+      return 1.0;
+    }
   }
 
   /// Bu alıcı bu ilana ilgilenebilir mi?

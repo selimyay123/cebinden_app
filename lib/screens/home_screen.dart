@@ -17,6 +17,8 @@ import '../models/user_vehicle_model.dart';
 import 'login_screen.dart';
 // import 'vehicle_category_screen.dart'; // YORUM: Kategori seçimi şimdilik devre dışı, doğrudan otomobil kategorisi
 import 'brand_selection_screen.dart'; // Doğrudan marka seçimi için
+import 'vehicle_detail_screen.dart';
+import 'opportunity_list_screen.dart';
 import 'settings_screen.dart';
 import 'my_vehicles_screen.dart';
 import 'sell_vehicle_screen.dart';
@@ -2000,7 +2002,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   children: [
                     // Sol taraf - Animasyon
                     Lottie.asset(
-                      'assets/animations/gallery.json',
+                      'assets/animations/gallery_v2.json',
                       width: 70,
                       height: 70,
                       fit: BoxFit.cover,
@@ -2160,6 +2162,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       balance: newBalance,
       ownsGallery: true,
       galleryPurchaseDate: DateTime.now(),
+      garageLimit: _currentUser!.garageLimit + 5, // Galeri satın alımında +5 araç limiti
     );
     
     await _db.updateUser(_currentUser!.id, updatedUser.toJson());
@@ -2253,7 +2256,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           Row(
             children: [
               Lottie.asset(
-                'assets/animations/gallery.json',
+                'assets/animations/gallery_v2.json',
                 width: 60,
                 height: 60,
                 fit: BoxFit.contain,
@@ -2322,6 +2325,34 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white.withOpacity(0.8),
                 foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+
+          // Fırsat Alımları Butonu
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OpportunityListScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.local_offer, color: Colors.white),
+              label: Text('gallery.opportunityPurchases'.tr()),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent.withOpacity(0.7),
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

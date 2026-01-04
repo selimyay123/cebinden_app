@@ -19,6 +19,9 @@ class MarketRefreshService {
   // Aktif ilanlar (bellekte tutulan)
   final List<MarketListing> _activeListings = [];
   
+  // Fırsat ilanları (Galericiler için)
+  final List<OpportunityListing> _opportunityListings = [];
+  
   // Market çalkantı durumu
   bool _isMarketShakeActive = false;
   int _marketShakeDaysRemaining = 0;
@@ -2574,6 +2577,142 @@ class MarketRefreshService {
   String? _getVehicleImage(String brand, String model) {
     return VehicleUtils.getVehicleImage(brand, model);
   }
+
+  // ===========================================================================
+  // FIRSAT ALIMLARI (OPPORTUNITY PURCHASES)
+  // ===========================================================================
+
+  /// Fırsat ilanlarını oluştur (Günde 1 kez çağrılmalı)
+  void generateOpportunityListings() {
+    // 1. Olasılık kontrolü (%30 şansla gelir)
+    if (_random.nextDouble() > 0.3) return;
+
+    // 2. Maksimum ilan sayısı kontrolü (En fazla 3 ilan olabilir)
+    if (_opportunityListings.length >= 3) return;
+
+    // 3. Günde en fazla 1 ilan ekle
+    final count = 1;
+    final currentDay = _gameTime.currentDay;
+    
+    for (int i = 0; i < count; i++) {
+      // Rastgele marka/model seç
+      final brand = _brandSpawnRates.keys.elementAt(_random.nextInt(_brandSpawnRates.length));
+      final models = _modelsByBrand[brand]!;
+      if (models.isEmpty) continue;
+      
+      final model = models[_random.nextInt(models.length)];
+      
+      // Rastgele yıl (Son 10 yıl)
+      final year = 2015 + _random.nextInt(11); // 2015-2025
+      
+      // Kilometre (Biraz yüksek olabilir, acil satılık)
+      final mileage = 50000 + _random.nextInt(150000);
+      
+      // Piyasa fiyatı hesapla (Basit bir mantıkla)
+      // Normalde Vehicle.create içinde hesaplanıyor ama burada indirim yapacağız
+      // Önce normal bir araç oluşturalım
+      final tempVehicle = Vehicle.create(
+        brand: brand,
+        model: model,
+        year: year,
+        mileage: mileage,
+        price: 1000000, // Geçici fiyat
+        location: _cities[_random.nextInt(_cities.length)],
+        color: _colors[_random.nextInt(_colors.length)],
+        fuelType: _fuelTypes[_random.nextInt(_fuelTypes.length)],
+        transmission: _transmissions[_random.nextInt(_transmissions.length)],
+        engineSize: '1.6', // Varsayılan
+        driveType: 'Önden', // Varsayılan
+        description: 'Temp',
+        bodyType: 'Sedan',
+        horsepower: 100,
+      );
+      
+      // Gerçek piyasa değerini tahmin et (Skor sistemindeki mantığa benzer)
+      double marketValue = _calculateEstimatedMarketValue(tempVehicle);
+      
+      // %15-30 indirim uygula
+      double discountRate = 0.15 + (_random.nextDouble() * 0.15);
+      double discountedPrice = marketValue * (1 - discountRate);
+      
+      // Satış nedeni
+      final reasons = [
+        'Acil nakit ihtiyacı',
+        'Yurtdışına taşınma',
+        'Borç ödemesi',
+        'Acil satılık',
+      ];
+      final reason = reasons[_random.nextInt(reasons.length)];
+      
+      // Araç resmi seç
+      final imageUrl = _getVehicleImage(brand, model);
+      
+      // Fırsat aracı oluştur
+      final opportunityVehicle = Vehicle.create(
+        brand: brand,
+        model: model,
+        year: year,
+        mileage: mileage,
+        price: discountedPrice, // İndirimli fiyat
+        location: tempVehicle.location,
+        color: tempVehicle.color,
+        fuelType: tempVehicle.fuelType,
+        transmission: tempVehicle.transmission,
+        imageUrl: imageUrl, // Resim eklendi
+        engineSize: tempVehicle.engineSize,
+        driveType: tempVehicle.driveType,
+        description: '$reason nedeniyle acil satılık! Piyasa değerinin altında.',
+        bodyType: tempVehicle.bodyType,
+        horsepower: tempVehicle.horsepower,
+        sellerType: 'Sahibinden (Acil)',
+        // Fırsat araçlarında bazen küçük kusurlar olabilir
+        hasAccidentRecord: _random.nextDouble() < 0.2, // %20 ihtimalle hasar kaydı
+      );
+      
+      _opportunityListings.add(OpportunityListing(
+        vehicle: opportunityVehicle,
+        createdDay: currentDay,
+        expiryDay: currentDay + 1, // Sadece 1 gün geçerli!
+        reason: reason,
+        originalPrice: marketValue,
+      ));
+    }
+  }
+  
+  /// Tahmini piyasa değeri hesapla (Basit)
+  double _calculateEstimatedMarketValue(Vehicle vehicle) {
+    // Base fiyatlar (Service içindeki _basePrices2025 haritasından alınabilir ama private)
+    // Basit bir yaklaşım kullanalım
+    double base = 1000000.0;
+    
+    // Yıl etkisi
+    int age = 2026 - vehicle.year;
+    base -= (age * 50000);
+    
+    // Km etkisi
+    base -= (vehicle.mileage / 10000) * 15000;
+    
+    // Marka etkisi (Basitçe)
+    if (['Mercurion', 'Bavora', 'Audira'].contains(vehicle.brand)) {
+      base *= 2.0;
+    }
+    
+    return base.clamp(200000.0, 5000000.0);
+  }
+  
+  /// Fırsat ilanlarını getir
+  List<OpportunityListing> getOpportunityListings() {
+    // Eğer hiç yoksa veya günü geçmişse yenile (Normalde onDayChange yapar ama garanti olsun)
+    if (_opportunityListings.isEmpty || _opportunityListings.first.isExpired(_gameTime.currentDay)) {
+      generateOpportunityListings();
+    }
+    return List.from(_opportunityListings);
+  }
+  
+  /// Fırsat ilanını kaldır (Satın alınınca)
+  void removeOpportunityListing(String vehicleId) {
+    _opportunityListings.removeWhere((l) => l.vehicle.id == vehicleId);
+  }
 }
 
 /// Pazar ilanı wrapper
@@ -2595,3 +2734,16 @@ class MarketListing {
   bool isExpired(int currentDay) => currentDay >= expiryDay;
 }
 
+/// Fırsat ilanı wrapper (MarketListing ile aynı yapıda ama ayırt edici özellikler olabilir)
+class OpportunityListing extends MarketListing {
+  final String reason; // Satış nedeni (Acil nakit, taşınma vb.)
+  final double originalPrice;
+  
+  OpportunityListing({
+    required super.vehicle,
+    required super.createdDay,
+    required super.expiryDay,
+    required this.reason,
+    required this.originalPrice,
+  });
+}

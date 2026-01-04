@@ -22,6 +22,9 @@ import '../mixins/auto_refresh_mixin.dart';
 
 import 'package:lottie/lottie.dart'; // 🆕 Animasyon için
 
+import '../models/ai_buyer_model.dart';
+import '../services/skill_service.dart';
+
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın tekliflerini göster
@@ -208,7 +211,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/general_bg.png'),
+            image: AssetImage('assets/images/general_bg_dark.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -464,7 +467,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/general_bg.png'),
+            image: AssetImage('assets/images/general_bg_dark.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -479,43 +482,43 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.check_circle_outline,
-                                  size: 80,
-                                  color: Colors.black,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'myVehicles.noActiveOffers'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(0, 1),
-                                        blurRadius: 2,
-                                        color: Colors.black54,
-                                      ),
-                                    ],
+                                  Icon(
+                                    Icons.check_circle_outline,
+                                    size: 80,
+                                    color: Colors.white,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'myVehicles.noPendingOffersForBrand'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                    shadows: [
-                                      Shadow(
-                                        offset: Offset(0, 1),
-                                        blurRadius: 2,
-                                        color: Colors.black54,
-                                      ),
-                                    ],
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'myVehicles.noActiveOffers'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(0, 1),
+                                          blurRadius: 2,
+                                          color: Colors.black54,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'myVehicles.noPendingOffersForBrand'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          offset: Offset(0, 1),
+                                          blurRadius: 2,
+                                          color: Colors.black54,
+                                        ),
+                                      ],
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                               ],
                             ),
                           )
@@ -569,7 +572,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/general_bg.png'),
+            image: AssetImage('assets/images/general_bg_dark.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -648,7 +651,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           Icon(
             Icons.local_offer_outlined, // Changed icon to match style
             size: 80, // Adjusted size
-            color: Colors.black,
+            color: Colors.white,
           ),
           const SizedBox(height: 16),
           Text(
@@ -656,7 +659,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Colors.white,
               
             ),
           ),
@@ -668,7 +671,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
-              color: Colors.black,
+              color: Colors.white,
               shadows: [
                 Shadow(
                   offset: Offset(0, 1),
@@ -3211,6 +3214,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       hasWarranty: sourceVehicle?.hasWarranty ?? false,
       hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
       score: sourceVehicle?.score ?? 75,
+      bodyType: sourceVehicle?.bodyType ?? 'Sedan',
+      horsepower: sourceVehicle?.horsepower ?? 100,
       imageUrl: offer.vehicleImageUrl,
     );
 
@@ -3255,11 +3260,47 @@ class _CounterOfferDialog extends StatefulWidget {
 class _CounterOfferDialogState extends State<_CounterOfferDialog> {
   late TextEditingController _amountController;
   final _formKey = GlobalKey<FormState>();
+  double _acceptanceChance = 0.0;
+  double _sweetTalkBonus = 0.0;
+  User? _currentUser;
+  final AuthService _authService = AuthService();
+  final SkillService _skillService = SkillService();
+  late AIBuyer _aiBuyer;
 
   @override
   void initState() {
     super.initState();
     _amountController = TextEditingController();
+    _aiBuyer = AIBuyer.generateRandom(seed: widget.offer.offerId.hashCode);
+    _loadBonus();
+  }
+
+  Future<void> _loadBonus() async {
+    _currentUser = await _authService.getCurrentUser();
+    if (_currentUser != null) {
+      final level = _skillService.getSkillLevel(_currentUser!, SkillService.skillSweetTalk);
+      _sweetTalkBonus = SkillService.sweetTalkBonuses[level] ?? 0.0;
+    }
+    _updateAcceptanceChance(_amountController.text);
+  }
+
+  void _updateAcceptanceChance(String value) {
+    final cleanedText = value.replaceAll('.', '');
+    final offerAmount = double.tryParse(cleanedText);
+    if (offerAmount != null) {
+      setState(() {
+        _acceptanceChance = _aiBuyer.calculateAcceptanceChance(
+          counterOfferAmount: offerAmount,
+          originalOfferPrice: widget.offer.offerPrice,
+          listingPrice: widget.offer.listingPrice,
+          sweetTalkBonus: _sweetTalkBonus,
+        );
+      });
+    } else {
+      setState(() {
+        _acceptanceChance = 0.0;
+      });
+    }
   }
 
   @override
@@ -3404,7 +3445,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> {
                   _ThousandsSeparatorInputFormatter(),
                 ],
                 onChanged: (value) {
-                  setState(() {}); // UI'ı güncelle
+                  _updateAcceptanceChance(value);
                 },
                 decoration: InputDecoration(
                   labelText: 'offers.yourCounterOffer'.tr(),
@@ -3428,6 +3469,73 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> {
                   }
                   return null;
                 },
+              ),
+
+              const SizedBox(height: 16),
+
+              // 🆕 Probability Bar (Gradient with Slider)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('offer.acceptanceChance'.tr(), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      Text('%${(_acceptanceChance * 100).toStringAsFixed(0)}', 
+                        style: TextStyle(
+                          fontSize: 12, 
+                          fontWeight: FontWeight.bold, 
+                          color: _acceptanceChance > 0.7 ? Colors.green : (_acceptanceChance > 0.3 ? Colors.orange : Colors.red)
+                        )
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 12,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: const LinearGradient(
+                        colors: [Colors.red, Colors.orange, Colors.green],
+                        stops: [0.0, 0.5, 1.0],
+                      ),
+                      border: Border.all(color: Colors.grey.withOpacity(0.3), width: 1),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.centerLeft,
+                      children: [
+                        AnimatedAlign(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                          alignment: Alignment(
+                            (_acceptanceChance * 2) - 1, // Map 0.0..1.0 to -1.0..1.0
+                            0.0
+                          ),
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: _acceptanceChance > 0.7 ? Colors.green : (_acceptanceChance > 0.3 ? Colors.orange : Colors.red),
+                                width: 2
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
 
               // Dinamik Kar/Zarar Göstergesi

@@ -13,7 +13,16 @@
     "rentSuccess": "Araçlar başarıyla kiralandı!",
     "noRentedVehicles": "Şu anda kirada araç yok.",
     "collectIncome": "Topla",
-    "incomeCollected": "Gelir toplandı!"
+    "incomeCollected": "Gelir toplandı!",
+    "opportunityPurchases": "Fırsat Alımları"
+  },
+  "opportunity": {
+    "title": "Fırsat Alımları",
+    "emptyTitle": "Şu an fırsat aracı bulunmuyor.",
+    "emptySubtitle": "Yarın tekrar kontrol et!",
+    "tag": "FIRSAT",
+    "buyConfirmation": "Bu aracı satın almak istiyor musunuz?",
+    "inspect": "İncele"
   },
   "market": {
     "title": "Market"
@@ -61,6 +70,7 @@
   "errors": {
     "balanceUpdateFailed": "Bakiye güncellenemedi",
     "vehicleAddFailed": "Araç garajınıza eklenemedi",
+    "garageFull": "Garajınız dolu!",
     "errorWithDetail": "Hata: {detail}"
   },
   "taxiGame": {
@@ -1686,7 +1696,25 @@
     "garageExpandSuccess": "Garaj başarıyla genişletildi! 🎉",
     "minGoldError": "En az 0.1 altın girmelisiniz",
     "insufficientGoldError": "Yetersiz altın! Mevcut: {amount} altın",
-    "securePaymentMessage": "Güvenli ödeme ile satın almak üzeresiniz."
+    "securePaymentMessage": "Güvenli ödeme ile satın almak üzeresiniz.",
+    "animatedPP": {
+      "title": "Animasyonlu Profil Resimleri",
+      "buy": "Satın Al",
+      "activate": "Aktif Et",
+      "active": "Aktif",
+      "price": "1 Altın",
+      "insufficientGold": "Bu animasyonu almak için yeterli altınınız yok.",
+      "purchaseSuccess": "Animasyon başarıyla satın alındı!",
+      "activationSuccess": "Profil resminiz güncellendi!",
+      "names": {
+        "MEMEWE": "MEMEWE",
+        "Money": "Para",
+        "PEPE": "PEPE",
+        "CoolEmoji": "Havalı Emoji",
+        "PepeMusic": "Pepe Sticker Müzik",
+        "NyanCat": "The Nyan Cat"
+      }
+    }
   },
   "seller_notes": {
     "base": {

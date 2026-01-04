@@ -21,6 +21,8 @@ class UserVehicle {
   final bool hasAccidentRecord;
   final String? imageUrl;
   final int score; // İlan skoru (Vehicle'dan alınır, arka plan)
+  final String bodyType; // Kasa tipi
+  final int horsepower; // Motor gücü
   
   // Satışa çıkarma bilgileri
   final bool isListedForSale; // Araç satışa çıkarılmış mı?
@@ -61,6 +63,8 @@ class UserVehicle {
     required this.hasAccidentRecord,
     this.imageUrl,
     required this.score,
+    required this.bodyType,
+    required this.horsepower,
     this.isListedForSale = false,
     this.listingPrice,
     this.listingDescription,
@@ -91,6 +95,8 @@ class UserVehicle {
     required bool hasWarranty,
     required bool hasAccidentRecord,
     required int score, // Vehicle'dan alınacak
+    required String bodyType,
+    required int horsepower,
     String? imageUrl,
     double? originalListingPrice,
   }) {
@@ -113,7 +119,42 @@ class UserVehicle {
       hasAccidentRecord: hasAccidentRecord,
       imageUrl: imageUrl,
       score: score,
+      bodyType: bodyType,
+      horsepower: horsepower,
       originalListingPrice: originalListingPrice,
+      pendingRentalIncome: 0.0,
+      canCollectRentalIncome: false,
+    );
+  }
+
+  // Vehicle modelinden UserVehicle oluştur
+  factory UserVehicle.fromVehicle(
+    dynamic vehicle, // Vehicle tipinde ama import sorunu olmasın diye dynamic
+    String userId, {
+    required double purchasePrice,
+  }) {
+    return UserVehicle(
+      id: const Uuid().v4(),
+      userId: userId,
+      vehicleId: vehicle.id,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      mileage: vehicle.mileage,
+      purchasePrice: purchasePrice,
+      purchaseDate: DateTime.now(),
+      color: vehicle.color,
+      fuelType: vehicle.fuelType,
+      transmission: vehicle.transmission,
+      engineSize: vehicle.engineSize,
+      driveType: vehicle.driveType,
+      hasWarranty: vehicle.hasWarranty,
+      hasAccidentRecord: vehicle.hasAccidentRecord,
+      imageUrl: vehicle.imageUrl,
+      score: vehicle.score,
+      bodyType: vehicle.bodyType,
+      horsepower: vehicle.horsepower,
+      originalListingPrice: null,
       pendingRentalIncome: 0.0,
       canCollectRentalIncome: false,
     );
@@ -140,6 +181,8 @@ class UserVehicle {
       hasAccidentRecord: json['hasAccidentRecord'] as bool? ?? false,
       imageUrl: json['imageUrl'] as String?,
       score: json['score'] as int? ?? 50, // Default score if missing
+      bodyType: json['bodyType'] as String? ?? 'Sedan',
+      horsepower: json['horsepower'] as int? ?? 100,
       isListedForSale: json['isListedForSale'] as bool? ?? false,
       listingPrice: json['listingPrice'] != null ? (json['listingPrice'] as num).toDouble() : null,
       listingDescription: json['listingDescription'] as String?,
@@ -241,6 +284,8 @@ class UserVehicle {
       hasAccidentRecord: hasAccidentRecord,
       imageUrl: imageUrl,
       score: score,
+      bodyType: bodyType,
+      horsepower: horsepower,
       isListedForSale: true,
       listingPrice: listingPrice,
       listingDescription: listingDescription,
@@ -279,6 +324,8 @@ class UserVehicle {
       hasAccidentRecord: hasAccidentRecord,
       imageUrl: imageUrl,
       score: score, // Score değişmeden kalır
+      bodyType: bodyType,
+      horsepower: horsepower,
       isListedForSale: isListedForSale, // Satış bilgisi korunur
       listingPrice: listingPrice,
       listingDescription: listingDescription,
@@ -316,6 +363,8 @@ class UserVehicle {
       hasAccidentRecord: hasAccidentRecord,
       imageUrl: imageUrl,
       score: score,
+      bodyType: bodyType,
+      horsepower: horsepower,
       isListedForSale: isListedForSale,
       listingPrice: listingPrice,
       listingDescription: listingDescription,
@@ -350,6 +399,8 @@ class UserVehicle {
     bool? hasAccidentRecord,
     String? imageUrl,
     int? score,
+    String? bodyType,
+    int? horsepower,
     bool? isListedForSale,
     double? listingPrice,
     String? listingDescription,
@@ -381,6 +432,8 @@ class UserVehicle {
       hasAccidentRecord: hasAccidentRecord ?? this.hasAccidentRecord,
       imageUrl: imageUrl ?? this.imageUrl,
       score: score ?? this.score,
+      bodyType: bodyType ?? this.bodyType,
+      horsepower: horsepower ?? this.horsepower,
       isListedForSale: isListedForSale ?? this.isListedForSale,
       listingPrice: listingPrice ?? this.listingPrice,
       listingDescription: listingDescription ?? this.listingDescription,

@@ -734,118 +734,111 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
             const SizedBox(height: 16),
             
             // Aksiyon Butonları
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      _showVehicleDetailsDialog(vehicle);
-                    },
-                    icon: const Icon(Icons.info_outline, size: 18),
-                    label: Text('misc.vehicleDetails'.tr()),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.deepPurple,
-                      side: const BorderSide(color: Colors.deepPurple),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    _showVehicleDetailsDialog(vehicle);
+                  },
+                  icon: const Icon(Icons.info_outline, size: 18),
+                  label: Text('misc.vehicleDetails'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.deepPurple,
+                    side: const BorderSide(color: Colors.deepPurple),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
                 // "Sat" butonu sadece araç satışta DEĞİLse görünsün
                 if (!vehicle.isListedForSale) ...[
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              // Satışa çıkarma ekranına git
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => CreateListingScreen(vehicle: vehicle),
-                                ),
-                              );
-                              
-                              // Eğer satışa çıkarma başarılıysa listeyi yenile
-                              if (result == true) {
-                                await _loadMyVehicles();
-                              }
-                            },
-                            icon: const Icon(Icons.sell, size: 18),
-                            label: Text(
-                              'misc.sellVehicle'.tr(),
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(0, 48),
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        // Satışa çıkarma ekranına git
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CreateListingScreen(vehicle: vehicle),
                           ),
-                        ),
+                        );
                         
-                        // Hızlı Sat Butonu (Eğer yetenek açıksa)
-                        if (_currentUser != null)
-                          Builder(
-                            builder: (context) {
-                              final level = SkillService().getSkillLevel(_currentUser!, SkillService.skillQuickSell);
-                              if (level > 0) {
-                                final margin = SkillService.quickSellMargins[level] ?? 0.0;
-                                return Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: ElevatedButton(
-                                      onPressed: () => _showQuickSellConfirmation(vehicle),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange.shade800,
-                                        foregroundColor: Colors.white,
-                                        minimumSize: const Size(0, 48),
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                      child: FittedBox(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            const Icon(Icons.flash_on, size: 16),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              'skills.quickSell'.tr(),
-                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '(${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.white.withOpacity(0.9),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            }
-                          ),
-                      ],
+                        // Eğer satışa çıkarma başarılıysa listeyi yenile
+                        if (result == true) {
+                          await _loadMyVehicles();
+                        }
+                      },
+                      icon: const Icon(Icons.sell, size: 18),
+                      label: Text(
+                        'misc.sellVehicle'.tr(),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(0, 48),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                     ),
                   ),
+                  
+                  // Hızlı Sat Butonu (Eğer yetenek açıksa)
+                  if (_currentUser != null)
+                    Builder(
+                      builder: (context) {
+                        final level = SkillService().getSkillLevel(_currentUser!, SkillService.skillQuickSell);
+                        if (level > 0) {
+                          final margin = SkillService.quickSellMargins[level] ?? 0.0;
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () => _showQuickSellConfirmation(vehicle),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange.shade800,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: const Size(0, 48),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.flash_on, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'skills.quickSell'.tr(),
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '(${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.white.withOpacity(0.9),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      }
+                    ),
                 ],
               ],
             ),
@@ -946,6 +939,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
                   child: Column(
                     children: [
                       _buildSimpleDetailRow('vehicles.mileage'.tr(), '${_formatNumber(vehicle.mileage)} km'),
+                      _buildSimpleDetailRow('vehicles.bodyType'.tr(), 'vehicles.${vehicle.bodyType.toLowerCase()}'.tr()),
+                      _buildSimpleDetailRow('vehicles.horsepower'.tr(), '${vehicle.horsepower} HP'),
                       _buildSimpleDetailRow('vehicles.fuelType'.tr(), 'vehicles.${vehicle.fuelType}'.tr()),
                       _buildSimpleDetailRow('vehicles.transmission'.tr(), 'vehicles.${vehicle.transmission}'.tr()),
                       _buildSimpleDetailRow('vehicles.engineSize'.tr(), '${vehicle.engineSize} L'),
