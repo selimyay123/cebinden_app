@@ -4,6 +4,7 @@ import '../models/user_model.dart';
 import '../services/notification_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../widgets/modern_alert_dialog.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'main_screen.dart';
 import 'my_offers_screen.dart';
@@ -71,20 +72,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     // Onay dialogu
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('notifications.deleteAll'.tr()),
-        content: Text('notifications.deleteAllConfirm'.tr()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text('common.delete'.tr()),
-          ),
-        ],
+      builder: (context) => ModernAlertDialog(
+        title: 'notifications.deleteAll'.tr(),
+        content: Text('notifications.deleteAllConfirm'.tr(), style: const TextStyle(color: Colors.white70)),
+        buttonText: 'common.delete'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.delete_sweep,
+        iconColor: Colors.redAccent,
       ),
     );
 
@@ -102,7 +98,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         title: Text('notifications.title'.tr()),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.white,
+        foregroundColor: Colors.black,
         actions: [
 
           if (_notifications.isNotEmpty) ...[

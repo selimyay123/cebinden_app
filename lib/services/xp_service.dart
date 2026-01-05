@@ -170,14 +170,18 @@ class XPService {
   }
   
   /// Seviye bazlı kilit açma özellikleri
+  /// Seviye bazlı kilit açma özellikleri
   List<String> _getUnlocksForLevel(int level) {
     final unlocks = <String>[];
     
+    // Kullanıcı isteği üzerine kilit açma yazıları gizlendi
+    /*
     if (level == 5) unlocks.add('xp.unlock.premiumVehicles');
     if (level == 10) unlocks.add('xp.unlock.advancedOffers');
     if (level == 15) unlocks.add('xp.unlock.autoSellBot');
     if (level == 25) unlocks.add('xp.unlock.vipStatus');
     if (level == 50) unlocks.add('xp.unlock.specialBadges');
+    */
     
     return unlocks;
   }

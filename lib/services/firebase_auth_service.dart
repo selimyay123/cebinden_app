@@ -214,7 +214,12 @@ class FirebaseAuthService {
       
       // Eğer isim hala boşsa veya "Apple User" ise ve email varsa, email'in baş kısmını kullan
       if ((displayName.isEmpty || displayName == 'Apple User') && firebaseUser.email != null) {
-        displayName = firebaseUser.email!.split('@')[0];
+        // Private relay email kontrolü
+        if (firebaseUser.email!.contains('privaterelay.appleid.com')) {
+          displayName = 'Apple User';
+        } else {
+          displayName = firebaseUser.email!.split('@')[0];
+        }
       } else if (displayName.isEmpty) {
         displayName = 'Apple User';
       }

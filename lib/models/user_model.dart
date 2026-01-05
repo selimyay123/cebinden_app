@@ -48,6 +48,10 @@ class User {
   final List<String> purchasedAnimatedPPs; // Satın alınan animasyonlu profil resimleri
   final String? activeAnimatedPP; // Aktif animasyonlu profil resmi
   final int lastSkillUseDay; // Son kullanım günü (sıfırlama için)
+  
+  // ========== KULLANICI ADI DEĞİŞİKLİĞİ ==========
+  final int usernameChangeCount; // Kullanıcı adı değiştirme sayısı
+  final DateTime? lastUsernameChangeDate; // Son kullanıcı adı değiştirme tarihi
 
   User({
     required this.id,
@@ -93,6 +97,8 @@ class User {
     this.collectedBrandRewards = const [],
     this.purchasedAnimatedPPs = const [],
     this.activeAnimatedPP,
+    this.usernameChangeCount = 0,
+    this.lastUsernameChangeDate,
   });
 
   // Yeni kullanıcı oluşturma factory
@@ -105,6 +111,7 @@ class User {
       username: username,
       password: password,
       registeredAt: DateTime.now(),
+      usernameChangeCount: 0,
     );
   }
 
@@ -224,6 +231,10 @@ class User {
       collectedBrandRewards: (json['collectedBrandRewards'] as List?)?.cast<String>() ?? const [],
       purchasedAnimatedPPs: (json['purchasedAnimatedPPs'] as List?)?.cast<String>() ?? const [],
       activeAnimatedPP: json['activeAnimatedPP'] as String?,
+      usernameChangeCount: json['usernameChangeCount'] as int? ?? 0,
+      lastUsernameChangeDate: json['lastUsernameChangeDate'] != null 
+          ? DateTime.parse(json['lastUsernameChangeDate']) 
+          : null,
     );
   }
 
@@ -273,6 +284,8 @@ class User {
       'collectedBrandRewards': collectedBrandRewards,
       'purchasedAnimatedPPs': purchasedAnimatedPPs,
       'activeAnimatedPP': activeAnimatedPP,
+      'usernameChangeCount': usernameChangeCount,
+      'lastUsernameChangeDate': lastUsernameChangeDate?.toIso8601String(),
     };
   }
 

@@ -241,8 +241,11 @@ class DailyQuestService {
     await _db.addActivity(Activity.create(
       userId: userId,
       type: ActivityType.income,
-      title: 'activity.questReward'.tr(),
-      description: quest.description.tr(),
+      title: 'activity.dailyQuestTitle'.tr(),
+      description: 'activity.rewardDesc'.trParams({
+        'money': quest.rewardMoney.toStringAsFixed(0),
+        'xp': quest.rewardXP.toString(),
+      }),
       amount: quest.rewardMoney,
     ));
     

@@ -2,6 +2,8 @@ import '../models/mission_model.dart';
 import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'xp_service.dart';
+import 'localization_service.dart';
+import '../models/activity_model.dart';
 
 class MissionService {
   final DatabaseHelper _db = DatabaseHelper();
@@ -327,6 +329,18 @@ class MissionService {
 
     // DB'yi güncelle
     await _db.updateMissionProgress(userId, missionId, true, true);
+    
+    // Aktivite Geçmişine Ekle
+    await _db.addActivity(Activity.create(
+      userId: userId,
+      type: ActivityType.income,
+      title: 'activity.oneTimeQuestTitle'.tr(),
+      description: 'activity.rewardDesc'.trParams({
+        'money': mission.rewardMoney.toStringAsFixed(0),
+        'xp': mission.rewardXP.toString(),
+      }),
+      amount: mission.rewardMoney,
+    ));
     
     return true;
   }

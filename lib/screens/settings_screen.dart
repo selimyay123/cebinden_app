@@ -15,6 +15,7 @@ import 'statistics_screen.dart';
 import 'admin_panel_screen.dart';
 import '../services/database_helper.dart';
 import '../widgets/user_profile_avatar.dart';
+import '../widgets/modern_alert_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -178,12 +179,8 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
-          return AlertDialog(
-            backgroundColor: const Color(0xFF1E1E1E),
-            title: Text(
-              'settings.selectProfilePicture'.tr(),
-              style: GoogleFonts.poppins(color: Colors.white),
-            ),
+          return ModernAlertDialog(
+            title: 'settings.selectProfilePicture'.tr(),
             content: SizedBox(
               width: double.maxFinite,
               child: GridView.builder(
@@ -208,7 +205,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: isSelected 
-                            ? Border.all(color: Colors.deepPurpleAccent, width: 3)
+                            ? Border.all(color: Colors.white, width: 3)
                             : null,
                       ),
                       child: UserProfileAvatar(
@@ -220,25 +217,16 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
                 },
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('common.cancel'.tr(), style: const TextStyle(color: Colors.white70)),
-              ),
-              ElevatedButton(
-                onPressed: selectedImage != null && selectedImage != _currentUser?.profileImageUrl
-                    ? () {
-                        Navigator.pop(context);
-                        _updateProfilePicture(selectedImage!);
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurpleAccent,
-                  foregroundColor: Colors.white,
-                ),
-                child: Text('common.save'.tr()),
-              ),
-            ],
+            buttonText: 'common.save'.tr(),
+            onPressed: selectedImage != null && selectedImage != _currentUser?.profileImageUrl
+                ? () {
+                    Navigator.pop(context);
+                    _updateProfilePicture(selectedImage!);
+                  }
+                : () {}, // Disabled state handled visually or ignored? ModernAlertDialog button is always enabled currently. 
+                         // TODO: Maybe add enabled state to ModernAlertDialog button? For now, just no-op.
+            secondaryButtonText: 'common.cancel'.tr(),
+            onSecondaryPressed: () => Navigator.pop(context),
           );
         }
       ),
@@ -309,20 +297,19 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('settings.deleteAccount'.tr()),
-        content: Text('settings.deleteAccountConfirm'.tr()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text('common.delete'.tr()),
-          ),
-        ],
+      builder: (context) => ModernAlertDialog(
+        title: 'settings.deleteAccount'.tr(),
+        content: Text(
+          'settings.deleteAccountConfirm'.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        buttonText: 'common.delete'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.delete_forever,
+        iconColor: Colors.redAccent,
       ),
     );
 
@@ -340,19 +327,19 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
   Future<void> _logout() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('auth.logout'.tr()),
-        content: Text('auth.logoutConfirm'.tr()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('auth.logout'.tr()),
-          ),
-        ],
+      builder: (context) => ModernAlertDialog(
+        title: 'auth.logout'.tr(),
+        content: Text(
+          'auth.logoutConfirm'.tr(),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        buttonText: 'auth.logout'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.logout,
+        iconColor: Colors.redAccent,
       ),
     );
 

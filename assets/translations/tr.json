@@ -160,7 +160,7 @@
     "tasks": "Yetenek Ağacı",
     "noRecentActivity": "Henüz işlem yok",
     "startBuying": "Hemen alışverişe başlayın!",
-    "bonusAwarded": "🎉 Özel bonus! Bakiyeniz 5,000,000 TL'ye yükseltildi!",
+    "bonusAwarded": "Özel bonus! Bakiyeniz 5,000,000 TL'ye yükseltildi!",
     "welcomeMessage": "Araç alım satım platformumuza hoş geldiniz! Başlamak için yukarıdaki hızlı işlemler menüsünden bir seçim yapabilirsiniz.",
     "membershipDate": "Üyelik",
     "notifications": "Bildirimler",
@@ -184,6 +184,10 @@
     "galleryStatus": "Galeri Durumu",
     "galleryPurchaseDate": "Satın Alma Tarihi",
     "galleryBenefits": "Aktif Avantajlar",
+    "galleryBenefit1": "Günlük kira geliri topla",
+    "galleryBenefit2": "Daha fazla müşteri çek",
+    "galleryBenefit3": "Daha yüksek araç limiti",
+    "galleryBenefit4": "Özel galeri rozeti",
     "tasksComingSoon": "Görevler sayfası yakında...",
     "rentComingSoon": "Araç kiralama sayfası yakında...",
     "listingCount": "İlan",
@@ -264,6 +268,10 @@
     "selectModel": "Model Seçiniz",
     "whichModelPrefer": "{brand} markasının hangi modelini tercih edersiniz?",
     "viewAllModelsOfBrand": "{brand} markasının tüm modellerini görüntüle",
+    "randomBrandSelect": "Rastgele Marka Seç",
+    "randomBrandDesc": "Şansına güven, rastgele bir marka seç!",
+    "randomModelSelect": "Rastgele Model Seç",
+    "randomModelDesc": "Kararsız mısın? Rastgele bir model seç!",
     "sortBy": "Sırala:",
     "sortPriceLowToHigh": "Fiyat: Düşükten Yükseğe",
     "sortPriceHighToLow": "Fiyat: Yüksekten Düşüğe",
@@ -281,7 +289,8 @@
     "priceRange2": "300k-500k TL",
     "priceRange3": "500k-700k TL",
     "priceRange4": "700k+ TL",
-    "yearRange1": "2024",
+    "yearRange0": "2026",
+    "yearRange1": "2024-2025",
     "yearRange2": "2020-2023",
     "yearRange3": "2015-2019",
     "yearRange4": "2015 öncesi",
@@ -869,7 +878,7 @@
     "features": "Özellikler",
     "contactTitle": "İletişim",
     "developerTitle": "Geliştirici",
-    "featuresList": "✓ Gerçekçi araç alım-satım simülasyonu\n✓ Detaylı ekspertiz raporları ve pazarlık sistemi\n✓ Kendi galerinizi yönetme ve büyütme imkanı\n✓ Günlük görevler ve sürpriz ödüller\n✓ Taksi durağı işletmeciliği ve ek gelir kapıları\n✓ Dinamik piyasa koşulları ve ekonomi yönetimi",
+    "featuresList": "✓ Gerçekçi araç alım-satım simülasyonu\n✓ Detaylı ekspertiz raporları ve pazarlık sistemi\n✓ Kendi galerinizi yönetme ve büyütme imkanı\n✓ Günlük görevler ve sürpriz ödüller\n✓ Yetenek ağacı ile karakter gelişimi\n✓ Dinamik piyasa koşulları ve ekonomi yönetimi",
     "contactContent": "Geri bildirim, öneri veya sorularınız için:\n\n📧 E-posta: info@cebindenapp.com\n📱 Instagram: @cebindenapp",
     "developerContent": "Bu uygulama Flutter ile geliştirilmiştir.\n\n© 2024 Cebinden\nmnTüm hakları saklıdır.",
     "disclaimer": "Bu bir oyun/simülasyon uygulamasıdır. Gerçek araç alım-satımı yapmaz. Tüm işlemler sanal ve eğlence amaçlıdır.",
@@ -943,7 +952,10 @@
     "clearAll": "Tümünü Temizle",
     "clearAllConfirm": "Tüm aktivite geçmişini silmek istediğinize emin misiniz?",
     "cleared": "Geçmiş temizlendi",
-    "questReward": "Günlük Görev Ödülü"
+    "questReward": "Günlük Görev Ödülü",
+    "dailyQuestTitle": "Günlük Görev",
+    "oneTimeQuestTitle": "Tek Seferlik Görev",
+    "rewardDesc": "{money} TL, {xp} XP"
   },
   "listing": {
     "listing": "ilan",
@@ -983,7 +995,7 @@
     "noActiveOffers": "Aktif Teklif Yok",
     "noPendingOffersForBrand": "Bu markada bekleyen teklifi olan araç bulunmuyor",
     "offers": "Teklifler",
-    "rejectAll": "Tüm Teklifleri Reddet",
+    "rejectAll": "Reddet",
     "noIncomingOffers": "Gelen Teklif Yok",
     "noSentOffers": "Gönderilen Teklif Yok",
     "noIncomingOffersDesc": "Henüz ilanlarınıza gelen bir teklif yok.",
@@ -1627,7 +1639,7 @@
       "message": "{vehicle} için verdiğiniz {price} ₺ teklif kabul edildi"
     },
     "vehicleSold": {
-      "title": "Araç Satıldı! 🎉",
+      "title": "Araç Satıldı!",
       "message": "{vehicle} başarıyla {price} ₺'ye satıldı"
     },
     "bulkOffer": {
@@ -1653,7 +1665,7 @@
     "loadingProducts": "Ürünler yükleniyor...",
     "title": "MAĞAZA",
     "buyGold": "Altın Al",
-    "convertGold": "Altın Bozdur",
+    "convertGold": "Bozdur",
     "errorItemUnavailable": "Bu ürün şu anda mevcut değil.",
     "errorServiceUnavailable": "Mağaza servisi kullanılamıyor.",
     "errorUserCanceled": "Satın alma iptal edildi.",
@@ -2058,7 +2070,11 @@
     "newUsername": "Yeni Kullanıcı Adı",
     "enterNewUsername": "Lütfen yeni bir kullanıcı adı girin",
     "success": "Kullanıcı adı başarıyla güncellendi!",
-    "usernameTaken": "Bu kullanıcı adı zaten alınmış"
+    "usernameTaken": "Bu kullanıcı adı zaten alınmış",
+    "firstChangeFree": "İlk kullanıcı adı değişikliği ücretsizdir!",
+    "nextChangeAvailable": "Sonraki değişiklik {days} gün sonra yapılabilir.",
+    "changeAvailable": "Kullanıcı adını değiştirebilirsin.",
+    "days": "gün"
   },
   "tutorial": {
     "title": "Eğitim",

@@ -139,7 +139,7 @@
     "tasks": "Talent Tree",
     "noRecentActivity": "No recent activity",
     "startBuying": "Start shopping now!",
-    "bonusAwarded": "🎉 Special bonus! Your balance has been increased to 5,000,000 ₺!",
+    "bonusAwarded": "Special bonus! Your balance has been increased to 5,000,000 ₺!",
     "welcomeMessage": "Welcome to our vehicle trading platform! You can start by selecting an action from the quick actions menu above.",
     "membershipDate": "Membership",
     "notifications": "Notifications",
@@ -157,12 +157,16 @@
     "galleryPrice": "Gallery Price",
     "galleryPriceValue": "10 Million TL",
     "galleryComingSoon": "Gallery purchase feature will be available soon!",
-    "galleryPurchaseSuccess": "🎉 Congratulations! You are now a gallery owner!",
+    "galleryPurchaseSuccess": "Congratulations! You are now a gallery owner!",
     "galleryInsufficientFunds": "Insufficient balance to purchase gallery. Required: 10,000,000 ₺",
     "myGallery": "My Gallery",
     "galleryStatus": "Gallery Status",
     "galleryPurchaseDate": "Purchase Date",
     "galleryBenefits": "Active Benefits",
+    "galleryBenefit1": "Collect daily rental income",
+    "galleryBenefit2": "Attract more customers",
+    "galleryBenefit3": "Higher vehicle limit",
+    "galleryBenefit4": "Special gallery badge",
     "tasksComingSoon": "Tasks page coming soon...",
     "rentComingSoon": "Vehicle rental page coming soon...",
     "listingCount": "Listing",
@@ -243,6 +247,10 @@
     "selectModel": "Select Model",
     "whichModelPrefer": "Which {brand} model do you prefer?",
     "viewAllModelsOfBrand": "View all {brand} models",
+    "randomBrandSelect": "Random Brand Select",
+    "randomBrandDesc": "Feeling lucky? Pick a random brand!",
+    "randomModelSelect": "Random Model Select",
+    "randomModelDesc": "Can't decide? Pick a random model!",
     "sortBy": "Sort by:",
     "sortPriceLowToHigh": "Price: Low to High",
     "sortPriceHighToLow": "Price: High to Low",
@@ -876,7 +884,7 @@
     "web": "Web",
     "email": "Email",
     "instagram": "Instagram",
-    "featuresList": "✓ Realistic car trading simulation\n✓ Detailed inspection reports and negotiation system\n✓ Manage and expand your own car gallery\n✓ Daily quests and surprise rewards\n✓ Taxi stand management and extra income sources\n✓ Dynamic market conditions and economy management"
+    "featuresList": "✓ Realistic vehicle trading simulation\n✓ Detailed appraisal reports and negotiation system\n✓ Manage and grow your own gallery\n✓ Daily quests and surprise rewards\n✓ Character development with Skill Tree\n✓ Dynamic market conditions and economy management"
   },
   "drawer": {
     "dashboard": "Dashboard",
@@ -944,7 +952,10 @@
     "clearAll": "Clear All",
     "clearAllConfirm": "Are you sure you want to clear all activity history?",
     "cleared": "History cleared",
-    "questReward": "Daily Quest Reward"
+    "questReward": "Daily Quest Reward",
+    "dailyQuestTitle": "Daily Task",
+    "oneTimeQuestTitle": "One-time Task",
+    "rewardDesc": "{money} TL, {xp} XP"
   },
   "myVehicles": {
     "buildCollection": "Build your collection by buying your first vehicle!",
@@ -979,7 +990,7 @@
     "noActiveOffers": "No Active Offers",
     "noPendingOffersForBrand": "No pending offers for vehicles of this brand",
     "offers": "Offers",
-    "rejectAll": "Reject All Offers",
+    "rejectAll": "Reject",
     "noIncomingOffers": "No Incoming Offers",
     "noSentOffers": "No Sent Offers",
     "noIncomingOffersDesc": "No offers received for your listings yet.",
@@ -1624,7 +1635,7 @@
       "message": "Your offer of {price} for {vehicle} has been accepted"
     },
     "vehicleSold": {
-      "title": "Vehicle Sold! 🎉",
+      "title": "Vehicle Sold!",
       "message": "{vehicle} was successfully sold for {price} ₺"
     },
     "bulkOffer": {
@@ -1650,7 +1661,7 @@
     "loadingProducts": "Loading products...",
     "title": "STORE",
     "buyGold": "Buy Gold",
-    "convertGold": "Convert Gold",
+    "convertGold": "Convert",
     "errorItemUnavailable": "This item is currently unavailable.",
     "errorServiceUnavailable": "Store service is unavailable.",
     "errorUserCanceled": "Purchase canceled.",
@@ -2062,7 +2073,11 @@
     "newUsername": "New Username",
     "enterNewUsername": "Please enter a new username",
     "success": "Username updated successfully!",
-    "usernameTaken": "This username is already taken"
+    "usernameTaken": "This username is already taken",
+    "firstChangeFree": "First username change is free!",
+    "nextChangeAvailable": "Next change available in {days} days.",
+    "changeAvailable": "You can change your username.",
+    "days": "days"
   },
   "tutorial": {
     "title": "Tutorial",

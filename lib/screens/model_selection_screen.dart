@@ -76,15 +76,20 @@ class ModelSelectionScreen extends StatelessWidget {
                   Expanded(
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: models.length + 1, // +1 for "Tüm Modeller"
+                      itemCount: models.length + 2, // +1 for "Tüm Modeller", +1 for "Rastgele Model"
                       itemBuilder: (context, index) {
                         // İlk item "Tüm Modeller"
                         if (index == 0) {
                           return _buildAllModelsCard(context, currentLanguage);
                         }
+
+                        // İkinci item "Rastgele Model"
+                        if (index == 1) {
+                          return _buildRandomModelCard(context, models);
+                        }
                         
                         // Diğer modeller
-                        final model = models[index - 1];
+                        final model = models[index - 2];
                         return _buildModelCard(
                           context,
                           modelName: model,
@@ -102,6 +107,77 @@ class ModelSelectionScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildRandomModelCard(BuildContext context, List<String> models) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: Colors.purpleAccent.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+        elevation: 3,
+        shadowColor: Colors.purple.withOpacity(0.3),
+        child: InkWell(
+          onTap: () async {
+            // Rastgele bir model seç
+            final randomModel = (models..toList()..shuffle()).first;
+            
+            // Seçilen modele göre araç listesi sayfasına git
+            final purchased = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VehicleListScreen(
+                  categoryName: '$brandName - $randomModel',
+                  categoryColor: categoryColor,
+                  brandName: brandName,
+                  modelName: randomModel,
+                ),
+              ),
+            );
+            
+            // Eğer satın alma başarılıysa, geriye dön
+            if (purchased == true && context.mounted) {
+              Navigator.pop(context, true);
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                // Icon
+                const Icon(
+                  Icons.shuffle,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                // Text
+                Expanded(
+                  child: Text(
+                    'vehicles.randomModelSelect'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Arrow
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildAllModelsCard(BuildContext context, String currentLanguage) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -116,7 +192,7 @@ class ModelSelectionScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
-                  categoryName: '$categoryName - $brandName - ${'vehicles.allModels'.tr()}',
+                  categoryName: '$brandName - ${'vehicles.allModels'.tr()}',
                   categoryColor: categoryColor,
                   brandName: brandName,
                   modelName: null, // null = tüm modeller
@@ -131,53 +207,35 @@ class ModelSelectionScreen extends StatelessWidget {
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
                 // Icon
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.apps,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                const Icon(
+                  Icons.apps,
+                  color: Colors.white,
+                  size: 24,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 // Text
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'vehicles.allModels'.tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'vehicles.viewAllModelsOfBrand'.trParams({'brand': brandName}),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'vehicles.allModels'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 12),
                 // Arrow
                 const Icon(
                   Icons.arrow_forward_ios,
                   color: Colors.white,
-                  size: 18,
+                  size: 16,
                 ),
               ],
             ),
@@ -215,7 +273,7 @@ class ModelSelectionScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
-                  categoryName: '$categoryName - $brandName - $modelName',
+                  categoryName: '$brandName - $modelName',
                   categoryColor: categoryColor,
                   brandName: brandName,
                   modelName: modelName,

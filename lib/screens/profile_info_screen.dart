@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import '../models/user_model.dart';
 import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
@@ -45,13 +46,15 @@ class ProfileInfoScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.deepPurple.withOpacity(0.1),
-                    child: Icon(
-                      Icons.person,
-                      size: 50,
-                      color: Colors.deepPurple,
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.deepPurple.withOpacity(0.1),
+                    ),
+                    child: ClipOval(
+                      child: _buildProfileImage(user.profileImageUrl),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -92,6 +95,44 @@ class ProfileInfoScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildProfileImage(String? imageUrl) {
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return const Icon(
+        Icons.person,
+        size: 50,
+        color: Colors.deepPurple,
+      );
+    }
+
+    if (imageUrl.endsWith('.json')) {
+      return Lottie.asset(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(Icons.person, size: 50, color: Colors.deepPurple);
+        },
+      );
+    }
+
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(Icons.person, size: 50, color: Colors.deepPurple);
+        },
+      );
+    }
+
+    return Image.asset(
+      imageUrl,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return const Icon(Icons.person, size: 50, color: Colors.deepPurple);
+      },
     );
   }
 

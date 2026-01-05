@@ -129,6 +129,17 @@ class SettingsHelper {
     await prefs.setInt(_keyLastNotificationReset, time.millisecondsSinceEpoch);
   }
 
+  // Saved Filters
+  static const String _keySavedFilters = 'saved_filters';
+
+  Future<List<String>> getSavedFilters() async {
+    return _prefs?.getStringList(_keySavedFilters) ?? [];
+  }
+
+  Future<void> setSavedFilters(List<String> filters) async {
+    await _prefs?.setStringList(_keySavedFilters, filters);
+  }
+
   // Clear all settings
   Future<void> clearAll() async {
     await _prefs?.clear();

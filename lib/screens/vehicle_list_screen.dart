@@ -8,6 +8,8 @@ import '../models/vehicle_model.dart';
 import '../widgets/vehicle_image.dart';
 import 'vehicle_detail_screen.dart';
 import 'main_screen.dart';
+import 'dart:convert';
+import '../services/settings_helper.dart';
 
 class VehicleListScreen extends StatefulWidget {
   final String categoryName;
@@ -41,6 +43,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   Set<String> selectedYearRanges = {};
   String? _selectedSortOption; // 'price_asc', 'price_desc'
   double? _currentBalance; // Kullanıcının mevcut bakiyesi
+  List<SavedFilter> savedFilters = []; // Kayıtlı filtreler
   
   // Yakıt tipi mapping (backend değerleri)
   final Map<String, String> _fuelTypeMapping = {
@@ -61,6 +64,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     super.initState();
     _loadVehicles();
     _loadUserBalance();
+    _loadSavedFilters();
     
     // Bakiye güncellemelerini dinle
     _userUpdateSubscription = DatabaseHelper().onUserUpdate.listen((_) {
@@ -82,6 +86,65 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         _currentBalance = user.balance;
       });
     }
+  }
+  
+  // Kayıtlı filtreleri yükle
+  Future<void> _loadSavedFilters() async {
+    final settings = await SettingsHelper.getInstance();
+    final savedJson = await settings.getSavedFilters();
+    if (mounted) {
+      setState(() {
+        savedFilters = savedJson
+            .map((jsonStr) => SavedFilter.fromJson(jsonDecode(jsonStr)))
+            .toList();
+      });
+    }
+  }
+
+  // Filtreyi kaydet
+  Future<void> _saveFilter(String name) async {
+    final newFilter = SavedFilter(
+      name: name,
+      fuelTypes: Set.from(selectedFuelTypes),
+      transmissions: Set.from(selectedTransmissions),
+      mileageRanges: Set.from(selectedMileageRanges),
+      priceRanges: Set.from(selectedPriceRanges),
+      yearRanges: Set.from(selectedYearRanges),
+      sortOption: _selectedSortOption,
+    );
+
+    setState(() {
+      savedFilters.add(newFilter);
+    });
+
+    final settings = await SettingsHelper.getInstance();
+    final savedJson = savedFilters.map((f) => jsonEncode(f.toJson())).toList();
+    await settings.setSavedFilters(savedJson);
+  }
+
+  // Kayıtlı filtreyi uygula
+  void _applySavedFilter(SavedFilter filter) {
+    setState(() {
+      selectedFuelTypes = Set.from(filter.fuelTypes);
+      selectedTransmissions = Set.from(filter.transmissions);
+      selectedMileageRanges = Set.from(filter.mileageRanges);
+      selectedPriceRanges = Set.from(filter.priceRanges);
+      selectedYearRanges = Set.from(filter.yearRanges);
+      _selectedSortOption = filter.sortOption;
+      _applyFilters();
+    });
+  }
+
+  // Kayıtlı filtreyi sil
+  Future<void> _deleteSavedFilter(SavedFilter filter) async {
+    setState(() {
+      savedFilters.remove(filter);
+      _clearFilters(); // Filtre silindiğinde varsayılana dön
+    });
+
+    final settings = await SettingsHelper.getInstance();
+    final savedJson = savedFilters.map((f) => jsonEncode(f.toJson())).toList();
+    await settings.setSavedFilters(savedJson);
   }
   
   // Araçları market servisinden yükle
@@ -137,7 +200,8 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         if (selectedYearRanges.isNotEmpty) {
           bool matchesAny = false;
           for (final range in selectedYearRanges) {
-            if (range == '2024' && vehicle.year == 2024) matchesAny = true;
+            if (range == '2026' && vehicle.year == 2026) matchesAny = true;
+            if (range == '2024-2025' && (vehicle.year >= 2024 && vehicle.year <= 2025)) matchesAny = true;
             if (range == '2020-2023' && (vehicle.year >= 2020 && vehicle.year <= 2023)) matchesAny = true;
             if (range == '2015-2019' && (vehicle.year >= 2015 && vehicle.year <= 2019)) matchesAny = true;
             if (range == '2015 öncesi' && vehicle.year < 2015) matchesAny = true;
@@ -233,15 +297,6 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                         ),
                         const SizedBox(width: 8),
                         
-                        // Fiyat
-                        _buildCategoryFilter(
-                          'vehicles.filterPrice'.tr(),
-                          selectedPriceRanges.isNotEmpty,
-                          selectedPriceRanges.length,
-                          () => _showPriceFilter(context),
-                        ),
-                        const SizedBox(width: 8),
-                        
                         // Yıl
                         _buildCategoryFilter(
                           'vehicles.filterYear'.tr(),
@@ -249,14 +304,30 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                           selectedYearRanges.length,
                           () => _showYearFilter(context),
                         ),
-                        
-                        // Temizle Butonu
-                        if (selectedFuelTypes.isNotEmpty || 
-                            selectedTransmissions.isNotEmpty || 
-                            selectedMileageRanges.isNotEmpty || 
-                            selectedPriceRanges.isNotEmpty || 
-                            selectedYearRanges.isNotEmpty) ...[
-                          const SizedBox(width: 16),
+                        const SizedBox(width: 8),
+
+                        // Fiyat (En sağa taşındı)
+                        _buildCategoryFilter(
+                          'vehicles.filterPrice'.tr(),
+                          selectedPriceRanges.isNotEmpty,
+                          selectedPriceRanges.length,
+                          () => _showPriceFilter(context),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Temizle ve Ekle Butonları (Alt Satır)
+                  if (selectedFuelTypes.isNotEmpty || 
+                      selectedTransmissions.isNotEmpty || 
+                      selectedMileageRanges.isNotEmpty || 
+                      selectedPriceRanges.isNotEmpty || 
+                      selectedYearRanges.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                      child: Row(
+                        children: [
+                          // Temizle Butonu
                           InkWell(
                             onTap: _clearFilters,
                             child: Container(
@@ -283,10 +354,111 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                               ),
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          // Ekle Butonu
+                          InkWell(
+                            onTap: () => _showSaveFilterDialog(context),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurple,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.add, size: 16, color: Colors.white),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Ekle',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
-                      ],
+                      ),
                     ),
-                  ),
+                  
+                  // Kayıtlı Filtreler Bölümü
+                  if (savedFilters.isNotEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: savedFilters.map((filter) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      InkWell(
+                                        onTap: () => _applySavedFilter(filter),
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(16),
+                                          bottomLeft: Radius.circular(16),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 12, top: 6, bottom: 6, right: 8),
+                                          child: Text(
+                                            filter.name,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () => _deleteSavedFilter(filter),
+                                        borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 4, right: 8, top: 6, bottom: 6),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              size: 10,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
                   
                   // Sonuç Sayısı Banner
                   Container(
@@ -1307,7 +1479,8 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
   // Yıl Filtresi
   void _showYearFilter(BuildContext context) {
     final Map<String, String> yearOptions = {
-      '2024': 'vehicles.yearRange1'.tr(),
+      '2026': 'vehicles.yearRange0'.tr(),
+      '2024-2025': 'vehicles.yearRange1'.tr(),
       '2020-2023': 'vehicles.yearRange2'.tr(),
       '2015-2019': 'vehicles.yearRange3'.tr(),
       '2015 öncesi': 'vehicles.yearRange4'.tr(),
@@ -1358,6 +1531,69 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     );
   }
 
+  // Filtre Kaydetme Dialogu
+  void _showSaveFilterDialog(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+    bool isButtonEnabled = false;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Filtreyi Kaydet'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Filtre Adı',
+                      hintText: 'Örn: Ucuz Sedanlar',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        isButtonEnabled = value.trim().isNotEmpty;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('İptal'),
+                ),
+                ElevatedButton(
+                  onPressed: isButtonEnabled
+                      ? () {
+                          if (savedFilters.length >= 5) {
+                            // Max limit uyarısı (opsiyonel, ama iyi olur)
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('En fazla 5 filtre kaydedebilirsiniz.')),
+                            );
+                            Navigator.pop(context);
+                            return;
+                          }
+                          _saveFilter(controller.text.trim());
+                          Navigator.pop(context);
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Kaydet'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildSortChip(String label, String value) {
     final isSelected = _selectedSortOption == value;
     return InkWell(
@@ -1395,3 +1631,49 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
 
 }
 
+
+
+class SavedFilter {
+  final String name;
+  final Set<String> fuelTypes;
+  final Set<String> transmissions;
+  final Set<String> mileageRanges;
+  final Set<String> priceRanges;
+  final Set<String> yearRanges;
+
+  final String? sortOption;
+
+  SavedFilter({
+    required this.name,
+    required this.fuelTypes,
+    required this.transmissions,
+    required this.mileageRanges,
+    required this.priceRanges,
+    required this.yearRanges,
+    this.sortOption,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'fuelTypes': fuelTypes.toList(),
+      'transmissions': transmissions.toList(),
+      'mileageRanges': mileageRanges.toList(),
+      'priceRanges': priceRanges.toList(),
+      'yearRanges': yearRanges.toList(),
+      'sortOption': sortOption,
+    };
+  }
+
+  factory SavedFilter.fromJson(Map<String, dynamic> json) {
+    return SavedFilter(
+      name: json['name'],
+      fuelTypes: Set<String>.from(json['fuelTypes']),
+      transmissions: Set<String>.from(json['transmissions']),
+      mileageRanges: Set<String>.from(json['mileageRanges']),
+      priceRanges: Set<String>.from(json['priceRanges']),
+      yearRanges: Set<String>.from(json['yearRanges']),
+      sortOption: json['sortOption'],
+    );
+  }
+}

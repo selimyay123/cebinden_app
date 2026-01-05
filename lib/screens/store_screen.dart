@@ -9,6 +9,7 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../services/iap_service.dart';
 import '../models/user_model.dart';
+import '../widgets/modern_alert_dialog.dart';
 import 'main_screen.dart';
 
 class StoreScreen extends StatefulWidget {
@@ -216,28 +217,27 @@ class _StoreScreenState extends State<StoreScreen> {
       ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.monetization_on, color: Colors.white, size: 28),
-                      const SizedBox(width: 8),
-                      Text(
-                        'store.yourGold'.tr(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  Icon(Icons.monetization_on, color: Colors.white, size: 28),
+                  const SizedBox(width: 8),
+                  Text(
+                    'store.yourGold'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(height: 8),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
                   Text(
                     '${_currentUser!.gold.toStringAsFixed(2)} ${'store.gold'.tr()}',
                     style: const TextStyle(
@@ -246,31 +246,31 @@ class _StoreScreenState extends State<StoreScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
-              // Convert Gold Button
-              ElevatedButton(
-                onPressed: _currentUser!.gold > 0 ? () => _showConvertGoldDialog() : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white.withOpacity(0.2),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.currency_exchange, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      'store.convertGold'.tr(),
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  // Convert Gold Button
+                  ElevatedButton(
+                    onPressed: _currentUser!.gold > 0 ? () => _showConvertGoldDialog() : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white.withOpacity(0.2),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      ),
                     ),
-                  ],
-                ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.currency_exchange, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          'store.convertGold'.tr(),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -360,16 +360,27 @@ class _StoreScreenState extends State<StoreScreen> {
           ElevatedButton(
             onPressed: () => _showExpandGarageDialog(),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.white.withOpacity(0.7),
+              foregroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text(
-              '1 ${'store.gold'.tr()}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '1',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Lottie.asset(
+                  'assets/animations/gold.json',
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                ),
+              ],
             ),
           ),
         ],
@@ -562,165 +573,92 @@ class _StoreScreenState extends State<StoreScreen> {
   void _showPurchaseDialog(ProductDetails product, int gold, int bonus) {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.5), // Arka planı biraz karart
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) => ValueListenableBuilder<bool>(
         valueListenable: _iapService.purchasePendingNotifier,
         builder: (context, isPending, child) {
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
+          return ModernAlertDialog(
+            title: 'store.purchaseGold'.tr(),
+            icon: Icons.shopping_cart,
+            iconColor: Colors.amber,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8), // Hafif şeffaf beyaz
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+                    color: Colors.white.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.withOpacity(0.2)),
                   ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Başlık
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.amber.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.shopping_cart, color: Colors.amber),
+                          Text(
+                            'store.package'.tr(),
+                            style: TextStyle(color: Colors.grey[700]),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'store.purchaseGold'.tr(),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              product.title.replaceAll(RegExp(r'\(.*\)'), '').trim(),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.end,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      
-                      // İçerik
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withOpacity(0.5)),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'store.package'.tr(),
-                                  style: TextStyle(color: Colors.grey[700]),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    product.title.replaceAll(RegExp(r'\(.*\)'), '').trim(),
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.end,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ),
-                              ],
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'store.price'.tr(),
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          Text(
+                            product.price.replaceAll('₺', 'TL'),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                              fontSize: 18,
                             ),
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'store.price'.tr(),
-                                  style: TextStyle(color: Colors.grey[700]),
-                                ),
-                                Text(
-                                  product.price.replaceAll('₺', 'TL'),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.deepPurple,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      
-                      const SizedBox(height: 24),
-                      
-                      if (isPending)
-                        Column(
-                          children: [
-                            const CircularProgressIndicator(),
-                            const SizedBox(height: 16),
-                            Text('common.pleaseWait'.tr()),
-                          ],
-                        )
-                      else
-                        Column(
-                          children: [
-                            Text(
-                              'store.securePaymentMessage'.tr(),
-                              style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text('common.cancel'.tr()),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      _iapService.buyProduct(product);
-                                      Navigator.pop(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.deepPurple,
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    child: Text('store.buy'.tr()),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(height: 24),
+                if (isPending)
+                  Column(
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text('common.pleaseWait'.tr()),
+                    ],
+                  )
+                else
+                  Text(
+                    'store.securePaymentMessage'.tr(),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    textAlign: TextAlign.center,
+                  ),
+              ],
             ),
+            buttonText: isPending ? null : 'store.buy'.tr(),
+            onPressed: isPending
+                ? null
+                : () {
+                    _iapService.buyProduct(product);
+                    Navigator.pop(context);
+                  },
+            secondaryButtonText: isPending ? null : 'common.cancel'.tr(),
+            onSecondaryPressed: isPending ? null : () => Navigator.pop(context),
           );
         },
       ),
@@ -730,8 +668,10 @@ class _StoreScreenState extends State<StoreScreen> {
   void _showExpandGarageDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('store.expandGarageTitle'.tr()),
+      builder: (context) => ModernAlertDialog(
+        title: 'store.expandGarageTitle'.tr(),
+        icon: Icons.garage,
+        iconColor: Colors.deepPurple,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -767,58 +707,48 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (_currentUser!.gold >= 1) {
-                Navigator.pop(context);
-                
-                // Altını düş ve limiti artır
-                final newGold = _currentUser!.gold - 1;
-                final newLimit = _currentUser!.garageLimit + 1;
-                
-                await _db.updateUser(_currentUser!.id, {
-                  'gold': newGold,
-                  'garageLimit': newLimit,
-                });
-                
-                await _loadCurrentUser();
-                
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      behavior: SnackBarBehavior.floating,
-                      content: Text('store.garageExpandSuccess'.tr()),
-                      backgroundColor: Colors.green.withOpacity(0.8),
-                    ),
-                  );
-                }
-              } else {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    behavior: SnackBarBehavior.floating,
-                    content: Text('store.insufficientGold'.tr()),
-                    backgroundColor: Colors.red.withOpacity(0.8),
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('store.buy'.tr()),
-          ),
-        ],
+        buttonText: 'store.buy'.tr(),
+        onPressed: () async {
+          if (_currentUser!.gold >= 1) {
+            Navigator.pop(context);
+            
+            // Altını düş ve limiti artır
+            final newGold = _currentUser!.gold - 1;
+            final newLimit = _currentUser!.garageLimit + 1;
+            
+            await _db.updateUser(_currentUser!.id, {
+              'gold': newGold,
+              'garageLimit': newLimit,
+            });
+            
+            await _loadCurrentUser();
+            
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('store.garageExpanded'.tr()),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 8,
+                ),
+              );
+            }
+          } else {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('store.insufficientGold'.tr()),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 8,
+              ),
+            );
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
       ),
     );
   }
@@ -1212,7 +1142,6 @@ class _StoreScreenState extends State<StoreScreen> {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.amber,
                         ),
                       ),
                     ],
@@ -1395,13 +1324,27 @@ class _StoreScreenState extends State<StoreScreen> {
                 ElevatedButton(
                   onPressed: () => _purchasePP(anim['name']!),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.white.withOpacity(0.7),
+                    foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     minimumSize: const Size(0, 32),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   ),
-                  child: Text('store.animatedPP.price'.tr(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '1',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      Lottie.asset(
+                        'assets/animations/gold.json',
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),

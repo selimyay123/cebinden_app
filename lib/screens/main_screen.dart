@@ -29,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
   StreamSubscription? _offerUpdateSubscription;
+  StreamSubscription? _tabChangeSubscription;
 
   // Navigator keys for each tab to preserve state
   final Map<int, GlobalKey<NavigatorState>> _navigatorKeys = {
@@ -53,11 +54,29 @@ class _MainScreenState extends State<MainScreen> {
 
     // Gün değişimini dinle (tekliflerin süresi dolmuş olabilir)
     GameTimeService().currentGameDay.addListener(_checkPendingOffers);
+    
+    // Tab değişim isteklerini dinle
+    _tabChangeSubscription = ScreenRefreshService().onTabChangeRequested.listen((index) {
+      if (mounted) {
+        // Eğer Dashboard (Home) seçildiyse ve zaten oradaysak veya başka tabdan geliyorsak
+        // Her durumda Dashboard'un stack'ini sıfırla
+        if (index == 3) {
+          _navigatorKeys[3]?.currentState?.popUntil((route) => route.isFirst);
+        }
+
+        setState(() {
+          _currentIndex = index;
+        });
+        // notifyTabChanged çağırmaya gerek yok, çünkü bu zaten bir istek sonucu oldu
+        // ama tutarlılık için çağrılabilir, şimdilik gerek yok
+      }
+    });
   }
 
   @override
   void dispose() {
     _offerUpdateSubscription?.cancel();
+    _tabChangeSubscription?.cancel();
     GameTimeService().currentGameDay.removeListener(_checkPendingOffers);
     super.dispose();
   }

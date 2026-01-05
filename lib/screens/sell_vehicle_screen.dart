@@ -11,6 +11,7 @@ import '../utils/vehicle_utils.dart';
 import '../services/skill_service.dart';
 import '../models/user_model.dart';
 import 'package:lottie/lottie.dart';
+import '../widgets/modern_alert_dialog.dart';
 
 class SellVehicleScreen extends StatefulWidget {
   const SellVehicleScreen({super.key});
@@ -26,6 +27,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
   User? _currentUser;
   bool _isLoading = true;
   StreamSubscription? _vehicleUpdateSubscription;
+  StreamSubscription? _userUpdateSubscription;
 
   @override
   void initState() {
@@ -36,11 +38,17 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
     _vehicleUpdateSubscription = _db.onVehicleUpdate.listen((_) {
       _loadUserVehicles();
     });
+
+    // Kullanıcı güncellemelerini dinle (Skill unlock vb. için)
+    _userUpdateSubscription = _db.onUserUpdate.listen((_) {
+      _loadUserVehicles();
+    });
   }
 
   @override
   void dispose() {
     _vehicleUpdateSubscription?.cancel();
+    _userUpdateSubscription?.cancel();
     super.dispose();
   }
 
@@ -516,8 +524,8 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('skills.quickSellConfirm'.tr()),
+      builder: (context) => ModernAlertDialog(
+        title: 'skills.quickSellConfirm'.tr(),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,20 +565,15 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _processQuickSell(vehicle, sellPrice);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-            child: Text('skills.quickSell'.tr()),
-          ),
-        ],
+        buttonText: 'skills.quickSell'.tr(),
+        onPressed: () async {
+          Navigator.pop(context);
+          await _processQuickSell(vehicle, sellPrice);
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
+        icon: Icons.flash_on,
+        iconColor: Colors.orange,
       ),
     );
   }

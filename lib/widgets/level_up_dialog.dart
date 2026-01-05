@@ -51,15 +51,23 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.deepPurple,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color.fromRGBO(0, 0, 0, 0.2),
+                color: Colors.black.withOpacity(0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
             ],
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.deepPurple.shade400,
+                Colors.deepPurple.shade800,
+              ],
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -80,7 +88,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -91,7 +99,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 24),
@@ -100,18 +108,18 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple.shade50,
+                  color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.deepPurple.shade100),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
                 child: Column(
                   children: [
                     Text(
                       'xp.rewards'.tr(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple.shade700,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -121,7 +129,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                       _buildRewardItem(
                         Icons.attach_money,
                         '${_formatCurrency(widget.reward.cashBonus)} TL',
-                        Colors.green,
+                        Colors.greenAccent,
                       ),
                       
                     // Gold Reward
@@ -143,6 +151,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -154,7 +163,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                       ...widget.reward.unlocks.map((unlock) => _buildRewardItem(
                         Icons.lock_open,
                         unlock.tr(),
-                        Colors.blue,
+                        Colors.lightBlueAccent,
                       )),
 
                     // Skill Points Reward
@@ -162,7 +171,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                       _buildRewardItem(
                         Icons.star,
                         '${widget.reward.skillPoints} ${'skills.availablePoints'.tr()}',
-                        Colors.amber,
+                        Colors.amberAccent,
                       ),
                   ],
                 ),
@@ -175,18 +184,18 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                 child: ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.deepPurple,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 4,
                   ),
                   child: Text(
                     'common.continue'.tr(),
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -212,6 +221,7 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
+              color: Colors.white,
             ),
           ),
         ],

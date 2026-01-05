@@ -12,6 +12,7 @@ import 'create_listing_screen.dart';
 import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
 import '../mixins/auto_refresh_mixin.dart';
+import 'package:cebinden_app/widgets/modern_alert_dialog.dart';
 import '../services/skill_service.dart';
 import 'package:lottie/lottie.dart';
 import '../services/game_time_service.dart';
@@ -260,7 +261,24 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
   
   // Belirli bir markanın araç listesi (2. seviye)
   Widget _buildVehicleList() {
-    final brandVehicles = _vehiclesByBrand[widget.selectedBrand] ?? [];
+    // Tam eşleşme dene
+    List<UserVehicle> brandVehicles = _vehiclesByBrand[widget.selectedBrand] ?? [];
+    
+    // Eşleşme yoksa, büyük/küçük harf duyarsız eşleşme dene
+    if (brandVehicles.isEmpty && widget.selectedBrand != null) {
+      final key = _vehiclesByBrand.keys.firstWhere(
+        (k) => k.toLowerCase().trim() == widget.selectedBrand!.toLowerCase().trim(),
+        orElse: () => '',
+      );
+      if (key.isNotEmpty) {
+        brandVehicles = _vehiclesByBrand[key]!;
+      }
+    }
+
+    // Hala boşsa ve seçili marka varsa, boş durum göster
+    if (brandVehicles.isEmpty) {
+      return _buildEmptyState();
+    }
     
     return RefreshIndicator(
       onRefresh: _loadMyVehicles,
@@ -275,7 +293,6 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
     );
   }
 
-  // Marka kartı widget'ı
   Widget _buildBrandCard(String brand, int vehicleCount) {
     final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepPurple);
     
@@ -395,6 +412,61 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
   }
 
   Widget _buildEmptyState() {
+    // Eğer araçlar var ama seçili markada yoksa
+    if (_myVehicles.isNotEmpty && widget.selectedBrand != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.search_off,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                '${widget.selectedBrand} markalı araç bulunamadı.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Garajınızda ${_myVehicles.length} araç var ancak bu markada araç yok.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  // Tüm araçları görmek için filtreyi kaldır
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MyVehiclesScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text('Tüm Araçları Göster'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -425,22 +497,6 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
               ),
             ),
             const SizedBox(height: 32),
-            // ElevatedButton.icon(
-            //   onPressed: () => Navigator.pop(context),
-            //   icon: const Icon(Icons.shopping_cart),
-            //   label: Text('misc.buyVehicleButton'.tr()),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.deepPurple,
-            //     foregroundColor: Colors.white,
-            //     padding: const EdgeInsets.symmetric(
-            //       horizontal: 32,
-            //       vertical: 16,
-            //     ),
-            //     shape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(12),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -1287,34 +1343,38 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('skills.quickSellConfirm'.tr()),
+      builder: (context) => ModernAlertDialog(
+        title: 'skills.quickSellConfirm'.tr(),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('skills.quickSellConfirmDesc'.trParams({'price': _formatCurrency(sellPrice.toDouble())})),
+            Text(
+              'skills.quickSellConfirmDesc'.trParams({'price': _formatCurrency(sellPrice.toDouble())}),
+              style: const TextStyle(color: Colors.white),
+            ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: Colors.green.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green.withOpacity(0.5)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.trending_up, color: Colors.green),
+                  const Icon(Icons.trending_up, color: Colors.greenAccent),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'}),
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent),
                       ),
                       Text(
                         '+${_formatCurrency(profit.toDouble())} TL',
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16),
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent, fontSize: 16),
                       ),
                     ],
                   ),
@@ -1324,24 +1384,17 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
             const SizedBox(height: 8),
             Text(
               '${'skills.remainingUses'.tr()}: $remainingUses/3',
-              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _processQuickSell(vehicle, sellPrice);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-            child: Text('skills.quickSell'.tr()),
-          ),
-        ],
+        buttonText: 'skills.quickSell'.tr(),
+        onPressed: () async {
+          Navigator.pop(context);
+          await _processQuickSell(vehicle, sellPrice);
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
       ),
     );
   }

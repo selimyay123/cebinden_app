@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import '../../models/user_model.dart';
+import '../../widgets/modern_alert_dialog.dart';
 import '../../services/chat_service.dart';
 import '../../services/localization_service.dart';
 
@@ -54,20 +56,15 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _deleteMessage(String messageId) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text('drawer.social.deleteMessage'.tr(), style: const TextStyle(color: Colors.white)),
+      builder: (context) => ModernAlertDialog(
+        title: 'drawer.social.deleteMessage'.tr(),
         content: Text('drawer.social.deleteMessageConfirm'.tr(), style: const TextStyle(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr(), style: const TextStyle(color: Colors.white70)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('common.delete'.tr(), style: const TextStyle(color: Colors.red)),
-          ),
-        ],
+        buttonText: 'common.delete'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.delete,
+        iconColor: Colors.redAccent,
       ),
     );
 
@@ -79,20 +76,15 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _clearChat() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text('drawer.social.clearChat'.tr(), style: const TextStyle(color: Colors.white)),
+      builder: (context) => ModernAlertDialog(
+        title: 'drawer.social.clearChat'.tr(),
         content: Text('drawer.social.clearChatConfirm'.tr(), style: const TextStyle(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr(), style: const TextStyle(color: Colors.white70)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('common.delete'.tr(), style: const TextStyle(color: Colors.red)),
-          ),
-        ],
+        buttonText: 'common.delete'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.delete_sweep,
+        iconColor: Colors.redAccent,
       ),
     );
 

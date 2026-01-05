@@ -5,6 +5,7 @@ import '../../services/friend_service.dart';
 import '../../services/chat_service.dart';
 import '../../services/database_helper.dart';
 import '../../models/user_model.dart';
+import '../../widgets/modern_alert_dialog.dart';
 import '../../services/localization_service.dart';
 import 'chat_screen.dart';
 import '../../widgets/user_profile_avatar.dart';
@@ -62,23 +63,18 @@ class _FriendsTabState extends State<FriendsTab> {
 
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
-        title: Text('drawer.social.removeFriend'.tr(), style: const TextStyle(color: Colors.white)),
+      builder: (context) => ModernAlertDialog(
+        title: 'drawer.social.removeFriend'.tr(),
         content: Text(
           'drawer.social.removeFriendConfirm'.trParams({'0': friendName}), 
           style: const TextStyle(color: Colors.white70)
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr(), style: const TextStyle(color: Colors.white70)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('common.delete'.tr(), style: const TextStyle(color: Colors.red)),
-          ),
-        ],
+        buttonText: 'common.delete'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.person_remove,
+        iconColor: Colors.redAccent,
       ),
     );
 

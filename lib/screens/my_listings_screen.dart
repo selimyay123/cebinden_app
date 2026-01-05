@@ -7,6 +7,7 @@ import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../services/favorite_service.dart';
 import '../services/localization_service.dart';
+import '../widgets/modern_alert_dialog.dart';
 import '../utils/brand_colors.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
@@ -989,49 +990,41 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   void _showRemoveListingDialog(UserVehicle vehicle) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('sell.removeListing'.tr()),
+      builder: (context) => ModernAlertDialog(
+        title: 'sell.removeListing'.tr(),
         content: Text(
           '${vehicle.fullName} ${'myListings.removeConfirm'.tr()}\n\n${'myListings.willStayInGarage'.tr()}',
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              // İlanı kaldır
-              final success = await _db.updateUserVehicle(vehicle.id, {
-                'isListedForSale': false,
-                'listingPrice': null,
-                'listingDescription': null,
-                'listedDate': null,
-              });
-              
-              if (success) {
-                // 🆕 İlana ait tüm teklifleri sil
-                await _db.deleteOffersForVehicle(vehicle.id);
+        buttonText: 'common.delete'.tr(),
+        onPressed: () async {
+          Navigator.pop(context);
+          // İlanı kaldır
+          final success = await _db.updateUserVehicle(vehicle.id, {
+            'isListedForSale': false,
+            'listingPrice': null,
+            'listingDescription': null,
+            'listedDate': null,
+          });
+          
+          if (success) {
+            // 🆕 İlana ait tüm teklifleri sil
+            await _db.deleteOffersForVehicle(vehicle.id);
 
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('sell.listingRemoved'.tr()),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  _loadUserListedVehicles(); // Listeyi yenile
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('common.delete'.tr()),
-          ),
-        ],
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('sell.listingRemoved'.tr()),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              _loadUserListedVehicles(); // Listeyi yenile
+            }
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
+        icon: Icons.delete_forever,
+        iconColor: Colors.red,
       ),
     );
   }
@@ -1124,19 +1117,8 @@ class _EditListingDialogState extends State<_EditListingDialog> {
 
     final maxPrice = widget.vehicle.purchasePrice * 1.15;
 
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      title: Row(
-        children: [
-          const Icon(Icons.edit, color: Colors.deepPurple),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text('sell.editListing'.tr()),
-          ),
-        ],
-      ),
+    return ModernAlertDialog(
+      title: 'sell.editListing'.tr(),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -1148,8 +1130,9 @@ class _EditListingDialogState extends State<_EditListingDialog> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1159,35 +1142,36 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${widget.vehicle.year} • ${_formatNumber(widget.vehicle.mileage)} km',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[600],
+                        color: Colors.white70,
                       ),
                     ),
                     const SizedBox(height: 8),
                     // Alış Fiyatı Gösterimi
                     Row(
                       children: [
-                        Icon(Icons.shopping_cart, size: 14, color: Colors.grey[600]),
+                        const Icon(Icons.shopping_cart, size: 14, color: Colors.white70),
                         const SizedBox(width: 4),
                         Text(
                           '${'vehicles.purchasePrice'.tr()}: ',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[600],
+                            color: Colors.white70,
                           ),
                         ),
                         Text(
                           '${_formatCurrency(widget.vehicle.purchasePrice)} TL',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
+                            color: Colors.white,
                           ),
                         ),
                       ],
@@ -1203,12 +1187,14 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _priceController,
                 keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.white),
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   _ThousandsSeparatorInputFormatter(),
@@ -1219,15 +1205,26 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                 decoration: InputDecoration(
                   prefixText: 'TL ',
                   suffixText: 'TL',
+                  prefixStyle: const TextStyle(color: Colors.white70),
+                  suffixStyle: const TextStyle(color: Colors.white70),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.white),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Colors.white.withOpacity(0.1),
                   helperText: 'myListings.maxPriceHint'.trParams({
                     'price': _formatCurrency(maxPrice),
                   }),
-                  helperStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  helperStyle: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -1251,17 +1248,17 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isProfit ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                    color: isProfit ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isProfit ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                      color: isProfit ? Colors.green.withOpacity(0.5) : Colors.red.withOpacity(0.5),
                     ),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         isProfit ? Icons.trending_up : Icons.trending_down,
-                        color: isProfit ? Colors.green : Colors.red,
+                        color: isProfit ? Colors.greenAccent : Colors.redAccent,
                         size: 16,
                       ),
                       const SizedBox(width: 8),
@@ -1273,7 +1270,7 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                             'percent': profitPercent.abs().toStringAsFixed(1),
                           }),
                           style: TextStyle(
-                            color: isProfit ? Colors.green[700] : Colors.red[700],
+                            color: isProfit ? Colors.greenAccent : Colors.redAccent,
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -1292,6 +1289,7 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -1299,44 +1297,48 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                 controller: _descriptionController,
                 maxLines: 4,
                 maxLength: 500,
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.white),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Colors.white.withOpacity(0.1),
                   hintText: 'vehicles.descriptionHint'.tr(),
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  counterStyle: const TextStyle(color: Colors.white54),
                 ),
               ),
             ],
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('common.cancel'.tr()),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              Navigator.pop(context);
-              
-              final newPrice = double.parse(_priceController.text.replaceAll('.', ''));
-              final newDescription = _descriptionController.text.trim();
-              
-              widget.onSave(newPrice, newDescription);
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
-            foregroundColor: Colors.white,
-          ),
-          child: Text('common.save'.tr()),
-        ),
-      ],
+      buttonText: 'common.save'.tr(),
+      onPressed: () {
+        if (_formKey.currentState!.validate()) {
+          Navigator.pop(context);
+          
+          final newPrice = double.parse(_priceController.text.replaceAll('.', ''));
+          final newDescription = _descriptionController.text.trim();
+          
+          widget.onSave(newPrice, newDescription);
+        }
+      },
+      secondaryButtonText: 'common.cancel'.tr(),
+      onSecondaryPressed: () {
+        Navigator.pop(context);
+      },
+      icon: Icons.edit,
+      iconColor: Colors.white,
     );
   }
 }

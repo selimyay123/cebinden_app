@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
@@ -34,17 +35,25 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
   User? _currentUser;
   bool _isLoading = true;
 
+  StreamSubscription? _userUpdateSubscription;
+
   @override
   void initState() {
     super.initState();
     _loadUser();
     // Gün değişimini dinle (Hızlı Al hakkını güncellemek için)
     _gameTime.currentGameDay.addListener(_onDayChanged);
+    
+    // Kullanıcı güncellemelerini dinle (Skill unlock vb. için)
+    _userUpdateSubscription = _db.onUserUpdate.listen((_) {
+      _loadUser();
+    });
   }
 
   @override
   void dispose() {
     _gameTime.currentGameDay.removeListener(_onDayChanged);
+    _userUpdateSubscription?.cancel();
     super.dispose();
   }
 
@@ -225,7 +234,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: brands.length + 1, // +1 for "Tüm Modeller"
+                    itemCount: brands.length + 2, // +1 for "Tüm Modeller", +1 for "Rastgele Marka"
                     itemBuilder: (context, index) {
                       // İlk item "Tüm Modeller"
                       if (index == 0) {
@@ -239,8 +248,13 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                         );
                       }
 
+                      // İkinci item "Rastgele Marka"
+                      if (index == 1) {
+                        return _buildRandomBrandCard(context, brands);
+                      }
+
                       // Diğer markalar
-                      final brand = brands[index - 1];
+                      final brand = brands[index - 2];
                       return _buildBrandCard(
                         context,
                         name: brand['name'] as String,
@@ -262,6 +276,68 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
     );
   }
 
+  Widget _buildRandomBrandCard(BuildContext context, List<Map<String, Object>> brands) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Material(
+        color: Colors.purpleAccent.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+        elevation: 3,
+        shadowColor: Colors.purple.withOpacity(0.3),
+        child: InkWell(
+          onTap: () async {
+            // Rastgele bir marka seç
+            final randomBrand = (brands..shuffle()).first;
+            
+            // Seçilen markaya göre MODEL SEÇİM sayfasına git
+            final purchased = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ModelSelectionScreen(
+                  categoryName: widget.categoryName,
+                  categoryColor: widget.categoryColor,
+                  brandName: randomBrand['name'] as String,
+                ),
+              ),
+            );
+
+            // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
+            if (purchased == true && context.mounted) {
+              Navigator.pop(context, true);
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
+            child: Row(
+              children: [
+                // Icon
+                const Icon(Icons.shuffle, color: Colors.white, size: 24),
+                const SizedBox(width: 12),
+                // Text
+                Expanded(
+                  child: Text(
+                    'vehicles.randomBrandSelect'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Arrow
+                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildAllBrandsCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -276,7 +352,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
-                  categoryName: '${widget.categoryName} - ${'vehicles.allModels'.tr()}',
+                  categoryName: 'vehicles.allModels'.tr(),
                   categoryColor: widget.categoryColor,
                   brandName: null, // null = tüm markalar
                   modelName: null, // null = tüm modeller
@@ -291,46 +367,28 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
                 // Icon
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.apps, color: Colors.white, size: 32),
-                ),
-                const SizedBox(width: 16),
+                const Icon(Icons.apps, color: Colors.white, size: 24),
+                const SizedBox(width: 12),
                 // Text
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'vehicles.allModels'.tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'vehicles.allModelsDesc'.tr(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'vehicles.allModels'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 12),
                 // Arrow
-                Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
               ],
             ),
           ),

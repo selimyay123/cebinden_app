@@ -237,6 +237,7 @@ class AuthService {
   }
 
   // Kullanıcı adı değiştir
+  // Kullanıcı adı değiştir
   Future<bool> changeUsername({
     required String userId,
     required String newUsername,
@@ -249,12 +250,31 @@ class AuthService {
       return false; // Uygunsuz kullanıcı adı
     }
 
+    // Kullanıcıyı getir
+    final userMap = await _db.getUserById(userId);
+    if (userMap == null) return false;
+    final user = User.fromJson(userMap);
+
+    // Süre kontrolü
+    if (user.usernameChangeCount > 0) {
+      if (user.lastUsernameChangeDate != null) {
+        final daysSinceLastChange = DateTime.now().difference(user.lastUsernameChangeDate!).inDays;
+        if (daysSinceLastChange < 7) {
+          return false; // 7 gün geçmedi
+        }
+      }
+    }
+
     // Kullanıcı adı zaten alınmış mı kontrol et
     final existingUser = await _db.getUserByUsername(newUsername.trim());
     if (existingUser != null) return false;
 
     // Kullanıcı adını güncelle
-    return await _db.updateUser(userId, {'username': newUsername.trim()});
+    return await _db.updateUser(userId, {
+      'username': newUsername.trim(),
+      'usernameChangeCount': user.usernameChangeCount + 1,
+      'lastUsernameChangeDate': DateTime.now().toIso8601String(),
+    });
   }
 
   // Kullanıcı bilgilerini güncelle

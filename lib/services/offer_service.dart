@@ -156,6 +156,61 @@ class OfferService {
         }
       }
       
+      // 🆕 FORCED OFFER: Eğer hiç teklif oluşmadıysa (fiyat çok yüksek olsa bile)
+      // En az bir teklif gelmeli (Zararına da olsa)
+      if (offersCreated == 0 && buyerCount > 0) {
+        // Zorunlu bir alıcı oluştur
+        AIBuyer forcedBuyer = AIBuyer.generateRandom();
+        
+        // Fiyat kontrolü: İlan fiyatı çok mu yüksek?
+        double priceRatio = listing.listingPrice! / fairPrice;
+        double offerPrice;
+        
+        if (priceRatio > 1.3) {
+          // Fiyat çok yüksek (Fair Price'ın %30'undan fazla)
+          // Alıcı "Fair Price" üzerinden teklif verir (Düşük teklif / Ölücü)
+          // Fair Price'ın %80-%100'ü arası
+          offerPrice = fairPrice * (0.80 + Random().nextDouble() * 0.20);
+        } else {
+          // Normal hesaplama
+          offerPrice = forcedBuyer.calculateOffer(
+            listingPrice: listing.listingPrice!,
+            fairPrice: fairPrice,
+          );
+        }
+        
+        // Teklif oluştur
+        Offer offer = Offer(
+          offerId: 'offer_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}',
+          vehicleId: listing.id,
+          sellerId: listing.userId,
+          buyerId: forcedBuyer.buyerId,
+          buyerName: forcedBuyer.buyerName,
+          offerPrice: offerPrice,
+          offerDate: DateTime.now(),
+          status: OfferStatus.pending,
+          message: forcedBuyer.generateContextualMessage(
+            mileage: listing.mileage,
+            hasAccidentRecord: listing.hasAccidentRecord,
+            listingPrice: listing.listingPrice!,
+            fairPrice: fairPrice,
+          ) ?? forcedBuyer.message,
+          listingPrice: listing.listingPrice!,
+          fairPrice: fairPrice,
+          expirationDate: DateTime.now().add(const Duration(days: 7)),
+          vehicleBrand: listing.brand,
+          vehicleModel: listing.model,
+          vehicleYear: listing.year,
+          vehicleImageUrl: listing.imageUrl ?? '',
+        );
+        
+        // Veritabanına kaydet
+        bool success = await _db.addOffer(offer);
+        if (success) {
+          offersCreated++;
+        }
+      }
+
       if (offersCreated > 0) {
         await NotificationService().sendBulkOfferNotification(
           userId: listing.userId,
@@ -165,7 +220,6 @@ class OfferService {
           offerCount: offersCreated,
         );
       }
-      
       
       return offersCreated;
     } catch (e) {
@@ -640,14 +694,9 @@ class OfferService {
         
         // Satış işlemini gerçekleştir
         await _processIncomingOfferAcceptance(originalOffer, counterOfferAmount);
-      } else if (decision['decision'] == 'reject') {
-        // AI alıcı reddetti
-        newStatus = OfferStatus.rejected;
-        response = decision['response'] as String;
       } else {
-        // AI alıcı yeni karşı teklif verdi
-        newStatus = OfferStatus.pending;
-        newCounterOffer = decision['counterAmount'] as double?;
+        // AI alıcı reddetti (veya başka bir şey döndü, reddet sayıyoruz)
+        newStatus = OfferStatus.rejected;
         response = decision['response'] as String;
       }
       
@@ -1073,9 +1122,9 @@ class OfferService {
     }
     
     if (priceRatio > maxTolerance) {
-      // Fiyat çok yüksek! Kimse ilgilenmez.
-
-      return 0;
+      // Fiyat çok yüksek! Normalde kimse ilgilenmez.
+      // AMA: Oyunun tıkanmaması için en az 1 "ölücü" alıcı gelmeli.
+      return 1;
     } else if (priceRatio > 1.15) {
       // Biraz pahalı (%15-%30 arası) -> Alıcı sayısı ciddi düşer
       baseCount = (baseCount * 0.3).round(); // %70 azalma

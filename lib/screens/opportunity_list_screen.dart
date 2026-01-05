@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../services/market_refresh_service.dart';
 import '../services/localization_service.dart';
+import '../widgets/modern_alert_dialog.dart';
 import '../services/database_helper.dart';
 import '../models/vehicle_model.dart';
 import '../models/user_model.dart';
@@ -288,8 +289,8 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
     final vehicle = listing.vehicle;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${'purchase.title'.tr()}: ${vehicle.fullName}'),
+      builder: (context) => ModernAlertDialog(
+        title: '${'purchase.title'.tr()}: ${vehicle.fullName}',
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,20 +316,12 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () => _processPurchase(vehicle),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('purchase.title'.tr()),
-          ),
-        ],
+        buttonText: 'purchase.title'.tr(),
+        onPressed: () => _processPurchase(vehicle),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
+        icon: Icons.shopping_cart,
+        iconColor: Colors.deepPurple,
       ),
     );
   }
