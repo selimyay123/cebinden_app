@@ -763,7 +763,7 @@
     "devBonusSuccess": "Geliştirici bonusu başarıyla tanımlandı!"
   },
   "skills": {
-    "availablePoints": "Kullanılabilir Puan",
+    "availablePoints": "Yetenek Puanı",
     "activeSkills": "Aktif Yetenekler",
     "quickBuy": "Hızlı Al",
     "quickBuyDesc": "Belirli skor aralığındaki araçları anında bulup detaylarını görüntülemenizi sağlar. Seviye arttıkça daha yüksek skorlu araçlar bulabilirsiniz.",
@@ -1629,6 +1629,10 @@
     "vehicleSold": {
       "title": "Araç Satıldı! 🎉",
       "message": "{vehicle} başarıyla {price} ₺'ye satıldı"
+    },
+    "bulkOffer": {
+      "title": "Yeni Teklifler!",
+      "message": "{brand} {model} aracın için {count} sayıda teklif geldi."
     }
   },
   "ads": {

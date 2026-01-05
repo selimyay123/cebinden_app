@@ -39,14 +39,21 @@ class NotificationService {
         message: 'notifications.newOffer.message'.trParams({
           'buyer': offer.buyerName,
           'vehicle': '${offer.vehicleBrand} ${offer.vehicleModel}',
-          'price': offer.offerPrice.toStringAsFixed(0),
+          'price': offer.offerPrice.toString(),
         }),
         createdAt: DateTime.now(),
         data: {
           'offerId': offer.offerId,
           'vehicleId': offer.vehicleId,
-          'buyerName': offer.buyerName,
           'offerPrice': offer.offerPrice,
+        },
+        // 🆕 Dynamic Localization
+        titleKey: 'notifications.newOffer.title',
+        messageKey: 'notifications.newOffer.message',
+        params: {
+          'buyer': offer.buyerName,
+          'vehicle': '${offer.vehicleBrand} ${offer.vehicleModel}',
+          'price': offer.offerPrice.toString(),
         },
       );
 
@@ -55,6 +62,58 @@ class NotificationService {
       
     } catch (e) {
       
+    }
+  }
+  
+  /// Toplu teklif bildirimi gönder
+  Future<void> sendBulkOfferNotification({
+    required String userId,
+    required String vehicleId,
+    required String vehicleBrand,
+    required String vehicleModel,
+    required int offerCount,
+  }) async {
+    try {
+      // Bildirim ayarını kontrol et
+      final settings = await SettingsHelper.getInstance();
+      final isEnabled = await settings.getNotificationOffers();
+      
+      if (!isEnabled) return;
+
+      // Bildirim oluştur
+      final notification = AppNotification(
+        id: 'notif_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}',
+        userId: userId,
+        type: NotificationType.newOffer, // İkon için newOffer kullanıyoruz
+        title: 'notifications.bulkOffer.title'.tr(),
+        message: 'notifications.bulkOffer.message'.trParams({
+          'brand': vehicleBrand,
+          'model': vehicleModel,
+          'count': offerCount.toString(),
+        }),
+        createdAt: DateTime.now(),
+        data: {
+          'vehicleId': vehicleId,
+          'brand': vehicleBrand,
+          'model': vehicleModel,
+          'offerCount': offerCount,
+          'isBulk': true,
+        },
+        // 🆕 Dynamic Localization
+        titleKey: 'notifications.bulkOffer.title',
+        messageKey: 'notifications.bulkOffer.message',
+        params: {
+          'brand': vehicleBrand,
+          'model': vehicleModel,
+          'count': offerCount.toString(),
+        },
+      );
+
+      // Veritabanına kaydet
+      await _db.addNotification(notification);
+      
+    } catch (e) {
+      debugPrint('Error sending bulk notification: $e');
     }
   }
 
@@ -76,12 +135,19 @@ class NotificationService {
         title: 'notifications.offerAccepted.title'.tr(),
         message: 'notifications.offerAccepted.message'.trParams({
           'vehicle': '${offer.vehicleBrand} ${offer.vehicleModel}',
-          'price': offer.offerPrice.toStringAsFixed(0),
+          'price': offer.offerPrice.toString(),
         }),
         createdAt: DateTime.now(),
         data: {
           'offerId': offer.offerId,
           'vehicleId': offer.vehicleId,
+        },
+        // 🆕 Dynamic Localization
+        titleKey: 'notifications.offerAccepted.title',
+        messageKey: 'notifications.offerAccepted.message',
+        params: {
+          'vehicle': '${offer.vehicleBrand} ${offer.vehicleModel}',
+          'price': offer.offerPrice.toString(),
         },
       );
 
@@ -111,9 +177,23 @@ class NotificationService {
         title: 'notifications.vehicleSold.title'.tr(),
         message: 'notifications.vehicleSold.message'.trParams({
           'vehicle': vehicleName,
-          'price': salePrice.toStringAsFixed(0),
+          'price': salePrice.toString(),
         }),
         createdAt: DateTime.now(),
+        data: {
+          // Assuming vehicleId might be needed, but not provided in params.
+          // If vehicleId is available, it should be added here.
+          // For now, keeping it consistent with the provided snippet's data structure.
+          // 'vehicleId': vehicleId, // If vehicleId is passed to the function
+          'price': salePrice,
+        },
+        // 🆕 Dynamic Localization
+        titleKey: 'notifications.vehicleSold.title',
+        messageKey: 'notifications.vehicleSold.message',
+        params: {
+          'vehicle': vehicleName,
+          'price': salePrice.toString(),
+        },
       );
 
       await _db.addNotification(notification);

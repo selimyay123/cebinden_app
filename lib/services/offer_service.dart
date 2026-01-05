@@ -152,13 +152,18 @@ class OfferService {
           if (success) {
             offersCreated++;
             
-            // 🔔 Bildirim gönder
-            await NotificationService().sendNewOfferNotification(
-              userId: listing.userId,
-              offer: offer,
-            );
           }
         }
+      }
+      
+      if (offersCreated > 0) {
+        await NotificationService().sendBulkOfferNotification(
+          userId: listing.userId,
+          vehicleId: listing.id,
+          vehicleBrand: listing.brand,
+          vehicleModel: listing.model,
+          offerCount: offersCreated,
+        );
       }
       
       

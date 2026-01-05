@@ -1252,22 +1252,32 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         size: 20, // İkon küçültüldü
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 16),
                     
                     // Metinler
+                    // Metinler
                     Expanded(
-                      child: Text(
-                        hasRewardsToClaim 
-                            ? 'quests.rewardClaimed'.tr().split('!')[0] + '!'
-                            : '$completedCount/$totalCount ${'common.done'.tr()}',
-                        style: TextStyle(
-                          color: hasRewardsToClaim ? Colors.green : Colors.grey[600],
-                          fontSize: 12, // Font küçültüldü
-                          fontWeight: hasRewardsToClaim ? FontWeight.bold : FontWeight.normal,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      child: hasRewardsToClaim
+                          ? PulseBadge(
+                              child: Text(
+                                '$completedCount/$totalCount',
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              '$completedCount/$totalCount',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                     ),
                     
                     // Sağ taraf (Badge veya Ok)
@@ -4403,3 +4413,43 @@ class _WiggleBadgeState extends State<WiggleBadge> with SingleTickerProviderStat
   }
 }
 
+
+class PulseBadge extends StatefulWidget {
+  final Widget child;
+  const PulseBadge({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<PulseBadge> createState() => _PulseBadgeState();
+}
+
+class _PulseBadgeState extends State<PulseBadge> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _animation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _animation,
+      child: widget.child,
+    );
+  }
+}

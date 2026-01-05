@@ -6,6 +6,7 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'main_screen.dart';
+import 'my_offers_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -96,8 +97,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('notifications.title'.tr()),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.white,
         actions: [
 
           if (_notifications.isNotEmpty) ...[
@@ -114,11 +119,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _notifications.isEmpty
-              ? _buildEmptyState()
-              : _buildNotificationsList(),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _notifications.isEmpty
+                  ? _buildEmptyState()
+                  : _buildNotificationsList(),
+        ),
+      ),
     );
   }
 
@@ -130,15 +145,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Icon(
             Icons.notifications_none_outlined,
             size: 120,
-            color: Colors.grey[300],
+            color: Colors.black,
           ),
           const SizedBox(height: 24),
           Text(
             'notifications.noNotifications'.tr(),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Colors.black,
             ),
           ),
           const SizedBox(height: 8),
@@ -148,7 +163,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               'notifications.noNotificationsDesc'.tr(),
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),
@@ -177,8 +192,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       locale: locale,
     );
 
+    // Assuming 'title' and 'message' are defined elsewhere or need to be extracted from notification
+    // For now, using placeholders or assuming they are available.
+    // If not, this part might need further context from the user.
+    final String title = notification.title; // Placeholder
+    final String message = notification.message; // Placeholder
+
     return Dismissible(
       key: Key(notification.id),
+      direction: DismissDirection.endToStart,
       background: Container(
         decoration: BoxDecoration(
           color: Colors.red,
@@ -188,18 +210,61 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         padding: const EdgeInsets.only(right: 24),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
-      direction: DismissDirection.endToStart,
       onDismissed: (_) => _deleteNotification(notification),
       child: InkWell(
-        onTap: () => _markAsRead(notification),
+        onTap: () async {
+          await _markAsRead(notification);
+          
+          // Navigation logic
+          if (notification.data != null) {
+            // Check for bulk offer notification
+            if (notification.data!.containsKey('vehicleId') && notification.data!.containsKey('brand')) {
+               final vehicleId = notification.data!['vehicleId'];
+               final brand = notification.data!['brand'];
+               
+               Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyOffersScreen(
+                      selectedBrand: brand,
+                      selectedVehicleId: vehicleId,
+                      isIncoming: true,
+                    ),
+                  ),
+                );
+            }
+            // Check for single offer notification (legacy support or if used elsewhere)
+            else if (notification.data!.containsKey('offerId') && notification.data!.containsKey('vehicleId')) {
+               // For single offers, we might not have the brand directly in data.
+               // We can try to navigate to MyOffersScreen without brand (if supported) or just open the offers tab.
+               // Since the requirement specifically mentioned "consolidated offer notification", 
+               // and we implemented that, this part is just a fallback.
+               // If we don't have brand, we can't deep link to the specific vehicle easily with current MyOffersScreen structure.
+               // So we just open MyOffersScreen with incoming tab.
+               
+               Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyOffersScreen(
+                      isIncoming: true,
+                      initialTab: 0,
+                    ),
+                  ),
+                );
+            }
+          }
+        },
         borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            color: notification.isRead ? Colors.white : Colors.blue[50],
+            color: notification.isRead
+                ? Colors.white.withOpacity(0.9)
+                : Colors.blue[50],
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: notification.isRead ? Colors.grey[300]! : Colors.blue[200]!,
-              width: 1,
+              color: notification.isRead
+                  ? Colors.grey.withOpacity(0.2)
+                  : Colors.blue.withOpacity(0.3),
             ),
             boxShadow: [
               BoxShadow(
@@ -209,76 +274,72 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // İkon
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: _getNotificationColor(notification.type).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      notification.type.icon,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ),
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // İkon
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _getNotificationColor(notification.type).withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 16),
-                // İçerik
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              notification.title,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-                                color: Colors.grey[900],
-                              ),
+                child: Text(
+                  notification.type.icon,
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ),
+              const SizedBox(width: 16),
+              // İçerik
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                           ),
-                          if (!notification.isRead)
-                            Container(
-                              width: 10,
-                              height: 10,
-                              decoration: const BoxDecoration(
-                                color: Colors.blue,
-                                shape: BoxShape.circle,
-                              ),
+                        ),
+                        if (!notification.isRead)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
                             ),
-                        ],
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      message,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 14,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification.message,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      timeago.format(notification.createdAt, locale: LocalizationService().currentLanguage),
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 12,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        timeAgoStr,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

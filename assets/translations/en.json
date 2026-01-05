@@ -760,7 +760,7 @@
     "devBonusSuccess": "Developer bonus applied successfully!"
   },
   "skills": {
-    "availablePoints": "Available Points",
+    "availablePoints": "Skill Point",
     "activeSkills": "Active Skills",
     "quickBuy": "Quick Buy",
     "quickBuyDesc": "Allows you to instantly find and view details of vehicles within a specific score range. Higher levels unlock higher score vehicles.",
@@ -1625,7 +1625,11 @@
     },
     "vehicleSold": {
       "title": "Vehicle Sold! 🎉",
-      "message": "{vehicle} successfully sold for {price}"
+      "message": "{vehicle} was successfully sold for {price} ₺"
+    },
+    "bulkOffer": {
+      "title": "New Offers!",
+      "message": "You received {count} offers for your {brand} {model} vehicle."
     }
   },
   "ads": {

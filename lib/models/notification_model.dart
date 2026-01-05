@@ -9,6 +9,11 @@ class AppNotification {
   final bool isRead;
   final Map<String, dynamic>? data; // Ek bilgiler (offerId, vehicleId vs)
   
+  // 🆕 Dynamic Localization Fields
+  final String? titleKey;
+  final String? messageKey;
+  final Map<String, String>? params;
+
   AppNotification({
     required this.id,
     required this.userId,
@@ -18,6 +23,9 @@ class AppNotification {
     required this.createdAt,
     this.isRead = false,
     this.data,
+    this.titleKey,
+    this.messageKey,
+    this.params,
   });
 
   // JSON'a çevir
@@ -31,6 +39,9 @@ class AppNotification {
       'createdAt': createdAt.toIso8601String(),
       'isRead': isRead,
       'data': data,
+      'titleKey': titleKey,
+      'messageKey': messageKey,
+      'params': params,
     };
   }
 
@@ -47,6 +58,9 @@ class AppNotification {
       createdAt: DateTime.parse(json['createdAt']),
       isRead: json['isRead'] ?? false,
       data: json['data'] != null ? Map<String, dynamic>.from(json['data']) : null,
+      titleKey: json['titleKey'],
+      messageKey: json['messageKey'],
+      params: json['params'] != null ? Map<String, String>.from(json['params']) : null,
     );
   }
 
@@ -60,6 +74,9 @@ class AppNotification {
     DateTime? createdAt,
     bool? isRead,
     Map<String, dynamic>? data,
+    String? titleKey,
+    String? messageKey,
+    Map<String, String>? params,
   }) {
     return AppNotification(
       id: id ?? this.id,
@@ -70,6 +87,9 @@ class AppNotification {
       createdAt: createdAt ?? this.createdAt,
       isRead: isRead ?? this.isRead,
       data: data ?? this.data,
+      titleKey: titleKey ?? this.titleKey,
+      messageKey: messageKey ?? this.messageKey,
+      params: params ?? this.params,
     );
   }
 }

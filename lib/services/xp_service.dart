@@ -52,7 +52,10 @@ class LevelUpReward {
     required this.cashBonus,
     required this.goldBonus,
     required this.unlocks,
+    this.skillPoints = 0,
   });
+
+  final int skillPoints;
 }
 
 /// XP Yönetim Servisi
@@ -130,7 +133,9 @@ class XPService {
   Future<LevelUpReward> _processLevelUpRewards(String userId, int newLevel) async {
     final userMap = await _db.getUserById(userId);
     if (userMap == null) {
-      return LevelUpReward(level: newLevel, cashBonus: 0, goldBonus: 0, unlocks: []);
+    if (userMap == null) {
+      return LevelUpReward(level: newLevel, cashBonus: 0, goldBonus: 0, unlocks: [], skillPoints: 0);
+    }
     }
     final user = User.fromJson(userMap);
     
@@ -141,9 +146,12 @@ class XPService {
     // Ödülleri kullanıcıya ekle
     final newBalance = user.balance + cashReward;
     final newGold = user.gold + goldReward;
+    final newSkillPoints = user.skillPoints + 1; // Her seviye için 1 SP
+
     await _db.updateUser(userId, {
       'balance': newBalance,
       'gold': newGold,
+      'skillPoints': newSkillPoints,
     });
     
     // Kilitleri aç
@@ -157,6 +165,7 @@ class XPService {
       cashBonus: cashReward,
       goldBonus: goldReward,
       unlocks: unlocks,
+      skillPoints: 1,
     );
   }
   

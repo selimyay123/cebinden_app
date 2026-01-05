@@ -156,6 +156,14 @@ class _LevelUpDialogState extends State<LevelUpDialog> with SingleTickerProvider
                         unlock.tr(),
                         Colors.blue,
                       )),
+
+                    // Skill Points Reward
+                    if (widget.reward.skillPoints > 0)
+                      _buildRewardItem(
+                        Icons.star,
+                        '${widget.reward.skillPoints} ${'skills.availablePoints'.tr()}',
+                        Colors.amber,
+                      ),
                   ],
                 ),
               ),
