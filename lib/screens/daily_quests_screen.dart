@@ -369,7 +369,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
                     const Icon(Icons.monetization_on, size: 16, color: Colors.green),
                     const SizedBox(width: 4),
                     Text(
-                      NumberFormat.currency(symbol: '₺', decimalDigits: 0).format(mission.rewardMoney),
+                      NumberFormat.currency(symbol: 'TL', decimalDigits: 0).format(mission.rewardMoney),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: isClaimed ? Colors.grey : Colors.green[700],

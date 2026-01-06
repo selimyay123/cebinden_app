@@ -25,7 +25,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   User? _currentUser;
   List<Map<String, dynamic>> _topPlayers = [];
   bool _isLoading = true;
-  final NumberFormat _currencyFormat = NumberFormat.currency(locale: 'tr_TR', symbol: '₺', decimalDigits: 0);
+  final NumberFormat _currencyFormat = NumberFormat.currency(locale: 'tr_TR', symbol: 'TL', decimalDigits: 0);
 
   @override
   void initState() {
@@ -293,7 +293,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   String _formatMoney(dynamic amount) {
-    if (amount == null) return '₺0';
+    if (amount == null) return 'TL0';
     return _currencyFormat.format(amount);
   }
 

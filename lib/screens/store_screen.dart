@@ -547,7 +547,7 @@ class _StoreScreenState extends State<StoreScreen> {
                         
                         // Fiyat
                         Text(
-                          product.price.replaceAll('₺', 'TL'),
+                          product.price.replaceAll('TL', 'TL'),
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -621,7 +621,7 @@ class _StoreScreenState extends State<StoreScreen> {
                             style: TextStyle(color: Colors.grey[700]),
                           ),
                           Text(
-                            product.price.replaceAll('₺', 'TL'),
+                            product.price.replaceAll('TL', 'TL'),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.deepPurple,
@@ -1363,13 +1363,32 @@ class _StoreScreenState extends State<StoreScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('store.animatedPP.buy'.tr()),
-        content: Text('${name} ${'store.animatedPP.price'.tr()}?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('common.cancel'.tr())),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('store.animatedPP.buy'.tr())),
-        ],
+      builder: (context) => ModernAlertDialog(
+        title: 'store.animatedPP.buy'.tr(),
+        icon: Icons.face,
+        iconColor: Colors.deepPurple,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${name} ${'store.animatedPP.price'.tr()}?',
+              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'store.costLabel'.trParams({
+                'amount': '1',
+                'currency': 'store.gold'.tr()
+              }),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        buttonText: 'store.animatedPP.buy'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
       ),
     );
 

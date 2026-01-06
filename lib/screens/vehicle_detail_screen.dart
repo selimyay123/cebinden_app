@@ -1026,7 +1026,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   Future<void> _showExpertiseDialog({bool isFree = false}) async {
     if (_currentUser == null) return;
     
-    final cost = isFree ? 0.0 : 3000.0;
+    double cost = 0.0;
+    if (!isFree) {
+      // Dinamik ekspertiz ücreti: 2000 TL taban + araç fiyatının %0.1'i
+      // Üst limit: 8000 TL
+      double calculatedFee = 2000.0 + (_vehicle.price * 0.001);
+      if (calculatedFee > 8000.0) {
+        calculatedFee = 8000.0;
+      }
+      // 50 TL'nin katlarına yuvarla
+      cost = (calculatedFee / 50).ceil() * 50.0;
+    }
+
     final canAfford = _currentUser!.balance >= cost;
 
     showDialog(
@@ -2143,7 +2154,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             children: [
               // Dönen çekiç/tokmak animasyonu
                 Lottie.asset(
-                  'assets/animations/satinal.json',
+                  'assets/animations/buy_car.json',
                 width: 300,
                 height: 300,
                 repeat: false, // Sadece 1 kez oynat

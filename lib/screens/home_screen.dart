@@ -531,6 +531,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                           child: GameTimeCountdown(
                                             key: _gameTimeKey,
                                             margin: EdgeInsets.zero,
+                                            currentUser: _currentUser,
                                           ),
                                         ),
                                       ],
@@ -549,6 +550,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                       ],
                                     ),
                                   ),
+                                  
+                                  const SizedBox(height: 16),
+
+
                                   
                                   // Hızlı İşlemler
                                   // _buildQuickActions(), // YORUM: SliverGrid olarak aşağıya taşındı
@@ -624,7 +629,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5), // Blur yerine yüksek opaklıkta beyaz
+        color: Colors.white.withOpacity(0.2), // Blur yerine yüksek opaklıkta beyaz
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
         boxShadow: [
@@ -968,7 +973,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         
                         const SizedBox(height: 10),
                         
-                        // XP Bölümü
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1002,6 +1006,72 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                               ),
                             ),
                           ],
+                        ),
+                        
+                        const SizedBox(height: 12),
+
+                        // Yetenek Ağacı Butonu
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SkillTreeScreen(),
+                              ),
+                            ).then((_) => _loadCurrentUser());
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurpleAccent.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.white.withOpacity(0.5)),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueAccent.withOpacity(0.3),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.account_tree,
+                                    color: Colors.blueAccent,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'home.tasks'.tr(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      // Text(
+                                      //   '${'skills.availablePoints'.tr()}: ${_currentUser!.skillPoints}',
+                                      //   style: TextStyle(
+                                      //     color: Colors.white.withOpacity(0.7),
+                                      //     fontSize: 12,
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.white70,
+                                  size: 20,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                         
                         const SizedBox(height: 12),
@@ -1327,94 +1397,95 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
   // Koleksiyon Kartı
   Widget _buildCollectionCard() {
-    if (_totalCollectionCount == 0) return const SizedBox.shrink();
-
+    if (_currentUser == null) return const SizedBox.shrink();
+    
     return GestureDetector(
-        onTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CollectionScreen(),
-            ),
-          );
-          _loadCurrentUser(); // Geri dönünce yenile
-        },
-        child: SizedBox(
-          height: 100, // Sabit yükseklik
-          child: _buildGlassContainer(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CollectionScreen(),
+          ),
+        ).then((_) => _loadCurrentUser());
+      },
+      child: _buildGlassContainer(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                // Başlık (Üstte)
-                Text(
-                  'drawer.collection'.tr(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14, // Biraz küçülttük
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.collections_bookmark,
+                    color: Colors.purple,
+                    size: 20,
                   ),
                 ),
-                
-                const Spacer(), // Aradaki boşluğu doldur
-                
-                // Alt Kısım
-                Row(
-                  children: [
-                    // İkon
-                    Container(
-                      padding: const EdgeInsets.all(8), // Padding azaltıldı
-                      decoration: BoxDecoration(
-                        color: Colors.purple.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.collections_bookmark_outlined,
-                        color: Colors.purple,
-                        size: 20, // İkon küçültüldü
-                      ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Koleksiyon', // TODO: Translate key
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
-                    const SizedBox(width: 8),
-                    
-                    // Metinler ve Progress
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min, // Minimum yer kapla
-                        children: [
-                          Text(
-                            '$_collectedCount/$_totalCollectionCount ${'vehicles.title'.tr()}', 
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12, // Font küçültüldü
-                            ),
-                          ),
-                          // İlerleme çubuğu
-                          const SizedBox(height: 4),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: _totalCollectionCount > 0 ? _collectedCount / _totalCollectionCount : 0,
-                              backgroundColor: Colors.grey[300],
-                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.purple),
-                              minHeight: 4, // Biraz incelttik
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    const SizedBox(width: 4),
-                    const Icon(Icons.chevron_right, color: Colors.grey, size: 16),
-                  ],
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 12),
+            
+            // İlerleme Çubuğu ve Metin
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '$_collectedCount / $_totalCollectionCount',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple.shade700,
+                      ),
+                    ),
+                    Text(
+                      '%${(_totalCollectionCount > 0 ? (_collectedCount / _totalCollectionCount * 100).toInt() : 0)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: _totalCollectionCount > 0 ? _collectedCount / _totalCollectionCount : 0,
+                    backgroundColor: Colors.purple.withOpacity(0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.purple.shade400),
+                    minHeight: 6,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
+
+
 
   Widget _buildQuickActionsSliver() {
     final quickActions = _getQuickActions();

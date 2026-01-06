@@ -153,69 +153,69 @@ class MarketRefreshService {
   // 2025 model yılı tavan fiyatları (brand -> model -> fiyat)
   final Map<String, Map<String, double>> _basePrices2025 = {
     'Renauva': {
-      'Slim': 1450000.0,    // Clio V (Icon, Touch, Esprit Alpine) - ₺1.200.000-₺1.450.000 tavan
-      'Magna': 1850000.0,   // Megane IV Sedan/HB (Icon, GT-Line) - ₺1.500.000-₺1.850.000 tavan
-      'Flow': 825000.0,     // Fluence (Üretim durdu, 2014-2016 en üst) - ₺700.000-₺825.000 tavan
-      'Signa': 875000.0,    // Symbol (2016-2020 Joy/Touch Plus) - ₺750.000-₺875.000 tavan
-      'Tallion': 1050000.0, // Taliant (2024-2025 Touch Plus) - ₺900.000-₺1.050.000 tavan
+      'Slim': 1450000.0,    // Clio V (Icon, Touch, Esprit Alpine) - TL1.200.000-TL1.450.000 tavan
+      'Magna': 1850000.0,   // Megane IV Sedan/HB (Icon, GT-Line) - TL1.500.000-TL1.850.000 tavan
+      'Flow': 825000.0,     // Fluence (Üretim durdu, 2014-2016 en üst) - TL700.000-TL825.000 tavan
+      'Signa': 875000.0,    // Symbol (2016-2020 Joy/Touch Plus) - TL750.000-TL875.000 tavan
+      'Tallion': 1050000.0, // Taliant (2024-2025 Touch Plus) - TL900.000-TL1.050.000 tavan
     },
     'Volkstar': {
-      'Paso': 2200000.0,    // Passat B8/B8.5 (Highline, R-Line) - ₺1.800.000-₺2.200.000 tavan
-      'Tenis': 1800000.0,   // Golf VIII (R-Line, Highline) - ₺1.400.000-₺1.800.000 tavan
-      'Colo': 1300000.0,    // Polo (Comfortline/Highline) - ₺1.050.000-₺1.300.000 tavan
-      'Jago': 1150000.0,    // Jetta (Üretim durdu, 2016-2018 Highline) - ₺950.000-₺1.150.000 tavan
+      'Paso': 2200000.0,    // Passat B8/B8.5 (Highline, R-Line) - TL1.800.000-TL2.200.000 tavan
+      'Tenis': 1800000.0,   // Golf VIII (R-Line, Highline) - TL1.400.000-TL1.800.000 tavan
+      'Colo': 1300000.0,    // Polo (Comfortline/Highline) - TL1.050.000-TL1.300.000 tavan
+      'Jago': 1150000.0,    // Jetta (Üretim durdu, 2016-2018 Highline) - TL950.000-TL1.150.000 tavan
     },
     'Fialto': {
-      'Agna': 1250000.0,    // Egea (Lounge, Limited, Hibrit) - ₺1.050.000-₺1.250.000 tavan
-      'Lagua': 650000.0,    // Linea (Üretim durdu, 2014-2015 Emotion Plus) - ₺500.000-₺650.000 tavan
-      'Zorno': 580000.0,    // Punto (Üretim durdu, 2014-2015 Lounge) - ₺450.000-₺580.000 tavan
+      'Agna': 1250000.0,    // Egea (Lounge, Limited, Hibrit) - TL1.050.000-TL1.250.000 tavan
+      'Lagua': 650000.0,    // Linea (Üretim durdu, 2014-2015 Emotion Plus) - TL500.000-TL650.000 tavan
+      'Zorno': 580000.0,    // Punto (Üretim durdu, 2014-2015 Lounge) - TL450.000-TL580.000 tavan
     },
     'Oplon': {
-      'Tasra': 1700000.0,   // Astra L (Ultimate, Elegance) - ₺1.350.000-₺1.700.000 tavan
-      'Lorisa': 1200000.0,  // Corsa F (Ultimate, Elegance) - ₺950.000-₺1.200.000 tavan
-      'Mornitia': 2000000.0, // Insignia B (Ultimate, Excellence) - ₺1.600.000-₺2.000.000 tavan
+      'Tasra': 1700000.0,   // Astra L (Ultimate, Elegance) - TL1.350.000-TL1.700.000 tavan
+      'Lorisa': 1200000.0,  // Corsa F (Ultimate, Elegance) - TL950.000-TL1.200.000 tavan
+      'Mornitia': 2000000.0, // Insignia B (Ultimate, Excellence) - TL1.600.000-TL2.000.000 tavan
     },
     'Bavora': {
-      'C Serisi': 3500000.0,  // 3 Serisi G20 (M Sport, Luxury Line) - ₺2.500.000-₺3.500.000 tavan
-      'E Serisi': 5000000.0,  // 5 Serisi G30/G60 (M Sport, Executive) - ₺3.500.000-₺5.000.000 tavan
-      'A Serisi': 1850000.0,  // 1 Serisi F40 (M Sport) - ₺1.500.000-₺1.850.000 tavan
-      'D Serisi': 4000000.0,  // 4 Serisi G22/G26 (M Sport, Cabrio) - ₺2.800.000-₺4.000.000 tavan
+      'C Serisi': 3500000.0,  // 3 Serisi G20 (M Sport, Luxury Line) - TL2.500.000-TL3.500.000 tavan
+      'E Serisi': 5000000.0,  // 5 Serisi G30/G60 (M Sport, Executive) - TL3.500.000-TL5.000.000 tavan
+      'A Serisi': 1850000.0,  // 1 Serisi F40 (M Sport) - TL1.500.000-TL1.850.000 tavan
+      'D Serisi': 4000000.0,  // 4 Serisi G22/G26 (M Sport, Cabrio) - TL2.800.000-TL4.000.000 tavan
     },
     'Fortran': {
-      'Odak': 1500000.0,      // Focus IV (Titanium, ST-Line) - ₺1.200.000-₺1.500.000 tavan
-      'Vista': 1150000.0,     // Fiesta VIII (ST-Line, Titanium) - ₺900.000-₺1.150.000 tavan
-      'Avger': 4500000.0,     // Ranger (Wildtrak, Bi-Turbo) - ₺2.500.000-₺4.500.000 tavan (Raptor daha yüksek!)
-      'Tupa': 2000000.0,      // Kuga III (Vignale, Hibrit) - ₺1.500.000-₺2.000.000 tavan
+      'Odak': 1500000.0,      // Focus IV (Titanium, ST-Line) - TL1.200.000-TL1.500.000 tavan
+      'Vista': 1150000.0,     // Fiesta VIII (ST-Line, Titanium) - TL900.000-TL1.150.000 tavan
+      'Avger': 4500000.0,     // Ranger (Wildtrak, Bi-Turbo) - TL2.500.000-TL4.500.000 tavan (Raptor daha yüksek!)
+      'Tupa': 2000000.0,      // Kuga III (Vignale, Hibrit) - TL1.500.000-TL2.000.000 tavan
     },
     'Mercurion': {
-      '3 Serisi': 4000000.0,  // C-Class W206 (AMG Line, Exclusive, Hibrit) - ₺2.800.000-₺4.000.000 tavan
-      '5 Serisi': 5500000.0,  // E-Class W213 (AMG Line, Designo) - ₺3.800.000-₺5.500.000 tavan
-      '1 Serisi': 2200000.0,  // A-Class W177 (AMG Line, MBUX) - ₺1.700.000-₺2.200.000 tavan
-      'GJE': 3000000.0,       // CLA C118 (AMG Line, 4 Kapı Coupe) - ₺2.400.000-₺3.000.000 tavan
-      '8 Serisi': 25000000.0, // G-Class (G 63 AMG) - ₺15.000.000-₺25.000.000+ tavan - OYUNUN EN PAHALI ARACI!
+      '3 Serisi': 4000000.0,  // C-Class W206 (AMG Line, Exclusive, Hibrit) - TL2.800.000-TL4.000.000 tavan
+      '5 Serisi': 5500000.0,  // E-Class W213 (AMG Line, Designo) - TL3.800.000-TL5.500.000 tavan
+      '1 Serisi': 2200000.0,  // A-Class W177 (AMG Line, MBUX) - TL1.700.000-TL2.200.000 tavan
+      'GJE': 3000000.0,       // CLA C118 (AMG Line, 4 Kapı Coupe) - TL2.400.000-TL3.000.000 tavan
+      '8 Serisi': 25000000.0, // G-Class (G 63 AMG) - TL15.000.000-TL25.000.000+ tavan - OYUNUN EN PAHALI ARACI!
     },
     // 'Hundar': {
-    //   'A10': 1100000.0,        // i20 III (Style Plus, Elite) - ₺900.000-₺1.100.000 tavan
-    //   'Tecent Red': 700000.0,  // Accent Blue (Mode Plus, Dizel Oto) - ₺550.000-₺700.000 tavan
-    //   'Tecent White': 520000.0, // Accent Era (Team, Dizel Oto) - ₺400.000-₺520.000 tavan
-    //   'A20': 1600000.0,        // i30 III (Elite, N-Line) - ₺1.250.000-₺1.600.000 tavan
-    //   'Kascon': 2500000.0,     // Tucson NX4 (Elite Plus, Hibrit) - ₺1.800.000-₺2.500.000 tavan
+    //   'A10': 1100000.0,        // i20 III (Style Plus, Elite) - TL900.000-TL1.100.000 tavan
+    //   'Tecent Red': 700000.0,  // Accent Blue (Mode Plus, Dizel Oto) - TL550.000-TL700.000 tavan
+    //   'Tecent White': 520000.0, // Accent Era (Team, Dizel Oto) - TL400.000-TL520.000 tavan
+    //   'A20': 1600000.0,        // i30 III (Elite, N-Line) - TL1.250.000-TL1.600.000 tavan
+    //   'Kascon': 2500000.0,     // Tucson NX4 (Elite Plus, Hibrit) - TL1.800.000-TL2.500.000 tavan
     // },
     'Koyoro': {
-      'Airoko': 2000000.0,     // Corolla E210 (Passion, Flame X-Pack, Hibrit) - ₺1.550.000-₺2.000.000 tavan
-      'Lotus': 950000.0,       // Auris (Premium, Elegant, Hibrit) - ₺750.000-₺950.000 tavan
-      'Karma': 1300000.0,      // Yaris XP210 (Passion, Hibrit) - ₺1.000.000-₺1.300.000 tavan
+      'Airoko': 2000000.0,     // Corolla E210 (Passion, Flame X-Pack, Hibrit) - TL1.550.000-TL2.000.000 tavan
+      'Lotus': 950000.0,       // Auris (Premium, Elegant, Hibrit) - TL750.000-TL950.000 tavan
+      'Karma': 1300000.0,      // Yaris XP210 (Passion, Hibrit) - TL1.000.000-TL1.300.000 tavan
     },
     'Audira': {
-      'B3': 2400000.0,         // A3 8Y (S Line, Edition One) 2023-2025 sıfıra yakın - ₺1.800.000-₺2.400.000 tavan
-      'B4': 3600000.0,         // A4 B9/B10 (S Line, Design, Quattro) 2023-2025 - ₺2.600.000-₺3.600.000 tavan
-      'B6': 5200000.0,         // A6 C8 (S Line, Exclusive, Quattro 3.0 V6) 2023-2025 - ₺4.000.000-₺5.200.000 tavan
-      'B5': 4000000.0,         // A5 B9 (S Line, Sportback, Quattro) 2023-2025 - ₺3.000.000-₺4.000.000 tavan
+      'B3': 2400000.0,         // A3 8Y (S Line, Edition One) 2023-2025 sıfıra yakın - TL1.800.000-TL2.400.000 tavan
+      'B4': 3600000.0,         // A4 B9/B10 (S Line, Design, Quattro) 2023-2025 - TL2.600.000-TL3.600.000 tavan
+      'B6': 5200000.0,         // A6 C8 (S Line, Exclusive, Quattro 3.0 V6) 2023-2025 - TL4.000.000-TL5.200.000 tavan
+      'B5': 4000000.0,         // A5 B9 (S Line, Sportback, Quattro) 2023-2025 - TL3.000.000-TL4.000.000 tavan
     },
     'Hanto': {
-      'Vice': 1850000.0,       // Civic FL (Executive, RS, Turbo) - ₺1.500.000-₺1.850.000 tavan
-      'VHL': 2700000.0,        // CR-V 6. nesil (Executive, Hibrit, AWD) - ₺2.000.000-₺2.700.000 tavan
-      'Caz': 1450000.0,        // Jazz 4. nesil (Executive, Hibrit) - ₺1.200.000-₺1.450.000 tavan
+      'Vice': 1850000.0,       // Civic FL (Executive, RS, Turbo) - TL1.500.000-TL1.850.000 tavan
+      'VHL': 2700000.0,        // CR-V 6. nesil (Executive, Hibrit, AWD) - TL2.000.000-TL2.700.000 tavan
+      'Caz': 1450000.0,        // Jazz 4. nesil (Executive, Hibrit) - TL1.200.000-TL1.450.000 tavan
     },
     // Diğer markalar eklenecek
   };

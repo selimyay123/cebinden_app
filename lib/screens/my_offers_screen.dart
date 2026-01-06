@@ -863,18 +863,18 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Alıcı Mesajı (Sol - Gri Balon)
+          // 1. Alıcı Mesajı (Sol - Gri Balon -> Mor Balon)
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Avatar
               CircleAvatar(
                 radius: 18,
-                backgroundColor: Colors.grey.shade300,
+                backgroundColor: Colors.white.withOpacity(0.2),
                 child: Text(
                   offer.buyerName[0],
-                  style: TextStyle(
-                    color: Colors.grey.shade800,
+                  style: const TextStyle(
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -930,13 +930,23 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
+                        color: Colors.deepPurple.withOpacity(0.6), // Mor arka plan
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(4),
                           topRight: Radius.circular(16),
                           bottomLeft: Radius.circular(16),
                           bottomRight: Radius.circular(16),
                         ),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -947,12 +957,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                               offer.message!.tr(),
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.black87,
+                                color: Colors.white, // Beyaz yazı
                               ),
                             ),
                           
                           const SizedBox(height: 8),
-                          const Divider(height: 16),
+                          Divider(height: 16, color: Colors.white.withOpacity(0.2)),
                           
                           // Teklif Fiyatı
                           Row(
@@ -962,7 +972,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 'offers.offerPrice'.tr() + ': ',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey.shade600,
+                                  color: Colors.white.withOpacity(0.7),
                                 ),
                               ),
                               Text(
@@ -970,7 +980,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.deepPurple,
+                                  color: Colors.white, // Beyaz fiyat
                                 ),
                               ),
                             ],
@@ -986,15 +996,15 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                               final profitLoss = offer.offerPrice - vehicle.purchasePrice;
                               final profitLossPercentage = (profitLoss / vehicle.purchasePrice) * 100;
                               final isProfit = profitLoss >= 0;
-                              final color = isProfit ? Colors.green : Colors.red;
+                              final color = isProfit ? Colors.greenAccent : Colors.redAccent; // Daha parlak renkler
 
                               return Container(
                                 margin: const EdgeInsets.only(top: 8),
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: color.withOpacity(0.1),
+                                  color: color.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: color.withOpacity(0.3)),
+                                  border: Border.all(color: color.withOpacity(0.5)),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -1017,7 +1027,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                       ' (%${profitLossPercentage.toStringAsFixed(1)})',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        color: color,
+                                        color: color.withOpacity(0.9),
                                       ),
                                     ),
                                   ],

@@ -204,6 +204,15 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
                             icon: Icons.fact_check,
                             color: Colors.indigo,
                           ),
+                          const SizedBox(height: 16),
+                          // Time Master Skill Card
+                          _buildSkillCard(
+                            skillId: SkillService.skillTimeMaster,
+                            title: 'skills.timeMaster'.tr(),
+                            description: 'skills.timeMasterDesc'.tr(),
+                            icon: Icons.fast_forward,
+                            color: Colors.purple,
+                          ),
                         ],
                       ),
                     ),

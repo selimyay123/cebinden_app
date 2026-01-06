@@ -87,8 +87,12 @@ class _ActivityScreenState extends State<ActivityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('activity.title'.tr()),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.black,
         actions: [
 
           if (_activities.isNotEmpty)
@@ -99,11 +103,21 @@ class _ActivityScreenState extends State<ActivityScreen> {
             ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _activities.isEmpty
-              ? _buildEmptyState()
-              : _buildActivitiesList(),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _activities.isEmpty
+                  ? _buildEmptyState()
+                  : _buildActivitiesList(),
+        ),
+      ),
     );
   }
 
@@ -164,15 +178,14 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.deepPurple.withOpacity(0.85), // Purple background
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.grey[200]!,
-          width: 1,
+          color: Colors.white.withOpacity(0.1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -188,12 +201,12 @@ class _ActivityScreenState extends State<ActivityScreen> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: _getActivityColor(activity.type).withOpacity(0.1),
+                color: Colors.white.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 _getActivityIcon(activity.type),
-                color: _getActivityColor(activity.type),
+                color: Colors.white, // White icon
                 size: 28,
               ),
             ),
@@ -209,10 +222,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       Expanded(
                         child: Text(
                           activity.title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[900],
+                            color: Colors.white, // White title
                           ),
                         ),
                       ),
@@ -225,7 +238,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     activity.description,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[700],
+                      color: Colors.white.withOpacity(0.9), // White description
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -233,7 +246,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     timeAgoStr,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[500],
+                      color: Colors.white.withOpacity(0.6), // Dim white time
                     ),
                   ),
                 ],
@@ -266,26 +279,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     }
   }
 
-  Color _getActivityColor(ActivityType type) {
-    switch (type) {
-      case ActivityType.purchase:
-        return Colors.red;
-      case ActivityType.sale:
-        return Colors.green;
-      case ActivityType.rental:
-        return Colors.blue;
-      case ActivityType.levelUp:
-        return Colors.amber;
-      case ActivityType.taxi:
-        return Colors.yellow[800]!;
-      case ActivityType.dailyLogin:
-        return Colors.purple;
-      case ActivityType.expense:
-        return Colors.red;
-      case ActivityType.income:
-        return Colors.green;
-    }
-  }
+
 
   Widget _buildAmountText(Activity activity) {
     final isGold = activity.type == ActivityType.dailyLogin;

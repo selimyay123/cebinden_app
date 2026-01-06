@@ -529,17 +529,11 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
   }
 
   Widget _buildQuickBuyCard(BuildContext context) {
-    final level = _skillService.getSkillLevel(_currentUser!, SkillService.skillQuickBuy);
     final remainingUses = _skillService.getRemainingDailyUses(_currentUser!, SkillService.skillQuickBuy);
-    
-    // DEBUG: Durumu görmek için
-    // print('DEBUG: CurrentDay: ${_gameTime.currentDay}, LastUseDay: ${_currentUser!.lastSkillUseDay}, Remaining: $remainingUses');
     
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        children: [
-          Material(
+      child: Material(
         color: Colors.orange.shade800.withOpacity(0.6),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
@@ -653,43 +647,23 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
                 // Icon
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.flash_on, color: Colors.white, size: 32),
-                ),
-                const SizedBox(width: 16),
+                const Icon(Icons.flash_on, color: Colors.white, size: 24),
+                const SizedBox(width: 12),
                 // Text
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'skills.quickBuy'.tr(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${'skills.level'.tr()} $level',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white.withOpacity(0.9),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'skills.quickBuy'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 // Remaining Uses
@@ -707,15 +681,13 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 // Arrow
-                Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
+                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
               ],
             ),
           ),
         ),
-      ),
-        ],
       ),
     );
   }

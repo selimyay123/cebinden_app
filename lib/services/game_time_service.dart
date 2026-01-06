@@ -271,5 +271,26 @@ class GameTimeService with WidgetsBindingObserver {
     final minutes = totalMinutes % 60;
     return '$hours saat $minutes dakika';
   }
+
+  /// Bir sonraki güne hızlı sar (Test/Debug için)
+  /// [secondsRemaining] : Yeni güne kaç saniye kala duracağı
+  void fastForwardToNextDay({int secondsRemaining = 3}) {
+    if (!_isAppActive || _sessionStartTime == null) return;
+
+    // Şu anki kalan süreyi bul
+    final currentRemaining = getTimeUntilNextDay();
+    
+    // Eğer zaten istenen süreden az kaldıysa işlem yapma
+    if (currentRemaining.inSeconds <= secondsRemaining) return;
+    
+    // İlerletilmesi gereken süre (saniye cinsinden)
+    final secondsToAdvance = currentRemaining.inSeconds - secondsRemaining;
+    
+    // Oturum başlangıç zamanını geriye çekerek zamanı ilerletmiş oluyoruz
+    _sessionStartTime = _sessionStartTime!.subtract(Duration(seconds: secondsToAdvance));
+    
+    // Zamanı güncelle
+    _updateCurrentTime();
+  }
 }
 

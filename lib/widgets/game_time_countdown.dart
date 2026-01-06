@@ -2,14 +2,25 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import '../services/localization_service.dart'; // Custom localization service
 import '../services/game_time_service.dart';
 import '../screens/settings_screen.dart';
+import '../screens/skill_tree_screen.dart';
+
+import '../models/user_model.dart';
+import '../services/skill_service.dart';
 
 class GameTimeCountdown extends StatefulWidget {
   final EdgeInsetsGeometry? margin;
-  const GameTimeCountdown({Key? key, this.margin}) : super(key: key);
+  final User? currentUser;
+  
+  const GameTimeCountdown({
+    Key? key, 
+    this.margin,
+    this.currentUser,
+  }) : super(key: key);
 
   @override
   State<GameTimeCountdown> createState() => _GameTimeCountdownState();
@@ -18,6 +29,7 @@ class GameTimeCountdown extends StatefulWidget {
 class _GameTimeCountdownState extends State<GameTimeCountdown> {
   final GameTimeService _gameTime = GameTimeService();
   Timer? _timer;
+  Duration _animationDuration = Duration.zero;
   Duration _remainingTime = Duration.zero;
   int _currentHour = 0;
   int _totalDurationMinutes = 1;
@@ -39,7 +51,17 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
   void _updateTime() {
     if (mounted) {
       setState(() {
-        _remainingTime = _gameTime.getTimeUntilNextDay();
+        final newTime = _gameTime.getTimeUntilNextDay();
+        
+        // Sadece zaman geriye doğru büyük bir atlama yaparsa animasyon uygula (Hızlı sarma)
+        // Gün döngüsünde (0 -> 60) zaman artacağı için bu koşul sağlanmaz ve animasyon çalışmaz
+        if (_remainingTime.inSeconds - newTime.inSeconds > 5) {
+          _animationDuration = const Duration(seconds: 2);
+        } else {
+          _animationDuration = Duration.zero;
+        }
+        
+        _remainingTime = newTime;
         _currentHour = _gameTime.getCurrentHour();
         _totalDurationMinutes = _gameTime.getGameDayDuration();
       });
@@ -72,11 +94,40 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
     final Color progressColor = isDay ? Colors.orangeAccent : Colors.purpleAccent;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const SettingsScreen()),
-        );
+      onLongPress: () {
+        // Yetenek kontrolü
+        if (widget.currentUser == null) return;
+        
+        final hasSkill = SkillService().getSkillLevel(widget.currentUser!, SkillService.skillTimeMaster) > 0;
+        
+        if (!hasSkill) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('skills.timeMasterDesc'.tr()), // "Unlock ability..." message
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              action: SnackBarAction(
+                label: 'skills.upgrade'.tr(),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SkillTreeScreen()),
+                  );
+                },
+              ),
+            ),
+          );
+          return;
+        }
+
+        // Haptic feedback
+        HapticFeedback.heavyImpact();
+        
+        // Hızlı sar
+        _gameTime.fastForwardToNextDay(secondsRemaining: 3);
+        
+        // UI güncellemesi için
+        _updateTime();
       },
       child: Container(
         height: 90,
@@ -133,22 +184,27 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          _formatDuration(_remainingTime),
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            // fontFamily: 'Courier',
-                            letterSpacing: 1.2,
-                            shadows: [
-                              Shadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                        TweenAnimationBuilder<int>(
+                          tween: IntTween(begin: _remainingTime.inSeconds, end: _remainingTime.inSeconds),
+                          duration: _animationDuration,
+                          builder: (context, value, child) {
+                            return Text(
+                              _formatDuration(Duration(seconds: value)),
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       ],
                     ),

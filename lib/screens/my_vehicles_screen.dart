@@ -475,14 +475,14 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
           children: [
             Icon(
               Icons.directions_car_outlined,
-              size: 100,
+              size: 80,
               color: Colors.black,
             ),
             const SizedBox(height: 24),
             Text(
               'vehicles.noVehicles'.tr(),
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -994,18 +994,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      _buildSimpleDetailRow('vehicles.mileage'.tr(), '${_formatNumber(vehicle.mileage)} km'),
-                      _buildSimpleDetailRow('vehicles.bodyType'.tr(), 'vehicles.${vehicle.bodyType.toLowerCase()}'.tr()),
-                      _buildSimpleDetailRow('vehicles.horsepower'.tr(), '${vehicle.horsepower} HP'),
-                      _buildSimpleDetailRow('vehicles.fuelType'.tr(), 'vehicles.${vehicle.fuelType}'.tr()),
-                      _buildSimpleDetailRow('vehicles.transmission'.tr(), 'vehicles.${vehicle.transmission}'.tr()),
-                      _buildSimpleDetailRow('vehicles.engineSize'.tr(), '${vehicle.engineSize} L'),
-                      _buildSimpleDetailRow('vehicles.driveType'.tr(), 'vehicles.${vehicle.driveType}'.tr()),
-                      _buildSimpleDetailRow('vehicles.color'.tr(), 'colors.${vehicle.color}'.tr()),
-                      const Divider(height: 24),
-                      _buildSimpleDetailRow('vehicles.purchasePrice'.tr(), '${_formatCurrency(vehicle.purchasePrice)} TL'),
-                      _buildSimpleDetailRow('vehicles.purchaseDate'.tr(), _formatDate(vehicle.purchaseDate)),
-                      _buildSimpleDetailRow('vehicles.daysOwned'.tr(), '${vehicle.daysOwned} ${'misc.days'.tr()}'),
+                      // Technical specs removed as per user request
+                      // Purchase details removed as per user request
                       
                       if (vehicle.hasAccidentRecord) ...[
                         const SizedBox(height: 16),

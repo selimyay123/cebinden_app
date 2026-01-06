@@ -19,6 +19,7 @@ class SkillService {
   static const String skillSweetTalk = 'sweet_talk';
   static const String skillLowballer = 'lowballer';
   static const String skillExpertiseExpert = 'expertise_expert';
+  static const String skillTimeMaster = 'time_master';
 
   // Yetenek Tanımları
   static const Map<String, Map<String, dynamic>> skillDefinitions = {
@@ -44,6 +45,11 @@ class SkillService {
       'maxLevel': 1,
       'costs': [1],
       'dailyLimit': 3,
+    },
+    skillTimeMaster: {
+      'maxLevel': 1,
+      'costs': [1],
+      'dailyLimit': 99, // Unlimited effectively
     },
   };
 

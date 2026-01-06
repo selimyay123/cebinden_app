@@ -139,7 +139,7 @@
     "tasks": "Talent Tree",
     "noRecentActivity": "No recent activity",
     "startBuying": "Start shopping now!",
-    "bonusAwarded": "Special bonus! Your balance has been increased to 5,000,000 ₺!",
+    "bonusAwarded": "Special bonus! Your balance has been increased to 5,000,000 TL!",
     "welcomeMessage": "Welcome to our vehicle trading platform! You can start by selecting an action from the quick actions menu above.",
     "membershipDate": "Membership",
     "notifications": "Notifications",
@@ -158,7 +158,7 @@
     "galleryPriceValue": "10 Million TL",
     "galleryComingSoon": "Gallery purchase feature will be available soon!",
     "galleryPurchaseSuccess": "Congratulations! You are now a gallery owner!",
-    "galleryInsufficientFunds": "Insufficient balance to purchase gallery. Required: 10,000,000 ₺",
+    "galleryInsufficientFunds": "Insufficient balance to purchase gallery. Required: 10,000,000 TL",
     "myGallery": "My Gallery",
     "galleryStatus": "Gallery Status",
     "galleryPurchaseDate": "Purchase Date",
@@ -794,7 +794,9 @@
     "upgradeFailed": "Could not upgrade skill. Insufficient points or max level reached.",
     "dailyLimitReached": "You have reached the daily usage limit.",
     "remainingUses": "Remaining Uses",
-    "noVehicleFound": "No suitable vehicle found in this score range. Please try again later."
+    "noVehicleFound": "No suitable vehicle found in this score range. Please try again later.",
+    "timeMaster": "Time Master",
+    "timeMasterDesc": "Unlock the ability to fast-forward time by long-pressing the game timer."
   },
   "admin": {
     "title": "Admin Panel",
@@ -1636,7 +1638,7 @@
     },
     "vehicleSold": {
       "title": "Vehicle Sold!",
-      "message": "{vehicle} was successfully sold for {price} ₺"
+      "message": "{vehicle} was successfully sold for {price} TL"
     },
     "bulkOffer": {
       "title": "New Offers!",
