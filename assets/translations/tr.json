@@ -3,6 +3,13 @@
     "name": "Cebinden",
     "subtitle": "Sanal Araba Ticareti"
   },
+  "resourceDownload": {
+    "title": "Kaynaklar İndiriliyor",
+    "info": "Güncellemeler yükleniyor, lütfen bekleyin...",
+    "checking": "Kaynaklar kontrol ediliyor...",
+    "downloading": "Oyun varlıkları indiriliyor...",
+    "ready": "Kaynaklar hazır!"
+  },
   "gallery": {
     "rentOut": "Aracını Kiraya Ver",
     "rentedVehicles": "Kiraya Verdiğim Araçlarım",

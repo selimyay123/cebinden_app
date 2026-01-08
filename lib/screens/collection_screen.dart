@@ -7,7 +7,9 @@ import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
 import '../utils/vehicle_utils.dart';
+import '../utils/vehicle_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../widgets/game_image.dart';
 
 class CollectionScreen extends StatefulWidget {
   const CollectionScreen({super.key});
@@ -86,9 +88,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
         elevation: 0,
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/home_bg.png'),
+        decoration: BoxDecoration(
+          image: GameDecorationImage(
+            assetPath: 'assets/images/home_bg.png',
             fit: BoxFit.cover,
           ),
         ),
@@ -135,11 +137,10 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     decoration: const BoxDecoration(
                       color: Colors.transparent,
                     ),
-                    child: Image.asset(
-                      'assets/images/brands/${brand.toLowerCase()}.png',
+                    child: GameImage(
+                      assetPath: 'assets/images/brands/${brand.toLowerCase()}.png',
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => 
-                        const Icon(Icons.directions_car, size: 32, color: Colors.white),
+                      // errorBuilder removed as GameImage handles it internally or we can add it if needed
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -218,8 +219,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
                       colorFilter: isOwned
                           ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
                           : ColorFilter.mode(Colors.grey.shade300, BlendMode.srcIn),
-                      child: Image.asset(
-                        imageUrl,
+                      child: GameImage(
+                        assetPath: imageUrl,
                         fit: BoxFit.contain,
                       ),
                     )

@@ -10,6 +10,7 @@ import '../models/vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/skill_service.dart';
 import 'vehicle_detail_screen.dart';
+import '../widgets/game_image.dart';
 
 import 'package:lottie/lottie.dart';
 import '../services/game_time_service.dart';
@@ -194,9 +195,9 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
             elevation: 0,
           ),
           body: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/general_bg.png'),
+            decoration: BoxDecoration(
+              image: GameDecorationImage(
+                assetPath: 'assets/images/general_bg.png',
                 fit: BoxFit.cover,
               ),
             ),
@@ -460,8 +461,8 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                     child: imagePath != null
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(9),
-                            child: Image.asset(
-                              imagePath,
+                            child: GameImage(
+                              assetPath: imagePath,
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) {
                                 // Resim yüklenemezse harf göster

@@ -3,6 +3,13 @@
     "name": "Cebinden",
     "subtitle": "Virtual Car Trading"
   },
+  "resourceDownload": {
+    "title": "Downloading Resources",
+    "info": "Updates are being installed, please wait...",
+    "checking": "Checking resources...",
+    "downloading": "Downloading game assets...",
+    "ready": "Resources ready!"
+  },
   "gallery": {
     "rentOut": "Rent Out Vehicle",
     "rentedVehicles": "Rented Vehicles",

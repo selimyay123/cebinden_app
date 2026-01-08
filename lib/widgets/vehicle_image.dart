@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/vehicle_model.dart';
+import 'game_image.dart';
 
 class VehicleImage extends StatelessWidget {
   final Vehicle vehicle;
@@ -34,8 +35,8 @@ class VehicleImage extends StatelessWidget {
       imagePath = 'assets/car_images/renauva/tallion/tallion_1.png';
     }
 
-    Widget image = Image.asset(
-      imagePath,
+    Widget image = GameImage(
+      assetPath: imagePath,
       width: width,
       height: height,
       fit: fit,
@@ -66,8 +67,8 @@ class VehicleImage extends StatelessWidget {
                     0, 0, 1, 0, 0,
                     1, 0, 0, 0, 0, // Alpha = Red kanalı
                   ]),
-                  child: Image.asset(
-                    'assets/car_images/Renauva/$maskName',
+                  child: GameImage(
+                    assetPath: 'assets/car_images/Renauva/$maskName',
                     width: width,
                     height: height,
                     fit: fit,

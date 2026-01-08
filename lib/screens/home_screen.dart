@@ -48,6 +48,7 @@ import '../mixins/auto_refresh_mixin.dart';
 import 'collection_screen.dart';
 import '../services/market_refresh_service.dart';
 import '../widgets/user_profile_avatar.dart';
+import '../widgets/game_image.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -495,9 +496,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   child: CircularProgressIndicator(),
                 )
               : Container(
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/home_bg.png'),
+                  decoration: BoxDecoration(
+                    image: GameDecorationImage(
+                      assetPath: 'assets/images/home_bg.png',
                       fit: BoxFit.cover,
                     ),
                   ),

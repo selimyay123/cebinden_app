@@ -16,6 +16,7 @@ import 'package:cebinden_app/widgets/modern_alert_dialog.dart';
 import '../services/skill_service.dart';
 import 'package:lottie/lottie.dart';
 import '../services/game_time_service.dart';
+import '../widgets/game_image.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
@@ -119,9 +120,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
               elevation: 0,
             ),
             body: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/general_bg.png'),
+              decoration: BoxDecoration(
+                image: GameDecorationImage(
+                  assetPath: 'assets/images/general_bg.png',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -325,18 +326,12 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
               bottom: -20,
               child: Opacity(
                 opacity: 0.1,
-                child: Image.asset(
-                  'assets/images/brands/${brand.toLowerCase()}.png',
+                child: GameImage(
+                  assetPath: 'assets/images/brands/${brand.toLowerCase()}.png',
                   width: 120,
                   height: 120,
                   fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.directions_car,
-                      size: 100,
-                      color: brandColor,
-                    );
-                  },
+                  // errorBuilder handled by GameImage or we can add it if needed
                 ),
               ),
             ),

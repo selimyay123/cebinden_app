@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
+import 'screens/resource_download_screen.dart';
 import 'services/database_helper.dart';
 import 'services/favorite_service.dart';
 import 'services/localization_service.dart';
@@ -81,7 +82,7 @@ class CebindenApp extends StatelessWidget {
               elevation: 0,
             ),
           ),
-          home: const SplashScreen(),
+          home: const ResourceDownloadScreen(),
         );
       },
     );

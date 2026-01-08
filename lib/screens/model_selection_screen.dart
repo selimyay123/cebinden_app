@@ -4,6 +4,7 @@ import '../services/market_refresh_service.dart';
 import '../utils/vehicle_utils.dart';
 import 'vehicle_list_screen.dart';
 import 'main_screen.dart';
+import '../widgets/game_image.dart';
 
 class ModelSelectionScreen extends StatelessWidget {
   final String categoryName;
@@ -36,9 +37,9 @@ class ModelSelectionScreen extends StatelessWidget {
             elevation: 0,
           ),
           body: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/general_bg.png'),
+            decoration: BoxDecoration(
+              image: GameDecorationImage(
+                assetPath: 'assets/images/general_bg.png',
                 fit: BoxFit.cover,
               ),
             ),
@@ -302,8 +303,8 @@ class ModelSelectionScreen extends StatelessWidget {
                       color: categoryColor.withOpacity(0.3),
                       width: 1, // Daha ince çerçeve
                     ),
-                    image: modelImage != null ? DecorationImage(
-                      image: AssetImage(modelImage),
+                    image: modelImage != null ? GameDecorationImage(
+                      assetPath: modelImage,
                       fit: BoxFit.contain,
                     ) : null,
                   ),

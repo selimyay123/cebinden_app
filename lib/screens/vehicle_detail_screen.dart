@@ -27,6 +27,7 @@ import '../services/screen_refresh_service.dart';
 import '../widgets/modern_alert_dialog.dart';
 
 import '../widgets/vehicle_image.dart';
+import '../widgets/game_image.dart';
 import 'package:intl/intl.dart';
 import 'main_screen.dart';
 
@@ -2344,8 +2345,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 width: 150,
                 height: 100,
                 child: _vehicle.imageUrl != null
-                    ? Image.asset(
-                        _vehicle.imageUrl!,
+                    ? GameImage(
+                        assetPath: _vehicle.imageUrl!,
                         fit: BoxFit.contain,
                       )
                     : const Icon(

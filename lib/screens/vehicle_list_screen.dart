@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../models/vehicle_model.dart';
 import '../widgets/vehicle_image.dart';
+import '../widgets/game_image.dart';
 import 'vehicle_detail_screen.dart';
 import 'main_screen.dart';
 import 'dart:convert';
@@ -251,9 +252,9 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         elevation: 0,
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/general_bg.png'),
+        decoration: BoxDecoration(
+          image: GameDecorationImage(
+            assetPath: 'assets/images/general_bg.png',
             fit: BoxFit.cover,
           ),
         ),
