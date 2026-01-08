@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../services/asset_service.dart';
@@ -19,17 +20,32 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
   final AssetService _assetService = AssetService();
   String _statusMessage = '';
   double _progress = 0.0;
-  String _currentFile = '';
+  String _timeRemaining = '';
+  int _totalFiles = 0;
+  int _downloadedFiles = 0;
+  DateTime? _startTime;
 
   @override
   void initState() {
     super.initState();
-    // Defer initialization to ensure context is available for localization if needed immediately,
-    // though we are awaiting in _startDownload so it might be fine.
-    // But to be safe and clean, let's just start.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startDownload();
     });
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+  
+  String _formatDurationShort(Duration duration) {
+    if (duration.inMinutes > 0) {
+      return '${duration.inMinutes}m ${duration.inSeconds % 60}s';
+    } else {
+      return '${duration.inSeconds}s';
+    }
   }
 
   Future<void> _startDownload() async {
@@ -40,44 +56,86 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
     await _assetService.init();
 
     if (!mounted) return;
+    
+    // 1. Get all file paths first
+    List<String> allPaths = [];
+    allPaths.addAll(await _assetService.getAllFilePaths('assets/images'));
+    allPaths.addAll(await _assetService.getAllFilePaths('assets/car_images'));
+    
+    _totalFiles = allPaths.length;
+    
+    if (_totalFiles == 0) {
+       _finishDownload();
+       return;
+    }
+
     setState(() {
       _statusMessage = LocalizationService().translate('resourceDownload.downloading');
+      _startTime = DateTime.now();
     });
 
-    // Sync critical folders
-    // We sync 'assets/images' and 'assets/car_images'
-    // You can add more folders here
+    // 2. Filter out already downloaded files (optional optimization, but good for progress accuracy)
+    // Actually, let's just check them as we go, or check beforehand.
+    // checking beforehand might take time.
+    // Let's check beforehand to know exactly how many *need* downloading for accurate time estimation.
+    // But `isAssetDownloaded` is async.
+    // Let's just iterate and download. If it exists, `downloadAsset` might overwrite or we check `isAssetDownloaded` inside loop.
+    // `AssetService.syncFolder` checks `isAssetDownloaded`.
     
-    int totalFiles = 0; // We don't know total files easily without listing first, 
-                        // so we just show "Downloading..." with file names
+    // Let's do a smart queue.
+    // We can process in chunks of 5.
     
-    await _assetService.syncFolder('assets/images', onProgress: (path, progress) {
-      if (mounted) {
-        setState(() {
-          _currentFile = path.split('/').last;
-          // We can keep the filename as is, or format it.
-          // Let's just show the status message + filename
-          _statusMessage = '${LocalizationService().translate('resourceDownload.downloading')} ($_currentFile)';
-        });
-      }
-    });
+    int chunkSize = 5;
+    for (int i = 0; i < allPaths.length; i += chunkSize) {
+      if (!mounted) return;
+      
+      int end = (i + chunkSize < allPaths.length) ? i + chunkSize : allPaths.length;
+      List<String> chunk = allPaths.sublist(i, end);
+      
+      await Future.wait(chunk.map((path) async {
+        bool exists = await _assetService.isAssetDownloaded(path);
+        if (!exists) {
+          await _assetService.downloadAsset(path);
+        }
+        _updateProgress();
+      }));
+    }
 
-    await _assetService.syncFolder('assets/car_images', onProgress: (path, progress) {
-      if (mounted) {
-        setState(() {
-          _currentFile = path.split('/').last;
-          _statusMessage = '${LocalizationService().translate('resourceDownload.downloading')} ($_currentFile)';
-        });
-      }
-    });
+    _finishDownload();
+  }
 
+  void _updateProgress() {
+    if (!mounted) return;
+    
+    _downloadedFiles++;
+    double progress = _downloadedFiles / _totalFiles;
+    
+    // Calculate time remaining
+    if (_startTime != null && _downloadedFiles > 0) {
+      final elapsed = DateTime.now().difference(_startTime!);
+      final avgTimePerFile = elapsed.inMilliseconds / _downloadedFiles;
+      final remainingFiles = _totalFiles - _downloadedFiles;
+      final remainingMillis = avgTimePerFile * remainingFiles;
+      final remainingDuration = Duration(milliseconds: remainingMillis.toInt());
+      
+      setState(() {
+        _progress = progress;
+        _timeRemaining = _formatDurationShort(remainingDuration);
+      });
+    } else {
+      setState(() {
+        _progress = progress;
+      });
+    }
+  }
+
+  void _finishDownload() {
     if (!mounted) return;
     setState(() {
       _statusMessage = LocalizationService().translate('resourceDownload.ready');
       _progress = 1.0;
+      _timeRemaining = '';
     });
-
-    // Navigate to next screen
     _checkAuthAndNavigate();
   }
 
@@ -122,7 +180,7 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
                     LocalizationService().translate('resourceDownload.title'),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
@@ -134,12 +192,48 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  
+                  // Progress Info (Percentage and Time)
+                  if (_progress < 1.0 && _progress > 0.0)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${(_progress * 100).toInt()}%',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              shadows: [Shadow(blurRadius: 5, color: Colors.black)],
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          if (_timeRemaining.isNotEmpty)
+                            Text(
+                              _timeRemaining,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                shadows: [Shadow(blurRadius: 5, color: Colors.black)],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
                   SizedBox(
-                    width: 200,
-                    child: LinearProgressIndicator(
-                      value: null, // Indeterminate for now as we don't know total size
-                      backgroundColor: Colors.white24,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                    width: 250,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: _progress > 0 ? _progress : null, 
+                        minHeight: 10,
+                        backgroundColor: Colors.white24,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                      ),
                     ),
                   ),
                 ],

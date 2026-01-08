@@ -85,12 +85,40 @@ class AssetService {
     }
   }
 
+  /// Recursively gets all file paths in a folder
+  Future<List<String>> getAllFilePaths(String folderPath) async {
+    try {
+      final ref = _storage.ref().child(folderPath);
+      final result = await ref.listAll();
+      List<String> paths = [];
+
+      for (var item in result.items) {
+        paths.add(item.fullPath);
+      }
+
+      for (var prefix in result.prefixes) {
+        paths.addAll(await getAllFilePaths(prefix.fullPath));
+      }
+      
+      return paths;
+    } catch (e) {
+      debugPrint('Error listing assets in $folderPath: $e');
+      return [];
+    }
+  }
+
   /// Recursively downloads all assets in a folder
   Future<void> syncFolder(String folderPath, {Function(String, double)? onProgress}) async {
     try {
       final ref = _storage.ref().child(folderPath);
       final result = await ref.listAll();
-
+      // ... existing implementation ...
+      // Note: We might not use this anymore in the new flow, but keeping it for compatibility
+      // or we can refactor it to use getAllFilePaths if we wanted, but the plan says
+      // we will refactor _startDownload in the screen, so I'll leave this as is for now
+      // unless I want to make it cleaner.
+      // Actually, let's just add the new method and leave syncFolder as is for now.
+      
       for (var item in result.items) {
         final path = item.fullPath;
         if (!await isAssetDownloaded(path)) {
