@@ -537,8 +537,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
                       if (imageUrl != null) {
                         return ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            imageUrl,
+                          child: GameImage(
+                            assetPath: imageUrl,
                             width: 100,
                             height: 100,
                             fit: BoxFit.contain,
@@ -548,8 +548,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
                               final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
                               
                               if (correctPath != null && correctPath != imageUrl) {
-                                return Image.asset(
-                                  correctPath,
+                                return GameImage(
+                                  assetPath: correctPath,
                                   width: 100,
                                   height: 100,
                                   fit: BoxFit.contain,

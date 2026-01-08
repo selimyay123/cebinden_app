@@ -61,6 +61,7 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
     List<String> allPaths = [];
     allPaths.addAll(await _assetService.getAllFilePaths('assets/images'));
     allPaths.addAll(await _assetService.getAllFilePaths('assets/car_images'));
+    allPaths.addAll(await _assetService.getAllFilePaths('assets/images/brands'));
     
     _totalFiles = allPaths.length;
     

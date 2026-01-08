@@ -9,6 +9,7 @@ import '../models/user_model.dart';
 import '../utils/currency_input_formatter.dart';
 import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
+import '../widgets/game_image.dart';
 
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
@@ -263,8 +264,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                   if (imageUrl != null) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        imageUrl,
+                      child: GameImage(
+                        assetPath: imageUrl,
                         width: 80,
                         height: 80,
                         fit: BoxFit.contain,
@@ -272,8 +273,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                           final correctPath = VehicleUtils.getVehicleImage(widget.vehicle.brand, widget.vehicle.model, vehicleId: widget.vehicle.id);
                           
                           if (correctPath != null && correctPath != imageUrl) {
-                            return Image.asset(
-                              correctPath,
+                            return GameImage(
+                              assetPath: correctPath,
                               width: 80,
                               height: 80,
                               fit: BoxFit.contain,

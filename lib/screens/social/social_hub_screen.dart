@@ -5,8 +5,50 @@ import 'friends_tab.dart';
 import 'requests_tab.dart';
 import 'search_tab.dart';
 
-class SocialHubScreen extends StatelessWidget {
+import 'dart:io';
+import '../../services/asset_service.dart';
+
+class SocialHubScreen extends StatefulWidget {
   const SocialHubScreen({super.key});
+
+  @override
+  State<SocialHubScreen> createState() => _SocialHubScreenState();
+}
+
+class _SocialHubScreenState extends State<SocialHubScreen> {
+  File? _bgFile;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBackground();
+  }
+
+  Future<void> _checkBackground() async {
+    const assetPath = 'assets/images/social_bg.jpeg';
+    final file = AssetService().getLocalFile(assetPath);
+    
+    if (file.existsSync()) {
+      if (mounted) {
+        setState(() {
+          _bgFile = file;
+          _isLoading = false;
+        });
+      }
+    } else {
+      // Dosya yok, indirmeyi dene
+      final success = await AssetService().downloadAsset(assetPath);
+      if (mounted) {
+        setState(() {
+          if (success) {
+            _bgFile = AssetService().getLocalFile(assetPath);
+          }
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +83,17 @@ class SocialHubScreen extends StatelessWidget {
           ),
         ),
         body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/social_bg.jpeg'),
-              fit: BoxFit.cover,
-            ),
+          decoration: BoxDecoration(
+            image: _bgFile != null
+                ? DecorationImage(
+                    image: FileImage(_bgFile!),
+                    fit: BoxFit.cover,
+                  )
+                : const DecorationImage(
+                    image: AssetImage('assets/images/social_bg.jpeg'), // Fallback
+                    fit: BoxFit.cover,
+                  ),
+            color: _bgFile == null ? const Color(0xFF121212) : null,
           ),
           child: const TabBarView(
             children: [

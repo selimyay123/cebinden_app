@@ -66,6 +66,17 @@ class _StoreScreenState extends State<StoreScreen> {
           elevation: 8,
         ),
       );
+    } else if (event.startsWith('info:')) {
+      final infoMessage = event.substring(6); // 'info: ' length
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(infoMessage),
+          backgroundColor: Colors.blue.withOpacity(0.8),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 8,
+        ),
+      );
     }
   }
 

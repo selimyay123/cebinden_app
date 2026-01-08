@@ -8,6 +8,7 @@ import 'screens/resource_download_screen.dart';
 import 'services/database_helper.dart';
 import 'services/favorite_service.dart';
 import 'services/localization_service.dart';
+import 'services/asset_service.dart';
 import 'services/ad_service.dart';
 import 'services/game_time_service.dart';
 import 'services/market_refresh_service.dart';
@@ -27,6 +28,9 @@ void main() async {
   
   // Favorite service'i initialize et
   await FavoriteService.init();
+
+  // Asset service'i initialize et
+  await AssetService().init();
   
   // Localization'ı initialize et
   await LocalizationService().initialize();

@@ -12,6 +12,7 @@ import '../services/skill_service.dart';
 import '../models/user_model.dart';
 import 'package:lottie/lottie.dart';
 import '../widgets/modern_alert_dialog.dart';
+import '../widgets/game_image.dart';
 
 class SellVehicleScreen extends StatefulWidget {
   const SellVehicleScreen({super.key});
@@ -210,8 +211,8 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                       if (imageUrl != null) {
                         return ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                            imageUrl,
+                          child: GameImage(
+                            assetPath: imageUrl,
                             width: 70,
                             height: 70,
                             fit: BoxFit.contain,
@@ -219,8 +220,8 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                               final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
                               
                               if (correctPath != null && correctPath != imageUrl) {
-                                return Image.asset(
-                                  correctPath,
+                                return GameImage(
+                                  assetPath: correctPath,
                                   width: 70,
                                   height: 70,
                                   fit: BoxFit.contain,
