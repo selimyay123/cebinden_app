@@ -21,6 +21,7 @@ class Mission {
   final bool isCompleted;
   final bool isClaimed;
   final double targetValue; // Hedef değer (örn: 1000000 TL, 5. seviye)
+  final double currentValue; // Mevcut değer (örn: 500000 TL, 3. seviye)
 
   Mission({
     required this.id,
@@ -32,6 +33,7 @@ class Mission {
     this.isCompleted = false,
     this.isClaimed = false,
     required this.targetValue,
+    this.currentValue = 0.0,
   });
 
   factory Mission.fromJson(Map<String, dynamic> json) {
@@ -45,6 +47,7 @@ class Mission {
       isCompleted: json['isCompleted'] as bool,
       isClaimed: json['isClaimed'] as bool,
       targetValue: (json['targetValue'] as num).toDouble(),
+      currentValue: (json['currentValue'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -59,6 +62,7 @@ class Mission {
       'isCompleted': isCompleted,
       'isClaimed': isClaimed,
       'targetValue': targetValue,
+      'currentValue': currentValue,
     };
   }
 
@@ -72,6 +76,7 @@ class Mission {
     bool? isCompleted,
     bool? isClaimed,
     double? targetValue,
+    double? currentValue,
   }) {
     return Mission(
       id: id ?? this.id,
@@ -83,6 +88,7 @@ class Mission {
       isCompleted: isCompleted ?? this.isCompleted,
       isClaimed: isClaimed ?? this.isClaimed,
       targetValue: targetValue ?? this.targetValue,
+      currentValue: currentValue ?? this.currentValue,
     );
   }
 }

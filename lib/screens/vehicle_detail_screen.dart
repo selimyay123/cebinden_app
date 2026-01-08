@@ -1468,21 +1468,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         builder: (context, setState) {
           return ModernAlertDialog(
             title: 'offer.makeOffer'.tr(),
-            icon: Icons.local_offer,
-            iconColor: Colors.deepPurple,
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '${_vehicle.brand} ${_vehicle.model}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  // Text(
+                  //   '${_vehicle.brand} ${_vehicle.model}',
+                  //   style: const TextStyle(
+                  //     fontSize: 16,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Colors.white,
+                  //   ),
+                  // ),
                   const SizedBox(height: 8),
                   Text(
                     '${'offer.listingPrice'.tr()}: ${_formatCurrency(_vehicle.price)} TL',
@@ -1552,33 +1550,59 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'offer.acceptanceChance'.tr(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          Text(
-                            '%${(acceptanceChance * 100).toStringAsFixed(0)}',
+                          Text('offer.acceptanceChance'.tr(), style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                          Text('%${(acceptanceChance * 100).toStringAsFixed(0)}', 
                             style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: _getChanceColor(acceptanceChance),
-                            ),
+                              fontSize: 12, 
+                              fontWeight: FontWeight.bold, 
+                              color: acceptanceChance > 0.7 ? Colors.greenAccent : (acceptanceChance > 0.3 ? Colors.orangeAccent : Colors.redAccent)
+                            )
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: acceptanceChance,
-                          backgroundColor: Colors.white10,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            _getChanceColor(acceptanceChance),
+                      Container(
+                        height: 12,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: const LinearGradient(
+                            colors: [Colors.red, Colors.orange, Colors.green],
+                            stops: [0.0, 0.5, 1.0],
                           ),
-                          minHeight: 8,
+                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                        ),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            AnimatedAlign(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                              alignment: Alignment(
+                                (acceptanceChance * 2) - 1, // Map 0.0..1.0 to -1.0..1.0
+                                0.0
+                              ),
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: acceptanceChance > 0.7 ? Colors.green : (acceptanceChance > 0.3 ? Colors.orange : Colors.red),
+                                    width: 2
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -1642,11 +1666,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     );
   }
 
-  Color _getChanceColor(double chance) {
-    if (chance >= 0.7) return Colors.green;
-    if (chance >= 0.4) return Colors.orange;
-    return Colors.red;
-  }
 
   void _showConfirmOfferDialog(double offerAmount) {
     showDialog(

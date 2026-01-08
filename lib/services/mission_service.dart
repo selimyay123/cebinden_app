@@ -233,6 +233,7 @@ class MissionService {
           result.add(mission.copyWith(
             isCompleted: isCompleted,
             isClaimed: isClaimed,
+            currentValue: _calculateCurrentValue(user, userVehicles.length, mission),
           ));
           foundActive = true;
           break; // Zincirin sonraki halkalarını gösterme
@@ -243,6 +244,7 @@ class MissionService {
            result.add(mission.copyWith(
             isCompleted: true,
             isClaimed: true,
+            currentValue: mission.targetValue, // Tamamlandığı için hedef değere eşit
           ));
         }
       }
@@ -273,6 +275,7 @@ class MissionService {
       result.add(mission.copyWith(
         isCompleted: isCompleted,
         isClaimed: isClaimed,
+        currentValue: isCompleted ? mission.targetValue : _calculateCurrentValue(user, userVehicles.length, mission),
       ));
     }
 
@@ -306,6 +309,34 @@ class MissionService {
         return user.collectedBrandRewards.length >= mission.targetValue;
       default:
         return false;
+    }
+  }
+
+  /// Mevcut ilerleme değerini hesapla
+  double _calculateCurrentValue(User user, int vehicleCount, Mission mission) {
+    switch (mission.type) {
+      case MissionType.tutorial:
+        return user.isTutorialCompleted ? 1.0 : 0.0;
+      case MissionType.firstBuy:
+        return user.totalVehiclesBought.toDouble();
+      case MissionType.firstSell:
+        return user.totalVehiclesSold.toDouble();
+      case MissionType.garageSize:
+        return user.garageLimit.toDouble();
+      case MissionType.balance:
+        return user.balance;
+      case MissionType.level:
+        return user.level.toDouble();
+      case MissionType.negotiation:
+        return user.successfulNegotiations.toDouble();
+      case MissionType.fleet:
+        return vehicleCount.toDouble();
+      case MissionType.gallery:
+        return user.ownsGallery ? 1.0 : 0.0;
+      case MissionType.collection:
+        return user.collectedBrandRewards.length.toDouble();
+      default:
+        return 0.0;
     }
   }
 

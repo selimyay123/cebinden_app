@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart'; // 🆕 Input formatters için
@@ -25,6 +26,7 @@ import 'package:lottie/lottie.dart'; // 🆕 Animasyon için
 
 import '../models/ai_buyer_model.dart';
 import '../services/skill_service.dart';
+import '../services/asset_service.dart';
 
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
@@ -50,6 +52,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
   final MarketRefreshService _marketService = MarketRefreshService();
+  final AssetService _assetService = AssetService();
 
 
 
@@ -85,6 +88,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       );
     }
     */
+    _initializeServices();
     _loadOffers();
 
     // Teklif güncellemelerini dinle (alt ekranlardan gelen değişimler için)
@@ -98,6 +102,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
     _offerUpdateSubscription?.cancel();
     super.dispose();
+  }
+
+  Future<void> _initializeServices() async {
+    await _assetService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadOffers() async {
@@ -230,6 +239,38 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
   }
 
+  // Marka logosunu oluştur (Local veya Asset)
+  Widget _buildBrandLogo(String brand, {double size = 120, Color? color}) {
+    final assetPath = 'assets/images/brands/${brand.toLowerCase()}.png';
+    final file = _assetService.getLocalFile(assetPath);
+
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => Icon(
+          Icons.inbox,
+          size: size * 0.8,
+          color: color,
+        ),
+      );
+    }
+    
+    return Image.asset(
+      assetPath,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) => Icon(
+        Icons.inbox,
+        size: size * 0.8,
+        color: color,
+      ),
+    );
+  }
+
   // Marka listesi (Grid view)
   Widget _buildBrandList() {
     final brandMap = _incomingOffersByBrand;
@@ -295,18 +336,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               bottom: -20,
               child: Opacity(
                 opacity: 0.1,
-                child: Image.asset(
-                  'assets/images/brands/${brand.toLowerCase()}.png',
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.inbox,
-                      size: 100,
-                      color: brandColor,
-                    );
-                  },
+                child: _buildBrandLogo(
+                  brand,
+                  size: 120,
+                  color: brandColor,
                 ),
               ),
             ),
@@ -518,9 +551,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         elevation: 0,
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/general_bg_dark.png'),
+            image: _getBackgroundImageProvider('assets/images/general_bg_dark.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -1255,6 +1288,18 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       if (brand != null && model != null) {
         final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
         if (fallbackPath != null) {
+          // Fallback path de indirilmiş olabilir mi?
+          final file = _assetService.getLocalFile(fallbackPath);
+          if (file.existsSync()) {
+             return Image.file(
+               file,
+               width: width,
+               height: height,
+               fit: BoxFit.contain,
+               errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+             );
+          }
+          
           return Image.asset(
             fallbackPath,
             width: width,
@@ -1278,6 +1323,18 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           if (brand != null && model != null) {
             final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
             if (fallbackPath != null) {
+               // Fallback path de indirilmiş olabilir mi?
+               final file = _assetService.getLocalFile(fallbackPath);
+               if (file.existsSync()) {
+                  return Image.file(
+                    file,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+                  );
+               }
+              
               return Image.asset(
                 fallbackPath,
                 width: width,
@@ -1292,7 +1349,24 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       );
     }
     
-    // 3. Local Asset ise
+    // 3. Local Asset veya İndirilmiş Dosya
+    // Önce indirilmiş dosya var mı bak
+    try {
+      final file = _assetService.getLocalFile(imageUrl);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          width: width,
+          height: height,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error checking local vehicle asset: $e');
+    }
+
+    // Yoksa asset olarak dene
     return Image.asset(
       imageUrl,
       width: width,
@@ -1303,6 +1377,18 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
           // Eğer fallback path farklıysa onu dene
           if (fallbackPath != null && fallbackPath != imageUrl) {
+             // Fallback path de indirilmiş olabilir mi?
+             final file = _assetService.getLocalFile(fallbackPath);
+             if (file.existsSync()) {
+                return Image.file(
+                  file,
+                  width: width,
+                  height: height,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+                );
+             }
+            
             return Image.asset(
               fallbackPath,
               width: width,
@@ -1746,7 +1832,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   const Divider(color: Colors.green),
                   Text(
                     'misc.ifYouAccept'.tr(),
+                    textAlign: TextAlign.left,
                     style: TextStyle(
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: Colors.green.shade900,
                     ),
@@ -1754,15 +1842,29 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   const SizedBox(height: 8),
                   Text(
                     'misc.balanceAdded'.trParams({'amount': _formatCurrency(offer.counterOfferAmount ?? offer.offerPrice)}),
-                    style: TextStyle(color: Colors.green.shade900),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade900,
+                    ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     'offers.vehicleSold'.tr(),
-                    style: TextStyle(color: Colors.green.shade900),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade900,
+                    ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     'offers.otherOffersRejected'.tr(),
-                    style: TextStyle(color: Colors.green.shade900),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade900,
+                    ),
                   ),
                 ],
               ),
@@ -1881,11 +1983,20 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   const Divider(color: Colors.green),
                   Text(
                     'offer.garageInfo'.tr(),
-                    style: TextStyle(color: Colors.green.shade900),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade900,
+                    ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     'offer.balanceInfo'.trParams({'amount': _formatCurrency(offer.counterOfferAmount!)}),
-                    style: TextStyle(color: Colors.green.shade900),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade900,
+                    ),
                   ),
                 ],
               ),
@@ -2856,6 +2967,28 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       return false;
     }
   }
+
+  ImageProvider _getBackgroundImageProvider(String assetPath) {
+    try {
+      // 1. Önce indirilmiş dosyalara bak
+      final file = _assetService.getLocalFile(assetPath);
+      if (file.existsSync()) {
+        return FileImage(file);
+      }
+    } catch (e) {
+      debugPrint('Error checking local asset: $e');
+    }
+    
+    // 2. Yoksa varsayılan (açık tema) görseli kullan (Fallback)
+    // Eğer koyu tema görseli assets içinde yoksa, açık tema görselini kullan
+    // Bu sayede uygulama çökmez.
+    if (assetPath.contains('general_bg_dark.png')) {
+       // Koyu tema görseli bulunamadıysa açık tema görselini dene
+       return const AssetImage('assets/images/general_bg.png');
+    }
+    
+    return AssetImage(assetPath);
+  }
 }
 
 /// Binlik ayırıcı input formatter (Teklif Ver gibi)
@@ -3229,8 +3362,6 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
       },
       secondaryButtonText: 'common.cancel'.tr(),
       onSecondaryPressed: () => Navigator.of(context, rootNavigator: true).pop(),
-      icon: Icons.local_offer,
-      iconColor: Colors.white,
     );
   }
 }

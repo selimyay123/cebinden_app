@@ -131,8 +131,16 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          // title: Text('quests.title'.tr()),
+          backgroundColor: Colors.white.withOpacity(0.5),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
           bottom: const TabBar(
+            labelColor: Colors.black,
+            unselectedLabelColor: Colors.black,
+            indicatorColor: Colors.black,
             tabs: [
               Tab(text: 'Günlük'), // TODO: Çeviri eklenebilir
               Tab(text: 'Görevler'),
@@ -208,10 +216,13 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
     final progress = quest.progress;
 
     return Card(
-      color: Colors.white.withOpacity(0.7),
+      color: Colors.deepPurpleAccent.withOpacity(0.9),
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -226,26 +237,18 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
                 if (isClaimed)
-                  const Icon(Icons.check_circle, color: Colors.green)
-                else if (isCompleted)
-                  ElevatedButton(
-                    onPressed: () => _claimReward(quest),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text('quests.claimReward'.tr()),
-                  ),
+                  const Icon(Icons.check_circle, color: Colors.green),
               ],
             ),
             const SizedBox(height: 12),
             LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: Colors.white10,
               valueColor: AlwaysStoppedAnimation<Color>(
                 isCompleted ? Colors.green : Colors.blue,
               ),
@@ -256,9 +259,9 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${quest.currentCount} / ${quest.targetCount}',
-                  style: TextStyle(
-                    color: Colors.grey[600],
+                  '${_formatCompactNumber(quest.currentCount.toDouble())} / ${_formatCompactNumber(quest.targetCount.toDouble())}',
+                  style: const TextStyle(
+                    color: Colors.white70,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -285,6 +288,27 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
                 ),
               ],
             ),
+            if (isCompleted && !isClaimed) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => _claimReward(quest),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.withOpacity(0.8),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'quests.claimReward'.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -294,126 +318,124 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
   Widget _buildMissionCard(Mission mission) {
     final isCompleted = mission.isCompleted;
     final isClaimed = mission.isClaimed;
+    final progress = (mission.currentValue / mission.targetValue).clamp(0.0, 1.0);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      color: Colors.white.withOpacity(0.9),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Colors.deepPurpleAccent.withOpacity(0.9),
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: isCompleted 
-                        ? (isClaimed ? Colors.grey.withOpacity(0.2) : Colors.green.withOpacity(0.2))
-                        : Colors.blue.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    isCompleted ? Icons.check_circle : Icons.star,
-                    color: isCompleted 
-                        ? (isClaimed ? Colors.grey : Colors.green)
-                        : Colors.blue,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         mission.titleKey.tr(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: isClaimed ? Colors.grey : Colors.black87,
-                          decoration: isClaimed ? TextDecoration.lineThrough : null,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         mission.descriptionKey.tr(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
-                          color: isClaimed ? Colors.grey : Colors.black54,
+                          color: Colors.white70,
                         ),
                       ),
                     ],
                   ),
                 ),
+                if (isClaimed)
+                  const Icon(Icons.check_circle, color: Colors.green),
               ],
             ),
             const SizedBox(height: 12),
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Colors.white10,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isCompleted ? Colors.green : Colors.blue,
+              ),
+              minHeight: 8,
+            ),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Ödüller
+                Text(
+                  '${_formatCompactNumber(mission.currentValue)} / ${_formatCompactNumber(mission.targetValue)}',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 Row(
                   children: [
-                    const Icon(Icons.bolt, size: 16, color: Colors.orange),
+                    const Icon(Icons.star, size: 16, color: Colors.amber),
                     const SizedBox(width: 4),
                     Text(
-                      "+${mission.rewardXP} XP",
-                      style: TextStyle(
+                      '${mission.rewardXP} XP',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isClaimed ? Colors.grey : Colors.orange[800],
+                        color: Colors.amber,
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Icon(Icons.monetization_on, size: 16, color: Colors.green),
-                    const SizedBox(width: 4),
                     Text(
-                      NumberFormat.currency(symbol: 'TL', decimalDigits: 0).format(mission.rewardMoney),
-                      style: TextStyle(
+                      '${mission.rewardMoney.toStringAsFixed(0)} TL',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isClaimed ? Colors.grey : Colors.green[700],
+                        color: Colors.green,
                       ),
                     ),
                   ],
                 ),
-                // Buton
-                if (isClaimed)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check, size: 16, color: Colors.grey),
-                        SizedBox(width: 4),
-                        Text("Tamamlandı", style: TextStyle(color: Colors.grey, fontSize: 12)),
-                      ],
-                    ),
-                  )
-                else
-                  ElevatedButton(
-                    onPressed: isCompleted ? () => _claimMissionReward(mission) : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isCompleted ? Colors.green : Colors.grey.withOpacity(0.5),
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey.withOpacity(0.3),
-                      disabledForegroundColor: Colors.white.withOpacity(0.5),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text('quests.claimReward'.tr()),
-                  ),
               ],
             ),
+            if (isCompleted && !isClaimed) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => _claimMissionReward(mission),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.withOpacity(0.8),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'quests.claimReward'.tr(),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  String _formatNumber(int number) {
+    final formatter = NumberFormat('#,###', 'tr_TR');
+    return formatter.format(number);
   }
 
   String _getLocalizedDescription(DailyQuest quest) {
@@ -447,5 +469,17 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
   String _formatCurrency(double amount) {
     final formatter = NumberFormat('#,###', 'tr_TR');
     return formatter.format(amount);
+  }
+
+  String _formatCompactNumber(double value) {
+    if (value >= 1000000) {
+      double result = value / 1000000;
+      return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}M';
+    }
+    if (value >= 1000) {
+      double result = value / 1000;
+      return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}K';
+    }
+    return NumberFormat('#,###', 'tr_TR').format(value);
   }
 }

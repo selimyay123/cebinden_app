@@ -18,19 +18,28 @@ import '../widgets/user_profile_avatar.dart';
 import '../widgets/modern_alert_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final bool highlightProfilePicture;
+
+  const SettingsScreen({
+    super.key,
+    this.highlightProfilePicture = false,
+  });
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin {
+class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin, SingleTickerProviderStateMixin {
   final AuthService _authService = AuthService();
   final LocalizationService _localizationService = LocalizationService();
   final GameTimeService _gameTimeService = GameTimeService();
   late SettingsHelper _settingsHelper;
   User? _currentUser;
   bool _isLoading = true;
+  
+  // Animation for highlighting
+  late AnimationController _highlightController;
+  late Animation<Color?> _highlightAnimation;
 
   // Settings states
   bool _darkMode = false;
@@ -46,6 +55,36 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
   void initState() {
     super.initState();
     _loadSettings();
+    
+    _highlightController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    
+    _highlightAnimation = ColorTween(
+      begin: Colors.transparent,
+      end: Colors.deepPurple.withOpacity(0.3),
+    ).animate(CurvedAnimation(
+      parent: _highlightController,
+      curve: Curves.easeInOut,
+    ));
+
+    if (widget.highlightProfilePicture) {
+      _highlightController.repeat(reverse: true);
+      // Stop animation after 3 seconds
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          _highlightController.stop();
+          _highlightController.reset();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _highlightController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadSettings() async {
@@ -431,10 +470,21 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin 
                 },
               ),
 
-              _buildListTile(
-                icon: Icons.image,
-                title: 'settings.changeProfilePicture'.tr(),
-                onTap: _showProfilePictureDialog,
+              AnimatedBuilder(
+                animation: _highlightAnimation,
+                builder: (context, child) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: _highlightAnimation.value,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: _buildListTile(
+                      icon: Icons.image,
+                      title: 'settings.changeProfilePicture'.tr(),
+                      onTap: _showProfilePictureDialog,
+                    ),
+                  );
+                },
               ),
               _buildListTile(
                 icon: Icons.edit,

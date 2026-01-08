@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 import '../models/user_vehicle_model.dart';
 import '../models/vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../services/favorite_service.dart';
 import '../services/localization_service.dart';
+import '../services/asset_service.dart';
 import '../widgets/modern_alert_dialog.dart';
 import '../utils/brand_colors.dart';
 import 'vehicle_detail_screen.dart';
@@ -33,6 +35,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   final FavoriteService _favoriteService = FavoriteService();
+  final AssetService _assetService = AssetService();
   List<UserVehicle> _userListedVehicles = [];
   List<Vehicle> _favoriteListings = [];
   bool _isLoading = true;
@@ -56,6 +59,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
+    _assetService.init();
     _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTab);
     _loadUserListedVehicles();
     _loadFavoriteListings();
@@ -141,9 +145,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 foregroundColor: Colors.white,
               ),
               body: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/general_bg.png'),
+                    image: _getBackgroundImageProvider('assets/images/general_bg.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -291,19 +295,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               bottom: -10,
               child: Opacity(
                 opacity: 0.15,
-                child: Image.asset(
-                  'assets/images/brands/${brand.toLowerCase()}.png',
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.store,
-                      size: 100,
-                      color: brandColor.withOpacity(0.1),
-                    );
-                  },
-                ),
+                child: _buildBrandLogo(brand, 120, 120, brandColor),
               ),
             ),
             
@@ -507,34 +499,20 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     child: Builder(
                       builder: (context) {
                         final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
-                            ? vehicle.imageUrl
-                            : VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                            ? vehicle.imageUrl!
+                            : '';
                         
-                        if (imageUrl != null) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              imageUrl,
-                              width: 70,
-                              height: 70,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
-                                if (correctPath != null && correctPath != imageUrl) {
-                                  return Image.asset(
-                                    correctPath,
-                                    width: 70,
-                                    height: 70,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error, stackTrace) => Icon(Icons.directions_car, color: brandColor, size: 40),
-                                  );
-                                }
-                                return Icon(Icons.directions_car, color: brandColor, size: 40);
-                              },
-                            ),
-                          );
-                        }
-                        return Icon(Icons.directions_car, color: brandColor, size: 40);
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: _buildVehicleImage(
+                            imageUrl,
+                            70,
+                            70,
+                            brand: vehicle.brand,
+                            model: vehicle.model,
+                            vehicleId: vehicle.id,
+                          ),
+                        );
                       }
                     ),
                   ),
@@ -673,34 +651,20 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                   child: Builder(
                     builder: (context) {
                       final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
-                          ? vehicle.imageUrl
-                          : VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
+                          ? vehicle.imageUrl!
+                          : '';
                       
-                      if (imageUrl != null) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                            imageUrl,
-                            width: 70,
-                            height: 70,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              final correctPath = VehicleUtils.getVehicleImage(vehicle.brand, vehicle.model, vehicleId: vehicle.id);
-                              if (correctPath != null && correctPath != imageUrl) {
-                                return Image.asset(
-                                  correctPath,
-                                  width: 70,
-                                  height: 70,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.directions_car, color: Colors.green, size: 40),
-                                );
-                              }
-                              return const Icon(Icons.directions_car, color: Colors.green, size: 40);
-                            },
-                          ),
-                        );
-                      }
-                      return const Icon(Icons.directions_car, color: Colors.green, size: 40);
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: _buildVehicleImage(
+                          imageUrl,
+                          70,
+                          70,
+                          brand: vehicle.brand,
+                          model: vehicle.model,
+                          vehicleId: vehicle.id,
+                        ),
+                      );
                     }
                   ),
                 ),
@@ -1046,6 +1010,204 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
       (Match m) => '${m[1]}.',
     );
   }
+
+  ImageProvider _getBackgroundImageProvider(String assetPath) {
+    try {
+      // 1. Önce indirilmiş dosyalara bak
+      final file = _assetService.getLocalFile(assetPath);
+      if (file.existsSync()) {
+        return FileImage(file);
+      }
+    } catch (e) {
+      debugPrint('Error checking local asset: $e');
+    }
+    
+    // 2. Yoksa varsayılan (açık tema) görseli kullan (Fallback)
+    // Eğer koyu tema görseli assets içinde yoksa, açık tema görselini kullan
+    // Bu sayede uygulama çökmez.
+    if (assetPath.contains('general_bg_dark.png')) {
+       // Koyu tema görseli bulunamadıysa açık tema görselini dene
+       return const AssetImage('assets/images/general_bg.png');
+    }
+    
+    return AssetImage(assetPath);
+  }
+
+  Widget _buildVehicleImage(String imageUrl, double width, double height, {String? brand, String? model, String? vehicleId}) {
+    // 1. URL boşsa veya null ise fallback dene
+    if (imageUrl.isEmpty) {
+      if (brand != null && model != null) {
+        final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+        if (fallbackPath != null) {
+          // Fallback path de indirilmiş olabilir mi?
+          final file = _assetService.getLocalFile(fallbackPath);
+          if (file.existsSync()) {
+             return Image.file(
+               file,
+               width: width,
+               height: height,
+               fit: BoxFit.contain,
+               errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+             );
+          }
+          
+          return Image.asset(
+            fallbackPath,
+            width: width,
+            height: height,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+          );
+        }
+      }
+      return _buildGenericCarIcon(width, height);
+    }
+
+    // 2. HTTP URL ise (Network Image)
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          if (brand != null && model != null) {
+            final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+            if (fallbackPath != null) {
+               // Fallback path de indirilmiş olabilir mi?
+               final file = _assetService.getLocalFile(fallbackPath);
+               if (file.existsSync()) {
+                  return Image.file(
+                    file,
+                    width: width,
+                    height: height,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+                  );
+               }
+              
+              return Image.asset(
+                fallbackPath,
+                width: width,
+                height: height,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+              );
+            }
+          }
+          return _buildGenericCarIcon(width, height);
+        },
+      );
+    }
+    
+    // 3. Local Asset veya İndirilmiş Dosya
+    // Önce indirilmiş dosya var mı bak
+    try {
+      final file = _assetService.getLocalFile(imageUrl);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          width: width,
+          height: height,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error checking local vehicle asset: $e');
+    }
+
+    // Yoksa asset olarak dene
+    return Image.asset(
+      imageUrl,
+      width: width,
+      height: height,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        if (brand != null && model != null) {
+          final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+          // Eğer fallback path farklıysa onu dene
+          if (fallbackPath != null && fallbackPath != imageUrl) {
+             // Fallback path de indirilmiş olabilir mi?
+             final file = _assetService.getLocalFile(fallbackPath);
+             if (file.existsSync()) {
+                return Image.file(
+                  file,
+                  width: width,
+                  height: height,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+                );
+             }
+            
+            return Image.asset(
+              fallbackPath,
+              width: width,
+              height: height,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+            );
+          }
+        }
+        return _buildGenericCarIcon(width, height);
+      },
+    );
+  }
+
+  Widget _buildBrandLogo(String brand, double width, double height, Color brandColor) {
+    final assetPath = 'assets/images/brands/${brand.toLowerCase()}.png';
+    
+    // 1. Önce indirilmiş dosyalara bak
+    try {
+      final file = _assetService.getLocalFile(assetPath);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          width: width,
+          height: height,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => Icon(
+            Icons.store,
+            size: width * 0.8,
+            color: brandColor.withOpacity(0.1),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error checking local brand logo: $e');
+    }
+
+    // 2. Yoksa asset olarak dene
+    return Image.asset(
+      assetPath,
+      width: width,
+      height: height,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        return Icon(
+          Icons.store,
+          size: width * 0.8,
+          color: brandColor.withOpacity(0.1),
+        );
+      },
+    );
+  }
+
+  Widget _buildGenericCarIcon(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(
+        Icons.directions_car,
+        color: Colors.grey[400],
+        size: width * 0.5,
+      ),
+    );
+  }
 }
 
 
@@ -1341,6 +1503,7 @@ class _EditListingDialogState extends State<_EditListingDialog> {
       iconColor: Colors.white,
     );
   }
+
 }
 
 class _ThousandsSeparatorInputFormatter extends TextInputFormatter {

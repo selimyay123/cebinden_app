@@ -714,79 +714,89 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Profil Resmi ve Çerçeve
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Glow Efekti
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: rankColor.withOpacity(0.5),
-                                    blurRadius: 15,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SettingsScreen(highlightProfilePicture: true),
                               ),
-                            ),
-                            // Çerçeve
-                            Container(
-                              width: 76,
-                              height: 76,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [rankColor, rankColor.withOpacity(0.5)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(2.5), // Çerçeve kalınlığı
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: UserProfileAvatar(
-                                    imageUrl: _currentUser?.profileImageUrl,
-                                    username: _currentUser?.username,
-                                    radius: 35,
-                                    fontSize: 32,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            // Seviye Rozeti (Avatarın altında)
-                            Positioned(
-                              bottom: 0,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            ).then((_) => _loadCurrentUser()); // Geri dönünce refresh et
+                          },
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Glow Efekti
+                              Container(
+                                width: 80,
+                                height: 80,
                                 decoration: BoxDecoration(
-                                  color: rankColor,
-                                  borderRadius: BorderRadius.circular(10),
+                                  shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
+                                      color: rankColor.withOpacity(0.5),
+                                      blurRadius: 15,
+                                      spreadRadius: 1,
                                     ),
                                   ],
                                 ),
-                                child: Text(
-                                  'Lv. ${_currentUser!.level}',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
+                              ),
+                              // Çerçeve
+                              Container(
+                                width: 76,
+                                height: 76,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [rankColor, rankColor.withOpacity(0.5)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.5), // Çerçeve kalınlığı
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: UserProfileAvatar(
+                                      imageUrl: _currentUser?.profileImageUrl,
+                                      username: _currentUser?.username,
+                                      radius: 35,
+                                      fontSize: 32,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                              // Seviye Rozeti (Avatarın altında)
+                              Positioned(
+                                bottom: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: rankColor,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    'Lv. ${_currentUser!.level}',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         
                         const SizedBox(width: 16),

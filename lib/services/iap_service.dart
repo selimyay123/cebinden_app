@@ -95,9 +95,7 @@ class IAPService {
     }
   }
 
-  Future<void> buyProduct(ProductDetails product) async {
-    final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
-    
+
   Future<void> buyProduct(ProductDetails product) async {
     final PurchaseParam purchaseParam = PurchaseParam(productDetails: product);
     
