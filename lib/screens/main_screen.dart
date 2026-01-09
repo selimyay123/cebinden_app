@@ -42,6 +42,15 @@ class _MainScreenState extends State<MainScreen> {
     3: GlobalKey<NavigatorState>(), // Home tab navigator key
   };
 
+  // Tutorial Keys
+  final GlobalKey _marketTabKey = GlobalKey();
+  final GlobalKey _sellTabKey = GlobalKey();
+  final GlobalKey _garageTabKey = GlobalKey();
+  final GlobalKey _listingsTabKey = GlobalKey();
+  final GlobalKey _offersTabKey = GlobalKey();
+  final GlobalKey _storeTabKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -114,7 +123,15 @@ class _MainScreenState extends State<MainScreen> {
       ),      // 2: Garage
       TabNavigator(
         navigatorKey: _navigatorKeys[3],
-        child: const HomeScreen(),
+        child: HomeScreen(
+          marketTabKey: _marketTabKey,
+          sellTabKey: _sellTabKey,
+          garageTabKey: _garageTabKey,
+          listingsTabKey: _listingsTabKey,
+          offersTabKey: _offersTabKey,
+          storeTabKey: _storeTabKey,
+          mainScaffoldKey: _mainScaffoldKey,
+        ),
       ),            // 3: Home (Center)
       TabNavigator(
         navigatorKey: _navigatorKeys[4],
@@ -131,6 +148,7 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     return Scaffold(
+      key: _mainScaffoldKey,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
@@ -168,19 +186,19 @@ class _MainScreenState extends State<MainScreen> {
           destinations: [
             // Market
             NavigationDestination(
-              icon: const Icon(Icons.search),
+              icon: Icon(Icons.search, key: _marketTabKey),
               selectedIcon: const Icon(Icons.search, color: Colors.deepPurple),
               label: 'market.title'.tr(),
             ),
             // Sell
             NavigationDestination(
-              icon: const Icon(Icons.sell_outlined),
+              icon: Icon(Icons.sell_outlined, key: _sellTabKey),
               selectedIcon: const Icon(Icons.sell, color: Colors.deepPurple),
               label: 'home.sellVehicle'.tr(),
             ),
             // Garage
             NavigationDestination(
-              icon: const Icon(Icons.directions_car_outlined),
+              icon: Icon(Icons.directions_car_outlined, key: _garageTabKey),
               selectedIcon: const Icon(Icons.directions_car, color: Colors.deepPurple),
               label: 'garage.title'.tr(),
             ),
@@ -192,7 +210,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             // Listings
             NavigationDestination(
-              icon: const Icon(Icons.list_alt_outlined),
+              icon: Icon(Icons.list_alt_outlined, key: _listingsTabKey),
               selectedIcon: const Icon(Icons.list_alt, color: Colors.deepPurple),
               label: 'home.myListings'.tr(),
             ),
@@ -202,9 +220,9 @@ class _MainScreenState extends State<MainScreen> {
                   ? Badge(
                       label: Text('$_pendingOffersCount'),
                       backgroundColor: Colors.red,
-                      child: const Icon(Icons.handshake_outlined),
+                      child: Icon(Icons.handshake_outlined, key: _offersTabKey),
                     )
-                  : const Icon(Icons.handshake_outlined),
+                  : Icon(Icons.handshake_outlined, key: _offersTabKey),
               selectedIcon: _pendingOffersCount > 0
                   ? Badge(
                       label: Text('$_pendingOffersCount'),
@@ -216,7 +234,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             // Store
             NavigationDestination(
-              icon: const Icon(Icons.shopping_bag_outlined),
+              icon: Icon(Icons.shopping_bag_outlined, key: _storeTabKey),
               selectedIcon: const Icon(Icons.shopping_bag, color: Colors.deepPurple),
               label: 'store.title'.tr(),
             ),
