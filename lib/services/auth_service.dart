@@ -138,6 +138,7 @@ class AuthService {
       'profitLossPercentage': newUser.profitLossPercentage,
       'profileImageUrl': newUser.profileImageUrl,
       'currency': newUser.currency,
+      'isTutorialCompleted': false, // Yeni kullanıcılar için tutorial gösterilmeli
     });
 
     if (result == -1) {

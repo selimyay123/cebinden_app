@@ -6,6 +6,7 @@ import '../../models/user_model.dart';
 import '../../widgets/modern_alert_dialog.dart';
 import '../../services/chat_service.dart';
 import '../../services/localization_service.dart';
+import '../../widgets/social_background.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -162,13 +163,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/social_bg.jpeg'),
-            fit: BoxFit.cover,
-          ),
-        ),
+      body: SocialBackground(
         child: Column(
           children: [
           Expanded(

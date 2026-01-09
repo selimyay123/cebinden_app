@@ -10,6 +10,7 @@ import 'package:lottie/lottie.dart';
 import '../services/report_service.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/user_profile_avatar.dart';
+import '../widgets/social_background.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -93,32 +94,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          // Arka Plan Resmi
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/social_bg.jpeg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          // Karartma Katmanı (Okunabilirlik için)
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.7),
-            ),
-          ),
-          // İçerik
-          _isLoading
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)))
-              : _topPlayers.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Henüz veri yok.',
-                        style: GoogleFonts.poppins(color: Colors.white70),
-                      ),
-                    )
-                  : Column(
+      body: SocialBackground(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)))
+            : _topPlayers.isEmpty
+                ? Center(
+                    child: Text(
+                      'Henüz veri yok.',
+                      style: GoogleFonts.poppins(color: Colors.white70),
+                    ),
+                  )
+                : Column(
                       children: [
                         // Bilgilendirme Mesajı
                         Container(
@@ -250,7 +236,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
                 ],
               ),
-        ],
       ),
     );
   }

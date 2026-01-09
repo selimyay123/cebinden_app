@@ -1489,7 +1489,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Koleksiyon', // TODO: Translate key
+                    'collection'.tr(),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,

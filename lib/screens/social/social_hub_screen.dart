@@ -7,6 +7,7 @@ import 'search_tab.dart';
 
 import 'dart:io';
 import '../../services/asset_service.dart';
+import '../../widgets/social_background.dart';
 
 class SocialHubScreen extends StatefulWidget {
   const SocialHubScreen({super.key});
@@ -16,38 +17,9 @@ class SocialHubScreen extends StatefulWidget {
 }
 
 class _SocialHubScreenState extends State<SocialHubScreen> {
-  File? _bgFile;
-  bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
-    _checkBackground();
-  }
-
-  Future<void> _checkBackground() async {
-    const assetPath = 'assets/images/social_bg.jpeg';
-    final file = AssetService().getLocalFile(assetPath);
-    
-    if (file.existsSync()) {
-      if (mounted) {
-        setState(() {
-          _bgFile = file;
-          _isLoading = false;
-        });
-      }
-    } else {
-      // Dosya yok, indirmeyi dene
-      final success = await AssetService().downloadAsset(assetPath);
-      if (mounted) {
-        setState(() {
-          if (success) {
-            _bgFile = AssetService().getLocalFile(assetPath);
-          }
-          _isLoading = false;
-        });
-      }
-    }
   }
 
   @override
@@ -82,19 +54,7 @@ class _SocialHubScreenState extends State<SocialHubScreen> {
             ],
           ),
         ),
-        body: Container(
-          decoration: BoxDecoration(
-            image: _bgFile != null
-                ? DecorationImage(
-                    image: FileImage(_bgFile!),
-                    fit: BoxFit.cover,
-                  )
-                : const DecorationImage(
-                    image: AssetImage('assets/images/social_bg.jpeg'), // Fallback
-                    fit: BoxFit.cover,
-                  ),
-            color: _bgFile == null ? const Color(0xFF121212) : null,
-          ),
+        body: SocialBackground(
           child: const TabBarView(
             children: [
               FriendsTab(),
