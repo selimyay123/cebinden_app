@@ -27,6 +27,7 @@ import 'package:lottie/lottie.dart'; // 🆕 Animasyon için
 import '../models/ai_buyer_model.dart';
 import '../services/skill_service.dart';
 import '../services/asset_service.dart';
+import '../services/ad_service.dart';
 
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
@@ -1883,6 +1884,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     if (confirmed == true) {
       // 🎬 Satış animasyonunu oynat ve teklifi kabul et (paralel)
       final xpResult = await _playSellingAnimation(_offerService.acceptOffer(offer));
+      
+      // 📺 Reklam Göster (Zorunlu)
+      await AdService().showInterstitialAd();
 
       if (mounted) {
         if (xpResult != null) {
@@ -1899,13 +1903,16 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
           // Level up varsa dialog göster
           if (xpResult.leveledUp) {
-            showDialog(
+            await showDialog(
               context: context,
               barrierDismissible: false,
               builder: (context) => LevelUpDialog(
                 reward: xpResult.rewards!,
               ),
             );
+            
+            // Dialog kapandıktan sonra reklam göster
+            await AdService().showInterstitialAd();
           }
 
           // Listeyi yenile
@@ -2015,6 +2022,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     if (confirmed == true) {
       // 🎬 Satış animasyonunu oynat ve teklifi kabul et (paralel)
       final result = await _playSellingAnimation(_offerService.acceptCounterOffer(offer));
+
+      // 📺 Reklam Göster (Zorunlu)
+      await AdService().showInterstitialAd();
 
       if (mounted && result != null) {
         if (result['success'] == true) {

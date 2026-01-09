@@ -8,7 +8,6 @@ class UserProfileAvatar extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final double? fontSize;
-
   const UserProfileAvatar({
     Key? key,
     this.imageUrl,
@@ -21,6 +20,10 @@ class UserProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _buildAvatar(context);
+  }
+
+  Widget _buildAvatar(BuildContext context) {
     final bgColor = backgroundColor ?? Colors.deepPurple.shade100;
     final txtColor = textColor ?? Colors.deepPurple.shade700;
     final fSize = fontSize ?? (radius);

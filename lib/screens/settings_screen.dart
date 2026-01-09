@@ -16,6 +16,9 @@ import 'admin_panel_screen.dart';
 import '../services/database_helper.dart';
 import '../widgets/user_profile_avatar.dart';
 import '../widgets/modern_alert_dialog.dart';
+import '../services/xp_service.dart';
+import '../services/ad_service.dart';
+import '../widgets/level_up_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool highlightProfilePicture;
@@ -208,9 +211,26 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
       'assets/pp/women1.png',
       'assets/pp/women2.png',
       'assets/pp/women3.png',
-      'assets/animations/pp/MEMEWE.json',
-      'assets/animations/pp/Money.json',
     ];
+
+    // Add purchased animated PPs
+    if (_currentUser != null) {
+      final animationMap = {
+        'MEMEWE': 'assets/animations/pp/MEMEWE.json',
+        'Money': 'assets/animations/pp/Money.json',
+        'VK': 'assets/animations/vk.json',
+        'PEPE': 'assets/animations/pp/PEPE.json',
+        'CoolEmoji': 'assets/animations/pp/Cool emoji.json',
+        'PepeMusic': 'assets/animations/pp/Pepe Sticker Music.json',
+        'NyanCat': 'assets/animations/pp/The Nyan Cat.json',
+      };
+
+      for (final ppName in _currentUser!.purchasedAnimatedPPs) {
+        if (animationMap.containsKey(ppName)) {
+          profileImages.add(animationMap[ppName]!);
+        }
+      }
+    }
 
     String? selectedImage = _currentUser?.profileImageUrl;
 
@@ -329,7 +349,23 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
     }
   }
 
+  /// Seviye atlama dialogu göster
+  Future<void> _showLevelUpDialog(XPGainResult result) async {
+    if (!mounted || result.rewards == null) return;
+    
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => LevelUpDialog(
+        reward: result.rewards!,
+      ),
+    );
 
+    // Dialog kapandıktan      // Reklam göster (eğer hazırsa ve kullanıcıda reklam kaldırma yoksa)
+      if (mounted) {
+        AdService().showInterstitialAd(force: true, hasNoAds: _currentUser?.hasNoAds ?? false);
+      }
+  }
 
   Future<void> _deleteAccount() async {
     if (_currentUser == null) return;
@@ -668,6 +704,34 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
                     );
                   },
                 ),
+                // ADMIN: Level Up Button (Sadece selimyay123@gmail.com için)
+                if (_currentUser?.email == 'selimyay123@gmail.com')
+                  _buildListTile(
+                    icon: Icons.upgrade,
+                    title: 'Admin: Level Up',
+                    textColor: Colors.redAccent,
+                    onTap: () async {
+                      if (_currentUser == null) return;
+                      
+                      final xpService = XPService();
+                      // Bir sonraki seviye için gereken XP'yi hesapla
+                      final xpToNext = _currentUser!.xpToNextLevel;
+                      
+                      // XP ekle ve seviye atlat
+                      final result = await xpService.addXP(
+                        _currentUser!.id,
+                        xpToNext,
+                        XPSource.achievement, 
+                      );
+                      
+                      // Dialog ve reklam göster
+                      if (result.leveledUp) {
+                        await _showLevelUpDialog(result);
+                        // Ayarları yenile
+                        await _loadSettings();
+                      }
+                    },
+                  ),
               ],
             ),
 

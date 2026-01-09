@@ -8,6 +8,7 @@ import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
 import '../services/auth_service.dart';
+import '../services/ad_service.dart';
 import '../services/database_helper.dart';
 import '../services/offer_service.dart';
 import '../services/favorite_service.dart';
@@ -953,17 +954,59 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     cost = (calculatedFee / 50).ceil() * 50.0;
                   }
 
-                  return ElevatedButton.icon(
-                    onPressed: _currentUser != null ? () => _showExpertiseDialog(isFree: isFree) : null,
-                    icon: Icon(isFree ? Icons.auto_awesome : Icons.search),
-                    label: Text(isFree 
-                      ? '${'skills.freeExpertise'.tr()} ($remainingUses/3)' 
-                      : '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isFree ? Colors.indigo : Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: _currentUser != null ? () => _showExpertiseDialog(isFree: isFree) : null,
+                        icon: Icon(isFree ? Icons.auto_awesome : Icons.search),
+                        label: Text(isFree 
+                          ? '${'skills.freeExpertise'.tr()} ($remainingUses/3)' 
+                          : '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isFree ? Colors.indigo : Colors.deepPurple,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                      if (!isFree) ...[
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () async {
+                            // Reklam yükleniyor mu kontrol et
+                            if (!AdService().isAdReady) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('common.adNotReady'.tr())),
+                              );
+                              // Reklam yüklemeyi dene
+                              AdService().loadRewardedAd();
+                              return;
+                            }
+
+                            // Reklamı göster
+                            final rewardEarned = await AdService().showRewardedAd(
+                              onRewarded: (reward) {
+                                // Ödül kazanıldı, ücretsiz ekspertiz yap
+                                _performExpertise(0, isFree: true);
+                              },
+                            );
+
+                            if (!rewardEarned) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('common.adFailed'.tr())),
+                                );
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.ondemand_video),
+                          label: Text('skills.watchAd'.tr()),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.purple,
+                          ),
+                        ),
+                      ],
+                    ],
                   );
                 }
               ),
@@ -1057,14 +1100,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isFree ? 'skills.freeExpertise'.tr() : 'expertise.dialogTitle'.tr()),
+      builder: (context) => ModernAlertDialog(
+        title: isFree ? 'skills.freeExpertise'.tr() : 'expertise.dialogTitle'.tr(),
+        icon: isFree ? Icons.auto_awesome : Icons.fact_check,
+        iconColor: isFree ? Colors.indigo : Colors.deepPurple,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(isFree 
-              ? 'skills.expertiseExpertDesc'.tr() 
+              ? (_currentUser!.hasUnlimitedExpertise 
+                  ? 'skills.unlimitedExpertiseDesc'.tr() 
+                  : 'skills.expertiseExpertDesc'.tr())
               : 'expertise.dialogMessage'.tr()),
             const SizedBox(height: 16),
             Row(
@@ -1090,25 +1137,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: (canAfford || isFree)
-                ? () {
-                    Navigator.pop(context);
-                    _performExpertise(cost, isFree: isFree);
-                  }
-                : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isFree ? Colors.indigo : null,
-              foregroundColor: isFree ? Colors.white : null,
-            ),
-            child: Text(isFree ? 'common.continue'.tr() : 'expertise.confirmAndPay'.tr()),
-          ),
-        ],
+        buttonText: isFree ? 'common.continue'.tr() : 'expertise.confirmAndPay'.tr(),
+        onPressed: (canAfford || isFree)
+            ? () {
+                Navigator.pop(context);
+                _performExpertise(cost, isFree: isFree);
+              }
+            : () {}, // ModernAlertDialog doesn't support disabled button, handle logic inside or show message
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
       ),
     );
   }
@@ -2413,11 +2450,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           duration: const Duration(milliseconds: 800),
           tween: Tween<double>(begin: 0, end: 1),
           onEnd: () {
-            Future.delayed(const Duration(seconds: 2), () {
+            Future.delayed(const Duration(seconds: 2), () async {
               entry.remove();
               // Level up varsa dialog göster
               if (result.leveledUp && mounted) {
-                _showLevelUpDialog(result);
+                await _showLevelUpDialog(result);
               }
             });
           },
@@ -2480,16 +2517,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
   
   /// Seviye atlama dialogu göster
-  void _showLevelUpDialog(XPGainResult result) {
+  Future<void> _showLevelUpDialog(XPGainResult result) async {
     if (!mounted || result.rewards == null) return;
     
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => LevelUpDialog(
         reward: result.rewards!,
       ),
     );
+
+    // Dialog kapandıktan sonra reklam göster
+    await AdService().showInterstitialAd(force: true);
   }
 
 

@@ -114,6 +114,7 @@ flutter:
   assets:
     - assets/images/app_logo/
     - assets/images/general_bg.png
+    - assets/images/vip_pass_bg.png
     - assets/images/splash_screen.jpeg
     - assets/images/icons/
     - assets/translations/
@@ -121,6 +122,7 @@ flutter:
     - assets/animations/pp/
     - assets/pp/
     - assets/home_images/
+    - assets/frame/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

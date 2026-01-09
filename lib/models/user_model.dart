@@ -51,9 +51,12 @@ class User {
   final DateTime? xpBoostEndTime; // XP Boost bitiş zamanı
   final int lastSkillUseDay; // Son kullanım günü (sıfırlama için)
   
-  // ========== KULLANICI ADI DEĞİŞİKLİĞİ ==========
+  final bool hasNoAds; // Reklamları kaldır özelliği var mı?
   final int usernameChangeCount; // Kullanıcı adı değiştirme sayısı
   final DateTime? lastUsernameChangeDate; // Son kullanıcı adı değiştirme tarihi
+
+  // VIP Status Getter
+  bool get isVip => ownsGallery && hasUnlimitedExpertise && hasNoAds;
 
   User({
     required this.id,
@@ -100,6 +103,7 @@ class User {
     this.purchasedAnimatedPPs = const [],
     this.activeAnimatedPP,
     this.hasUnlimitedExpertise = false,
+    this.hasNoAds = false,
     this.xpBoostEndTime,
     this.usernameChangeCount = 0,
     this.lastUsernameChangeDate,
@@ -242,6 +246,7 @@ class User {
       purchasedAnimatedPPs: (json['purchasedAnimatedPPs'] as List?)?.cast<String>() ?? const [],
       activeAnimatedPP: json['activeAnimatedPP'] as String?,
       hasUnlimitedExpertise: json['hasUnlimitedExpertise'] as bool? ?? false,
+      hasNoAds: json['hasNoAds'] as bool? ?? false,
       xpBoostEndTime: json['xpBoostEndTime'] != null 
           ? DateTime.parse(json['xpBoostEndTime']) 
           : null,
@@ -299,6 +304,7 @@ class User {
       'purchasedAnimatedPPs': purchasedAnimatedPPs,
       'activeAnimatedPP': activeAnimatedPP,
       'hasUnlimitedExpertise': hasUnlimitedExpertise,
+      'hasNoAds': hasNoAds,
       'xpBoostEndTime': xpBoostEndTime?.toIso8601String(),
       'usernameChangeCount': usernameChangeCount,
       'lastUsernameChangeDate': lastUsernameChangeDate?.toIso8601String(),
@@ -347,6 +353,7 @@ class User {
     List<String>? purchasedAnimatedPPs,
     String? activeAnimatedPP,
     bool? hasUnlimitedExpertise,
+    bool? hasNoAds,
     DateTime? xpBoostEndTime,
   }) {
     return User(
@@ -390,6 +397,7 @@ class User {
       purchasedAnimatedPPs: purchasedAnimatedPPs ?? this.purchasedAnimatedPPs,
       activeAnimatedPP: activeAnimatedPP ?? this.activeAnimatedPP,
       hasUnlimitedExpertise: hasUnlimitedExpertise ?? this.hasUnlimitedExpertise,
+      hasNoAds: hasNoAds ?? this.hasNoAds,
       xpBoostEndTime: xpBoostEndTime ?? this.xpBoostEndTime,
     );
   }

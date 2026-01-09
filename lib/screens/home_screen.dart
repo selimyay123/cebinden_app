@@ -4305,16 +4305,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   }
   
   /// Seviye atlama dialogu göster
-  void _showLevelUpDialog(XPGainResult result) {
+  Future<void> _showLevelUpDialog(XPGainResult result) async {
     if (!mounted || result.rewards == null) return;
     
-    showDialog(
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => LevelUpDialog(
         reward: result.rewards!,
       ),
     );
+
+    // Dialog kapandıktan sonra reklam göster
+    await AdService().showInterstitialAd(force: true);
   }
 
   
@@ -4331,7 +4334,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     // Seviye atlandıysa dialog göster
     if (result.leveledUp) {
       await Future.delayed(const Duration(milliseconds: 1500));
-      _showLevelUpDialog(result);
+      await _showLevelUpDialog(result);
     }
   }
 }

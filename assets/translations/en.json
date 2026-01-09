@@ -793,6 +793,7 @@
     "lowballerBonus": "Acceptance Chance: +{percent}",
     "expertiseExpert": "Expertise Expert",
     "expertiseExpertDesc": "Allows you to perform 3 free expertises every game day.",
+    "watchAd": "Free Expertise (Watch Ad)",
     "unlimitedExpertiseTitle": "Unlimited Expertise",
     "unlimitedExpertiseDesc": "You can perform unlimited and free expertise for all vehicles.",
     "xpBoostTitle": "XP Boost (24 Hours)",
@@ -1674,6 +1675,18 @@
     "googleLoginError": "An error occurred during Google sign-in."
   },
   "store": {
+    "removeAds": "Remove Ads",
+    "removeAdsDesc": "Permanently removes mandatory ads.",
+    "removeAdsDialogDesc": "Do you want to permanently remove all mandatory ads (after sales and level up)?",
+    "removeAdsSuccess": "Ads Removed!",
+    "removeAdsSuccessDesc": "You will no longer see mandatory ads. Enjoy the game!",
+    "vipPass": {
+      "title": "VIP PASS",
+      "desc": "Get everything at once! Gallery + Unlimited Expertise + No Ads + 24h XP Boost + MEMEWE",
+      "dialogDesc": "Do you want to buy VIP PASS for 5 Gold? \n\nIncludes:\n• Gallery\n• Unlimited Expertise\n• No Ads\n• 24h XP Boost\n• MEMEWE Special Profile Picture",
+      "success": "VIP PASS Activated!",
+      "successDesc": "You have all the privileges now! Enjoy the game."
+    },
     "purchaseSuccess": "Purchase successful!",
     "productsLoadError": "Error loading products",
     "loadingProducts": "Loading products...",
@@ -1742,7 +1755,8 @@
         "PEPE": "PEPE",
         "CoolEmoji": "Cool Emoji",
         "PepeMusic": "Pepe Sticker Music",
-        "NyanCat": "The Nyan Cat"
+        "NyanCat": "The Nyan Cat",
+        "VK": "VK"
       }
     }
   },

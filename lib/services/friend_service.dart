@@ -5,12 +5,14 @@ class SocialUser {
   final String username;
   final String? profileImageUrl;
   final int level;
+  final bool isVip;
 
   SocialUser({
     required this.id, 
     required this.username, 
     this.profileImageUrl, 
-    required this.level
+    required this.level,
+    this.isVip = false,
   });
 
   factory SocialUser.fromMap(Map<String, dynamic> map, String id) {
@@ -19,6 +21,7 @@ class SocialUser {
       username: map['username'] ?? '',
       profileImageUrl: map['profileImageUrl'],
       level: map['level'] ?? 1,
+      isVip: map['isVip'] ?? false,
     );
   }
 }

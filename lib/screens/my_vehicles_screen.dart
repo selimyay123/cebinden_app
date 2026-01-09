@@ -17,6 +17,13 @@ import '../services/skill_service.dart';
 import 'package:lottie/lottie.dart';
 import '../services/game_time_service.dart';
 import '../widgets/game_image.dart';
+import '../services/ad_service.dart';
+import '../services/xp_service.dart';
+import '../widgets/level_up_dialog.dart';
+import '../services/xp_service.dart';
+import '../widgets/level_up_dialog.dart';
+import '../services/xp_service.dart';
+import '../widgets/level_up_dialog.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
@@ -33,6 +40,7 @@ class MyVehiclesScreen extends StatefulWidget {
 class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, AutoRefreshMixin {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
+  final XPService _xpService = XPService();
   
   User? _currentUser;
   List<UserVehicle> _myVehicles = [];
@@ -1397,8 +1405,30 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
       // 3. Yetenek kullanımını kaydet
       await SkillService().recordSkillUsage(_currentUser!.id, SkillService.skillQuickSell);
 
-      // 4. Animasyon
+      // 4. XP Kazandır ve Level Up Kontrolü
+      final profit = sellPrice - vehicle.purchasePrice;
+      final xpResult = await _xpService.onVehicleSale(_currentUser!.id, profit);
+
+      // 5. Animasyon
       await _playSoldAnimation();
+
+      // 6. Level Up varsa dialog göster
+      if (xpResult.leveledUp && xpResult.rewards != null) {
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => LevelUpDialog(
+            reward: xpResult.rewards!,
+          ),
+        );
+        // Level up sonrası zorunlu reklam
+        await AdService().showInterstitialAd(force: true);
+      } else {
+        // Reklam göster (eğer hazırsa ve kullanıcıda reklam kaldırma yoksa)
+      if (mounted) {
+        AdService().showInterstitialAd(hasNoAds: _currentUser?.hasNoAds ?? false);
+      }
+      }
 
       // 5. Listeyi yenile
       await _loadMyVehicles();

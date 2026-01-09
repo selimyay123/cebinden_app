@@ -19,6 +19,7 @@ class LeaderboardService {
         'balance': user.balance,
         'profileImageUrl': user.profileImageUrl,
         'level': user.level,
+        'isVip': user.isVip,
         'lastUpdated': FieldValue.serverTimestamp(),
       };
 

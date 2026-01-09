@@ -797,6 +797,7 @@
     "lowballerBonus": "Kabul Şansı: +{percent}",
     "expertiseExpert": "Ekspertiz Uzmanı",
     "expertiseExpertDesc": "Her oyun gününde 3 adet ücretsiz ekspertiz yapmanızı sağlar.",
+    "watchAd": "Ücretsiz Ekspertiz (Reklam İzle)",
     "unlimitedExpertiseTitle": "Sınırsız Ekspertiz",
     "unlimitedExpertiseDesc": "Tüm araçlar için ücretsiz ve sınırsız ekspertiz yapabilirsin.",
     "xpBoostTitle": "XP Boost (24 Saat)",
@@ -1678,6 +1679,18 @@
     "googleLoginError": "Google ile giriş yapılırken bir hata oluştu."
   },
   "store": {
+    "removeAds": "Reklamları Kaldır",
+    "removeAdsDesc": "Zorunlu reklamları kalıcı olarak kaldırır.",
+    "removeAdsDialogDesc": "Oyundaki tüm zorunlu reklamları (satış sonrası ve seviye atlama) kalıcı olarak kaldırmak istiyor musunuz?",
+    "removeAdsSuccess": "Reklamlar Kaldırıldı!",
+    "removeAdsSuccessDesc": "Artık zorunlu reklamlarla karşılaşmayacaksınız. İyi oyunlar!",
+    "vipPass": {
+      "title": "VIP PASS",
+      "desc": "Her şeye tek seferde sahip ol! Galeri + Sınırsız Ekspertiz + Reklamsız + 24s XP Boost + MEMEWE",
+      "dialogDesc": "5 Altın karşılığında VIP PASS satın almak istiyor musunuz? \n\nİçerik:\n• Galeri\n• Sınırsız Ekspertiz\n• Reklamsız Deneyim\n• 24 Saat XP Boost\n• MEMEWE Özel Profil Resmi",
+      "success": "VIP PASS Aktif!",
+      "successDesc": "Tüm ayrıcalıklara sahipsiniz! İyi oyunlar."
+    },
     "purchaseSuccess": "Satın alma başarılı!",
     "productsLoadError": "Ürünler yüklenirken hata oluştu",
     "loadingProducts": "Ürünler yükleniyor...",
@@ -1745,8 +1758,9 @@
         "Money": "Para",
         "PEPE": "PEPE",
         "CoolEmoji": "Havalı Emoji",
-        "PepeMusic": "Pepe Sticker Müzik",
-        "NyanCat": "The Nyan Cat"
+        "PepeMusic": "Pepe Müzik",
+        "NyanCat": "Nyan Kedi",
+        "VK": "VK"
       }
     }
   },

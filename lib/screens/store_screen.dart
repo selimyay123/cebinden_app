@@ -126,7 +126,24 @@ class _StoreScreenState extends State<StoreScreen> {
           appBar: AppBar(
             title: Text('store.title'.tr()),
             actions: [
-
+              if (_currentUser?.email == 'selimyay123@gmail.com')
+                IconButton(
+                  icon: const Icon(Icons.restore, color: Colors.red),
+                  onPressed: () async {
+                    await _db.updateUser(_currentUser!.id, {
+                      'ownsGallery': false,
+                      'hasUnlimitedExpertise': false,
+                      'hasNoAds': false,
+                      'xpBoostEndTime': null,
+                    });
+                    await _loadCurrentUser();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('VIP Status Reset!')),
+                      );
+                    }
+                  },
+                ),
             ],
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
@@ -185,17 +202,16 @@ class _StoreScreenState extends State<StoreScreen> {
                                   // Garaj Genişletme (Yükseltmeler)
                                   _buildSectionTitle('store.garageExpansion'.tr()),
                                   const SizedBox(height: 12),
-                                  if (!_currentUser!.ownsGallery) ...[
-                                    _buildGalleryPurchaseCard(),
-                                    const SizedBox(height: 12),
-                                  ],
+                                  _buildGalleryPurchaseCard(),
+                                  const SizedBox(height: 12),
                                   _buildGarageExpansionCard(),
                                   const SizedBox(height: 12),
-                                  if (!_currentUser!.hasUnlimitedExpertise) ...[
-                                    _buildUnlimitedExpertiseCard(),
-                                    const SizedBox(height: 12),
-                                  ],
+                                  _buildUnlimitedExpertiseCard(),
+                                  const SizedBox(height: 12),
                                   _buildXpBoostCard(),
+                                  const SizedBox(height: 12),
+                                  _buildRemoveAdsCard(),
+                                  const SizedBox(height: 12),
 
                                   const SizedBox(height: 32),
 
@@ -203,6 +219,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                   _buildSectionTitle('store.animatedPP.title'.tr()),
                                   const SizedBox(height: 12),
                                   _buildAnimatedPPSection(),
+                                  const SizedBox(height: 12),
+
+                                  const SizedBox(height: 20),
+                                  _buildVipPassCard(),
                                   const SizedBox(height: 32),
 
                                 ],
@@ -219,6 +239,7 @@ class _StoreScreenState extends State<StoreScreen> {
   }
 
   Widget _buildGalleryPurchaseCard() {
+    final isOwned = _currentUser!.ownsGallery;
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
       decoration: BoxDecoration(
@@ -259,32 +280,42 @@ class _StoreScreenState extends State<StoreScreen> {
               ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () => _showBuyGalleryDialog(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.2),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  '5',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          isOwned
+              ? Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.green, width: 2),
+                  ),
+                  child: const Icon(Icons.check, color: Colors.green, size: 24),
+                )
+              : ElevatedButton(
+                  onPressed: () => _showBuyGalleryDialog(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '5',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Lottie.asset(
+                        'assets/animations/gold.json',
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
+                  ),
                 ),
-                Lottie.asset(
-                  'assets/animations/gold.json',
-                  width: 30,
-                  height: 30,
-                  fit: BoxFit.contain,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -607,6 +638,183 @@ class _StoreScreenState extends State<StoreScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRemoveAdsCard() {
+    final isOwned = _currentUser!.hasNoAds;
+    return Container(
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Lottie.asset(
+              'assets/animations/level_up.json', // Using level_up as generic upgrade animation
+              width: 70,
+              height: 70,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'store.removeAds'.tr(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                // Text(
+                //   'store.removeAdsDesc'.tr(),
+                //   style: TextStyle(
+                //     fontSize: 12,
+                //     color: Colors.white.withOpacity(0.8),
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+          isOwned
+              ? Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.green, width: 2),
+                  ),
+                  child: const Icon(Icons.check, color: Colors.green, size: 24),
+                )
+              : ElevatedButton(
+                  onPressed: () => _showRemoveAdsDialog(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '5',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Lottie.asset(
+                        'assets/animations/gold.json',
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
+                  ),
+                ),
+        ],
+      ),
+    );
+  }
+
+  void _showRemoveAdsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'store.removeAds'.tr(),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.block,
+              size: 60,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'store.removeAdsDialogDesc'.tr(),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'store.costLabel'.trParams({
+                'amount': '5',
+                'currency': 'store.gold'.tr()
+              }),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+        buttonText: 'store.buy'.tr(),
+        onPressed: () async {
+          if (_currentUser!.gold >= 5) {
+            Navigator.pop(context);
+            
+            // Altını düş ve özelliği ekle
+            final newGold = _currentUser!.gold - 5;
+            
+            await _db.updateUser(_currentUser!.id, {
+              'gold': newGold,
+              'hasNoAds': true,
+            });
+            
+            await _loadCurrentUser();
+            
+            if (mounted) {
+              showDialog(
+                context: context,
+                builder: (context) => ModernAlertDialog(
+                  title: 'store.removeAdsSuccess'.tr(),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.celebration,
+                        size: 60,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'store.removeAdsSuccessDesc'.tr(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  buttonText: 'common.ok'.tr(),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              );
+            }
+          } else {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('store.insufficientGold'.tr()),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 8,
+              ),
+            );
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
       ),
     );
   }
@@ -968,6 +1176,7 @@ class _StoreScreenState extends State<StoreScreen> {
   }
 
   Widget _buildUnlimitedExpertiseCard() {
+    final isOwned = _currentUser!.hasUnlimitedExpertise;
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
       decoration: BoxDecoration(
@@ -1008,32 +1217,42 @@ class _StoreScreenState extends State<StoreScreen> {
               ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () => _showBuyUnlimitedExpertiseDialog(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.2),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  '1',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          isOwned
+              ? Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.green, width: 2),
+                  ),
+                  child: const Icon(Icons.check, color: Colors.green, size: 24),
+                )
+              : ElevatedButton(
+                  onPressed: () => _showBuyUnlimitedExpertiseDialog(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '1',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Lottie.asset(
+                        'assets/animations/gold.json',
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
+                  ),
                 ),
-                Lottie.asset(
-                  'assets/animations/gold.json',
-                  width: 30,
-                  height: 30,
-                  fit: BoxFit.contain,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -1120,6 +1339,9 @@ class _StoreScreenState extends State<StoreScreen> {
   }
 
   Widget _buildXpBoostCard() {
+    final now = DateTime.now();
+    final isActive = _currentUser!.xpBoostEndTime != null && _currentUser!.xpBoostEndTime!.isAfter(now);
+
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
       decoration: BoxDecoration(
@@ -1157,35 +1379,54 @@ class _StoreScreenState extends State<StoreScreen> {
                     color: Colors.white,
                   ),
                 ),
+                if (isActive)
+                  Text(
+                    '${'common.active'.tr()} (${_currentUser!.xpBoostEndTime!.difference(now).inHours}s)',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.greenAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
               ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () => _showBuyXpBoostDialog(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.2),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  '1',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          isActive
+              ? Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.green, width: 2),
+                  ),
+                  child: const Icon(Icons.check, color: Colors.green, size: 24),
+                )
+              : ElevatedButton(
+                  onPressed: () => _showBuyXpBoostDialog(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.2),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '1',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Lottie.asset(
+                        'assets/animations/gold.json',
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
+                  ),
                 ),
-                Lottie.asset(
-                  'assets/animations/gold.json',
-                  width: 30,
-                  height: 30,
-                  fit: BoxFit.contain,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -1327,200 +1568,116 @@ class _StoreScreenState extends State<StoreScreen> {
                   // Input alanı + ve - butonları ile
                   Row(
                     children: [
-                      // Azalt butonu (-)
                       IconButton(
-                        onPressed: selectedGold > 0.1
-                            ? () {
-                                setDialogState(() {
-                                  selectedGold = (selectedGold - 0.1).clamp(0.1, maxGold);
-                                  selectedGold = double.parse(selectedGold.toStringAsFixed(1));
-                                  controller.text = selectedGold.toStringAsFixed(1);
-                                  validationError = _validateGoldAmount(controller.text, maxGold);
-                                });
-                              }
-                            : null,
-                        icon: const Icon(Icons.remove_circle_outline, size: 36),
-                        color: Colors.deepPurple,
-                        iconSize: 36,
+                        onPressed: () {
+                          double currentVal = double.tryParse(controller.text) ?? 0.1;
+                          if (currentVal > 0.1) {
+                            currentVal -= 0.1;
+                            controller.text = currentVal.toStringAsFixed(1);
+                            selectedGold = currentVal;
+                            setDialogState(() {});
+                          }
+                        },
+                        icon: const Icon(Icons.remove_circle_outline),
+                        color: Colors.red,
                       ),
-                      // Input (readonly)
                       Expanded(
                         child: TextFormField(
                           controller: controller,
-                          readOnly: true, // Kullanıcı yazamasın
-                          enableInteractiveSelection: false, // Context menu'yu kapat
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[100],
+                            suffixText: 'store.gold'.tr(),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: validationError != null ? Colors.red : Colors.grey[300]!,
-                                width: 2,
-                              ),
-                            ),
-                            suffix: Text(
-                              'store.gold'.tr(),
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 16,
-                            ),
-                            errorText: validationError,
-                            errorMaxLines: 2,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           ),
-                          validator: (value) => _validateGoldAmount(value, maxGold),
+                          onChanged: (value) {
+                            final val = double.tryParse(value);
+                            if (val != null) {
+                              selectedGold = val;
+                              setDialogState(() {});
+                            }
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'store.enterAmount'.tr();
+                            }
+                            final val = double.tryParse(value);
+                            if (val == null) {
+                              return 'store.invalidNumber'.tr();
+                            }
+                            if (val < 0.1) {
+                              return 'store.minAmount'.tr() + ': 0.1';
+                            }
+                            if (val > maxGold) {
+                              return 'store.insufficientGoldError'.trParams({'amount': maxGold.toStringAsFixed(2)});
+                            }
+                            return null;
+                          },
                         ),
                       ),
-                      // Arttır butonu (+)
                       IconButton(
                         onPressed: () {
-                          setDialogState(() {
-                            selectedGold = (selectedGold + 0.1).clamp(0.1, maxGold);
-                            selectedGold = double.parse(selectedGold.toStringAsFixed(1));
-                            controller.text = selectedGold.toStringAsFixed(1);
-                            validationError = _validateGoldAmount(controller.text, maxGold);
-                          });
+                          double currentVal = double.tryParse(controller.text) ?? 0.1;
+                          if (currentVal < maxGold) {
+                            currentVal += 0.1;
+                            controller.text = currentVal.toStringAsFixed(1);
+                            selectedGold = currentVal;
+                            setDialogState(() {});
+                          }
                         },
-                        icon: const Icon(Icons.add_circle_outline, size: 36),
-                        color: Colors.deepPurple,
-                        iconSize: 36,
+                        icon: const Icon(Icons.add_circle_outline),
+                        color: Colors.green,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  // Hızlı seçim butonları
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildQuickSelectButton(
-                        context,
-                        '1',
-                        1.0,
-                        maxGold,
-                        () {
-                          setDialogState(() {
-                            if (1.0 <= maxGold) {
-                              selectedGold = 1.0;
-                              controller.text = '1.0';
-                              validationError = _validateGoldAmount(controller.text, maxGold);
-                            }
-                          });
-                        },
-                      ),
-                      _buildQuickSelectButton(
-                        context,
-                        '5',
-                        5.0,
-                        maxGold,
-                        () {
-                          setDialogState(() {
-                            if (5.0 <= maxGold) {
-                              selectedGold = 5.0;
-                              controller.text = '5.0';
-                              validationError = _validateGoldAmount(controller.text, maxGold);
-                            }
-                          });
-                        },
-                      ),
-                      _buildQuickSelectButton(
-                        context,
-                        '10',
-                        10.0,
-                        maxGold,
-                        () {
-                          setDialogState(() {
-                            if (10.0 <= maxGold) {
-                              selectedGold = 10.0;
-                              controller.text = '10.0';
-                              validationError = _validateGoldAmount(controller.text, maxGold);
-                            }
-                          });
-                        },
-                      ),
-                      _buildQuickSelectButton(
-                        context,
-                        '25',
-                        25.0,
-                        maxGold,
-                        () {
-                          setDialogState(() {
-                            if (25.0 <= maxGold) {
-                              selectedGold = 25.0;
-                              controller.text = '25.0';
-                              validationError = _validateGoldAmount(controller.text, maxGold);
-                            }
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'store.availableGold'.tr() + ': ${maxGold.toStringAsFixed(2)} ${'store.gold'.tr()}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
+                  
+                  // Bilgi Kartı
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Alacağınız Para
-                        Text(
-                          'store.youWillGet'.tr(),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${_formatCurrency(selectedGold * 1000000.0)} TL',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('store.exchangeRate'.tr(), style: TextStyle(color: Colors.grey[600])),
+                            const Text('1 Gold = 10,000 TL', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
                         ),
                         const Divider(height: 24),
-                        // Kalan Altın
-                        Text(
-                          'store.remainingGold'.tr(),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[700],
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('store.youWillGet'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                            Text(
+                              '${_formatCurrency(selectedGold * 10000)} TL',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${(maxGold - selectedGold).toStringAsFixed(2)} ${'store.gold'.tr()}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('store.remainingGold'.tr(), style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                            Text(
+                              '${(maxGold - selectedGold).toStringAsFixed(2)} Gold',
+                              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -1528,243 +1685,388 @@ class _StoreScreenState extends State<StoreScreen> {
                 ],
               ),
             ),
-              actions: [
-                TextButton(
-                  onPressed: () {
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('common.cancel'.tr(), style: TextStyle(color: Colors.grey[600])),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
                     Navigator.pop(context);
-                  },
-                  child: Text('common.cancel'.tr()),
+                    
+                    // Onay Dialogu
+                    showDialog(
+                      context: context,
+                      builder: (context) => ModernAlertDialog(
+                        title: 'store.confirmConvert'.tr(),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('store.confirmConvertMessage'.tr()),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('store.goldAmount'.tr()),
+                                  Text(
+                                    '${selectedGold.toStringAsFixed(1)} Gold',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amber),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Icon(Icons.arrow_downward, color: Colors.grey),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('store.gameCurrency'.tr()),
+                                  Text(
+                                    '${_formatCurrency(selectedGold * 10000)} TL',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        buttonText: 'store.confirmButton'.tr(),
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          
+                          // İşlemi gerçekleştir
+                          final newGold = _currentUser!.gold - selectedGold;
+                          final newBalance = _currentUser!.balance + (selectedGold * 10000);
+                          
+                          await _db.updateUser(_currentUser!.id, {
+                            'gold': newGold,
+                            'balance': newBalance,
+                          });
+                          
+                          await _loadCurrentUser();
+                          
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('common.success'.tr()),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                          }
+                        },
+                        secondaryButtonText: 'common.cancel'.tr(),
+                        onSecondaryPressed: () => Navigator.pop(context),
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    if (formKey.currentState!.validate()) {
-                      Navigator.pop(context);
-                      await _showConvertConfirmDialog(selectedGold);
-                    }
-                  },
-                  icon: const Icon(Icons.check),
-                  label: Text('store.convert'.tr()),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ],
-            );
+                child: Text('store.convert'.tr()),
+              ),
+            ],
+          );
         },
       ),
     );
   }
 
-  // Hızlı seçim butonu widget'ı
-  Widget _buildQuickSelectButton(
-    BuildContext context,
-    String label,
-    double value,
-    double maxGold,
-    VoidCallback onTap,
-  ) {
-    final isDisabled = value > maxGold;
-    
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: ElevatedButton(
-          onPressed: isDisabled ? null : onTap,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isDisabled ? Colors.grey[300] : Colors.amber[600],
-            foregroundColor: isDisabled ? Colors.grey[600] : Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            elevation: isDisabled ? 0 : 2,
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+  Widget _buildVipPassCard() {
+    // Check if user has all permanent items
+    final hasAll = _currentUser!.ownsGallery && 
+                   _currentUser!.hasUnlimitedExpertise && 
+                   _currentUser!.hasNoAds;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        image: const DecorationImage(
+          image: AssetImage('assets/images/vip_pass_bg.png'),
+          fit: BoxFit.cover,
         ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.4),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+        border: Border.all(color: Colors.amber.withOpacity(0.5), width: 1),
       ),
-    );
-  }
-
-  String? _validateGoldAmount(String? value, double maxGold) {
-    if (value == null || value.isEmpty) {
-      return 'store.enterAmount'.tr();
-    }
-
-    final parsed = double.tryParse(value);
-    if (parsed == null) {
-      return 'store.invalidNumber'.tr();
-    }
-
-    if (parsed < 0.1) {
-      return 'store.minGoldError'.tr();
-    }
-
-    if (parsed > maxGold) {
-      return 'store.insufficientGoldError'.trParams({'amount': maxGold.toStringAsFixed(1)});
-    }
-
-    return null;
-  }
-
-  Future<void> _showConvertConfirmDialog(double gold) async {
-    final gameCurrency = gold * 1000000.0;
-    
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.warning_amber_rounded, color: Colors.orange),
-            ),
-            const SizedBox(width: 12),
-            Expanded(child: Text('store.confirmConvert'.tr())),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'store.confirmConvertMessage'.tr(),
-              style: const TextStyle(fontSize: 15),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'store.goldAmount'.tr(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
+      child: Column(
+        children: [
+          Column(
+            children: [
+              // MEMEWE Preview
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: Center(
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                    child: ClipOval(
+                      child: Lottie.asset(
+                        'assets/animations/pp/MEMEWE.json',
+                        fit: BoxFit.cover,
                       ),
-                      Text(
-                        '${gold.toStringAsFixed(2)} ${'store.gold'.tr()}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  const Divider(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'store.youWillGet'.tr(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      Text(
-                        '${_formatCurrency(gameCurrency)} TL',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'store.vipPass.title'.tr(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'store.vipPass.desc'.tr(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (hasAll)
+             Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green, width: 1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green),
+                  const SizedBox(width: 8),
+                  Text(
+                    'common.active'.tr(), // Or a specific message like "VIP Active"
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ElevatedButton(
+              onPressed: () => _showBuyVipPassDialog(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '10',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.lineThrough,
+                      color: Colors.black.withOpacity(0.5),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '5',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Lottie.asset(
+                    'assets/animations/gold.json',
+                    width: 30,
+                    height: 30,
+                    fit: BoxFit.contain,
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber,
-              foregroundColor: Colors.white,
-            ),
-            child: Text('store.confirmButton'.tr()),
-          ),
         ],
       ),
     );
-
-    if (confirmed == true) {
-      await _convertGold(gold);
-    }
   }
 
-  Future<void> _convertGold(double gold) async {
-    try {
-      final gameCurrency = gold * 1000000.0;
-      final newGold = _currentUser!.gold - gold;
-      final newBalance = _currentUser!.balance + gameCurrency;
-
-      await _db.updateUser(_currentUser!.id, {
-        'gold': newGold,
-        'balance': newBalance,
-      });
-
-      await _loadCurrentUser();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            behavior: SnackBarBehavior.floating,
-            content: Text(
-              '✅ ${gold.toStringAsFixed(2)} ${'store.gold'.tr()} → ${_formatCurrency(gameCurrency)} TL',
+  void _showBuyVipPassDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'store.vipPass.title'.tr(),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'store.vipPass.dialogDesc'.tr(),
+              textAlign: TextAlign.center,
             ),
-            backgroundColor: Colors.green.withOpacity(0.8),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            behavior: SnackBarBehavior.floating,
-            content: Text('store.convertError'.tr()),
-            backgroundColor: Colors.red.withOpacity(0.8),
-          ),
-        );
-      }
-    }
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'store.costLabel'.trParams({
+                    'amount': '10',
+                    'currency': 'store.gold'.tr()
+                  }),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16,
+                    decoration: TextDecoration.lineThrough,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'store.costLabel'.trParams({
+                    'amount': '5',
+                    'currency': 'store.gold'.tr()
+                  }),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 20,
+                    color: Colors.green,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        buttonText: 'store.buy'.tr(),
+        onPressed: () async {
+          if (_currentUser!.gold >= 5) {
+            Navigator.pop(context);
+
+            final newGold = _currentUser!.gold - 5;
+            final newGarageLimit = _currentUser!.ownsGallery ? _currentUser!.garageLimit : _currentUser!.garageLimit + 5;
+            
+            // XP Boost logic
+            DateTime currentEndTime = _currentUser!.xpBoostEndTime ?? DateTime.now();
+            if (currentEndTime.isBefore(DateTime.now())) {
+              currentEndTime = DateTime.now();
+            }
+            final newEndTime = currentEndTime.add(const Duration(hours: 24));
+
+            // Add MEMEWE to purchased animated PPs if not already owned
+            List<String> newPurchasedPPs = List.from(_currentUser!.purchasedAnimatedPPs);
+            if (!newPurchasedPPs.contains('MEMEWE')) {
+              newPurchasedPPs.add('MEMEWE');
+            }
+
+            await _db.updateUser(_currentUser!.id, {
+              'gold': newGold,
+              'ownsGallery': true,
+              'galleryPurchaseDate': _currentUser!.ownsGallery ? _currentUser!.galleryPurchaseDate : DateTime.now().toIso8601String(),
+              'garageLimit': newGarageLimit,
+              'hasUnlimitedExpertise': true,
+              'hasNoAds': true,
+              'xpBoostEndTime': newEndTime.toIso8601String(),
+              'purchasedAnimatedPPs': newPurchasedPPs,
+              'profileImageUrl': 'assets/animations/pp/MEMEWE.json',
+              'activeAnimatedPP': 'MEMEWE',
+            });
+
+            await _loadCurrentUser();
+
+            if (mounted) {
+              showDialog(
+                context: context,
+                builder: (context) => ModernAlertDialog(
+                  title: 'common.success'.tr(),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.stars,
+                        size: 60,
+                        color: Colors.amber,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'store.vipPass.success'.tr(),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'store.vipPass.successDesc'.tr(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  buttonText: 'common.ok'.tr(),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              );
+            }
+          } else {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('store.insufficientGold'.tr()),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 8,
+              ),
+            );
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
+      ),
+    );
   }
 
   Widget _buildAnimatedPPSection() {
     final animations = [
-      {'name': 'MEMEWE', 'key': 'store.animatedPP.names.MEMEWE', 'path': 'assets/animations/pp/MEMEWE.json'},
+      {'name': 'VK', 'key': 'store.animatedPP.names.VK', 'path': 'assets/animations/vk.json'},
       {'name': 'Money', 'key': 'store.animatedPP.names.Money', 'path': 'assets/animations/pp/Money.json'},
       {'name': 'PEPE', 'key': 'store.animatedPP.names.PEPE', 'path': 'assets/animations/pp/PEPE.json'},
       {'name': 'Cool emoji', 'key': 'store.animatedPP.names.CoolEmoji', 'path': 'assets/animations/pp/Cool emoji.json'},
