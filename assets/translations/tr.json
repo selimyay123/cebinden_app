@@ -182,6 +182,8 @@
     "advantage3Desc": "Profesyonel galeri olarak araçlarınızı daha yüksek fiyatlarla satın.",
     "advantage4Title": "Prestij & İtibar",
     "advantage4Desc": "Galeri statüsü ile daha fazla müşteri ve güven kazanın.",
+    "advantage5Title": "+5 Araç Limiti",
+    "advantage5Desc": "Garaj kapasiteniz anında 5 araç artar.",
     "galleryPrice": "Galeri Fiyatı",
     "galleryPriceValue": "10 Milyon TL",
     "galleryComingSoon": "Galeri satın alma özelliği yakında aktif olacak!",
@@ -711,7 +713,8 @@
       "dailyRewardClaimed": "Günlük ödül alındı!",
       "questCompleted": "Görev Tamamlama",
       "achievement": "Başarım"
-    }
+    },
+    "dailyRewardError": "Ödül zaten alındı veya bir hata oluştu."
   },
   "favorites": {
     "myFavorites": "Favori İlanlarım",
@@ -794,6 +797,11 @@
     "lowballerBonus": "Kabul Şansı: +{percent}",
     "expertiseExpert": "Ekspertiz Uzmanı",
     "expertiseExpertDesc": "Her oyun gününde 3 adet ücretsiz ekspertiz yapmanızı sağlar.",
+    "unlimitedExpertiseTitle": "Sınırsız Ekspertiz",
+    "unlimitedExpertiseDesc": "Tüm araçlar için ücretsiz ve sınırsız ekspertiz yapabilirsin.",
+    "xpBoostTitle": "XP Boost (24 Saat)",
+    "xpBoostDesc": "24 saat boyunca kazanılan tüm tecrübe puanlarını ikiye katlar.",
+    "xpBoostSuccess": "XP Boost başarıyla aktif edildi! 24 saat boyunca 2x XP kazanacaksınız.",
     "freeExpertise": "Ücretsiz Ekspertiz",
     "quickSellConfirm": "Hızlı Satış Onayı",
     "quickSellConfirmDesc": "Aracı {price} fiyatına satmak istiyor musunuz? Bu işlem geri alınamaz.",
@@ -1178,6 +1186,7 @@
     "clean": "TEMİZ",
     "disclaimer": "Araç bilgileri satıcı beyanına dayanmaktadır. Ekspertiz yaptırarak gerçek durumu öğrenebilirsiniz.",
     "performAction": "Ekspertize Sok (3.000 TL)",
+    "performActionNoPrice": "Ekspertize Sok",
     "accidentRecord": "Hasar Kaydı",
     "exists": "Var",
     "none": "Yok",

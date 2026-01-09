@@ -100,6 +100,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   
   // Tutorial aktif mi? (scroll'u engellemek için)
   bool _isTutorialActive = false;
+
+  // Günlük ödül dialogu açık mı?
+  bool _isDailyLoginDialogShown = false;
   
   final ScrollController _scrollController = ScrollController();
   StreamSubscription? _userUpdateSubscription;
@@ -1008,12 +1011,34 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                             const SizedBox(height: 1),
                             Align(
                               alignment: Alignment.centerRight,
-                              child: Text(
-                                '${_currentUser!.xp} XP',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
-                                  fontSize: 10,
-                                ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (_currentUser!.isXpBoostActive)
+                                    Container(
+                                      margin: const EdgeInsets.only(right: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: const Text(
+                                        'X2',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  Text(
+                                    '${_currentUser!.xp} XP',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.6),
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -2718,28 +2743,33 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     showDialog(
       context: context,
       builder: (context) => ModernAlertDialog(
-        title: 'home.galleryBenefits'.tr(),
+        title: 'home.galleryAdvantages'.tr(),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildGalleryBenefit(
-              icon: Icons.attach_money,
-              title: 'home.galleryBenefit1'.tr(),
+              icon: Icons.key,
+              title: 'home.advantage1Title'.tr(),
             ),
             const SizedBox(height: 12),
             _buildGalleryBenefit(
-              icon: Icons.people,
-              title: 'home.galleryBenefit2'.tr(),
+              icon: Icons.local_offer,
+              title: 'home.advantage2Title'.tr(),
             ),
             const SizedBox(height: 12),
             _buildGalleryBenefit(
-              icon: Icons.directions_car,
-              title: 'home.galleryBenefit3'.tr(),
+              icon: Icons.trending_up,
+              title: 'home.advantage3Title'.tr(),
             ),
             const SizedBox(height: 12),
             _buildGalleryBenefit(
-              icon: Icons.star,
-              title: 'home.galleryBenefit4'.tr(),
+              icon: Icons.verified,
+              title: 'home.advantage4Title'.tr(),
+            ),
+            const SizedBox(height: 12),
+            _buildGalleryBenefit(
+              icon: Icons.garage,
+              title: 'home.advantage5Title'.tr(),
             ),
             const SizedBox(height: 20),
             
@@ -2789,8 +2819,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         },
         secondaryButtonText: 'common.cancel'.tr(),
         onSecondaryPressed: () => Navigator.pop(context),
-        icon: Icons.store_mall_directory,
-        iconColor: Colors.deepPurple,
       ),
     );
   }
@@ -4147,8 +4175,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     // Servisten kontrol et
     final status = await _loginService.checkStreak(_currentUser!.id);
     
-    // Eğer ödül alınabilirse dialog göster
-    if (status['canClaim'] == true && mounted) {
+    // Eğer ödül alınabilirse ve dialog zaten açık değilse dialog göster
+    if (status['canClaim'] == true && mounted && !_isDailyLoginDialogShown) {
       // İLK GİRİŞ KONTROLÜ:
       // Eğer kullanıcı ilk kez ödül alacaksa (lastDailyRewardDate == null)
       // Dialog gösterme, sessizce ödülü ver ve geç (Burası 0. gün sayılır)
@@ -4161,7 +4189,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       // Biraz gecikmeli göster ki UI yüklensin
       await Future.delayed(const Duration(milliseconds: 1000));
       
-      if (!mounted) return;
+      if (!mounted || _isDailyLoginDialogShown) return;
+      
+      _isDailyLoginDialogShown = true;
       
       showDialog(
         context: context,
@@ -4187,7 +4217,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
             // }
           },
         ),
-      );
+      ).then((_) {
+        if (mounted) {
+          _isDailyLoginDialogShown = false;
+        }
+      });
     } else {
       // Ödül zaten alınmışsa bile günlük görev için login say
       // (Bunu her açılışta yapmak yerine sadece günde bir kez yapmak daha doğru olabilir ama şimdilik basit tutalım)

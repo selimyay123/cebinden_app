@@ -95,6 +95,11 @@ class XPService {
     // %25 daha fazla XP kazanımı
     int finalXP = xpAmount;
     
+    // XP Boost Kontrolü
+    if (user.isXpBoostActive) {
+      finalXP *= 2;
+    }
+    
     final oldLevel = user.level;
     final newXP = user.xp + finalXP;
     final newLevel = User.calculateLevel(newXP);

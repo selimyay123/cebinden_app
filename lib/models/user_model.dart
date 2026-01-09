@@ -47,6 +47,8 @@ class User {
   final Map<String, int> dailySkillUses; // Yetenek ID -> Günlük kullanım sayısı
   final List<String> purchasedAnimatedPPs; // Satın alınan animasyonlu profil resimleri
   final String? activeAnimatedPP; // Aktif animasyonlu profil resmi
+  final bool hasUnlimitedExpertise; // Sınırsız ekspertiz hakkı var mı?
+  final DateTime? xpBoostEndTime; // XP Boost bitiş zamanı
   final int lastSkillUseDay; // Son kullanım günü (sıfırlama için)
   
   // ========== KULLANICI ADI DEĞİŞİKLİĞİ ==========
@@ -97,6 +99,8 @@ class User {
     this.collectedBrandRewards = const [],
     this.purchasedAnimatedPPs = const [],
     this.activeAnimatedPP,
+    this.hasUnlimitedExpertise = false,
+    this.xpBoostEndTime,
     this.usernameChangeCount = 0,
     this.lastUsernameChangeDate,
   });
@@ -171,6 +175,12 @@ class User {
   /// Toplam Kar/Zarar (Varsayılan başlangıç parası 1M TL kabul edilerek)
   double get totalProfitLoss => balance - 1000000.0;
 
+  /// XP Boost aktif mi?
+  bool get isXpBoostActive {
+    if (xpBoostEndTime == null) return false;
+    return xpBoostEndTime!.isAfter(DateTime.now());
+  }
+
   // JSON'dan User nesnesi oluşturma
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -231,6 +241,10 @@ class User {
       collectedBrandRewards: (json['collectedBrandRewards'] as List?)?.cast<String>() ?? const [],
       purchasedAnimatedPPs: (json['purchasedAnimatedPPs'] as List?)?.cast<String>() ?? const [],
       activeAnimatedPP: json['activeAnimatedPP'] as String?,
+      hasUnlimitedExpertise: json['hasUnlimitedExpertise'] as bool? ?? false,
+      xpBoostEndTime: json['xpBoostEndTime'] != null 
+          ? DateTime.parse(json['xpBoostEndTime']) 
+          : null,
       usernameChangeCount: json['usernameChangeCount'] as int? ?? 0,
       lastUsernameChangeDate: json['lastUsernameChangeDate'] != null 
           ? DateTime.parse(json['lastUsernameChangeDate']) 
@@ -284,6 +298,8 @@ class User {
       'collectedBrandRewards': collectedBrandRewards,
       'purchasedAnimatedPPs': purchasedAnimatedPPs,
       'activeAnimatedPP': activeAnimatedPP,
+      'hasUnlimitedExpertise': hasUnlimitedExpertise,
+      'xpBoostEndTime': xpBoostEndTime?.toIso8601String(),
       'usernameChangeCount': usernameChangeCount,
       'lastUsernameChangeDate': lastUsernameChangeDate?.toIso8601String(),
     };
@@ -330,6 +346,8 @@ class User {
     List<String>? collectedBrandRewards,
     List<String>? purchasedAnimatedPPs,
     String? activeAnimatedPP,
+    bool? hasUnlimitedExpertise,
+    DateTime? xpBoostEndTime,
   }) {
     return User(
       id: id ?? this.id,
@@ -371,6 +389,8 @@ class User {
       collectedBrandRewards: collectedBrandRewards ?? this.collectedBrandRewards,
       purchasedAnimatedPPs: purchasedAnimatedPPs ?? this.purchasedAnimatedPPs,
       activeAnimatedPP: activeAnimatedPP ?? this.activeAnimatedPP,
+      hasUnlimitedExpertise: hasUnlimitedExpertise ?? this.hasUnlimitedExpertise,
+      xpBoostEndTime: xpBoostEndTime ?? this.xpBoostEndTime,
     );
   }
 

@@ -161,6 +161,8 @@
     "advantage3Desc": "Sell your vehicles at higher prices as a professional gallery.",
     "advantage4Title": "Prestige & Reputation",
     "advantage4Desc": "Gain more customers and trust with gallery status.",
+    "advantage5Title": "+5 Vehicle Limit",
+    "advantage5Desc": "Your garage capacity increases by 5 vehicles instantly.",
     "galleryPrice": "Gallery Price",
     "galleryPriceValue": "10 Million TL",
     "galleryComingSoon": "Gallery purchase feature will be available soon!",
@@ -707,7 +709,8 @@
       "dailyRewardClaimed": "Daily reward claimed!",
       "questCompleted": "Quest Completed",
       "achievement": "Achievement"
-    }
+    },
+    "dailyRewardError": "Reward already claimed or an error occurred."
   },
   "favorites": {
     "myFavorites": "Favorite Listings",
@@ -790,6 +793,11 @@
     "lowballerBonus": "Acceptance Chance: +{percent}",
     "expertiseExpert": "Expertise Expert",
     "expertiseExpertDesc": "Allows you to perform 3 free expertises every game day.",
+    "unlimitedExpertiseTitle": "Unlimited Expertise",
+    "unlimitedExpertiseDesc": "You can perform unlimited and free expertise for all vehicles.",
+    "xpBoostTitle": "XP Boost (24 Hours)",
+    "xpBoostDesc": "Doubles all experience points gained for 24 hours.",
+    "xpBoostSuccess": "XP Boost successfully activated! You will earn 2x XP for 24 hours.",
     "freeExpertise": "Free Expertise",
     "quickSellConfirm": "Quick Sell Confirmation",
     "quickSellConfirmDesc": "Do you want to sell the vehicle for {price}? This action cannot be undone.",
@@ -1173,6 +1181,7 @@
     "clean": "CLEAN",
     "disclaimer": "Vehicle information is based on seller declaration. You can perform expertise to learn the real condition.",
     "performAction": "Perform Expertise (3,000 TL)",
+    "performActionNoPrice": "Perform Expertise",
     "accidentRecord": "Accident Record",
     "exists": "Yes",
     "none": "No",

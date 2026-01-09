@@ -182,10 +182,20 @@ class _StoreScreenState extends State<StoreScreen> {
 
                                   const SizedBox(height: 32),
 
-                                  // Garaj Genişletme
+                                  // Garaj Genişletme (Yükseltmeler)
                                   _buildSectionTitle('store.garageExpansion'.tr()),
                                   const SizedBox(height: 12),
+                                  if (!_currentUser!.ownsGallery) ...[
+                                    _buildGalleryPurchaseCard(),
+                                    const SizedBox(height: 12),
+                                  ],
                                   _buildGarageExpansionCard(),
+                                  const SizedBox(height: 12),
+                                  if (!_currentUser!.hasUnlimitedExpertise) ...[
+                                    _buildUnlimitedExpertiseCard(),
+                                    const SizedBox(height: 12),
+                                  ],
+                                  _buildXpBoostCard(),
 
                                   const SizedBox(height: 32),
 
@@ -205,6 +215,215 @@ class _StoreScreenState extends State<StoreScreen> {
         ),
       );
       },
+    );
+  }
+
+  Widget _buildGalleryPurchaseCard() {
+    return Container(
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Lottie.asset(
+              'assets/animations/level_up.json',
+              width: 70,
+              height: 70,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'home.buyGallery'.tr(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => _showBuyGalleryDialog(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '5',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Lottie.asset(
+                  'assets/animations/gold.json',
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBuyGalleryDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'home.buyGallery'.tr(),
+        // icon: Icons.store_mall_directory, // Removed
+        // iconColor: Colors.deepPurple, // Removed
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Benefits List
+            _buildGalleryBenefit(
+              icon: Icons.key,
+              title: 'home.advantage1Title'.tr(),
+            ),
+            const SizedBox(height: 12),
+            _buildGalleryBenefit(
+              icon: Icons.local_offer,
+              title: 'home.advantage2Title'.tr(),
+            ),
+            const SizedBox(height: 12),
+            _buildGalleryBenefit(
+              icon: Icons.trending_up,
+              title: 'home.advantage3Title'.tr(),
+            ),
+            const SizedBox(height: 12),
+            _buildGalleryBenefit(
+              icon: Icons.verified,
+              title: 'home.advantage4Title'.tr(),
+            ),
+            const SizedBox(height: 12),
+            _buildGalleryBenefit(
+              icon: Icons.garage,
+              title: 'home.advantage5Title'.tr(),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'store.costLabel'.trParams({
+                'amount': '5',
+                'currency': 'store.gold'.tr()
+              }),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+        buttonText: 'store.buy'.tr(),
+        onPressed: () async {
+          if (_currentUser!.gold >= 5) {
+            Navigator.pop(context);
+            
+            // Altını düş ve galeri özelliklerini ekle
+            final newGold = _currentUser!.gold - 5;
+            final newGarageLimit = _currentUser!.garageLimit + 5; // Galeri ile +5 limit
+            
+            await _db.updateUser(_currentUser!.id, {
+              'gold': newGold,
+              'ownsGallery': true,
+              'galleryPurchaseDate': DateTime.now().toIso8601String(),
+              'garageLimit': newGarageLimit,
+            });
+            
+            await _loadCurrentUser();
+            
+            if (mounted) {
+              showDialog(
+                context: context,
+                builder: (context) => ModernAlertDialog(
+                  title: 'home.galleryPurchaseSuccess'.tr(),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.celebration,
+                        size: 60,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'home.galleryDescription'.tr(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  buttonText: 'common.ok'.tr(),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              );
+            }
+          } else {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('store.insufficientGold'.tr()),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 8,
+              ),
+            );
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  Widget _buildGalleryBenefit({
+    required IconData icon,
+    required String title,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: Colors.white.withOpacity(0.9),
+          size: 18,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.95),
+              fontSize: 13,
+            ),
+          ),
+        ),
+        const Icon(
+          Icons.check_circle,
+          color: Colors.white,
+          size: 16,
+        ),
+      ],
     );
   }
 
@@ -324,11 +543,11 @@ class _StoreScreenState extends State<StoreScreen> {
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.deepPurple.withOpacity(0.9),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -337,12 +556,12 @@ class _StoreScreenState extends State<StoreScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.only(right: 24), // Reduced padding for animation
+            padding: const EdgeInsets.symmetric(horizontal: 12), // Reduced padding for animation
             child: Lottie.asset(
-              'assets/animations/GARAGEV2.json',
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
+              'assets/animations/level_up.json',
+              width: 70,
+              height: 70,
+              fit: BoxFit.contain,
             ),
           ),
           const SizedBox(width: 16),
@@ -355,14 +574,7 @@ class _StoreScreenState extends State<StoreScreen> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'store.currentLimit'.trParams({'limit': _currentUser!.garageLimit.toString()}),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -371,8 +583,8 @@ class _StoreScreenState extends State<StoreScreen> {
           ElevatedButton(
             onPressed: () => _showExpandGarageDialog(),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.7),
-              foregroundColor: Colors.black,
+              backgroundColor: Colors.white.withOpacity(0.2),
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -681,18 +893,9 @@ class _StoreScreenState extends State<StoreScreen> {
       context: context,
       builder: (context) => ModernAlertDialog(
         title: 'store.expandGarageTitle'.tr(),
-        icon: Icons.garage,
-        iconColor: Colors.deepPurple,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Lottie.asset(
-              'assets/animations/GARAGEV2.json',
-              width: 80,
-              height: 80,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 16),
             Text(
               'store.currentLimitLabel'.trParams({'limit': _currentUser!.garageLimit.toString()}),
               style: const TextStyle(fontSize: 16),
@@ -708,7 +911,7 @@ class _StoreScreenState extends State<StoreScreen> {
                 color: Colors.green,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Text(
               'store.costLabel'.trParams({
                 'amount': '1',
@@ -737,11 +940,324 @@ class _StoreScreenState extends State<StoreScreen> {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('store.garageExpanded'.tr()),
+                  content: Text('store.garageExpandSuccess'.tr()),
                   backgroundColor: Colors.green,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 8,
+                ),
+              );
+            }
+          } else {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('store.insufficientGold'.tr()),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 8,
+              ),
+            );
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  Widget _buildUnlimitedExpertiseCard() {
+    return Container(
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Lottie.asset(
+              'assets/animations/level_up.json',
+              width: 70,
+              height: 70,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'skills.unlimitedExpertiseTitle'.tr(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => _showBuyUnlimitedExpertiseDialog(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '1',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Lottie.asset(
+                  'assets/animations/gold.json',
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBuyUnlimitedExpertiseDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'skills.unlimitedExpertiseTitle'.tr(),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'skills.unlimitedExpertiseDesc'.tr(),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'store.costLabel'.trParams({
+                'amount': '1',
+                'currency': 'store.gold'.tr()
+              }),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+        buttonText: 'store.buy'.tr(),
+        onPressed: () async {
+          if (_currentUser!.gold >= 1) {
+            Navigator.pop(context);
+
+            final newGold = _currentUser!.gold - 1;
+
+            await _db.updateUser(_currentUser!.id, {
+              'gold': newGold,
+              'hasUnlimitedExpertise': true,
+            });
+
+            await _loadCurrentUser();
+
+            if (mounted) {
+              showDialog(
+                context: context,
+                builder: (context) => ModernAlertDialog(
+                  title: 'common.success'.tr(),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.celebration,
+                        size: 60,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'skills.unlimitedExpertiseTitle'.tr(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  buttonText: 'common.ok'.tr(),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              );
+            }
+          } else {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('store.insufficientGold'.tr()),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 8,
+              ),
+            );
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  Widget _buildXpBoostCard() {
+    return Container(
+      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Lottie.asset(
+              'assets/animations/level_up.json',
+              width: 70,
+              height: 70,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'skills.xpBoostTitle'.tr(),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => _showBuyXpBoostDialog(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '1',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Lottie.asset(
+                  'assets/animations/gold.json',
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBuyXpBoostDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'skills.xpBoostTitle'.tr(),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'skills.xpBoostDesc'.tr(),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'store.costLabel'.trParams({
+                'amount': '1',
+                'currency': 'store.gold'.tr()
+              }),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+        buttonText: 'store.buy'.tr(),
+        onPressed: () async {
+          if (_currentUser!.gold >= 1) {
+            Navigator.pop(context);
+
+            final newGold = _currentUser!.gold - 1;
+            
+            // Mevcut bitiş zamanını al veya şimdiye ayarla
+            DateTime currentEndTime = _currentUser!.xpBoostEndTime ?? DateTime.now();
+            if (currentEndTime.isBefore(DateTime.now())) {
+              currentEndTime = DateTime.now();
+            }
+            
+            // 24 saat ekle
+            final newEndTime = currentEndTime.add(const Duration(hours: 24));
+
+            await _db.updateUser(_currentUser!.id, {
+              'gold': newGold,
+              'xpBoostEndTime': newEndTime.toIso8601String(),
+            });
+
+            await _loadCurrentUser();
+
+            if (mounted) {
+              showDialog(
+                context: context,
+                builder: (context) => ModernAlertDialog(
+                  title: 'common.success'.tr(),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.celebration,
+                        size: 60,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'skills.xpBoostSuccess'.tr(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                  buttonText: 'common.ok'.tr(),
+                  onPressed: () => Navigator.pop(context),
                 ),
               );
             }
@@ -1263,7 +1779,7 @@ class _StoreScreenState extends State<StoreScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 0.85,
+        childAspectRatio: 1.0,
       ),
       itemCount: animations.length,
       itemBuilder: (context, index) {
@@ -1272,12 +1788,13 @@ class _StoreScreenState extends State<StoreScreen> {
         final isActive = _currentUser!.activeAnimatedPP == anim['name'];
 
         return Container(
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.deepPurple.withOpacity(0.9),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -1287,11 +1804,11 @@ class _StoreScreenState extends State<StoreScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 80,
-                height: 80,
+                width: 70,
+                height: 70,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey[200],
+                  color: Colors.white.withOpacity(0.1),
                 ),
                 child: ClipOval(
                   child: Lottie.asset(
@@ -1300,61 +1817,81 @@ class _StoreScreenState extends State<StoreScreen> {
                   ),
                 ),
               ),
-              // const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 anim['key']!.tr(),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 13,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              // const SizedBox(height: 5),
+              const SizedBox(height: 8),
               if (isActive)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.green),
+                    color: Colors.green.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.greenAccent),
                   ),
                   child: Text(
                     'store.animatedPP.active'.tr(),
-                    style: const TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.greenAccent,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 )
               else if (isPurchased)
-                ElevatedButton(
-                  onPressed: () => _activatePP(anim['name']!, anim['path']!),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    minimumSize: const Size(0, 32),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _activatePP(anim['name']!, anim['path']!),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.deepPurple,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text('store.animatedPP.activate'.tr(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
-                  child: Text('store.animatedPP.activate'.tr(), style: const TextStyle(fontSize: 12)),
                 )
               else
-                ElevatedButton(
-                  onPressed: () => _purchasePP(anim['name']!),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.7),
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    minimumSize: const Size(0, 32),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '1',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      Lottie.asset(
-                        'assets/animations/gold.json',
-                        width: 24,
-                        height: 24,
-                        fit: BoxFit.contain,
-                      ),
-                    ],
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _purchasePP(anim['name']!),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white.withOpacity(0.2),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          '1',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 4),
+                        Lottie.asset(
+                          'assets/animations/gold.json',
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
             ],

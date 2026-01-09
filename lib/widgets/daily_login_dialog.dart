@@ -83,7 +83,7 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red.withOpacity(0.8),
-            content: const Text('Ödül alınırken bir hata oluştu.'),
+            content: Text('xp.dailyRewardError'.tr()),
           ),
         );
       }

@@ -199,11 +199,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
               // Açıklama Girişi
               _buildDescriptionInput(),
-              const SizedBox(height: 24),
-
-              // Araç Özellikleri (Otomatik Dolu)
-              _buildVehicleDetails(),
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
 
               // Satışa Çıkar Butonu
               SizedBox(
@@ -518,7 +514,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _descriptionController,
-          maxLines: 5,
+          maxLines: 3,
           maxLength: 500,
           decoration: InputDecoration(
             hintText: 'sell.descriptionHint'.tr(),
@@ -533,65 +529,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     );
   }
 
-  Widget _buildVehicleDetails() {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'sell.vehicleFeatures'.tr(),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildDetailRow('sell.brand'.tr(), widget.vehicle.brand),
-            _buildDetailRow('sell.model'.tr(), widget.vehicle.model),
-            _buildDetailRow('sell.year'.tr(), widget.vehicle.year.toString()),
-            _buildDetailRow('sell.mileage'.tr(), '${_formatNumber(widget.vehicle.mileage)} km'),
-            _buildDetailRow('sell.fuel'.tr(), 'vehicleAttributes.${widget.vehicle.fuelType}'.tr()),
-            _buildDetailRow('sell.transmission'.tr(), 'vehicleAttributes.${widget.vehicle.transmission}'.tr()),
-            _buildDetailRow('sell.engine'.tr(), widget.vehicle.engineSize),
-            _buildDetailRow('sell.drive'.tr(), 'vehicleAttributes.${widget.vehicle.driveType}'.tr()),
-            _buildDetailRow('sell.warranty'.tr(), widget.vehicle.hasWarranty ? 'sell.var'.tr() : 'sell.yok'.tr()),
-            _buildDetailRow('sell.accidentRecord'.tr(), widget.vehicle.hasAccidentRecord ? 'sell.var'.tr() : 'sell.yok'.tr()),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   String _formatCurrency(double amount) {
     return amount.toStringAsFixed(0).replaceAllMapped(

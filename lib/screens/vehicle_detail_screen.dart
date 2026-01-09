@@ -944,12 +944,21 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   final remainingUses = _currentUser != null ? _skillService.getRemainingDailyUses(_currentUser!, SkillService.skillExpertiseExpert) : 0;
                   final isFree = hasSkill && remainingUses > 0;
                   
+                  // Calculate dynamic cost for display
+                  double cost = 0.0;
+                  if (!isFree) {
+                    double calculatedFee = _vehicle.price * 0.005;
+                    if (calculatedFee < 5000.0) calculatedFee = 5000.0;
+                    if (calculatedFee > 50000.0) calculatedFee = 50000.0;
+                    cost = (calculatedFee / 50).ceil() * 50.0;
+                  }
+
                   return ElevatedButton.icon(
                     onPressed: _currentUser != null ? () => _showExpertiseDialog(isFree: isFree) : null,
                     icon: Icon(isFree ? Icons.auto_awesome : Icons.search),
                     label: Text(isFree 
                       ? '${'skills.freeExpertise'.tr()} ($remainingUses/3)' 
-                      : 'expertise.performAction'.tr()),
+                      : '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isFree ? Colors.indigo : Colors.deepPurple,
                       foregroundColor: Colors.white,
@@ -1027,14 +1036,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   Future<void> _showExpertiseDialog({bool isFree = false}) async {
     if (_currentUser == null) return;
     
+    if (_currentUser!.hasUnlimitedExpertise) {
+      isFree = true;
+    }
+
     double cost = 0.0;
     if (!isFree) {
-      // Dinamik ekspertiz ücreti: 2000 TL taban + araç fiyatının %0.1'i
-      // Üst limit: 8000 TL
-      double calculatedFee = 2000.0 + (_vehicle.price * 0.001);
-      if (calculatedFee > 8000.0) {
-        calculatedFee = 8000.0;
-      }
+      // Dinamik ekspertiz ücreti: Araç fiyatının %0.5'i
+      // Min: 5.000 TL, Max: 50.000 TL
+      double calculatedFee = _vehicle.price * 0.005;
+      
+      if (calculatedFee < 5000.0) calculatedFee = 5000.0;
+      if (calculatedFee > 50000.0) calculatedFee = 50000.0;
+      
       // 50 TL'nin katlarına yuvarla
       cost = (calculatedFee / 50).ceil() * 50.0;
     }
