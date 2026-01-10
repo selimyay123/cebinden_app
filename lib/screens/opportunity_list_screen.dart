@@ -10,6 +10,7 @@ import '../models/user_vehicle_model.dart';
 import '../services/auth_service.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
+import '../widgets/vehicle_image.dart';
 
 class OpportunityListScreen extends StatefulWidget {
   const OpportunityListScreen({super.key});
@@ -141,16 +142,16 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
-                      image: vehicle.imageUrl != null
-                          ? DecorationImage(
-                              image: AssetImage(vehicle.imageUrl!),
-                              fit: BoxFit.contain,
-                            )
-                          : null,
                     ),
-                    child: vehicle.imageUrl == null
-                        ? const Icon(Icons.directions_car, size: 40, color: Colors.grey)
-                        : null,
+                    child: vehicle.imageUrl != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: VehicleImage(
+                              vehicle: vehicle,
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : const Icon(Icons.directions_car, size: 40, color: Colors.grey),
                   ),
                   const SizedBox(width: 12),
                   

@@ -1830,43 +1830,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       ),
                     ],
                   ),
-                  const Divider(color: Colors.green),
-                  Text(
-                    'misc.ifYouAccept'.tr(),
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade900,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'misc.balanceAdded'.trParams({'amount': _formatCurrency(offer.counterOfferAmount ?? offer.offerPrice)}),
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.green.shade900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'offers.vehicleSold'.tr(),
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.green.shade900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'offers.otherOffersRejected'.tr(),
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.green.shade900,
-                    ),
-                  ),
+
                 ],
               ),
             ),

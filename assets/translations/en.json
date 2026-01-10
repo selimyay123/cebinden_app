@@ -188,7 +188,8 @@
     "highProfitMargin": "High Profit Margin",
     "prestigeReputation": "Prestige & Reputation",
     "taxi": "TAXI",
-    "buyGold": "Buy Gold"
+    "buyGold": "Buy Gold",
+    "collection": "Collection"
   },
   "vehicles": {
     "title": "Vehicles",

@@ -510,16 +510,15 @@ class _StoreScreenState extends State<StoreScreen> {
                   // Convert Gold Button
                   ElevatedButton(
                     onPressed: _currentUser!.gold > 0 ? () => _showConvertGoldDialog() : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.2),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
                     child: Row(
                       children: [
                         const Icon(Icons.currency_exchange, size: 16),
@@ -843,6 +842,15 @@ class _StoreScreenState extends State<StoreScreen> {
     );
   }
 
+  String _formatProductPrice(ProductDetails product) {
+    // Bazı cihazlarda ₺ sembolü düzgün görüntülenemiyor (mor çubuk sorunu)
+    // Bu yüzden TRY kodu varsa sembolü TL ile değiştiriyoruz
+    if (product.currencyCode == 'TRY') {
+      return product.price.replaceAll('₺', 'TL').replaceAll('TL', 'TL'); // İkinci replace garanti olsun diye
+    }
+    return product.price;
+  }
+
   Widget _buildGoldPackages() {
     return ValueListenableBuilder<String?>(
       valueListenable: _iapService.errorNotifier,
@@ -978,7 +986,7 @@ class _StoreScreenState extends State<StoreScreen> {
                         
                         // Fiyat
                         Text(
-                          product.price.replaceAll('TL', 'TL'),
+                          _formatProductPrice(product),
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -1052,7 +1060,7 @@ class _StoreScreenState extends State<StoreScreen> {
                             style: TextStyle(color: Colors.grey[700]),
                           ),
                           Text(
-                            product.price.replaceAll('TL', 'TL'),
+                            _formatProductPrice(product),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.deepPurple,
@@ -1634,6 +1642,99 @@ class _StoreScreenState extends State<StoreScreen> {
                       ),
                     ],
                   ),
+                  // Hızlı Seçim Butonları
+                  const SizedBox(height: 16),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (1 <= maxGold) {
+                                  controller.text = '1';
+                                  selectedGold = 1.0;
+                                  setDialogState(() {});
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amber.withOpacity(0.2),
+                                foregroundColor: Colors.amber[900],
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text('1', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (5 <= maxGold) {
+                                  controller.text = '5';
+                                  selectedGold = 5.0;
+                                  setDialogState(() {});
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amber.withOpacity(0.2),
+                                foregroundColor: Colors.amber[900],
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text('5', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (10 <= maxGold) {
+                                  controller.text = '10';
+                                  selectedGold = 10.0;
+                                  setDialogState(() {});
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amber.withOpacity(0.2),
+                                foregroundColor: Colors.amber[900],
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text('10', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (25 <= maxGold) {
+                                  controller.text = '25';
+                                  selectedGold = 25.0;
+                                  setDialogState(() {});
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.amber.withOpacity(0.2),
+                                foregroundColor: Colors.amber[900],
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text('25', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   
                   // Bilgi Kartı
@@ -1646,24 +1747,30 @@ class _StoreScreenState extends State<StoreScreen> {
                     ),
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('store.exchangeRate'.tr(), style: TextStyle(color: Colors.grey[600])),
-                            const Text('1 Gold = 10,000 TL', style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 4),
+                            const Text('1 Gold = 1.000.000 TL', style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
                         ),
-                        const Divider(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        const Divider(height: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('store.youWillGet'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                            Row(
+                              children: [
+                                Text('store.youWillGet'.tr(), style: TextStyle(color: Colors.grey[600])),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
                             Text(
-                              '${_formatCurrency(selectedGold * 10000)} TL',
+                              '${_formatCurrency(selectedGold * 1000000)} TL',
                               style: const TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 18,
+                                fontSize: 20,
                               ),
                             ),
                           ],
@@ -1736,7 +1843,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                 children: [
                                   Text('store.gameCurrency'.tr()),
                                   Text(
-                                    '${_formatCurrency(selectedGold * 10000)} TL',
+                                    '${_formatCurrency(selectedGold * 1000000)} TL',
                                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
                                   ),
                                 ],
@@ -1750,7 +1857,7 @@ class _StoreScreenState extends State<StoreScreen> {
                           
                           // İşlemi gerçekleştir
                           final newGold = _currentUser!.gold - selectedGold;
-                          final newBalance = _currentUser!.balance + (selectedGold * 10000);
+                          final newBalance = _currentUser!.balance + (selectedGold * 1000000);
                           
                           await _db.updateUser(_currentUser!.id, {
                             'gold': newGold,
@@ -1789,6 +1896,8 @@ class _StoreScreenState extends State<StoreScreen> {
       ),
     );
   }
+
+
 
   Widget _buildVipPassCard() {
     // Check if user has all permanent items
@@ -1839,24 +1948,36 @@ class _StoreScreenState extends State<StoreScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                'store.vipPass.title'.tr(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1,
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'store.vipPass.desc'.tr(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                child: Column(
+                  children: [
+                    Text(
+                      'store.vipPass.title'.tr(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'store.vipPass.desc'.tr(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -1947,34 +2068,37 @@ class _StoreScreenState extends State<StoreScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'store.costLabel'.trParams({
-                    'amount': '10',
-                    'currency': 'store.gold'.tr()
-                  }),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold, 
-                    fontSize: 16,
-                    decoration: TextDecoration.lineThrough,
-                    color: Colors.grey,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'store.costLabel'.trParams({
+                      'amount': '10',
+                      'currency': 'store.gold'.tr()
+                    }),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 16,
+                      decoration: TextDecoration.lineThrough,
+                      color: Colors.grey,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'store.costLabel'.trParams({
-                    'amount': '5',
-                    'currency': 'store.gold'.tr()
-                  }),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold, 
-                    fontSize: 20,
-                    color: Colors.green,
+                  const SizedBox(width: 12),
+                  Text(
+                    'store.costLabel'.trParams({
+                      'amount': '5',
+                      'currency': 'store.gold'.tr()
+                    }),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 20,
+                      color: Colors.green,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -2081,7 +2205,7 @@ class _StoreScreenState extends State<StoreScreen> {
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 1.0,
+        childAspectRatio: 0.85,
       ),
       itemCount: animations.length,
       itemBuilder: (context, index) {

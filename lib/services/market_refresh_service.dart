@@ -2678,6 +2678,92 @@ class MarketRefreshService {
       ));
     }
   }
+
+  /// TEST İÇİN: Zorla fırsat oluştur (Olasılık ve limitleri yok sayar)
+  void forceGenerateOpportunity() {
+    // 3. Günde en fazla 1 ilan ekle
+    final currentDay = _gameTime.currentDay;
+    
+    // Rastgele marka/model seç
+    final brand = _brandSpawnRates.keys.elementAt(_random.nextInt(_brandSpawnRates.length));
+    final models = _modelsByBrand[brand]!;
+    if (models.isEmpty) return;
+    
+    final model = models[_random.nextInt(models.length)];
+    
+    // Rastgele yıl (Son 10 yıl)
+    final year = 2015 + _random.nextInt(11); // 2015-2025
+    
+    // Kilometre (Biraz yüksek olabilir, acil satılık)
+    final mileage = 50000 + _random.nextInt(150000);
+    
+    // Piyasa fiyatı hesapla (Basit bir mantıkla)
+    final tempVehicle = Vehicle.create(
+      brand: brand,
+      model: model,
+      year: year,
+      mileage: mileage,
+      price: 1000000, // Geçici fiyat
+      location: _cities[_random.nextInt(_cities.length)],
+      color: _colors[_random.nextInt(_colors.length)],
+      fuelType: _fuelTypes[_random.nextInt(_fuelTypes.length)],
+      transmission: _transmissions[_random.nextInt(_transmissions.length)],
+      engineSize: '1.6', // Varsayılan
+      driveType: 'Önden', // Varsayılan
+      description: 'Temp',
+      bodyType: 'Sedan',
+      horsepower: 100,
+    );
+    
+    // Gerçek piyasa değerini tahmin et
+    double marketValue = _calculateEstimatedMarketValue(tempVehicle);
+    
+    // %15-30 indirim uygula
+    double discountRate = 0.15 + (_random.nextDouble() * 0.15);
+    double discountedPrice = marketValue * (1 - discountRate);
+    
+    // Satış nedeni
+    final reasons = [
+      'Acil nakit ihtiyacı',
+      'Yurtdışına taşınma',
+      'Borç ödemesi',
+      'Acil satılık',
+      'TEST FIRSATI',
+    ];
+    final reason = reasons[_random.nextInt(reasons.length)];
+    
+    // Araç resmi seç
+    final imageUrl = _getVehicleImage(brand, model);
+    
+    // Fırsat aracı oluştur
+    final opportunityVehicle = Vehicle.create(
+      brand: brand,
+      model: model,
+      year: year,
+      mileage: mileage,
+      price: discountedPrice, // İndirimli fiyat
+      location: tempVehicle.location,
+      color: tempVehicle.color,
+      fuelType: tempVehicle.fuelType,
+      transmission: tempVehicle.transmission,
+      imageUrl: imageUrl, // Resim eklendi
+      engineSize: tempVehicle.engineSize,
+      driveType: tempVehicle.driveType,
+      description: '$reason nedeniyle acil satılık! Piyasa değerinin altında.',
+      bodyType: tempVehicle.bodyType,
+      horsepower: tempVehicle.horsepower,
+      sellerType: 'Sahibinden (Acil)',
+      hasAccidentRecord: _random.nextDouble() < 0.2, // %20 ihtimalle hasar kaydı
+    );
+    
+    _opportunityListings.add(OpportunityListing(
+      vehicle: opportunityVehicle,
+      createdDay: currentDay,
+      expiryDay: currentDay + 1, // Sadece 1 gün geçerli!
+      reason: reason,
+      originalPrice: marketValue,
+    ));
+  }
   
   /// Tahmini piyasa değeri hesapla (Basit)
   double _calculateEstimatedMarketValue(Vehicle vehicle) {

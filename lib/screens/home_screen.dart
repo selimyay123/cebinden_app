@@ -390,8 +390,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       
       if (!mounted) return;
       
-      // Giriş ekranına yönlendir
-      Navigator.of(context).pushAndRemoveUntil(
+      // Giriş ekranına yönlendir (Root Navigator kullanarak)
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
         (route) => false,
       );
@@ -1078,55 +1078,22 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                             ).then((_) => _loadCurrentUser());
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                             decoration: BoxDecoration(
-                              color: Colors.deepPurpleAccent.withOpacity(0.2),
+                              color: Colors.deepPurpleAccent.withOpacity(0.4),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: Colors.white.withOpacity(0.5)),
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueAccent.withOpacity(0.3),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.account_tree,
-                                    color: Colors.blueAccent,
-                                    size: 18,
-                                  ),
+                            child: Center(
+                              child: Text(
+                                'home.tasks'.tr(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'home.tasks'.tr(),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      // Text(
-                                      //   '${'skills.availablePoints'.tr()}: ${_currentUser!.skillPoints}',
-                                      //   style: TextStyle(
-                                      //     color: Colors.white.withOpacity(0.7),
-                                      //     fontSize: 12,
-                                      //   ),
-                                      // ),
-                                    ],
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.chevron_right,
-                                  color: Colors.white70,
-                                  size: 20,
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -1489,7 +1456,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'collection'.tr(),
+                    'home.collection'.tr(),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,

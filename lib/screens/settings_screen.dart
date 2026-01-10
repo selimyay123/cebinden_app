@@ -13,6 +13,7 @@ import 'login_screen.dart';
 import 'main_screen.dart';
 import 'statistics_screen.dart';
 import 'admin_panel_screen.dart';
+import '../services/market_refresh_service.dart';
 import '../services/database_helper.dart';
 import '../widgets/user_profile_avatar.dart';
 import '../widgets/modern_alert_dialog.dart';
@@ -421,7 +422,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
     if (confirm == true) {
       await _authService.logout();
       if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
           (route) => false,
         );
@@ -730,6 +731,20 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
                         // Ayarları yenile
                         await _loadSettings();
                       }
+                    },
+                  ),
+                  _buildListTile(
+                    icon: Icons.local_offer,
+                    title: 'Admin: Fırsat Oluştur',
+                    textColor: Colors.redAccent,
+                    onTap: () {
+                      MarketRefreshService().forceGenerateOpportunity();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Fırsat ilanı oluşturuldu!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                     },
                   ),
               ],

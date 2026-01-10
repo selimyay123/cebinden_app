@@ -943,7 +943,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 builder: (context) {
                   final hasSkill = _currentUser != null && _skillService.getSkillLevel(_currentUser!, SkillService.skillExpertiseExpert) > 0;
                   final remainingUses = _currentUser != null ? _skillService.getRemainingDailyUses(_currentUser!, SkillService.skillExpertiseExpert) : 0;
-                  final isFree = hasSkill && remainingUses > 0;
+                  final hasUnlimitedExpertise = _currentUser?.hasUnlimitedExpertise ?? false;
+                  final isFree = hasUnlimitedExpertise || (hasSkill && remainingUses > 0);
                   
                   // Calculate dynamic cost for display
                   double cost = 0.0;
@@ -954,15 +955,22 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     cost = (calculatedFee / 50).ceil() * 50.0;
                   }
 
+                  String buttonText;
+                  if (hasUnlimitedExpertise) {
+                    buttonText = '${'skills.freeExpertise'.tr()} (VIP)';
+                  } else if (isFree) {
+                    buttonText = '${'skills.freeExpertise'.tr()} ($remainingUses/3)';
+                  } else {
+                    buttonText = '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)';
+                  }
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       ElevatedButton.icon(
                         onPressed: _currentUser != null ? () => _showExpertiseDialog(isFree: isFree) : null,
                         icon: Icon(isFree ? Icons.auto_awesome : Icons.search),
-                        label: Text(isFree 
-                          ? '${'skills.freeExpertise'.tr()} ($remainingUses/3)' 
-                          : '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)'),
+                        label: Text(buttonText),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isFree ? Colors.indigo : Colors.deepPurple,
                           foregroundColor: Colors.white,
@@ -1723,8 +1731,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       context: context,
       builder: (context) => ModernAlertDialog(
         title: 'offer.confirmOffer'.tr(),
-        icon: Icons.help_outline,
-        iconColor: Colors.deepPurple,
+        // icon: Icons.help_outline, // Removed
+        // iconColor: Colors.deepPurple, // Removed
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1794,29 +1802,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline, color: Colors.lightBlueAccent, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'offer.checkResultsInMyOffers'.tr(),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.lightBlueAccent,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+
+            // const SizedBox(height: 16), // Removed info container
+            // Info container removed
           ],
         ),
         buttonText: 'offer.sendOffer'.tr(),
