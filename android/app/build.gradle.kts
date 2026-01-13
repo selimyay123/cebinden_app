@@ -24,7 +24,6 @@ android {
         jniLibs {
             useLegacyPackaging = true
         }
-        doNotStrip("**/*.so")
     }
 
     compileOptions {
@@ -61,6 +60,9 @@ android {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
     }
 }
