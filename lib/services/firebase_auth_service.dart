@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'package:uuid/uuid.dart';
+import 'cloud_service.dart';
 
 class FirebaseAuthService {
   static final FirebaseAuthService _instance = FirebaseAuthService._internal();
@@ -61,6 +62,22 @@ class FirebaseAuthService {
         // Mevcut kullanıcı - giriş yap
         return existingUser;
       } else {
+        // 🆕 Cloud Save Check (Bulutta var mı?)
+        final cloudUser = await CloudService().getUserByGoogleId(firebaseUser.uid);
+        
+        if (cloudUser != null) {
+          // Bulutta bulundu! Restore et
+          await DatabaseHelper().insertUser(cloudUser.toJson());
+          
+          // Araçları da restore et
+          final vehicles = await CloudService().getUserVehicles(cloudUser.id);
+          for (var vehicle in vehicles) {
+            await DatabaseHelper().addUserVehicle(vehicle);
+          }
+          
+          return cloudUser;
+        }
+        
         // Yeni kullanıcı - kayıt oluştur
         final newUser = await _createGoogleUser(firebaseUser);
         return newUser;
@@ -174,6 +191,22 @@ class FirebaseAuthService {
       if (existingUser != null) {
         return existingUser;
       } else {
+        // 🆕 Cloud Save Check (Bulutta var mı?)
+        final cloudUser = await CloudService().getUserByAppleId(firebaseUser.uid);
+        
+        if (cloudUser != null) {
+          // Bulutta bulundu! Restore et
+          await DatabaseHelper().insertUser(cloudUser.toJson());
+          
+          // Araçları da restore et
+          final vehicles = await CloudService().getUserVehicles(cloudUser.id);
+          for (var vehicle in vehicles) {
+            await DatabaseHelper().addUserVehicle(vehicle);
+          }
+          
+          return cloudUser;
+        }
+
         // Yeni kullanıcı oluştur
         final newUser = await _createAppleUser(firebaseUser, appleCredential);
         return newUser;

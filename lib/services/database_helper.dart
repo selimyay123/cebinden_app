@@ -6,7 +6,9 @@ import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
 import '../models/notification_model.dart';
 import '../models/activity_model.dart';
+import '../models/activity_model.dart';
 import 'leaderboard_service.dart';
+import 'cloud_service.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -81,6 +83,8 @@ class DatabaseHelper {
       try {
         final userObj = User.fromJson(userMap.cast<String, dynamic>());
         await LeaderboardService().updateUserScore(userObj);
+        // 🆕 Cloud Save Sync
+        await CloudService().saveUser(userObj);
       } catch (e) {
         print('Firestore sync error: $e');
       }
@@ -192,6 +196,14 @@ class DatabaseHelper {
         }
       }
       
+      // 🆕 Cloud Save Sync (Her güncellemede)
+      try {
+        final userObj = User.fromJson(updatedUser.cast<String, dynamic>());
+        CloudService().saveUser(userObj);
+      } catch (e) {
+        print('Cloud save error: $e');
+      }
+      
       _userUpdateController.add(null);
       return true;
     } catch (e) {
@@ -254,6 +266,13 @@ class DatabaseHelper {
       await _userVehiclesBox.put(vehicle.id, vehicleMap);
       await _userVehiclesBox.flush();
       _vehicleUpdateController.add(null);
+      
+      // 🆕 Cloud Save Sync
+      try {
+        await CloudService().saveVehicle(vehicle);
+      } catch (e) {
+        print('Cloud save vehicle error: $e');
+      }
       
       return true;
     } catch (e) {
@@ -447,6 +466,14 @@ class DatabaseHelper {
       await _userVehiclesBox.flush();
       _vehicleUpdateController.add(null);
       
+      // 🆕 Cloud Save Sync
+      try {
+        final updatedVehicleObj = UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap));
+        await CloudService().saveVehicle(updatedVehicleObj);
+      } catch (e) {
+        print('Cloud update vehicle error: $e');
+      }
+      
       return true;
     } catch (e) {
       
@@ -490,9 +517,22 @@ class DatabaseHelper {
   // Kullanıcının aracını sil (kalıcı)
   Future<bool> deleteUserVehicle(String vehicleId) async {
     try {
+      // Cloud sync için silmeden önce aracı bul
+      final vehicle = await getUserVehicleById(vehicleId);
+      final userId = vehicle?.userId;
+
       await _userVehiclesBox.delete(vehicleId);
       await _userVehiclesBox.flush();
       _vehicleUpdateController.add(null);
+      
+      // 🆕 Cloud Save Sync
+      if (userId != null) {
+        try {
+           await CloudService().deleteVehicle(userId, vehicleId);
+        } catch (e) {
+          print('Cloud delete vehicle error: $e');
+        }
+      }
       
       return true;
     } catch (e) {
