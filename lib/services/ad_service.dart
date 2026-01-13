@@ -17,9 +17,9 @@ class AdService {
   /// Test Rewarded Ad Unit ID'leri (Google'ın resmi test ID'leri)
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/5224354917'; // Test ID
+      return 'ca-app-pub-4956175890616972/8812663628'; // Cebinden_Odullu_Reklam
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/1712485313'; // Test ID
+      return 'ca-app-pub-4956175890616972/5665040936'; // Cebinden_Odullu_Reklam (iOS)
     }
     return '';
   }
@@ -31,9 +31,9 @@ class AdService {
   /// Test Interstitial Ad Unit ID'leri
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/1033173712'; // Test ID
+      return 'ca-app-pub-4956175890616972/5816427631'; // Cebinden_Zorunlu_Reklam
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/4411468910'; // Test ID
+      return 'ca-app-pub-4956175890616972/8445432731'; // Cebinden_Zorunlu_Reklam (iOS)
     }
     return '';
   }

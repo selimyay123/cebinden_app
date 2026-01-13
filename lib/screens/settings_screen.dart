@@ -763,12 +763,12 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
                 textColor: Colors.red,
                 onTap: _deleteAccount,
               ),
-              _buildListTile(
-                icon: Icons.logout,
-                title: 'settings.logoutButton'.tr(),
-                textColor: Colors.red,
-                onTap: _logout,
-              ),
+              // _buildListTile(
+              //   icon: Icons.logout,
+              //   title: 'settings.logoutButton'.tr(),
+              //   textColor: Colors.red,
+              //   onTap: _logout,
+              // ),
             ],
           ),
 
