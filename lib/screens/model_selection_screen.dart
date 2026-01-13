@@ -122,7 +122,7 @@ class ModelSelectionScreen extends StatelessWidget {
             final randomModel = (models..toList()..shuffle()).first;
             
             // Seçilen modele göre araç listesi sayfasına git
-            final purchased = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
@@ -133,11 +133,6 @@ class ModelSelectionScreen extends StatelessWidget {
                 ),
               ),
             );
-            
-            // Eğer satın alma başarılıysa, geriye dön
-            if (purchased == true && context.mounted) {
-              Navigator.pop(context, true);
-            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
@@ -189,7 +184,7 @@ class ModelSelectionScreen extends StatelessWidget {
         shadowColor: categoryColor.withOpacity(0.3),
         child: InkWell(
           onTap: () async {
-            final purchased = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
@@ -200,11 +195,6 @@ class ModelSelectionScreen extends StatelessWidget {
                 ),
               ),
             );
-            
-            // Eğer satın alma başarılıysa, geriye dön
-            if (purchased == true && context.mounted) {
-              Navigator.pop(context, true);
-            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
@@ -270,7 +260,7 @@ class ModelSelectionScreen extends StatelessWidget {
         child: InkWell(
           onTap: () async {
             // Seçilen modele göre araç listesi sayfasına git
-            final purchased = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
@@ -281,11 +271,6 @@ class ModelSelectionScreen extends StatelessWidget {
                 ),
               ),
             );
-            
-            // Eğer satın alma başarılıysa, geriye dön
-            if (purchased == true && context.mounted) {
-              Navigator.pop(context, true);
-            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(

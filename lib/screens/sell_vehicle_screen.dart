@@ -9,6 +9,8 @@ import 'create_listing_screen.dart';
 import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
 import '../services/skill_service.dart';
+import '../services/daily_quest_service.dart';
+import '../models/daily_quest_model.dart';
 import '../models/user_model.dart';
 import 'package:lottie/lottie.dart';
 import '../widgets/modern_alert_dialog.dart';
@@ -591,6 +593,9 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
 
       // 3. Yetenek kullanımını kaydet
       await SkillService().recordSkillUsage(_currentUser!.id, SkillService.skillQuickSell);
+
+      // 🆕 Günlük Görev Güncellemesi (Araç Satma)
+      await DailyQuestService().updateProgress(_currentUser!.id, QuestType.sellVehicle, 1);
 
       // 4. Animasyon
       await _playSoldAnimation();

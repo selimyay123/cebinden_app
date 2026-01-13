@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../services/localization_service.dart';
@@ -147,98 +148,145 @@ class _MainScreenState extends State<MainScreen> {
       ),           // 6: Store
     ];
 
-    return Scaffold(
-      key: _mainScaffoldKey,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: NavigationBar(
-          selectedIndex: _currentIndex,
-          onDestinationSelected: (index) {
-            // Eğer Dashboard (Home) veya Market seçildiyse stack'i sıfırla
-            if (index == 3) {
-              _navigatorKeys[3]?.currentState?.popUntil((route) => route.isFirst);
-            } else if (index == 0) {
-              _navigatorKeys[0]?.currentState?.popUntil((route) => route.isFirst);
-            }
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          return;
+        }
 
-            setState(() {
-              _currentIndex = index;
-            });
-            ScreenRefreshService().notifyTabChanged(index);
-            _checkPendingOffers();
-          },
-          backgroundColor: Colors.white.withOpacity(0.2),
-          elevation: 8,
-          indicatorColor: Colors.deepPurple.withOpacity(0.2),
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-          destinations: [
-            // Market
-            NavigationDestination(
-              icon: Icon(Icons.search, key: _marketTabKey),
-              selectedIcon: const Icon(Icons.search, color: Colors.deepPurple),
-              label: 'market.title'.tr(),
-            ),
-            // Sell
-            NavigationDestination(
-              icon: Icon(Icons.sell_outlined, key: _sellTabKey),
-              selectedIcon: const Icon(Icons.sell, color: Colors.deepPurple),
-              label: 'home.sellVehicle'.tr(),
-            ),
-            // Garage
-            NavigationDestination(
-              icon: Icon(Icons.directions_car_outlined, key: _garageTabKey),
-              selectedIcon: const Icon(Icons.directions_car, color: Colors.deepPurple),
-              label: 'garage.title'.tr(),
-            ),
-            // Home
-            NavigationDestination(
-              icon: const Icon(Icons.dashboard_outlined),
-              selectedIcon: const Icon(Icons.dashboard, color: Colors.deepPurple),
-              label: 'home.title'.tr(),
-            ),
-            // Listings
-            NavigationDestination(
-              icon: Icon(Icons.list_alt_outlined, key: _listingsTabKey),
-              selectedIcon: const Icon(Icons.list_alt, color: Colors.deepPurple),
-              label: 'home.myListings'.tr(),
-            ),
-            // Offers
-            NavigationDestination(
-              icon: _pendingOffersCount > 0
-                  ? Badge(
-                      label: Text('$_pendingOffersCount'),
-                      backgroundColor: Colors.red,
-                      child: Icon(Icons.handshake_outlined, key: _offersTabKey),
-                    )
-                  : Icon(Icons.handshake_outlined, key: _offersTabKey),
-              selectedIcon: _pendingOffersCount > 0
-                  ? Badge(
-                      label: Text('$_pendingOffersCount'),
-                      backgroundColor: Colors.red,
-                      child: const Icon(Icons.handshake, color: Colors.deepPurple),
-                    )
-                  : const Icon(Icons.handshake, color: Colors.deepPurple),
-              label: 'offers.title'.tr(),
-            ),
-            // Store
-            NavigationDestination(
-              icon: Icon(Icons.shopping_bag_outlined, key: _storeTabKey),
-              selectedIcon: const Icon(Icons.shopping_bag, color: Colors.deepPurple),
-              label: 'store.title'.tr(),
-            ),
-          ],
+        final NavigatorState? currentNavigator =
+            _navigatorKeys[_currentIndex]?.currentState;
+
+        if (currentNavigator != null && currentNavigator.canPop()) {
+          currentNavigator.pop();
+        } else if (_currentIndex != 3) {
+          // Eğer ana sayfada değilsek, ana sayfaya dön
+          setState(() {
+            _currentIndex = 3;
+          });
+          ScreenRefreshService().notifyTabChanged(3);
+          _checkPendingOffers();
+        } else {
+          // Ana sayfadaysak ve geri gidilecek yer yoksa uygulamadan çıkılabilir
+          // SystemNavigator.pop() kullanılabilir veya kullanıcıya sorulabilir
+          // Şimdilik sistemin çıkış yapmasına izin veriyoruz (canPop: false olduğu için manuel çıkış lazım)
+          // Ancak kullanıcı deneyimi için genellikle ana sayfada tekrar basınca çıkış istenir.
+          // Burada direkt çıkış yapalım:
+          // SystemNavigator.pop(); // Bu import gerektirir: import 'package:flutter/services.dart';
+          // Veya basitçe:
+          // exit(0); // import 'dart:io';
+          
+          // Ancak Flutter'da best practice, PopScope'un canPop'unu true yapıp tekrar pop çağırmaktır
+          // ama burada logic karmaşıklaşabilir. 
+          // En temiz yöntem:
+          // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+          
+          // Şimdilik kullanıcı "swipe back" yaptığında app kapansın istiyorsa (root'ta)
+          // bu davranışı simüle edelim.
+          // Ama "swipe back" ile kapanması "bug" olarak nitelendirildiğine göre,
+          // muhtemelen *yanlışlıkla* kapanmasını istemiyorlar.
+          // Yine de root'ta ise kapanması normaldir.
+          // Bizim amacımız *nested* iken kapanmaması.
+          
+          // Eğer buraya düştüysek: Tab'ın rootundayız VE Home tabındayız.
+          // Bu durumda app kapanmalı.
+           SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        key: _mainScaffoldKey,
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              // Eğer Dashboard (Home) veya Market seçildiyse stack'i sıfırla
+              if (index == 3) {
+                _navigatorKeys[3]?.currentState?.popUntil((route) => route.isFirst);
+              } else if (index == 0) {
+                _navigatorKeys[0]?.currentState?.popUntil((route) => route.isFirst);
+              }
+
+              setState(() {
+                _currentIndex = index;
+              });
+              ScreenRefreshService().notifyTabChanged(index);
+              _checkPendingOffers();
+            },
+            backgroundColor: Colors.white.withOpacity(0.2),
+            elevation: 8,
+            indicatorColor: Colors.deepPurple.withOpacity(0.2),
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+            destinations: [
+              // Market
+              NavigationDestination(
+                icon: Icon(Icons.search, key: _marketTabKey),
+                selectedIcon: const Icon(Icons.search, color: Colors.deepPurple),
+                label: 'market.title'.tr(),
+              ),
+              // Sell
+              NavigationDestination(
+                icon: Icon(Icons.sell_outlined, key: _sellTabKey),
+                selectedIcon: const Icon(Icons.sell, color: Colors.deepPurple),
+                label: 'home.sellVehicle'.tr(),
+              ),
+              // Garage
+              NavigationDestination(
+                icon: Icon(Icons.directions_car_outlined, key: _garageTabKey),
+                selectedIcon: const Icon(Icons.directions_car, color: Colors.deepPurple),
+                label: 'garage.title'.tr(),
+              ),
+              // Home
+              NavigationDestination(
+                icon: const Icon(Icons.dashboard_outlined),
+                selectedIcon: const Icon(Icons.dashboard, color: Colors.deepPurple),
+                label: 'home.title'.tr(),
+              ),
+              // Listings
+              NavigationDestination(
+                icon: Icon(Icons.list_alt_outlined, key: _listingsTabKey),
+                selectedIcon: const Icon(Icons.list_alt, color: Colors.deepPurple),
+                label: 'home.myListings'.tr(),
+              ),
+              // Offers
+              NavigationDestination(
+                icon: _pendingOffersCount > 0
+                    ? Badge(
+                        label: Text('$_pendingOffersCount'),
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.handshake_outlined, key: _offersTabKey),
+                      )
+                    : Icon(Icons.handshake_outlined, key: _offersTabKey),
+                selectedIcon: _pendingOffersCount > 0
+                    ? Badge(
+                        label: Text('$_pendingOffersCount'),
+                        backgroundColor: Colors.red,
+                        child: const Icon(Icons.handshake, color: Colors.deepPurple),
+                      )
+                    : const Icon(Icons.handshake, color: Colors.deepPurple),
+                label: 'offers.title'.tr(),
+              ),
+              // Store
+              NavigationDestination(
+                icon: Icon(Icons.shopping_bag_outlined, key: _storeTabKey),
+                selectedIcon: const Icon(Icons.shopping_bag, color: Colors.deepPurple),
+                label: 'store.title'.tr(),
+              ),
+            ],
+          ),
         ),
       ),
     );

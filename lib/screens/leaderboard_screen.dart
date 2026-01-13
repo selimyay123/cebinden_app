@@ -51,7 +51,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       }
 
       // Liderlik tablosunu çek
-      final players = await _leaderboardService.getTopPlayers(limit: 20);
+      final players = await _leaderboardService.getTopPlayers(limit: 50);
       
       if (mounted) {
         setState(() {
@@ -220,6 +220,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                 fontSize: 15,
                               ),
                             ),
+                            onTap: () {
+                              _showUserDetailDialog(
+                                rank: rank,
+                                username: player['username'] ?? 'Bilinmeyen Oyuncu',
+                                profileImageUrl: player['profileImageUrl'],
+                                balance: player['balance'],
+                              );
+                            },
                             onLongPress: () {
                               if (!isCurrentUser) {
                                 _showReportDialog(
@@ -435,6 +443,108 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _showUserDetailDialog({
+    required int rank,
+    required String username,
+    required String? profileImageUrl,
+    required dynamic balance,
+  }) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Sıralama Rozeti
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: _getRankColor(rank).withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: _getRankColor(rank), width: 1),
+              ),
+              child: Text(
+                '#$rank',
+                style: GoogleFonts.poppins(
+                  color: _getRankColor(rank),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            
+            // Profil Resmi
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: _getRankColor(rank), width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: _getRankColor(rank).withOpacity(0.3),
+                    blurRadius: 15,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: UserProfileAvatar(
+                imageUrl: profileImageUrl,
+                username: username,
+                radius: 48,
+                backgroundColor: Colors.grey[800],
+                textColor: Colors.white,
+                fontSize: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Kullanıcı Adı
+            Text(
+              username,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            
+            // Bakiye
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE5B80B).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                _formatMoney(balance),
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFFE5B80B),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'common.close'.tr(), // 'Kapat'
+              style: const TextStyle(color: Colors.white54),
+            ),
+          ),
+        ],
       ),
     );
   }

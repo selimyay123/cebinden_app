@@ -32,7 +32,7 @@ class LeaderboardService {
   }
 
   /// En zengin ilk N kullanıcıyı getirir
-  Future<List<Map<String, dynamic>>> getTopPlayers({int limit = 10}) async {
+  Future<List<Map<String, dynamic>>> getTopPlayers({int limit = 50}) async {
     try {
       final querySnapshot = await _firestore
           .collection(collectionName)

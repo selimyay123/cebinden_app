@@ -291,7 +291,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
             final randomBrand = (brands..shuffle()).first;
             
             // Seçilen markaya göre MODEL SEÇİM sayfasına git
-            final purchased = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ModelSelectionScreen(
@@ -301,11 +301,6 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ),
               ),
             );
-
-            // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
-            if (purchased == true && context.mounted) {
-              Navigator.pop(context, true);
-            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
@@ -349,7 +344,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
         shadowColor: widget.categoryColor.withOpacity(0.3),
         child: InkWell(
           onTap: () async {
-            final purchased = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VehicleListScreen(
@@ -360,11 +355,6 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ),
               ),
             );
-
-            // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
-            if (purchased == true && context.mounted) {
-              Navigator.pop(context, true);
-            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
@@ -416,7 +406,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
         child: InkWell(
           onTap: () async {
             // Seçilen markaya göre MODEL SEÇİM sayfasına git
-            final purchased = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ModelSelectionScreen(
@@ -426,11 +416,6 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ),
               ),
             );
-
-            // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
-            if (purchased == true && context.mounted) {
-              Navigator.pop(context, true);
-            }
           },
           borderRadius: BorderRadius.circular(12),
           child: Padding(
@@ -595,16 +580,12 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
 
                 if (mounted) {
                   // Detay sayfasına git
-                  final purchased = await Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => VehicleDetailScreen(vehicle: vehicle),
                     ),
                   );
-                  
-                  if (purchased == true && mounted) {
-                    Navigator.pop(context, true);
-                  }
                 }
               } else {
                 if (mounted) {

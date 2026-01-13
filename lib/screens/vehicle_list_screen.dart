@@ -623,23 +623,18 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       child: InkWell(
         onTap: () async {
           // Araç detayına git ve satın alma sonucunu bekle
-          final purchased = await Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => VehicleDetailScreen(vehicle: vehicle),
             ),
           );
           
-          // Listeyi yenile (Ekspertiz durumu değişmiş olabilir)
+          // Listeyi yenile (Ekspertiz durumu değişmiş olabilir veya araç satılmış olabilir)
           if (context.mounted) {
             _loadVehicles();
             _applyFilters();
             _loadUserBalance(); // Bakiyeyi güncelle
-          }
-          
-          // Eğer satın alma başarılıysa, bir önceki sayfaya bildir
-          if (purchased == true && context.mounted) {
-            Navigator.pop(context, true);
           }
         },
         borderRadius: BorderRadius.circular(12),

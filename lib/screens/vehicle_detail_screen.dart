@@ -2201,6 +2201,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   Future<void> _playPurchaseAnimation() async {
     if (!mounted) return;
     
+    // Dialog'u kapatmak için navigator'ı önceden al (Root navigator kullan)
+    final navigator = Navigator.of(context, rootNavigator: true);
+    
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -2227,13 +2230,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     // Animasyon süresi kadar bekle (~2 saniye)
     await Future.delayed(const Duration(milliseconds: 2000));
 
-    if (mounted) {
-      Navigator.of(context).pop(); // Animasyon overlay'ini kapat
-    }
+    // Dialog'u kapat (mounted kontrolüne gerek yok çünkü navigator'ı capture ettik)
+    navigator.pop(); 
   }
 
   /// Satın alma başarılı dialogunu göster
   void _showPurchaseSuccessDialog(double newBalance) {
+    // Ekranı kapatmak için navigator'ı önceden al (Tab navigator)
+    final screenNavigator = Navigator.of(context);
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -2370,8 +2375,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pop(context, true);
+                            Navigator.pop(context); // Dialogu kapat (Root navigator)
+                            screenNavigator.pop(true); // Ekranı kapat (Tab navigator)
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,

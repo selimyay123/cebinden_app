@@ -4,6 +4,8 @@ import '../services/skill_service.dart';
 import '../services/database_helper.dart';
 import '../models/user_model.dart';
 
+import '../widgets/modern_alert_dialog.dart';
+
 class SkillTreeScreen extends StatefulWidget {
   const SkillTreeScreen({super.key});
 
@@ -58,6 +60,30 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
           SnackBar(content: Text('skills.upgradeFailed'.tr())),
         );
       }
+    }
+  }
+
+  Future<void> _showUpgradeConfirmation(String skillId, String title, int cost) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'skills.upgradeConfirmationTitle'.tr(),
+        content: Text(
+          'skills.upgradeConfirmationMessage'.trParams({
+            'skill': title,
+            'cost': cost.toString(),
+          }),
+        ),
+        buttonText: 'common.confirm'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.upgrade,
+      ),
+    );
+
+    if (confirmed == true) {
+      await _upgradeSkill(skillId);
     }
   }
 
@@ -303,7 +329,9 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: canUpgrade ? () => _upgradeSkill(skillId) : null,
+                onPressed: canUpgrade 
+                    ? () => _showUpgradeConfirmation(skillId, title, nextLevelCost) 
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: color,
                   foregroundColor: Colors.white,

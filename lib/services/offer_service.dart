@@ -995,9 +995,17 @@ class OfferService {
       await _db.addUserVehicle(userVehicle);
 
       // Aktivite kaydı
-      await ActivityService().logVehiclePurchase(userId, userVehicle);
-      
-      return true;
+    await ActivityService().logVehiclePurchase(userId, userVehicle);
+
+    // 🆕 Günlük Görev Güncellemesi (Araç Satın Alma)
+    await _questService.updateProgress(
+      userId, 
+      QuestType.buyVehicle, 
+      1, 
+      brand: userVehicle.brand
+    );
+    
+    return true;
     } catch (e) {
       
       return false;

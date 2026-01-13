@@ -14,6 +14,8 @@ import '../utils/vehicle_utils.dart';
 import '../mixins/auto_refresh_mixin.dart';
 import 'package:cebinden_app/widgets/modern_alert_dialog.dart';
 import '../services/skill_service.dart';
+import '../services/daily_quest_service.dart';
+import '../models/daily_quest_model.dart';
 import 'package:lottie/lottie.dart';
 import '../services/game_time_service.dart';
 import '../widgets/game_image.dart';
@@ -1404,6 +1406,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
 
       // 3. Yetenek kullanımını kaydet
       await SkillService().recordSkillUsage(_currentUser!.id, SkillService.skillQuickSell);
+
+      // 🆕 Günlük Görev Güncellemesi (Araç Satma)
+      await DailyQuestService().updateProgress(_currentUser!.id, QuestType.sellVehicle, 1);
 
       // 4. XP Kazandır ve Level Up Kontrolü
       final profit = sellPrice - vehicle.purchasePrice;
