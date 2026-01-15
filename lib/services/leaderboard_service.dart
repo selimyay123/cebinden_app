@@ -31,6 +31,15 @@ class LeaderboardService {
     }
   }
 
+  /// Kullanıcı skorunu siler (Hesap silme durumunda)
+  Future<void> deleteUserScore(String userId) async {
+    try {
+      await _firestore.collection(collectionName).doc(userId).delete();
+    } catch (e) {
+      print('Error deleting leaderboard score: $e');
+    }
+  }
+
   /// En zengin ilk N kullanıcıyı getirir
   Future<List<Map<String, dynamic>>> getTopPlayers({int limit = 50}) async {
     try {

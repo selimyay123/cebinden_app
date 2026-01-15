@@ -4,6 +4,8 @@ import '../models/user_model.dart';
 import '../services/activity_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../widgets/modern_alert_dialog.dart';
+import '../widgets/custom_snackbar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'main_screen.dart';
 
@@ -51,31 +53,26 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
   Future<void> _clearAll() async {
     // Onay dialogu
-    final confirm = await showDialog<bool>(
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('activity.clearAll'.tr()),
+      builder: (context) => ModernAlertDialog(
+        title: 'activity.clearAll'.tr(),
         content: Text('activity.clearAllConfirm'.tr()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text('common.cancel'.tr()),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text('common.delete'.tr()),
-          ),
-        ],
+        buttonText: 'common.delete'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.delete_forever,
+        isDestructive: true,
       ),
     );
 
-    if (confirm == true && _currentUser != null) {
+    if (confirmed == true && _currentUser != null) {
       await _activityService.clearAllActivities(_currentUser!.id);
       await _loadData();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          CustomSnackBar(
             content: Text('activity.cleared'.tr()),
             backgroundColor: Colors.green,
           ),
@@ -129,7 +126,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
           Icon(
             Icons.history,
             size: 120,
-            color: Colors.grey[300],
+            color: Colors.black,
           ),
           const SizedBox(height: 24),
           Text(
@@ -137,7 +134,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Colors.black,
             ),
           ),
           const SizedBox(height: 8),
@@ -147,7 +144,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               'activity.noActivitiesDesc'.tr(),
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: Colors.black,
               ),
               textAlign: TextAlign.center,
             ),

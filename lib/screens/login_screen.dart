@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
     if (user != null) {
       // Başarılı giriş - Tüm route geçmişini temizle
       
-      Navigator.of(context).pushAndRemoveUntil(
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainScreen()),
         (route) => false, // Tüm önceki ekranları temizle
       );
@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
       if (user != null) {
         // Başarılı Google girişi
         
-        Navigator.of(context).pushAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
         );
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
       if (user != null) {
         // Başarılı Apple girişi
         
-        Navigator.of(context).pushAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
         );

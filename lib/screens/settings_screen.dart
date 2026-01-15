@@ -392,7 +392,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
     if (confirm == true) {
       final success = await _authService.deleteAccount(_currentUser!.id);
       if (success && mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
           (route) => false,
         );

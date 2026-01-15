@@ -163,7 +163,7 @@ class XPService {
     final unlocks = _getUnlocksForLevel(newLevel);
 
     // Aktivite kaydı
-    await ActivityService().logLevelUp(userId, newLevel, cashReward);
+    await ActivityService().logLevelUp(userId, newLevel, cashReward, 1);
     
     return LevelUpReward(
       level: newLevel,

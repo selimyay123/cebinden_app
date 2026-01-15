@@ -289,6 +289,9 @@ class OfferService {
         buyerId: offer.buyerId,
         offer: acceptedOffer,
       );
+
+      // 🆕 Araç satıldığı için ilgili bildirimleri temizle (Teklif bildirimleri vs.)
+      await NotificationService().deleteNotificationsForVehicle(offer.vehicleId);
       
       return xpResult;
     } catch (e) {
@@ -855,12 +858,8 @@ class OfferService {
       // Diğer teklifleri reddet
       await _db.rejectOtherOffers(offer.vehicleId, offer.offerId);
       
-      // 🔔 Satıcıya araç satıldı bildirimi gönder
-      await NotificationService().sendVehicleSoldNotification(
-        userId: offer.sellerId,
-        vehicleName: '${vehicle.brand} ${vehicle.model}',
-        salePrice: finalPrice,
-      );
+      // 🆕 Araç satıldığı için ilgili bildirimleri temizle (Teklif bildirimleri vs.)
+      await NotificationService().deleteNotificationsForVehicle(offer.vehicleId);
       
       // 💎 XP Kazandır (Araç Satışı + Kâr Bonusu + Başarılı Pazarlık)
       final profit = finalPrice - vehicle.purchasePrice;

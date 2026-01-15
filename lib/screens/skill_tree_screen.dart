@@ -5,6 +5,7 @@ import '../services/database_helper.dart';
 import '../models/user_model.dart';
 
 import '../widgets/modern_alert_dialog.dart';
+import '../widgets/custom_snackbar.dart';
 
 class SkillTreeScreen extends StatefulWidget {
   const SkillTreeScreen({super.key});
@@ -50,14 +51,20 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
     if (success) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('skills.upgradeSuccess'.tr())),
+          CustomSnackBar(
+            content: Text('skills.upgradeSuccess'.tr()),
+            backgroundColor: Colors.green,
+          ),
         );
       }
       await _loadUser(); // Refresh UI
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('skills.upgradeFailed'.tr())),
+          CustomSnackBar(
+            content: Text('skills.upgradeFailed'.tr()),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }

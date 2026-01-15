@@ -4,6 +4,8 @@ import 'package:profanity_filter/profanity_filter.dart';
 import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'firebase_auth_service.dart';
+import 'cloud_service.dart';
+import 'leaderboard_service.dart';
 
 class AuthService {
   // Singleton pattern
@@ -301,9 +303,19 @@ class AuthService {
   // Hesabı sil
   Future<bool> deleteAccount(String userId) async {
     try {
-      return await _db.deleteUser(userId);
-    } catch (e) {
+      // 1. Cloud'dan sil (Firestore)
+      // CloudService singleton olduğu için direkt instance alabiliriz veya yukarıda tanımlı _firebaseAuth gibi tanımlayabiliriz.
+      // Ancak CloudService henüz AuthService içinde tanımlı değil, import var ama field yok.
+      // Singleton olduğu için CloudService() diyerek erişebiliriz.
+      await CloudService().deleteUser(userId);
       
+      // 1.5 Leaderboard'dan sil
+      await LeaderboardService().deleteUserScore(userId);
+
+      // 2. Local verileri sil (Hive) - deleteUser yerine deleteUserData kullanıyoruz
+      return await _db.deleteUserData(userId);
+    } catch (e) {
+      print('Error deleting account: $e');
       return false;
     }
   }

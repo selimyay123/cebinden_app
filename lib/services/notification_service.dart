@@ -233,6 +233,11 @@ class NotificationService {
     await _db.deleteAllNotifications(userId);
   }
 
+  /// Belirli bir araca ait bildirimleri sil
+  Future<void> deleteNotificationsForVehicle(String vehicleId) async {
+    await _db.deleteNotificationsByVehicleId(vehicleId);
+  }
+
   /// 24 saatlik bildirim sıfırlama kontrolü
   /// Eğer son sıfırlamadan 24 saat geçtiyse bildirimleri sıfırla
   Future<void> checkAndResetDailyNotifications(String userId) async {

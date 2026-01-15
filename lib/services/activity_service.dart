@@ -68,14 +68,12 @@ class ActivityService {
   }
 
   // Seviye atlama
-  Future<void> logLevelUp(String userId, int newLevel, double rewardAmount) async {
+  Future<void> logLevelUp(String userId, int newLevel, double rewardAmount, int skillPoints) async {
     await logActivity(
       userId: userId,
       type: ActivityType.levelUp,
       title: 'activity.levelUpTitle'.tr(),
-      description: 'activity.levelUpDesc'.trParams({
-        'level': newLevel.toString(),
-      }),
+      description: '${'activity.levelUpDesc'.trParams({'level': newLevel.toString()})}\n$skillPoints SP',
       amount: rewardAmount > 0 ? rewardAmount : null,
     );
   }

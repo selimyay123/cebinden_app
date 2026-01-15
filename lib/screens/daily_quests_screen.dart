@@ -6,6 +6,8 @@ import '../services/daily_quest_service.dart';
 import '../services/mission_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../services/xp_service.dart';
+import '../widgets/level_up_dialog.dart';
 import 'main_screen.dart';
 
 class DailyQuestsScreen extends StatefulWidget {
@@ -66,8 +68,8 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
   Future<void> _claimReward(DailyQuest quest) async {
     if (_currentUser == null) return;
 
-    final success = await _questService.claimReward(_currentUser!['id'], quest.id);
-    if (success) {
+    final result = await _questService.claimReward(_currentUser!['id'], quest.id);
+    if (result != null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -83,6 +85,17 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
             backgroundColor: Colors.green.withOpacity(0.8),
           ),
         );
+        
+        if (result.leveledUp && result.rewards != null) {
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => LevelUpDialog(
+              reward: result.rewards!,
+            ),
+          );
+        }
+        
         _loadData(); // Listeyi yenile
       }
     } else {
@@ -103,8 +116,8 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
   Future<void> _claimMissionReward(Mission mission) async {
     if (_currentUser == null) return;
 
-    final success = await _missionService.claimReward(_currentUser!['id'], mission.id);
-    if (success) {
+    final result = await _missionService.claimReward(_currentUser!['id'], mission.id);
+    if (result != null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -120,6 +133,17 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
             backgroundColor: Colors.green.withOpacity(0.8),
           ),
         );
+        
+        if (result.leveledUp && result.rewards != null) {
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => LevelUpDialog(
+              reward: result.rewards!,
+            ),
+          );
+        }
+
         _loadData(); // Listeyi yenile
       }
     }

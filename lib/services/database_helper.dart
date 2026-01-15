@@ -217,6 +217,77 @@ class DatabaseHelper {
     return await updateUser(userId, {'password': newPasswordHash});
   }
 
+  // Kullanıcıyı ve tüm verilerini sil (Kapsamlı Temizlik)
+  Future<bool> deleteUserData(String userId) async {
+    try {
+      // 1. Kullanıcının araçlarını sil
+      final userVehicles = await getUserVehicles(userId);
+      for (var vehicle in userVehicles) {
+        await _userVehiclesBox.delete(vehicle.id);
+      }
+      
+      // 2. Kullanıcının tekliflerini sil (Hem alıcı hem satıcı olduğu)
+      final allOffers = _offersBox.values;
+      final offersToDelete = <String>[];
+      
+      for (var offerMap in allOffers) {
+        final offer = Offer.fromJson(Map<String, dynamic>.from(offerMap));
+        if (offer.sellerId == userId || offer.buyerId == userId) {
+          offersToDelete.add(offer.offerId);
+        }
+      }
+      
+      for (var offerId in offersToDelete) {
+        await _offersBox.delete(offerId);
+      }
+      
+      // 3. Kullanıcının bildirimlerini sil
+      final allNotifications = _notificationsBox.values;
+      final notificationsToDelete = <String>[];
+      
+      for (var notifMap in allNotifications) {
+        final notif = AppNotification.fromJson(Map<String, dynamic>.from(notifMap));
+        if (notif.userId == userId) {
+          notificationsToDelete.add(notif.id);
+        }
+      }
+      
+      for (var notifId in notificationsToDelete) {
+        await _notificationsBox.delete(notifId);
+      }
+      
+      // 4. Görev ilerlemelerini sil (Missions)
+      final allMissions = _missionsBox.keys;
+      final missionsToDelete = <dynamic>[];
+      
+      for (var key in allMissions) {
+        if (key.toString().startsWith('${userId}_')) {
+          missionsToDelete.add(key);
+        }
+      }
+      
+      for (var key in missionsToDelete) {
+        await _missionsBox.delete(key);
+      }
+      
+      // 5. Günlük görevleri sil (Daily Quests)
+      // Daily quests genellikle 'daily_quests' box'ında tutulur.
+      // Ancak yapısını tam bilmediğimiz için, eğer userId ile ilişkili ise silelim.
+      // Genellikle DailyQuestService yönetir ama burada temizlemek iyi olur.
+      // Eğer box key'i userId ise:
+      if (_dailyQuestsBox.containsKey(userId)) {
+        await _dailyQuestsBox.delete(userId);
+      }
+      
+      // 6. Son olarak kullanıcıyı sil
+      return await deleteUser(userId);
+      
+    } catch (e) {
+      print('Error deleting user data: $e');
+      return false;
+    }
+  }
+
   // Kullanıcıyı sil
   Future<bool> deleteUser(String userId) async {
     try {
@@ -888,6 +959,28 @@ class DatabaseHelper {
     } catch (e) {
       
       return false;
+    }
+  }
+
+  // Belirli bir araca ait bildirimleri sil
+  Future<void> deleteNotificationsByVehicleId(String vehicleId) async {
+    try {
+      final allNotifications = _notificationsBox.values;
+      final notificationsToDelete = <String>[];
+      
+      for (var notifMap in allNotifications) {
+        final notif = AppNotification.fromJson(Map<String, dynamic>.from(notifMap));
+        if (notif.data != null && notif.data!['vehicleId'] == vehicleId) {
+          notificationsToDelete.add(notif.id);
+        }
+      }
+      
+      for (var notifId in notificationsToDelete) {
+        await _notificationsBox.delete(notifId);
+      }
+      await _notificationsBox.flush();
+    } catch (e) {
+      print('Error deleting vehicle notifications: $e');
     }
   }
 

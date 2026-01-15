@@ -109,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> with LocalizationMixin 
     if (success) {
       // Başarılı kayıt - Tüm route geçmişini temizle ve ana sayfaya yönlendir
       
-      Navigator.of(context).pushAndRemoveUntil(
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainScreen()),
         (route) => false, // Tüm önceki ekranları temizle
       );

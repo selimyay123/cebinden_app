@@ -1085,15 +1085,44 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: Colors.white.withOpacity(0.5)),
                             ),
-                            child: Center(
-                              child: Text(
-                                'home.tasks'.tr(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'home.tasks'.tr(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
+                                if (_currentUser != null && _currentUser!.skillPoints > 0) ...[
+                                  const SizedBox(width: 8),
+                                  PulseBadge(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 24,
+                                        minHeight: 24,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          _currentUser!.skillPoints.toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         ),

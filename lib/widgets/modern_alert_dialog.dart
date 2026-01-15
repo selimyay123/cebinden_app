@@ -10,6 +10,7 @@ class ModernAlertDialog extends StatefulWidget {
   final IconData? icon;
   final Color? iconColor;
   final List<Widget>? customActions;
+  final bool isDestructive;
 
   const ModernAlertDialog({
     super.key,
@@ -22,6 +23,7 @@ class ModernAlertDialog extends StatefulWidget {
     this.icon,
     this.iconColor,
     this.customActions,
+    this.isDestructive = false,
   });
 
   @override
@@ -154,17 +156,17 @@ class _ModernAlertDialogState extends State<ModernAlertDialog>
                         const SizedBox(height: 12),
                       ],
                       if (widget.buttonText != null)
-                        ElevatedButton(
-                          onPressed: widget.onPressed,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.deepPurple,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                          ElevatedButton(
+                            onPressed: widget.onPressed,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: widget.isDestructive ? Colors.red : Colors.white,
+                              foregroundColor: widget.isDestructive ? Colors.white : Colors.deepPurple,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 5,
                             ),
-                            elevation: 5,
-                          ),
                           child: Text(
                             widget.buttonText!,
                             style: const TextStyle(

@@ -25,6 +25,36 @@ class CloudService {
     }
   }
 
+  /// Kullanıcıyı ve tüm verilerini sil (Hesap Silme)
+  Future<void> deleteUser(String userId) async {
+    try {
+      // 1. Önce kullanıcının araçlarını sil (Subcollection)
+      final vehiclesSnapshot = await _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .collection(vehiclesCollection)
+          .get();
+
+      // Batch write ile toplu silme yapalım (Daha verimli)
+      final batch = _firestore.batch();
+      
+      for (final doc in vehiclesSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      
+      // 2. Kullanıcı dokümanını sil
+      final userRef = _firestore.collection(usersCollection).doc(userId);
+      batch.delete(userRef);
+      
+      // İşlemi uygula
+      await batch.commit();
+      
+    } catch (e) {
+      print('Cloud Delete Error (User Full): $e');
+      // Hata olsa bile devam etmeye çalışabiliriz veya loglayabiliriz
+    }
+  }
+
   /// Google ID'ye göre kullanıcı bul
   Future<User?> getUserByGoogleId(String googleId) async {
     try {

@@ -341,14 +341,14 @@ class MissionService {
   }
 
   /// Ödül talep et
-  Future<bool> claimReward(String userId, String missionId) async {
+  Future<XPGainResult?> claimReward(String userId, String missionId) async {
     final missions = await getUserMissions(userId);
     final mission = missions.firstWhere((m) => m.id == missionId, orElse: () => throw Exception('Mission not found'));
 
-    if (!mission.isCompleted || mission.isClaimed) return false;
+    if (!mission.isCompleted || mission.isClaimed) return null;
 
     // Ödülleri ver
-    await _xpService.addXP(userId, mission.rewardXP, XPSource.achievement); // XPSource.achievement eklenmeli
+    final xpResult = await _xpService.addXP(userId, mission.rewardXP, XPSource.achievement); // XPSource.achievement eklenmeli
     
     final userMap = await _db.getUserById(userId);
     if (userMap != null) {
@@ -373,6 +373,6 @@ class MissionService {
       amount: mission.rewardMoney,
     ));
     
-    return true;
+    return xpResult;
   }
 }

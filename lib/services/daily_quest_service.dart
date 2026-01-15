@@ -212,16 +212,16 @@ class DailyQuestService {
   }
 
   /// Ödülü topla
-  Future<bool> claimReward(String userId, String questId) async {
+  Future<XPGainResult?> claimReward(String userId, String questId) async {
     final questMap = await _db.getDailyQuestById(questId);
-    if (questMap == null) return false;
+    if (questMap == null) return null;
     
     final quest = DailyQuest.fromJson(Map<String, dynamic>.from(questMap));
     
-    if (quest.isClaimed || !quest.isCompleted) return false;
+    if (quest.isClaimed || !quest.isCompleted) return null;
     
     // 1. XP Ver
-    await _xpService.addXP(userId, quest.rewardXP, XPSource.dailyLogin); // Source'u genel tutabiliriz veya yeni source ekleyebiliriz
+    final xpResult = await _xpService.addXP(userId, quest.rewardXP, XPSource.dailyLogin); // Source'u genel tutabiliriz veya yeni source ekleyebiliriz
     
     // 2. Para Ver
     final userMap = await _db.getUserById(userId);
@@ -249,7 +249,7 @@ class DailyQuestService {
       amount: quest.rewardMoney,
     ));
     
-    return true;
+    return xpResult;
   }
 }
 
