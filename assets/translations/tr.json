@@ -21,7 +21,9 @@
     "noRentedVehicles": "Şu anda kirada araç yok.",
     "collectIncome": "Topla",
     "incomeCollected": "Gelir toplandı!",
-    "opportunityPurchases": "Fırsat Alımları"
+    "opportunityPurchases": "Fırsat Alımları",
+    "rentLimitReached": "Kiralama limitine ulaşıldı (Maks 3 araç).",
+    "slotsLeft": "hak kaldı"
   },
   "opportunity": {
     "title": "Fırsat Alımları",
@@ -2114,7 +2116,7 @@
     "days": "gün"
   },
   "tutorial": {
-    "title": "Hoş Geldiniz!",
+    "title": "Öğretici",
     "step1_title": "Bakiye ve Altın",
     "step1_desc": "Buradan mevcut paranızı ve altın miktarınızı takip edebilirsiniz.",
     "step2_title": "Oyun Zamanı",

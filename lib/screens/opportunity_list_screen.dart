@@ -11,6 +11,7 @@ import '../services/auth_service.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/vehicle_image.dart';
+import '../widgets/custom_snackbar.dart';
 
 class OpportunityListScreen extends StatefulWidget {
   const OpportunityListScreen({super.key});
@@ -91,16 +92,18 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+          Icon(Icons.search_off, size: 64, color: Colors.black),
           const SizedBox(height: 16),
           Text(
             'opportunity.emptyTitle'.tr(),
-            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 18, color: Colors.black),
           ),
           const SizedBox(height: 8),
           Text(
             'opportunity.emptySubtitle'.tr(),
-            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: Colors.black),
           ),
         ],
       ),
@@ -336,7 +339,10 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
     // Bakiye kontrolü
     if (_currentUser!.balance < vehicle.price) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('purchase.insufficientBalance'.tr())),
+        CustomSnackBar(
+          content: Text('purchase.insufficientBalance'.tr()),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -345,7 +351,10 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
     final activeVehicles = await _db.getUserActiveVehicles(_currentUser!.id);
     if (activeVehicles.length >= _currentUser!.garageLimit) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('errors.garageFull'.tr())),
+        CustomSnackBar(
+          content: Text('errors.garageFull'.tr()),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -374,7 +383,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       // 4. Başarı mesajı ve yenileme
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          CustomSnackBar(
             content: Text('purchase.purchaseSuccess'.tr()),
             backgroundColor: Colors.green,
           ),
@@ -385,7 +394,10 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hata oluştu: $e')),
+          CustomSnackBar(
+            content: Text('Hata oluştu: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }

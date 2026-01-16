@@ -21,7 +21,9 @@
     "noRentedVehicles": "No vehicles currently rented.",
     "collectIncome": "Collect",
     "incomeCollected": "Income collected!",
-    "opportunityPurchases": "Opportunity Purchases"
+    "opportunityPurchases": "Opportunity Purchases",
+    "rentLimitReached": "Rental limit reached (Max 3 vehicles).",
+    "slotsLeft": "slots left"
   },
   "opportunity": {
     "title": "Opportunity Purchases",
@@ -2118,7 +2120,7 @@
     "days": "days"
   },
   "tutorial": {
-    "title": "Welcome!",
+    "title": "Tutorial",
     "step1_title": "Balance & Gold",
     "step1_desc": "Here you can see your total money and gold.",
     "step2_title": "Game Time",

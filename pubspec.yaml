@@ -85,6 +85,7 @@ dependencies:
   profanity_filter: ^2.0.0
   firebase_storage: ^12.4.10
   dio: ^5.9.0
+  showcaseview: ^5.0.1
 
 dev_dependencies:
   flutter_test:

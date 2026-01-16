@@ -30,6 +30,7 @@ import 'daily_quests_screen.dart';
 import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
 import '../widgets/modern_alert_dialog.dart';
+import '../widgets/custom_snackbar.dart';
 import '../widgets/level_up_dialog.dart';
 import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
@@ -793,6 +794,35 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                   ),
                                 ),
                               ),
+
+                              // Düzenleme İkonu (Sağ Üst)
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Tooltip(
+                                  message: 'settings.changeProfilePicture'.tr(),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.7),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.deepPurple.withOpacity(0.5), width: 1),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      Icons.edit,
+                                      size: 14,
+                                      color: Colors.deepPurple.shade700,
+                                    ),
+                                  ),
+                                ),
+                              ),
                               // Seviye Rozeti (Avatarın altında)
                               Positioned(
                                 bottom: 0,
@@ -892,31 +922,47 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TweenAnimationBuilder<double>(
-                                tween: Tween<double>(
-                                  begin: _currentUser!.balance - (_showRentalIncomeAnimation ? _lastRentalIncome : 0),
-                                  end: _currentUser!.balance,
-                                ),
-                                duration: const Duration(seconds: 2),
-                                curve: Curves.easeOut,
-                                builder: (context, value, child) {
-                                  return Text(
-                                    '${_formatCurrency(value)} ${'common.currency'.tr()}',
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  // Görünmez Text ile alan rezerve et (Titremeyi önler)
+                                  Text(
+                                    '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.transparent, // Görünmez
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black26,
-                                          blurRadius: 8,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
                                     ),
-                                  );
-                                },
+                                  ),
+                                  // Animasyonlu Değer
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween<double>(
+                                      begin: _currentUser!.balance - (_showRentalIncomeAnimation ? _lastRentalIncome : 0),
+                                      end: _currentUser!.balance,
+                                    ),
+                                    duration: const Duration(seconds: 2),
+                                    curve: Curves.easeOut,
+                                    builder: (context, value, child) {
+                                      return Text(
+                                        '${_formatCurrency(value)} ${'common.currency'.tr()}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black26,
+                                              blurRadius: 8,
+                                              offset: Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                               
                               // Kiralama Geliri Göstergesi (Animasyonlu)
@@ -2419,18 +2465,21 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           // Kiraya Ver Butonu
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
+            child: ElevatedButton(
               onPressed: _showRentOutDialog,
-              icon: const Icon(Icons.key),
-              label: Text('gallery.rentOut'.tr()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white.withOpacity(0.8),
-                foregroundColor: Colors.black,
+                backgroundColor: Colors.blue.withOpacity(0.5),
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.blue.withOpacity(0.5)),
                 ),
                 elevation: 0,
+              ),
+              child: Text(
+                'gallery.rentOut'.tr(),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -2440,7 +2489,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           // Fırsat Alımları Butonu
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
+            child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -2449,16 +2498,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                 );
               },
-              icon: const Icon(Icons.local_offer, color: Colors.white),
-              label: Text('gallery.opportunityPurchases'.tr()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent.withOpacity(0.7),
+                backgroundColor: Colors.purple.withOpacity(0.5),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.purple.withOpacity(0.5)),
                 ),
                 elevation: 0,
+              ),
+              child: Text(
+                'gallery.opportunityPurchases'.tr(),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -2520,100 +2572,102 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.directions_car, color: Colors.white, size: 20),
-                  const SizedBox(width: 12),
+                  // Sol: Araç Adı
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          vehicle.isRented 
-                            ? '${'gallery.dailyIncome'.tr()}: ${_formatCurrency(dailyIncome)} TL'
-                            : '${'gallery.collectIncome'.tr()}: ${_formatCurrency(vehicle.pendingRentalIncome)} TL',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
+                    flex: 4,
+                    child: Text(
+                      vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.start,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  // Topla Butonu
-                  SizedBox(
-                    height: 32,
-                    child: ElevatedButton(
-                      onPressed: vehicle.canCollectRentalIncome
-                          ? () async {
-                              final incomeToCollect = vehicle.pendingRentalIncome;
-                              final success = await _rentalService.collectRentalIncome(
-                                _currentUser!.id,
-                                vehicle.id,
-                              );
-                              if (success && mounted) {
-                                // Kiralama geliri animasyonunu tetikle
-                                setState(() {
-                                  _lastRentalIncome = incomeToCollect;
-                                  _showRentalIncomeAnimation = true;
-                                });
-                                
-                                // 3 saniye sonra animasyonu gizle
-                                Future.delayed(const Duration(seconds: 3), () {
-                                  if (mounted) {
-                                    setState(() {
-                                      _showRentalIncomeAnimation = false;
-                                    });
-                                  }
-                                });
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('gallery.incomeCollected'.tr()),
-                                    backgroundColor: Colors.green,
-                                    behavior: SnackBarBehavior.floating,
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                                _loadCurrentUser(); // Listeyi yenile
-                              }
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.white.withValues(alpha: 0.1),
-                        disabledForegroundColor: Colors.white.withValues(alpha: 0.3),
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                  
+                  // Orta: Gelir
+                  Expanded(
+                    flex: 3,
+                    child: Center(
                       child: Text(
-                        'gallery.collectIncome'.tr(),
+                        vehicle.isRented 
+                          ? '+${_formatCurrency(dailyIncome)} TL'
+                          : '+${_formatCurrency(vehicle.pendingRentalIncome)} TL',
                         style: const TextStyle(
-                          fontSize: 12,
+                          color: Colors.greenAccent,
                           fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  
+                  // Sağ: Buton
+                  Expanded(
+                    flex: 3,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: SizedBox(
+                        height: 32,
+                        child: ElevatedButton(
+                          onPressed: vehicle.canCollectRentalIncome
+                              ? () async {
+                                  final incomeToCollect = vehicle.pendingRentalIncome;
+                                  final success = await _rentalService.collectRentalIncome(
+                                    _currentUser!.id,
+                                    vehicle.id,
+                                  );
+                                  if (success && mounted) {
+                                    // Kiralama geliri animasyonunu tetikle
+                                    setState(() {
+                                      _lastRentalIncome = incomeToCollect;
+                                      _showRentalIncomeAnimation = true;
+                                    });
+                                    
+                                    // 3 saniye sonra animasyonu gizle
+                                    Future.delayed(const Duration(seconds: 3), () {
+                                      if (mounted) {
+                                        setState(() {
+                                          _showRentalIncomeAnimation = false;
+                                        });
+                                      }
+                                    });
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      CustomSnackBar(
+                                        content: Text('gallery.incomeCollected'.tr()),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                    _loadCurrentUser(); // Listeyi yenile
+                                  }
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber.withOpacity(0.7),
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.white.withOpacity(0.1),
+                            disabledForegroundColor: Colors.white.withOpacity(0.3),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: Text(
+                            'gallery.collectIncome'.tr(),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  if (vehicle.isRented)
-                    IconButton(
-                      icon: const Icon(Icons.stop_circle_outlined, color: Colors.white),
-                      tooltip: 'gallery.stopRenting'.tr(),
-                      onPressed: () async {
-                        await _rentalService.stopRentingVehicle(vehicle.id);
-                        _loadCurrentUser(); // Listeyi yenile
-                      },
-                    ),
                 ],
               ),
             );
@@ -2631,12 +2685,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
     if (rentableVehicles.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          elevation: 8,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        CustomSnackBar(
           content: Text('gallery.noRentableVehicles'.tr()),
-          backgroundColor: Colors.orange.withOpacity(0.8),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Şu an kirada olan araç sayısını hesapla
+    final currentRentedCount = _userVehicles.where((v) => v.isRented).length;
+    final remainingSlots = 3 - currentRentedCount;
+
+    if (remainingSlots <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar(
+          content: Text('gallery.rentLimitReached'.tr()),
+          backgroundColor: Colors.orange,
         ),
       );
       return;
@@ -2647,9 +2712,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => ModernAlertDialog(
-          title: 'gallery.rentOutTitle'.tr(),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (sbContext, setState) => ModernAlertDialog(
+          title: '${'gallery.rentOutTitle'.tr()} ($remainingSlots ${'gallery.slotsLeft'.tr()})',
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -2659,30 +2724,45 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 final vehicle = rentableVehicles[index];
                 final dailyIncome = vehicle.purchasePrice * RentalService.dailyRentalRate;
                 final isSelected = selectedVehicleIds.contains(vehicle.id);
+                // Eğer seçim hakkı dolduysa ve bu araç seçili değilse, disable et
+                final isDisabled = !isSelected && selectedVehicleIds.length >= remainingSlots;
 
                 return CheckboxListTile(
                   value: isSelected,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      if (value == true) {
-                        selectedVehicleIds.add(vehicle.id);
-                      } else {
-                        selectedVehicleIds.remove(vehicle.id);
-                      }
-                    });
-                  },
+                  onChanged: isDisabled 
+                    ? null 
+                    : (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            if (selectedVehicleIds.length < remainingSlots) {
+                              selectedVehicleIds.add(vehicle.id);
+                            }
+                          } else {
+                            selectedVehicleIds.remove(vehicle.id);
+                          }
+                        });
+                      },
                   title: Text(
                     vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: isDisabled ? Colors.white38 : Colors.white,
+                    ),
                   ),
                   subtitle: Text(
                     '${'gallery.dailyIncome'.tr()}: ${_formatCurrency(dailyIncome)} TL',
-                    style: const TextStyle(color: Colors.greenAccent),
+                    style: TextStyle(
+                      color: isDisabled ? Colors.white30 : Colors.greenAccent,
+                    ),
                   ),
-                  secondary: const Icon(Icons.car_rental, color: Colors.white70),
+                  secondary: Icon(
+                    Icons.car_rental, 
+                    color: isDisabled ? Colors.white30 : Colors.white70,
+                  ),
                   activeColor: Colors.deepPurpleAccent,
                   checkColor: Colors.white,
-                  side: const BorderSide(color: Colors.white54),
+                  side: BorderSide(
+                    color: isDisabled ? Colors.white30 : Colors.white54,
+                  ),
                 );
               },
             ),
@@ -2691,7 +2771,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           onPressed: selectedVehicleIds.isEmpty
               ? null
               : () async {
-                  Navigator.pop(context);
+                  Navigator.pop(dialogContext);
                   
                   // Seçilen araçları kiraya ver
                   for (final vehicleId in selectedVehicleIds) {
@@ -2701,10 +2781,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   // Başarı mesajı
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        elevation: 8,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        behavior: SnackBarBehavior.floating,
+                      CustomSnackBar(
                         content: Row(
                           children: [
                             const Icon(Icons.check_circle, color: Colors.white),
@@ -2712,7 +2789,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                             Expanded(child: Text('gallery.rentSuccess'.tr())),
                           ],
                         ),
-                        backgroundColor: Colors.green.withOpacity(0.9),
+                        backgroundColor: Colors.green,
                       ),
                     );
                   }
@@ -2721,7 +2798,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   _loadCurrentUser();
                 },
           secondaryButtonText: 'common.cancel'.tr(),
-          onSecondaryPressed: () => Navigator.pop(context),
+          onSecondaryPressed: () => Navigator.pop(dialogContext),
         ),
       ),
     );
@@ -3133,7 +3210,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Colors.deepPurpleAccent.withOpacity(0.2),
+        color: Colors.white.withOpacity(0.2),
         child: Column(
           children: [
             // Drawer Header
