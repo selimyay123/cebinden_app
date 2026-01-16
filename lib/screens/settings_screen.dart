@@ -579,6 +579,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
                   items: [
                     DropdownMenuItem(value: 'tr', child: Text('settings.turkish'.tr())),
                     DropdownMenuItem(value: 'en', child: Text('settings.english'.tr())),
+                    DropdownMenuItem(value: 'es', child: Text('settings.spanish'.tr())),
                   ],
                   onChanged: _changeLanguage,
                 ),

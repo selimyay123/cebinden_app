@@ -1017,7 +1017,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  'vehicles.hasAccidentRecord'.tr(),
+                                  'vehicles.accidentRecord'.tr(),
                                   style: const TextStyle(
                                     color: Colors.red,
                                     fontWeight: FontWeight.bold,

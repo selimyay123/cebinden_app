@@ -25,12 +25,13 @@ class LocalizationService {
   Locale get currentLocale => Locale(_currentLanguage);
   
   /// Desteklenen diller
-  static const List<String> supportedLanguages = ['tr', 'en'];
+  static const List<String> supportedLanguages = ['tr', 'en', 'es'];
   
   /// Desteklenen locale'ler
   static const List<Locale> supportedLocales = [
     Locale('tr', 'TR'),
     Locale('en', 'US'),
+    Locale('es', 'ES'),
   ];
 
   /// Cihazın sistem dilini al

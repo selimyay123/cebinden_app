@@ -1,0 +1,2150 @@
+{
+  "app": {
+    "name": "Cebinden",
+    "subtitle": "Comercio Virtual de Autos"
+  },
+  "resourceDownload": {
+    "title": "Descargando Recursos",
+    "info": "Instalando actualizaciones, por favor espere...",
+    "checking": "Verificando recursos...",
+    "downloading": "Descargando archivos del juego...",
+    "ready": "¡Recursos listos!"
+  },
+  "gallery": {
+    "rentOut": "Alquilar Vehículo",
+    "rentedVehicles": "Vehículos Alquilados",
+    "rentOutTitle": "Seleccionar Vehículos para Alquilar",
+    "dailyIncome": "Ingreso Diario",
+    "noRentableVehicles": "No hay vehículos disponibles para alquilar.",
+    "stopRenting": "Dejar de Alquilar",
+    "rentSuccess": "¡Vehículos alquilados con éxito!",
+    "noRentedVehicles": "No hay vehículos alquilados actualmente.",
+    "collectIncome": "Cobrar",
+    "incomeCollected": "¡Ingreso cobrado!",
+    "opportunityPurchases": "Compras de Oportunidad"
+  },
+  "opportunity": {
+    "title": "Compras de Oportunidad",
+    "emptyTitle": "No hay vehículos de oportunidad disponibles por el momento.",
+    "emptySubtitle": "¡Vuelve a comprobar mañana!",
+    "tag": "OPORTUNIDAD",
+    "buyConfirmation": "¿Quieres comprar este vehículo?",
+    "inspect": "Inspeccionar"
+  },
+  "market": {
+    "title": "Mercado"
+  },
+  "garage": {
+    "title": "Garaje"
+  },
+  "common": {
+    "yes": "Sí",
+    "no": "No",
+    "ok": "OK",
+    "pleaseWait": "Por favor espere...",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "userNotFound": "Usuario no encontrado",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "ads": {
+      "clickToWin": "Haz clic para ganar 5000 TL",
+      "freeMoney": "+5000 TL"
+    },
+    "done": "Hecho",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Info",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "refresh": "Actualizar",
+    "share": "Compartir",
+    "currency": "TL",
+    "continue": "Continuar",
+    "active": "Activo",
+    "dear": "Estimado",
+    "attention": "¡Atención!",
+    "retry": "Reintentar",
+    "remaining": "restante",
+    "free": "GRATIS"
+  },
+  "errors": {
+    "balanceUpdateFailed": "No se pudo actualizar el saldo",
+    "vehicleAddFailed": "No se pudo añadir el vehículo a tu garaje",
+    "garageFull": "¡Tu garaje está lleno!",
+    "errorWithDetail": "Error: {detail}"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "username": "Nombre de usuario",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "enterUsername": "Ingresa tu nombre de usuario",
+    "enterPassword": "Ingresa tu contraseña",
+    "enterPasswordAgain": "Ingresa tu contraseña de nuevo",
+    "usernameRequired": "Por favor ingresa tu nombre de usuario",
+    "passwordRequired": "Por favor ingresa tu contraseña",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "invalidCredentials": "Nombre de usuario o contraseña inválidos",
+    "usernameExists": "Este nombre de usuario ya está en uso",
+    "registrationSuccess": "¡Registro exitoso!",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "logoutConfirm": "¿Estás seguro de que quieres cerrar sesión?",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "noAccount": "¿No tienes una cuenta?",
+    "gender": "Género",
+    "male": "Masculino",
+    "female": "Femenino",
+    "birthDate": "Fecha de Nacimiento",
+    "selectBirthDate": "Selecciona tu fecha de nacimiento",
+    "selectGender": "Selecciona tu género",
+    "usernameMinLength": "El nombre de usuario debe tener al menos 3 caracteres",
+    "usernameMaxLength": "El nombre de usuario no puede exceder los 20 caracteres",
+    "usernameProfanity": "El nombre de usuario no puede contener lenguaje inapropiado",
+    "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+    "ageRestriction": "Debes tener al menos 13 años",
+    "createAccountTitle": "Elige un nombre de usuario para empezar el juego",
+    "reportInfo": "Mantén presionado el nombre de un usuario para reportarlo"
+  },
+  "home": {
+    "title": "Panel de Control",
+    "welcome": "Bienvenido",
+    "balance": "Saldo Total",
+    "quickActions": "Acciones Rápidas",
+    "watchAd": "Ver Anuncio",
+    "statistics": "Estadísticas",
+    "recentActivity": "Actividad Reciente",
+    "nextDayIn": "Tiempo hasta el siguiente día",
+    "changeTimeZone": "Cambiar Zona Horaria",
+    "totalVehicles": "Total de Vehículos",
+    "totalVehiclesShort": "Total Vehículos",
+    "pendingOffers": "Ofertas Pendientes",
+    "ranks": {
+      "rookie": "Conductor Novato",
+      "speedster": "Velocista",
+      "asphaltBeast": "Bestia del Asfalto",
+      "cityRuler": "Gobernante de la Ciudad",
+      "legend": "Leyenda"
+    },
+    "totalTransactions": "Transacciones",
+    "myVehicles": "GARAJE",
+    "myListings": "ANUNCIOS",
+    "myOffers": "OFERTAS",
+    "buyVehicle": "COMPRAR",
+    "sellVehicle": "VENDER",
+    "rentVehicle": "Alquilar Vehículo",
+    "buyGallery": "Comprar Galería",
+    "professionalBusiness": "Negocio Profesional",
+    "tasks": "Árbol de Habilidades",
+    "noRecentActivity": "Sin actividad reciente",
+    "startBuying": "¡Empieza a comprar ahora!",
+    "bonusAwarded": "¡Bono especial! ¡Tu saldo ha aumentado a 5,000,000 TL!",
+    "welcomeMessage": "¡Bienvenido a nuestra plataforma de comercio de vehículos! Puedes empezar seleccionando una acción del menú de acciones rápidas arriba.",
+    "membershipDate": "Membresía",
+    "notifications": "Notificaciones",
+    "galleryOwner": "Conviértete en Dueño de Galería",
+    "galleryDescription": "Lleva tu negocio a un nivel profesional y abre nuevas fuentes de ingresos comprando una galería.",
+    "galleryAdvantages": "Beneficios de la Galería",
+    "advantage1Title": "Servicio de Alquiler de Vehículos",
+    "advantage1Desc": "Gana ingresos pasivos alquilando vehículos de tu garaje.",
+    "advantage2Title": "Compras de Oportunidad",
+    "advantage2Desc": "Compra vehículos de clientes con necesidad urgente de efectivo por debajo del valor de mercado.",
+    "advantage3Title": "Alto Margen de Beneficio",
+    "advantage3Desc": "Vende tus vehículos a precios más altos como galería profesional.",
+    "advantage4Title": "Prestigio y Reputación",
+    "advantage4Desc": "Gana más clientes y confianza con el estatus de galería.",
+    "advantage5Title": "+5 Límite de Vehículos",
+    "advantage5Desc": "La capacidad de tu garaje aumenta en 5 vehículos al instante.",
+    "galleryPrice": "Precio de la Galería",
+    "galleryPriceValue": "10 Millones TL",
+    "galleryComingSoon": "¡La función de compra de galería estará disponible pronto!",
+    "galleryPurchaseSuccess": "¡Felicidades! ¡Ahora eres dueño de una galería!",
+    "galleryInsufficientFunds": "Saldo insuficiente para comprar la galería. Requerido: 10,000,000 TL",
+    "myGallery": "Mi Galería",
+    "galleryStatus": "Estado de la Galería",
+    "galleryPurchaseDate": "Fecha de Compra",
+    "galleryBenefits": "Beneficios Activos",
+    "galleryBenefit1": "Cobrar ingreso diario de alquiler",
+    "galleryBenefit2": "Atraer más clientes",
+    "galleryBenefit3": "Límite de vehículos más alto",
+    "galleryBenefit4": "Insignia especial de galería",
+    "tasksComingSoon": "Página de tareas próximamente...",
+    "rentComingSoon": "Página de alquiler de vehículos próximamente...",
+    "listingCount": "Anuncio",
+    "viewAll": "Ver Todo",
+    "viewAllListings": "Ver Todos los Anuncios",
+    "viewAllListingsComingSoon": "Función de ver todos tus anuncios próximamente...",
+    "listingDetailComingSoon": "Página de detalle del anuncio próximamente...",
+    "rentalService": "Servicio de Alquiler de Vehículos",
+    "opportunityPurchases": "Compras de Oportunidad",
+    "highProfitMargin": "Alto Margen de Beneficio",
+    "prestigeReputation": "Prestigio y Reputación",
+    "taxi": "TAXI",
+    "buyGold": "Comprar Oro",
+    "collection": "Colección"
+  },
+  "vehicles": {
+    "title": "Vehículos",
+    "brand": "Marca",
+    "model": "Modelo",
+    "year": "Año",
+    "price": "Precio",
+    "mileage": "Kilometraje",
+    "fuel": "Combustible",
+    "transmission": "Transmisión",
+    "color": "Color",
+    "engine": "Motor",
+    "power": "Potencia",
+    "category": "Categoría",
+    "benzinLpg": "Gasolina+GLP",
+    "selectCategory": "Seleccionar Categoría",
+    "selectBrand": "Seleccionar Marca",
+    "noVehicles": "No se encontraron vehículos",
+    "noVehiclesDesc": "Aún no hay vehículos. ¡Empieza a comprar ahora!",
+    "purchasePrice": "Precio de Compra",
+    "salePrice": "Precio de Venta",
+    "listingPrice": "Precio de Lista",
+    "fairPrice": "Precio Justo",
+    "daysOwned": "Días de Propiedad",
+    "purchaseDate": "Fecha de Compra",
+    "saleDate": "Fecha de Venta",
+    "sold": "Vendido",
+    "onSale": "En Venta",
+    "notForSale": "No en Venta",
+    "listForSale": "Poner en Venta",
+    "removeFromSale": "Quitar de Venta",
+    "details": "Detalles",
+    "specifications": "Especificaciones",
+    "description": "Descripción",
+    "images": "Imágenes",
+    "sedan": "Sedán",
+    "suv": "SUV",
+    "hatchback": "Hatchback",
+    "coupe": "Coupé",
+    "convertible": "Descapotable",
+    "sports": "Deportivo",
+    "luxury": "Lujo",
+    "manual": "Manual",
+    "automatic": "Automático",
+    "diesel": "Diésel",
+    "gasoline": "Gasolina",
+    "electric": "Eléctrico",
+    "hybrid": "Híbrido",
+    "foundVehicles": "vehículos encontrados",
+    "allModels": "Todos los Modelos",
+    "allModelsDesc": "Ver vehículos de todas las marcas",
+    "fuelType": "Tipo de Combustible",
+    "gearbox": "Caja de Cambios",
+    "mileageRange": "Kilometraje",
+    "priceRange": "Precio",
+    "yearRange": "Año",
+    "clearFilters": "Limpiar",
+    "apply": "Aplicar",
+    "noVehiclesFiltered": "No se encontraron vehículos con estos filtros",
+    "filterFuelType": "Tipo de Combustible",
+    "filterTransmission": "Transmisión",
+    "filterMileage": "Kilometraje",
+    "filterPrice": "Precio",
+    "filterYear": "Año",
+    "selectModel": "Seleccionar Modelo",
+    "whichModelPrefer": "¿Qué modelo de {brand} prefieres?",
+    "viewAllModelsOfBrand": "Ver todos los modelos de {brand}",
+    "randomBrandSelect": "Selección Aleatoria de Marca",
+    "randomBrandDesc": "¿Te sientes con suerte? ¡Elige una marca al azar!",
+    "randomModelSelect": "Selección Aleatoria de Modelo",
+    "randomModelDesc": "¿No puedes decidir? ¡Elige un modelo al azar!",
+    "sortBy": "Ordenar por:",
+    "sortPriceLowToHigh": "Precio: Bajo a Alto",
+    "sortPriceHighToLow": "Precio: Alto a Bajo",
+    "fuelGasoline": "Gasolina",
+    "fuelDiesel": "Diésel",
+    "fuelHybrid": "Híbrido",
+    "fuelElectric": "Eléctrico",
+    "transmissionManual": "Manual",
+    "transmissionAutomatic": "Automático",
+    "mileageRange1": "0-50k km",
+    "mileageRange2": "50k-100k km",
+    "mileageRange3": "100k-150k km",
+    "mileageRange4": "150k+ km",
+    "priceRange1": "0-300k",
+    "priceRange2": "300k-500k",
+    "priceRange3": "500k-700k",
+    "priceRange4": "700k+",
+    "yearRange0": "2026",
+    "yearRange1": "2024",
+    "yearRange2": "2020-2023",
+    "yearRange3": "2015-2019",
+    "yearRange4": "Antes de 2015",
+    "categoryInfoAuto": "En la categoría de automóviles, ¿qué marca prefieres?",
+    "categoryAuto": "Automóvil",
+    "categoryAutoDesc": "Modelos sedán, hatchback y coupé",
+    "categoryElectric": "Vehículos Eléctricos",
+    "categoryElectricDesc": "Modelos eléctricos ecológicos",
+    "categoryCommercial": "Vehículos Comerciales",
+    "categoryCommercialDesc": "Furgonetas, minibuses y comerciales ligeros",
+    "categoryDamaged": "Vehículos Dañados",
+    "categoryDamagedDesc": "Vehículos que requieren reparación",
+    "categoryClassic": "Vehículos Clásicos",
+    "categoryClassicDesc": "Vehículos de colección",
+    "modelYear": "Año del Modelo",
+    "listingInfo": "Información del Anuncio",
+    "vehicleInfo": "Información del Vehículo",
+    "technicalSpecs": "Especificaciones Técnicas",
+    "engineSize": "Tamaño del Motor",
+    "driveType": "Tipo de Tracción",
+    "statusWarranty": "Estado y Garantía",
+    "warrantyStatus": "Estado de Garantía",
+    "available": "Disponible",
+    "notAvailable": "No Disponible",
+    "yes": "Sí",
+    "no": "No",
+    "accidentRecord": "Historial de Accidentes",
+    "sellerNote": "Nota del Vendedor",
+    "funDisclaimer": "Esta descripción es para fines de entretenimiento. ¡Revisa la pestaña de Información del Anuncio para detalles reales! 😄",
+    "listingNo": "Nº de Anuncio",
+    "listingDate": "Fecha de Anuncio",
+    "condition": "Condición",
+    "bodyType": "Tipo de Carrocería",
+    "horsepower": "Caballos de Fuerza",
+    "sellerType": "Tipo de Vendedor",
+    "vehicleDiagram": "Diagrama del Vehículo",
+    "paintedOrReplacedParts": "Piezas Pintadas o Reemplazadas",
+    "priceRequired": "El campo de precio es obligatorio",
+    "validPrice": "Por favor ingresa un precio válido",
+    "descriptionHint": "Proporciona información detallada sobre tu vehículo...",
+    "descriptionRequired": "El campo de descripción es obligatorio",
+    "descriptionMinLength": "La descripción debe tener al menos 20 caracteres",
+    "series": "Serie",
+    "colorWhite": "Blanco",
+    "colorBlack": "Negro",
+    "colorGrey": "Gris",
+    "colorRed": "Rojo",
+    "colorBlue": "Azul",
+    "colorSilver": "Plata",
+    "colorBrown": "Marrón",
+    "colorGreen": "Verde",
+    "driveFront": "Tracción Delantera",
+    "driveRear": "Tracción Trasera",
+    "drive4x4": "4x4",
+    "Beyaz": "Blanco",
+    "Siyah": "Negro",
+    "Gri": "Gris",
+    "Kırmızı": "Rojo",
+    "Mavi": "Azul",
+    "Gümüş": "Plata",
+    "Kahverengi": "Marrón",
+    "Yeşil": "Verde",
+    "Önden": "Tracción Delantera",
+    "Arkadan": "Tracción Trasera",
+    "4x4": "4x4",
+    "Benzin": "Gasolina",
+    "Dizel": "Diésel",
+    "Hybrid": "Híbrido",
+    "Benzin+LPG": "Gasolina+GLP",
+    "Manuel": "Manual",
+    "Otomatik": "Automático",
+    "Galeriden": "Galería",
+    "conditionUsed": "Usado",
+    "conditionNew": "Nuevo",
+    "sellerGallery": "Galería",
+    "sellerOwner": "Vendedor Privado",
+    "İkinci El": "Usado",
+    "Sıfır": "Nuevo",
+    "Galeri": "Galería",
+    "Sahibinden": "Vendedor Privado"
+  },
+  "purchase": {
+    "title": "Compra",
+    "confirm": "Confirmación de Compra",
+    "currentBalance": "Saldo Actual",
+    "vehiclePrice": "Precio del Vehículo",
+    "remainingBalance": "Saldo Restante",
+    "confirmMessage": "¿estás seguro de que quieres comprar este vehículo?",
+    "insufficientBalance": "¡Saldo insuficiente! Por favor gana más dinero.",
+    "purchaseSuccess": "¡Compra Exitosa!",
+    "purchaseSuccessMessage": "¡Felicidades! La compra de tu vehículo se ha completado con éxito.",
+    "purchaseError": "Error de Compra",
+    "newBalance": "Tu Nuevo Saldo",
+    "addedToGarage": "Vehículo añadido a tu garaje",
+    "great": "¡Genial!",
+    "vehicle": "Vehículo",
+    "missing": "faltante",
+    "congratulations": "¡Felicidades!",
+    "successfullyPurchased": "¡comprado con éxito!",
+    "successMessage": "¡Este vehículo es ahora tuyo!",
+    "errorMessage": "Ocurrió un error al comprar el vehículo:",
+    "tryAgain": "Por favor intenta de nuevo.",
+    "makeOffer": "Hacer Oferta",
+    "makeOfferComingSoon": "La función de Hacer Oferta estará disponible pronto",
+    "purchasingVehicle": "🚗 Comprando Vehículo",
+    "appleSignIn": "Iniciar sesión con Apple",
+    "appleLoginFailed": "Inicio de sesión con Apple fallido",
+    "appleLoginError": "Ocurrió un error durante el inicio de sesión con Apple"
+  },
+  "offers": {
+    "processing": "Procesando...",
+    "counter": "Contraoferta",
+    "title": "Mis Ofertas",
+    "limitWarning": "Puedes recibir un máximo de 10 ofertas por vehículo. Puedes rechazar ofertas existentes para recibir nuevas.",
+    "noOffers": "Aún No Hay Ofertas",
+    "noOffersDesc": "Cuando pongas un vehículo a la venta, las ofertas aparecerán aquí",
+    "incoming": "Ofertas Entrantes",
+    "sent": "Ofertas Enviadas",
+    "noIncoming": "No Hay Ofertas Entrantes",
+    "noIncomingDesc": "Cuando pongas un vehículo a la venta, las ofertas aparecerán aquí",
+    "noSent": "No Hay Ofertas Enviadas",
+    "noSentDesc": "Cuando hagas ofertas en vehículos, aparecerán aquí",
+    "pending": "Pendiente",
+    "accepted": "Aceptada",
+    "rejected": "Rechazada",
+    "expired": "Expirada",
+    "buyer": "Comprador",
+    "seller": "Vendedor",
+    "you": "Tú",
+    "offerPrice": "Precio de Oferta",
+    "offerDate": "Fecha de Oferta",
+    "message": "Mensaje",
+    "accept": "Aceptar",
+    "reject": "Rechazar",
+    "sendCounterOffer": "Enviar Contraoferta",
+    "acceptConfirm": "Aceptar Oferta",
+    "acceptConfirmMessage": "¿Estás seguro de que quieres aceptar la oferta de",
+    "acceptSuccess": "✅ ¡Oferta aceptada! Venta completada con éxito.",
+    "acceptError": "❌ Ocurrió un error. Por favor intenta de nuevo.",
+    "rejectConfirm": "Rechazar Oferta",
+    "rejectConfirmMessage": "oferta. ¿Estás seguro de que quieres rechazar?",
+    "rejectSuccess": "Oferta rechazada.",
+    "rejectError": "❌ Ocurrió un error. Por favor intenta de nuevo.",
+    "history": "Historial de Ofertas",
+    "offerPriceLabel": "Precio de Oferta:",
+    "vehicleSold": "• El vehículo se marcará como vendido",
+    "otherOffersRejected": "• Otras ofertas serán rechazadas automáticamente",
+    "offerAccepted": "ACEPTADA",
+    "offerRejected": "RECHAZADA",
+    "counterOfferDialogTitle": "Enviar Contraoferta",
+    "counterOfferDialogDesc": "Establece tu precio de contraoferta para la oferta del comprador",
+    "buyerOffer": "Oferta del Comprador",
+    "yourCounterOffer": "Tu Contraoferta",
+    "counterOfferHint": "Ingresa monto de contraoferta",
+    "counterOfferInfo": "Una buena contraoferta acelera la negociación y aumenta la probabilidad de un trato.",
+    "counterOfferRangeError": "Tu contraoferta debe estar entre la oferta del comprador y el precio de lista",
+    "counterOfferSuccess": "✅ ¡Contraoferta enviada!",
+    "counterOfferError": "❌ Ocurrió un error al enviar la contraoferta",
+    "buyerResponse": "Respuesta del Comprador",
+    "rejectAllConfirm": "¿Estás seguro de que quieres rechazar {count} ofertas pendientes para este vehículo?",
+    "rejectAllWarning": "Las ofertas rechazadas serán eliminadas permanentemente.",
+    "rejectAllButton": "Rechazar Todo",
+    "rejectAllSuccess": "{count} ofertas rechazadas y eliminadas con éxito.",
+    "rejectAllPartialSuccess": "{count}/{total} ofertas rechazadas.",
+    "rejectCounterOfferTitle": "Rechazar Contraoferta",
+    "rejectCounterOfferMessage": "¿Estás seguro de que quieres rechazar la contraoferta para {brand} {model}?\n\nLa oferta rechazada será eliminada permanentemente.",
+    "rejectAndDelete": "Rechazar y Eliminar",
+    "timeAgo": {
+      "now": "Ahora",
+      "minutesAgo": "hace minutos",
+      "hoursAgo": "hace horas",
+      "daysAgo": "hace días"
+    }
+  },
+  "offer": {
+    "makeOffer": "Hacer Oferta",
+    "yourOffer": "Tu Oferta",
+    "listingPrice": "Precio de Lista",
+    "enterAmount": "Ingresa monto de oferta",
+    "message": "Mensaje",
+    "optional": "opcional",
+    "messageHint": "Escribe un mensaje al vendedor...",
+    "sendOffer": "Enviar Oferta",
+    "enterAmountError": "Por favor ingresa monto de oferta",
+    "invalidAmountError": "Monto inválido",
+    "offerTooHighError": "Tu oferta no puede ser mayor que el precio de lista.",
+    "acceptanceChance": "Probabilidad de Aceptación",
+    "sendError": "Error enviando oferta",
+    "accepted": "Oferta Aceptada",
+    "rejected": "Oferta Rechazada",
+    "counterOffer": "Contraoferta",
+    "counterOfferAmount": "Contraoferta",
+    "pending": "Pendiente",
+    "cannotSendOffer": "No se Puede Enviar Oferta",
+    "previousOfferRejected": "No puedes enviar una nueva oferta porque tu oferta anterior para este vehículo fue rechazada.",
+    "confirmOffer": "Confirmar Oferta",
+    "confirmOfferMessage": "¿Estás seguro de que quieres continuar con esta oferta?",
+    "checkResultsInMyOffers": "Puedes seguir el resultado de tu oferta en la sección Mis Ofertas > Ofertas Enviadas.",
+    "viewInMyOffers": "Puedes ver los detalles de tu oferta en la página Mis Ofertas.",
+    "viewOffers": "Ir a Mis Ofertas",
+    "sendCounterOffer": "Enviar Contraoferta",
+    "sellerCounterOffer": "Contraoferta del Vendedor",
+    "yourCounterOffer": "Tu Contraoferta",
+    "counterOfferRange": "Ingresa un valor entre tu oferta y la contraoferta del vendedor",
+    "counterOfferInfo": "La negociación puede continuar. El vendedor evaluará tu nueva oferta.",
+    "counterOfferRangeError": "Tu contraoferta debe estar entre tu oferta inicial y la contraoferta del vendedor",
+    "newCounterOffer": "Nueva Contraoferta",
+    "purchaseCompleted": "¡Compra completada! Vehículo añadido a tu garaje.",
+    "negotiationContinues": "La negociación continúa. Puedes seguirla en la página Mis Ofertas.",
+    "offerAcceptedAndPurchased": "¡Oferta aceptada y vehículo comprado!",
+    "rejectTitle": "Rechazar Oferta",
+    "rejectAndDelete": "Rechazar y Eliminar",
+    "rejectSuccess": "Oferta rechazada y eliminada.",
+    "rejectWarning": "Esta acción no se puede deshacer.",
+    "acceptCounterTitle": "Aceptar Contraoferta",
+    "acceptCounterConfirmMessage": "¿Estás seguro de que quieres aceptar la contraoferta para {brand} {model}?",
+    "yourOfferLabel": "Tu Oferta:",
+    "counterOfferLabel": "Contraoferta:",
+    "garageInfo": "• El vehículo será añadido a tu garaje",
+    "balanceInfo": "• {amount} TL serán deducidos de tu saldo",
+    "acceptButton": "Aceptar",
+    "counterOfferAcceptedSuccess": "¡Contraoferta aceptada! Vehículo añadido a tu garaje.",
+    "counterOfferRejectedSuccess": "Contraoferta rechazada y eliminada.",
+    "buyerRejectedMessage": "El comprador rechazó tu oferta. Puedes esperar otra oferta.",
+    "negotiationContinueMessage": "La negociación continúa. Puedes ver la nueva oferta del comprador arriba.",
+    "counterOfferInputHelper": "Ingresa un valor entre la oferta del comprador y el precio de lista",
+    "profit": "Beneficio",
+    "loss": "Pérdida"
+  },
+  "aiBuyer": {
+    "messages": {
+      "bargainer": {
+        "1": "Mi presupuesto es un poco ajustado, ¿podemos acordar este precio?",
+        "2": "Mi situación financiera no es excelente ahora, pero realmente me gustó el auto.",
+        "3": "Esta es mi oferta final, desafortunadamente no puedo pagar más.",
+        "4": "Esto es todo lo que tengo, por favor acepta.",
+        "5": "Este precio tiene más sentido para mí, agradecería si lo consideras."
+      },
+      "realistic": {
+        "1": "Estoy ofreciendo un precio acorde con el valor de mercado.",
+        "2": "Determiné un precio justo como resultado de mi investigación.",
+        "3": "Creo que es un precio adecuado para ambos.",
+        "4": "Revisé los precios de vehículos similares, este precio es razonable.",
+        "5": "Estoy aquí con una oferta realista."
+      },
+      "urgent": {
+        "1": "Lo necesito urgentemente, podemos acordar inmediatamente.",
+        "2": "Necesito cerrar el trato hoy.",
+        "3": "Tengo prisa, estoy dando el precio que quieres.",
+        "4": "Vine a esta ciudad por trabajo, necesito un auto inmediatamente.",
+        "5": "Tengo una emergencia, por favor acepta."
+      },
+      "generous": {
+        "1": "Exactamente el auto que estaba buscando, estoy dando el precio que quieres.",
+        "2": "He estado buscando este modelo por mucho tiempo, el precio no es un problema.",
+        "3": "Me gustó mucho, estoy listo para pagar la tarifa que quieres.",
+        "4": "Este auto es justo para mí, tu dinero está listo.",
+        "5": "Definitivamente quiero comprarlo, no soy flexible con el precio."
+      },
+      "contextual": {
+        "highMileage": {
+          "1": "El kilometraje es un poco alto para su edad, por eso mi oferta es esta.",
+          "2": "Para un vehículo con este kilometraje, el precio parecía un poco alto.",
+          "3": "El motor podría estar cansado, el kilometraje es preocupante.",
+          "4": "Un auto que ha viajado mucho, podría causar gastos."
+        },
+        "lowMileage": {
+          "1": "El kilometraje es muy bueno, exactamente la limpieza que estaba buscando.",
+          "2": "Es genial que se haya usado tan poco.",
+          "3": "Un auto como nuevo, no quería perdérmelo.",
+          "4": "Difícil encontrar autos con bajo kilometraje, mi oferta es seria."
+        },
+        "accident": {
+          "1": "Tener un historial de accidentes me hace pensar un poco.",
+          "2": "Desafortunadamente estar dañado baja su valor.",
+          "3": "El historial no está limpio, así que bajé el precio.",
+          "4": "Estoy dando este precio considerando el historial de accidentes."
+        },
+        "clean": {
+          "1": "Estar impecable es una gran ventaja.",
+          "2": "Estaba buscando un auto sin reemplazos ni pintura.",
+          "3": "Merece este precio por su historial limpio.",
+          "4": "El informe de peritaje dio confianza."
+        },
+        "expensive": {
+          "1": "Escribiste un poco alto comparado con el mercado.",
+          "2": "Si mantienes el precio un poco más razonable compraré inmediatamente.",
+          "3": "Empuja mi presupuesto pero quería hacer una oferta de todos modos.",
+          "4": "Quedó caro comparado con similares."
+        },
+        "cheap": {
+          "1": "El precio es muy asequible, quiero comprar inmediatamente.",
+          "2": "No se puede perder a este precio, mi efectivo está listo.",
+          "3": "Se convirtió en un vehículo de oportunidad, acepta mi oferta.",
+          "4": "Por debajo del mercado, acordemos inmediatamente."
+        }
+      }
+    }
+  },
+  "offerService": {
+    "responses": {
+      "acceptance": {
+        "1": "¡Genial! Trato. Estoy de acuerdo con este precio.",
+        "2": "Bien, acepto. Hagamos un trato.",
+        "3": "Está bien, este precio está bien.",
+        "4": "Buen trato. Acepto.",
+        "5": "Bien, estoy de acuerdo con este precio.",
+        "6": "¡Trato! Aceptado."
+      },
+      "rejection": {
+        "1": "Desafortunadamente no puedo estar de acuerdo con este precio. Gracias.",
+        "2": "Lo pensé pero este precio no es adecuado para mí.",
+        "3": "Lo siento, digo no a esta oferta.",
+        "4": "Supongo que no podemos estar de acuerdo en este precio. Gracias.",
+        "5": "Desafortunadamente no puedo aceptar. ¿Puedes considerar otro precio?",
+        "6": "Este precio es más bajo de lo que esperaba. Gracias pero no."
+      },
+      "counter": {
+        "1": "Hmm, lo pensé un poco. ¿Qué tal {amount} TL?",
+        "2": "Difícil a este precio. Si es {amount} TL podemos estar de acuerdo.",
+        "3": "¿Qué tal {amount} TL? Encontremos un punto medio.",
+        "4": "Bien, {amount} TL es mi oferta final.",
+        "5": "Demos un paso. ¿Qué tal si es {amount} TL?"
+      }
+    }
+  },
+  "taxiGame": {
+    "gameOver": "Viaje Terminado",
+    "totalEarnings": "Ganancias Totales:",
+    "vehicleCount": "Vehículo: {count}",
+    "stackCount": "Pila: {count}",
+    "rewardDoubled": "¡Felicidades! ¡Tus ganancias se duplicaron!",
+    "adNotReady": "Anuncio no listo.",
+    "doubleEarnings": "2x Ganancias (Ver Anuncio)",
+    "exit": "Salir",
+    "playAgain": "Jugar de Nuevo",
+    "title": "MISIÓN TAXI",
+    "collectMoney": "¡Recoge pilas de dinero!",
+    "swipeToMove": "Desliza para mover",
+    "start": "EMPEZAR",
+    "earnedXP": "+ {amount} XP",
+    "earnedGold": "+ {amount} Oro"
+  },
+  "negotiation": {
+    "accept": {
+      "1": "¡Tu oferta es adecuada, acepto!",
+      "2": "¡Acordado! Acepto la oferta.",
+      "3": "Precio adecuado, aceptado.",
+      "4": "Bien, acordemos este precio.",
+      "5": "Acepto tu oferta. ¡Gracias!"
+    },
+    "insult": {
+      "1": "¿Estás bromeando? ¡Este auto no puede tener este precio!",
+      "2": "Lo siento pero este precio es inaceptable. No debes hablar en serio.",
+      "3": "Esta oferta está muy por debajo de mis expectativas. No.",
+      "4": "¿No investigaste el mercado en absoluto? Este precio es gracioso.",
+      "5": "Lo siento pero no podemos estar de acuerdo con esta oferta. Demasiado bajo.",
+      "6": "Imposible vender a este precio. Por favor sé realista.",
+      "7": "Una oferta muy por debajo del valor del vehículo. Desafortunadamente no puedo aceptar."
+    },
+    "reject": {
+      "1": "Desafortunadamente este precio es demasiado bajo. Esperando otras ofertas.",
+      "2": "No puedo aceptar esta oferta. Esperando un precio más realista.",
+      "3": "El vehículo no es adecuado para este precio. Gracias.",
+      "4": "El precio está muy por debajo de mis expectativas. Rechazando.",
+      "5": "Esta oferta no es adecuada para mí."
+    },
+    "counter": {
+      "1": "No puedo vender a este precio pero podemos acordar en {amount} TL.",
+      "2": "Un poco bajo. Si es {amount} TL está bien.",
+      "3": "Mi contraoferta: {amount} TL. ¿Aceptas?",
+      "4": "Encontrémonos en el medio: {amount} TL.",
+      "5": "Especial para ti {amount} TL es mi precio final."
+    },
+    "finalBargain": {
+      "1": "Tu oferta es buena pero si es {amount} TL acordemos inmediatamente.",
+      "2": "¿Qué tal si aumentas un poco más? {amount} TL sería ideal.",
+      "3": "¡Casi acordado! Digo bien a {amount} TL.",
+      "4": "{amount} TL es mi oferta final, cerremos esto inmediatamente.",
+      "5": "Realmente quiero vender pero {amount} TL sería más justo."
+    },
+    "patienceExhaustedAccept": {
+      "1": "Bien, hablamos suficiente. Acordemos este precio.",
+      "2": "Está bien, acepto esta oferta final. Acordemos.",
+      "3": "Esto tomó demasiado tiempo. Bien a este precio, acordemos.",
+      "4": "No quiero regatear más. Acepto.",
+      "5": "Bien, estoy de acuerdo con este precio. Terminemos esto."
+    },
+    "patienceExhaustedReject": {
+      "1": "Hablamos suficiente, no podemos estar de acuerdo en este precio. Lo siento.",
+      "2": "Lo estiramos demasiado, este precio no es adecuado para mí. Gracias.",
+      "3": "No quiero regatear más. No es posible a este precio.",
+      "4": "Me rindo. No puedo vender a este precio.",
+      "5": "Esta fue mi oferta final. No podemos estar de acuerdo a este precio, esperaré a otros compradores.",
+      "6": "Mi paciencia se agotó francamente. No puedo estar de acuerdo a este precio. Buen día."
+    }
+  },
+  "xp": {
+    "level": "Nivel {level}",
+    "levelUp": "¡Subiste de Nivel!",
+    "rewards": "Recompensas",
+    "awesome": "¡Impresionante!",
+    "xpShort": "XP",
+    "toNextLevel": "Al siguiente nivel",
+    "progress": "Progreso",
+    "gained": "Ganado",
+    "congratulations": "¡Felicidades!",
+    "newLevel": "Nuevo Nivel",
+    "cashBonus": "Bono en Efectivo",
+    "goldBonus": "Bono de Oro",
+    "unlocked": "Desbloqueado",
+    "continue": "Continuar",
+    "dailyLoginBonus": "Bono Diario de Inicio de Sesión",
+    "consecutiveDays": "Días Consecutivos",
+    "keepStreak": "¡Mantén tu Racha!",
+    "unlock": {
+      "premiumVehicles": "Categorías de Vehículos Premium",
+      "advancedOffers": "Sistema de Ofertas Avanzado",
+      "autoSellBot": "Bot de Venta Automática",
+      "vipStatus": "Estado VIP",
+      "specialBadges": "Insignias de Logro Especiales"
+    },
+    "source": {
+      "vehiclePurchase": "Compra de Vehículo",
+      "vehicleSale": "Venta de Vehículo",
+      "offerMade": "Oferta Realizada",
+      "offerAccepted": "Oferta Aceptada",
+      "dailyLogin": "Inicio de Sesión Diario",
+      "dailyRewardClaimed": "¡Recompensa diaria reclamada!",
+      "questCompleted": "Misión Completada",
+      "achievement": "Logro"
+    },
+    "dailyRewardError": "Recompensa ya reclamada o ocurrió un error."
+  },
+  "favorites": {
+    "myFavorites": "Anuncios Favoritos",
+    "addToFavorites": "Añadir a Favoritos",
+    "removeFromFavorites": "Eliminar de Favoritos",
+    "addedToFavorites": "Añadido a favoritos",
+    "removedFromFavorites": "Eliminado de favoritos",
+    "noFavorites": "Aún No Hay Anuncios Favoritos",
+    "noFavoritesDesc": "Añade tus anuncios favoritos para acceder fácilmente a ellos más tarde"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "profile": "Perfil",
+    "profileInfo": "Información del Perfil",
+    "changePassword": "Cambiar Contraseña",
+    "appearance": "Apariencia",
+    "darkMode": "Modo Oscuro",
+    "darkModeDesc": "Activar modo nocturno",
+    "darkModeComingSoon": "La función de modo oscuro estará disponible pronto",
+    "language": "Idioma",
+    "languageFull": "Idioma",
+    "currency": "Moneda",
+    "currencyUpdated": "Moneda actualizada",
+    "notifications": "Notificaciones",
+    "newListings": "Notificaciones de Nuevos Anuncios",
+    "priceDrops": "Notificaciones de Bajada de Precio",
+    "offers": "Notificaciones de Oferta",
+    "system": "Notificaciones del Sistema",
+    "appInfo": "Aplicación",
+    "about": "Acerca de",
+    "version": "Versión",
+    "developer": "Desarrollador",
+    "generateOffers": "Generar Ofertas (Prueba)",
+    "generateOffersDesc": "Generar ofertas de IA para anuncios activos",
+    "offersCreatedSuccess": "ofertas creadas",
+    "checkOffersSection": "Puedes revisarlas en la sección Mis Ofertas",
+    "offersCreatedError": "Ocurrió un error al generar ofertas",
+    "noListingsForOffers": "Para generar ofertas, necesitas comprar un vehículo y ponerlo a la venta primero.\n\n1️⃣ Panel → Comprar Vehículo\n2️⃣ Panel → Vender Vehículo\n3️⃣ Intenta de nuevo",
+    "clearDatabase": "Limpiar Base de Datos",
+    "clearDatabaseDesc": "Todos los usuarios y datos serán eliminados",
+    "clearDatabaseConfirm": "Todos los usuarios y datos serán eliminados. Esta acción no se puede deshacer. ¿Estás seguro?",
+    "databaseCleared": "Base de datos limpiada",
+    "account": "Cuenta",
+    "deleteAccount": "Eliminar Cuenta",
+    "deleteAccountDesc": "Tu cuenta será eliminada permanentemente",
+    "deleteAccountConfirm": "Tu cuenta será eliminada permanentemente. Esta acción no se puede deshacer. ¿Estás seguro?",
+    "accountDeleted": "Cuenta eliminada",
+    "logoutButton": "Cerrar Sesión",
+    "turkish": "Türkçe",
+    "english": "English",
+    "spanish": "Español",
+    "languageChanged": "Idioma cambiado",
+    "restartRequired": "Es posible que debas reiniciar la aplicación",
+    "success": "Éxito",
+    "error": "Error",
+    "ok": "OK",
+    "gameSettings": "Ajustes del Juego",
+    "gameDayDuration": "Duración del Día del Juego",
+    "gameDayDurationUpdated": "Duración del día del juego establecida en {minutes} minutos",
+    "changeProfilePicture": "Cambiar Foto de Perfil",
+    "selectProfilePicture": "Seleccionar Foto de Perfil",
+    "profilePictureUpdated": "¡Foto de perfil actualizada!",
+    "admin": "Admin",
+    "adminPanel": "Panel de Admin",
+    "devBonus": "Bono de Desarrollador (100 Oro + 1000 SP)",
+    "devBonusSuccess": "¡Bono de desarrollador aplicado con éxito!"
+  },
+  "skills": {
+    "availablePoints": "Punto de Habilidad",
+    "activeSkills": "Habilidades Activas",
+    "quickBuy": "Compra Rápida",
+    "quickBuyDesc": "Te permite encontrar y ver instantáneamente detalles de vehículos dentro de un rango de puntuación específico. Niveles más altos desbloquean vehículos de mayor puntuación.",
+    "quickSell": "Venta Rápida",
+    "quickSellDesc": "Te permite vender instantáneamente tus vehículos con un margen de beneficio. La tasa de beneficio aumenta a medida que aumenta el nivel.",
+    "quickSellProfit": "Beneficio: {percent}",
+    "sweetTalk": "Labia",
+    "sweetTalkDesc": "Aumenta la probabilidad de que los clientes acepten tu oferta durante la negociación.",
+    "sweetTalkBonus": "Probabilidad de Aceptación: +{percent}",
+    "lowballer": "Regateador",
+    "lowballerDesc": "Aumenta la probabilidad de que los vendedores acepten tu oferta durante la negociación al comprar un vehículo.",
+    "lowballerBonus": "Probabilidad de Aceptación: +{percent}",
+    "expertiseExpert": "Experto en Peritaje",
+    "expertiseExpertDesc": "Te permite realizar 3 peritajes gratuitos cada día del juego.",
+    "upgradeConfirmationTitle": "Confirmación de Mejora",
+    "upgradeConfirmationMessage": "¿Estás seguro de que quieres mejorar {skill} por {cost} SP?",
+    "watchAd": "Peritaje Gratis (Ver Anuncio)",
+    "unlimitedExpertiseTitle": "Peritaje Ilimitado",
+    "unlimitedExpertiseDesc": "Puedes realizar peritajes ilimitados y gratuitos para todos los vehículos.",
+    "xpBoostTitle": "Impulso de XP (24 Horas)",
+    "xpBoostDesc": "Duplica todos los puntos de experiencia ganados por 24 horas.",
+    "xpBoostSuccess": "¡Impulso de XP activado con éxito! Ganarás 2x XP por 24 horas.",
+    "freeExpertise": "Peritaje Gratis",
+    "quickSellConfirm": "Confirmación de Venta Rápida",
+    "quickSellConfirmDesc": "¿Quieres vender el vehículo por {price}? Esta acción no se puede deshacer.",
+    "quickSellSuccess": "¡Vehículo vendido con éxito!",
+    "level": "Nivel",
+    "upgrade": "Mejorar",
+    "maxLevel": "Nivel Máx",
+    "upgradeSuccess": "¡Habilidad mejorada con éxito!",
+    "upgradeFailed": "No se pudo mejorar la habilidad. Puntos insuficientes o nivel máximo alcanzado.",
+    "dailyLimitReached": "Has alcanzado el límite de uso diario.",
+    "remainingUses": "Usos Restantes",
+    "noVehicleFound": "No se encontró un vehículo adecuado en este rango de puntuación. Por favor intenta de nuevo más tarde.",
+    "timeMaster": "Maestro del Tiempo",
+    "timeMasterDesc": "Desbloquea la capacidad de adelantar el tiempo manteniendo presionado el temporizador del juego."
+  },
+  "admin": {
+    "title": "Panel de Admin",
+    "noReports": "No hay reportes pendientes.",
+    "reported": "Reported: {username}",
+    "reason": "Razón: {reason}",
+    "description": "Descripción: {description}",
+    "dismiss": "Descartar",
+    "dismissConfirmTitle": "Descartar Reporte",
+    "dismissConfirmMessage": "¿Estás seguro de que quieres descartar este reporte?",
+    "ban": "Banear",
+    "banConfirmTitle": "Banear Usuario",
+    "banConfirmMessage": "¿Estás seguro de que quieres banear a {username}? Esta acción no se puede deshacer.",
+    "reportDismissed": "Reporte descartado.",
+    "userBanned": "Usuario baneado.",
+    "error": "Ocurrió un error."
+  },
+  "report": {
+    "title": "Reportar Usuario",
+    "message": "¿Por qué estás reportando a {username}?",
+    "reasonHint": "Razón (ej. Nombre inapropiado)",
+    "cancel": "Cancelar",
+    "submit": "Reportar",
+    "success": "Reporte recibido. Gracias.",
+    "error": "Ocurrió un error al enviar el reporte.",
+    "reasons": {
+      "inappropriateUsername": "Nombre de Usuario Inapropiado",
+      "other": "Otro"
+    },
+    "alreadyReported": "Ya has reportado a este usuario."
+  },
+  "profile": {
+    "title": "Información del Perfil",
+    "username": "Nombre de Usuario",
+    "gender": "Género",
+    "birthDate": "Fecha de Nacimiento",
+    "age": "Edad",
+    "registeredAt": "Registrado En",
+    "balance": "Saldo",
+    "profitLoss": "Ganancia/Pérdida",
+    "currency": "Moneda",
+    "personalInfo": "Información Personal",
+    "accountInfo": "Información de la Cuenta",
+    "registrationInfo": "Información de Registro",
+    "yearsOld": "años",
+    "registrationDate": "Fecha de Registro",
+    "membershipDuration": "Duración de la Membresía"
+  },
+  "gender": {
+    "male": "Masculino",
+    "female": "Femenino"
+  },
+  "changePassword": {
+    "title": "Cambiar Contraseña",
+    "subtitle": "Cambia tu contraseña regularmente para la seguridad de tu cuenta",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña",
+    "confirmNewPassword": "Confirmar Nueva Contraseña",
+    "enterOldPassword": "Ingresa tu contraseña actual",
+    "enterNewPassword": "Ingresa tu nueva contraseña",
+    "button": "Cambiar Contraseña",
+    "sameAsOld": "La nueva contraseña no puede ser la misma que la anterior",
+    "wrongOldPassword": "La contraseña actual es incorrecta",
+    "passwordChanged": "Contraseña cambiada con éxito",
+    "securityTipsTitle": "Consejos de Seguridad",
+    "securityTipsContent": "Tu contraseña debe tener al menos 6 caracteres y no debe compartirse con otros."
+  },
+  "about": {
+    "title": "Acerca de",
+    "version": "Versión",
+    "developer": "Desarrollador",
+    "developerName": "Equipo Cebinden",
+    "description": "Cebinden es un divertido juego de simulación donde puedes comerciar autos virtuales.",
+    "gameDescription": "Descripción del Juego",
+    "gameDescriptionText": "En Cebinden, puedes comprar y vender vehículos para obtener ganancias, construir tu propio garaje y aprender los entresijos del comercio de autos.",
+    "termsOfUse": "Términos de Uso",
+    "privacyPolicy": "Política de Privacidad",
+    "contact": "Contacto",
+    "contactEmail": "info@cebindenapp.com",
+    "aboutApp": "Acerca de la Aplicación",
+    "features": "Características",
+    "contactTitle": "Contacto",
+    "developerTitle": "Desarrollador",
+    "contactContent": "Para comentarios, sugerencias o preguntas:\n\n📧 Email: info@cebindenapp.com\n📱 Instagram: @cebindenapp",
+    "developerContent": "Esta aplicación está desarrollada con Flutter.\n\n© 2024 Cebinden\nTodos los derechos reservados.",
+    "disclaimer": "Esta es una aplicación de juego/simulación. No implica comercio real de vehículos. Todas las transacciones son virtuales y con fines de entretenimiento.",
+    "web": "Web",
+    "email": "Email",
+    "instagram": "Instagram",
+    "featuresList": "✓ Simulación realista de comercio de vehículos\n✓ Informes de tasación detallados y sistema de negociación\n✓ Gestiona y haz crecer tu propia galería\n✓ Misiones diarias y recompensas sorpresa\n✓ Desarrollo de personaje con Árbol de Habilidades\n✓ Condiciones de mercado dinámicas y gestión de economía"
+  },
+  "drawer": {
+    "dashboard": "Panel",
+    "buyVehicle": "Comprar Vehículo",
+    "sellVehicle": "Vender Vehículo",
+    "rentVehicle": "Alquilar Vehículo",
+    "myOffers": "Mis Ofertas",
+    "tasks": "Tareas",
+    "settings": "Ajustes",
+    "collection": "Colección",
+    "collectionRewards": {
+      "collect": "Recoger",
+      "collected": "Recogido",
+      "rewardTitle": "¡Felicidades!",
+      "rewardMessage": "¡Has recogido todos los modelos de {0}! Ganaste {1} TL y {2} XP.",
+      "alreadyCollected": "¡Ya has recogido esta recompensa!"
+    },
+    "tasksComingSoon": "Página de tareas próximamente...",
+    "rentComingSoon": "Página de alquiler de vehículos próximamente...",
+    "vehicle": "vehículo",
+    "vehicles": "vehículos",
+    "leaderboard": "Clasificación",
+    "social": {
+      "title": "Social",
+      "friends": "Amigos",
+      "requests": "Solicitudes",
+      "search": "Buscar",
+      "searchHint": "Buscar nombre de usuario...",
+      "removeFriend": "Eliminar Amigo",
+      "removeFriendConfirm": "¿Estás seguro de que quieres eliminar a {0} de tus amigos?",
+      "friendRemoved": "Amigo eliminado",
+      "deleteMessage": "Eliminar Mensaje",
+      "deleteMessageConfirm": "¿Estás seguro de que quieres eliminar este mensaje?",
+      "clearChat": "Limpiar Chat",
+      "clearChatConfirm": "¿Estás seguro de que quieres limpiar todo el historial del chat? Esto no se puede deshacer.",
+      "chatCleared": "Chat limpiado",
+      "noFriends": "Aún no hay amigos",
+      "findFriends": "Encontrar Amigos",
+      "noRequests": "No hay solicitudes pendientes",
+      "requestSent": "¡Solicitud de amistad enviada!",
+      "requestAccepted": "¡Solicitud de amistad aceptada!",
+      "requestRejected": "Solicitud rechazada",
+      "alreadyFriends": "Ya son amigos",
+      "requestAlreadySent": "Solicitud ya enviada",
+      "sendMessage": "Escribe un mensaje...",
+      "addFriend": "Añadir Amigo"
+    }
+  },
+  "activity": {
+    "title": "Registro de Actividad",
+    "noActivities": "Aún No Hay Actividades",
+    "noActivitiesDesc": "Tus transacciones aparecerán aquí",
+    "purchaseTitle": "Compra de Vehículo",
+    "purchaseDesc": "Compró {brand} {model}",
+    "saleTitle": "Venta de Vehículo",
+    "saleDesc": "Vendió {brand} {model} ({profit} TL de Ganancia)",
+    "rentalTitle": "Ingreso de Alquiler",
+    "rentalDesc": "Cobró alquiler de {count} vehículos",
+    "levelUpTitle": "Subida de Nivel",
+    "levelUpDesc": "Alcanzó el Nivel {level}",
+    "taxiTitle": "Ganancias de Taxi",
+    "taxiDesc": "Ganado de misión de Taxi",
+    "dailyLoginTitle": "Bono Diario",
+    "dailyLoginDesc": "Recompensa diaria de inicio de sesión",
+    "clearAll": "Limpiar Todo",
+    "clearAllConfirm": "¿Estás seguro de que quieres limpiar todo el historial de actividad?",
+    "cleared": "Historial limpiado",
+    "questReward": "Recompensa de Misión Diaria",
+    "dailyQuestTitle": "Tarea Diaria",
+    "oneTimeQuestTitle": "Tarea Única",
+    "rewardDesc": "{money} TL, {xp} XP"
+  },
+  "myVehicles": {
+    "buildCollection": "¡Construye tu colección comprando tu primer vehículo!",
+    "garageFull": "¡Garaje Lleno!",
+    "garageLimitReached": "Has alcanzado el límite de tu garaje.",
+    "expandGarageHint": "Necesitas expandir tu garaje para comprar nuevos vehículos.",
+    "goToStore": "Ir a la Tienda",
+    "noVehiclesDesc": "Puedes poner a la venta vehículos de tu garaje.",
+    "vehicleFeatures": "Características del Vehículo",
+    "brand": "Marca",
+    "model": "Modelo",
+    "year": "Año",
+    "mileage": "Kilometraje",
+    "marketValue": "Valor de Mercado",
+    "fuel": "Combustible",
+    "transmission": "Transmisión",
+    "engine": "Motor",
+    "drive": "Tracción",
+    "color": "Color",
+    "warranty": "Garantía",
+    "accidentRecord": "Historial de Accidentes",
+    "var": "Sí",
+    "yok": "No",
+    "purchasePrice": "Precio de Compra",
+    "daysOwned": "Días de Propiedad",
+    "listForSaleButton": "Poner en Venta",
+    "alreadyListed": "¡Este vehículo ya está a la venta!",
+    "statusPending": "Pendiente",
+    "statusAccepted": "Aceptada",
+    "statusRejected": "Rechazada",
+    "myVehicles": "Mis Vehículos",
+    "noActiveOffers": "No Hay Ofertas Activas",
+    "noPendingOffersForBrand": "No hay ofertas pendientes para vehículos de esta marca",
+    "offers": "Ofertas",
+    "rejectAll": "Rechazar",
+    "noIncomingOffers": "No Hay Ofertas Entrantes",
+    "noSentOffers": "No Hay Ofertas Enviadas",
+    "noIncomingOffersDesc": "Aún no has recibido ofertas por tus anuncios.",
+    "noSentOffersDesc": "Aún no has enviado ninguna oferta.",
+    "potentialProfitLoss": "Ganancia/Pérdida Potencial",
+    "listingScore": "Puntuación del Anuncio"
+  },
+  "quests": {
+    "title": "Misiones",
+    "noQuests": "No se encontraron misiones para hoy.",
+    "rewardClaimed": "¡Recompensa Reclamada! +{xp} XP, +{money} TL",
+    "claimFailed": "Fallo al reclamar recompensa.",
+    "claimReward": "Reclamar Recompensa",
+    "descriptions": {
+      "buyVehicle": "Compra {count} vehículos hoy",
+      "buyVehicleBrand": "Compra {count} vehículos {brand} hoy",
+      "sellVehicle": "Vende {count} vehículos hoy",
+      "makeOffer": "Envía {count} ofertas hoy",
+      "earnProfit": "Gana {amount} TL de beneficio hoy",
+      "login": "Inicia sesión en el juego"
+    }
+  },
+  "missions": {
+    "title": "Misiones",
+    "noMissions": "No hay misiones disponibles.",
+    "tutorial": {
+      "title": "¡Bienvenido Conductor!",
+      "desc": "Completa el tutorial para aprender lo básico."
+    },
+    "firstBuy": {
+      "title": "Primera Compra",
+      "desc": "Compra tu primer vehículo del mercado."
+    },
+    "firstSell": {
+      "title": "Primera Venta",
+      "desc": "Vende tu primer vehículo y obtén ganancias."
+    },
+    "garage5": {
+      "title": "Expansión de Garaje",
+      "desc": "Mejora el límite de tu garaje a 5 vehículos."
+    },
+    "balance1m": {
+      "title": "Millonario",
+      "desc": "Alcanza un saldo de 2,000,000 TL."
+    },
+    "balance5m": {
+      "title": "Millonario II",
+      "desc": "Alcanza un saldo de 5,000,000 TL."
+    },
+    "balance10m": {
+      "title": "Millonario III",
+      "desc": "Alcanza un saldo de 10,000,000 TL."
+    },
+    "level5": {
+      "title": "Estrella Naciente",
+      "desc": "Alcanza el Nivel 5."
+    },
+    "level10": {
+      "title": "Estrella Naciente II",
+      "desc": "Alcanza el Nivel 10."
+    },
+    "level20": {
+      "title": "Estrella Naciente III",
+      "desc": "Alcanza el Nivel 20."
+    },
+    "negotiation10": {
+      "title": "Maestro Negociador",
+      "desc": "Negocia con éxito 10 veces."
+    },
+    "negotiation20": {
+      "title": "Maestro Negociador II",
+      "desc": "Negocia con éxito 20 veces."
+    },
+    "negotiation50": {
+      "title": "Maestro Negociador III",
+      "desc": "Negocia con éxito 50 veces."
+    },
+    "fleet10": {
+      "title": "Gerente de Flota",
+      "desc": "Posee 10 vehículos en tu garaje."
+    },
+    "fleet20": {
+      "title": "Gerente de Flota II",
+      "desc": "Posee 20 vehículos en tu garaje."
+    },
+    "fleet50": {
+      "title": "Gerente de Flota III",
+      "desc": "Posee 50 vehículos en tu garaje."
+    },
+    "gallery": {
+      "title": "Dueño de Negocio",
+      "desc": "Compra tu propia galería."
+    },
+    "collectionMaster": {
+      "title": "Maestro Coleccionista",
+      "desc": "Completa todas las colecciones de vehículos."
+    }
+  },
+  "myListings": {
+    "potential": "Potencial",
+    "profit": "Beneficio",
+    "loss": "Pérdida",
+    "description": "Descripción del Anuncio",
+    "listed": "Listado",
+    "removeConfirm": "¿estás seguro de que quieres eliminar el anuncio?",
+    "willStayInGarage": "El vehículo permanecerá en tu garaje.",
+    "maxPriceHint": "Máx: {price} TL (15% Beneficio)",
+    "profitLossStatus": "{status}: {amount} TL (%{percent})"
+  },
+  "listings": {
+    "title": "Mis Anuncios",
+    "myListings": "Mis Anuncios",
+    "noListings": "Aún No Hay Anuncios",
+    "noListingsDesc": "Aún no has puesto ningún vehículo a la venta."
+  },
+  "misc": {
+    "daysAgo": "hace días",
+    "hoursAgo": "hace horas",
+    "minutesAgo": "hace minutos",
+    "justNow": "Justo ahora",
+    "day": "día",
+    "days": "días",
+    "listing": "anuncio",
+    "listings": "anuncios",
+    "hour": "hora",
+    "minute": "minuto",
+    "minutes": "minutos",
+    "month": "mes",
+    "year": "año",
+    "offers": "ofertas",
+    "offer": "oferta",
+    "offersCreated": "ofertas creadas",
+    "noActiveOffers": "No Hay Ofertas Activas",
+    "noPendingOffersForBrand": "No hay ofertas pendientes para vehículos de esta marca",
+    "rejectAll": "Rechazar Todas las Ofertas",
+    "noIncomingOffers": "No Hay Ofertas Entrantes",
+    "noSentOffers": "No Hay Ofertas Enviadas",
+    "noIncomingOffersDesc": "Aún no has recibido ofertas por tus anuncios.",
+    "noSentOffersDesc": "Aún no has enviado ninguna oferta.",
+    "statusPending": "Pendiente",
+    "statusAccepted": "Aceptada",
+    "statusRejected": "Rechazada",
+    "checkOffers": "Puedes revisarlas en la sección Mis Ofertas",
+    "generatingOffers": "Generando ofertas...",
+    "errorGeneratingOffers": "Ocurrió un error al generar ofertas",
+    "profit": "Beneficio",
+    "loss": "Pérdida",
+    "profitLossRatio": "Relación Ganancia/Pérdida:",
+    "purchasePrice": "Precio de Compra:",
+    "acceptedStatus": "ACEPTADA ✓",
+    "rejectedStatus": "RECHAZADA ✗",
+    "acceptOfferTitle": "Aceptar Oferta",
+    "ifYouAccept": "Si aceptas esta oferta:",
+    "balanceAdded": "• {amount} TL serán añadidos a tu saldo",
+    "acceptButton": "Aceptar",
+    "noPendingToReject": "No hay ofertas pendientes para rechazar.",
+    "listingPriceLabel": "Anuncio: {price}",
+    "km": "km",
+    "buyVehicleButton": "Comprar Vehículo",
+    "vehicleDetails": "Detalles",
+    "sellVehicle": "Vender",
+    "vehicleDetailComingSoon": "Página de detalle del vehículo próximamente...",
+    "sellFeatureComingSoon": "Función de venta de vehículo próximamente...",
+    "vehicleLimit": "Vehicle Limit",
+    "vehicle": "vehicle"
+  },
+  "expertise": {
+    "reportTitle": "Informe de Peritaje",
+    "statusTitle": "Estado de Peritaje",
+    "issueFound": "¡PROBLEMA ENCONTRADO!",
+    "clean": "LIMPIO",
+    "disclaimer": "La información del vehículo se basa en la declaración del vendedor. Puedes realizar un peritaje para conocer la condición real.",
+    "performAction": "Realizar Peritaje (3,000 TL)",
+    "performActionNoPrice": "Realizar Peritaje",
+    "accidentRecord": "Historial de Accidentes",
+    "exists": "Sí",
+    "none": "No",
+    "mileage": "Kilometraje",
+    "partsCondition": "Condición de Piezas",
+    "partsClean": "Limpio",
+    "partsIssue": "Piezas Reparadas/Reemplazadas",
+    "declared": "Declarado:",
+    "real": "Real:",
+    "verified": "Real: Verificado",
+    "dialogTitle": "Realizar Peritaje",
+    "dialogMessage": "¿Quieres realizar un peritaje para conocer la condición real del vehículo?",
+    "fee": "Tarifa de Peritaje:",
+    "insufficientBalance": "¡Saldo Insuficiente!",
+    "confirmAndPay": "Confirmar y Pagar",
+    "issuesFoundMessage": "¡Problemas ocultos encontrados en el peritaje! Precio actualizado.",
+    "cleanMessage": "¡El vehículo está limpio! Declaración del vendedor verificada.",
+    "value": "Valor de Peritaje"
+  },
+  "vehicleParts": {
+    "original": "Original",
+    "localPainted": "Pintura Local",
+    "painted": "Pintado",
+    "replaced": "Reemplazado"
+  },
+  "colors": {
+    "Beyaz": "Blanco",
+    "Siyah": "Negro",
+    "Gri": "Gris",
+    "Kırmızı": "Rojo",
+    "Mavi": "Azul",
+    "Gümüş": "Plata",
+    "Kahverengi": "Marrón",
+    "Yeşil": "Verde"
+  },
+  "vehicleAttributes": {
+    "Benzin": "Gasolina",
+    "Benzin+LPG": "Gasolina+GLP",
+    "Dizel": "Diésel",
+    "Hybrid": "Híbrido",
+    "LPG": "GLP",
+    "Elektrik": "Eléctrico",
+    "Manuel": "Manual",
+    "Otomatik": "Automático",
+    "Önden": "Delantera",
+    "Arkadan": "Trasera",
+    "4x4": "4x4",
+    "Sedan": "Sedán",
+    "Hatchback": "Hatchback",
+    "SUV": "SUV",
+    "Coupe": "Coupé",
+    "Station Wagon": "Station Wagon",
+    "MPV": "Monovolumen"
+  },
+  "brands": {
+    "hints": {
+      "Audira": "Rendimiento de lujo alemán",
+      "Bavora": "Motor bávaro",
+      "Fialto": "Practicidad italiana",
+      "Fortran": "Clásico americano",
+      "_UNUSED_Hundar": "Tecnología coreana",
+      "Hanto": "Fiabilidad japonesa",
+      "Mercurion": "Lujo alemán",
+      "Oplon": "Practicidad alemana",
+      "Renauva": "Innovación francesa",
+      "Koyoro": "Perfección japonesa",
+      "Volkstar": "El auto del pueblo"
+    }
+  },
+  "listingDescriptions": {
+    "base": {
+      "0": "Único dueño, bien mantenido y uso limpio.",
+      "1": "Vehículo sin daños, bien mantenido y sin problemas.",
+      "2": "Auto de garaje. Siempre usado regularmente.",
+      "3": "Vehículo en venta de familia. Es un vehículo sin problemas.",
+      "4": "Todo el mantenimiento se ha hecho desde cero km.",
+      "5": "Segunda mano pero como nuevo. Historial limpio.",
+      "6": "Vehículo económico y fiable.",
+      "7": "Vehículo sin cambios, sin pintura y sin daños."
+    },
+    "extra": {
+      "diesel": "Motor diésel, eficiente y potente.",
+      "lpg": "GLP de fábrica, ahorro de combustible garantizado.",
+      "hybrid": "Tecnología híbrida, ecológico.",
+      "automatic": "Transmisión automática, conducción cómoda.",
+      "manual": "Transmisión manual, tú tienes el control.",
+      "cvt": "Transmisión CVT, transición suave.",
+      "dsg": "Transmisión de doble embrague, cambio rápido.",
+      "4x4": "Sistema de tracción 4x4, adecuado para todas las condiciones.",
+      "rwd": "Tracción trasera, placer de conducción deportivo.",
+      "fwd": "Tracción delantera, manejo seguro."
+    }
+  },
+  "modelDescriptions": {
+    "Renauva": {
+      "Slim": [
+        "Hatchback moderno y dinámico.",
+        "Ideal para uso en ciudad.",
+        "Diseño joven y deportivo."
+      ],
+      "Magna": [
+        "Interior cómodo y espacioso.",
+        "Excelente manejo.",
+        "Muy adecuado como auto familiar."
+      ],
+      "Flow": [
+        "Gran capacidad de equipaje y comodidad.",
+        "Ideal para viajes largos."
+      ],
+      "Signa": [
+        "Vehículo económico y práctico.",
+        "Consumo de combustible muy bajo."
+      ],
+      "Tallion": [
+        "Nueva generación, tecnología moderna.",
+        "Seguro y económico para tu familia."
+      ],
+      "cvt": "Transmisión automática X-Tronic CVT, placer de conducción.",
+      "auto": "Transmisión automática Easy-R, cómoda en ciudad.",
+      "edc": "EDC doble embrague, cambio rápido y seguro.",
+      "diesel": "Motor 1.5 dCi muy eficiente y económico.",
+      "lpg": "GLP de fábrica, ahorro de combustible garantizado.",
+      "hybrid": "Tecnología híbrida, ecológico."
+    },
+    "Volkstar": {
+      "Paso": [
+        "Segmento premium, lujo y confort.",
+        "Interior espacioso y alta tecnología.",
+        "Elección perfecta para viajes largos."
+      ],
+      "Tenis": [
+        "Compacto pero interior espacioso.",
+        "Calidad y fiabilidad Volkswagen.",
+        "Alta demanda y venta rápida."
+      ],
+      "Colo": [
+        "Segmento de auto pequeño premium.",
+        "Práctico en uso urbano.",
+        "Prestigio Volkswagen a precio asequible."
+      ],
+      "Jago": [
+        "Sedán con gran equipaje.",
+        "Adecuado como auto familiar."
+      ],
+      "tdi": "Motor TDI, eficiente y potente.",
+      "dsg": "Transmisión automática de doble embrague DSG."
+    },
+    "Fialto": {
+      "Agna": [
+        "Opciones de carrocería amplia, vehículo práctico.",
+        "Ideal para uso comercial y familiar.",
+        "Alto volumen, venta rápida."
+      ],
+      "Lagua": [
+        "Estructura simple y robusta.",
+        "Sedán económico.",
+        "Fiable a alto kilometraje."
+      ],
+      "Zorno": [
+        "Compacto y económico.",
+        "Ideal para ciudad.",
+        "Bajo costo operativo."
+      ],
+      "multijet": "Motor diésel Multijet, eficiente y económico.",
+      "hybrid": "Tecnología híbrida, ahorro de combustible.",
+      "dualogic": "Transmisión semiautomática Dualogic.",
+      "auto": "Transmisión automática, conducción cómoda."
+    },
+    "Oplon": {
+      "Tasra": [
+        "Calidad alemana fiable.",
+        "Opción de carrocería amplia, cómoda.",
+        "Disponible tanto sedán como hatchback."
+      ],
+      "Lorisa": [
+        "Compacto y económico.",
+        "Práctico en uso urbano.",
+        "Transmisión automática fiable."
+      ],
+      "Mornitia": [
+        "Segmento premium, equipamiento de lujo.",
+        "Confort de viaje largo nivel superior.",
+        "Prestigioso y fiable."
+      ],
+      "cdti": "Motor diésel CDTI, eficiente y potente.",
+      "easytronic": "Transmisión semiautomática Easytronic.",
+      "auto": "Automática de convertidor de par, fiable."
+    },
+    "Bavora": {
+      "C_Serisi": [
+        "Segmento premium, alto prestigio.",
+        "Placer de conducción tracción trasera (RWD).",
+        "Paquete M Sport muy valioso."
+      ],
+      "E_Serisi": [
+        "Segmento de lujo, modelo más prestigioso.",
+        "Interior espacioso y confort.",
+        "Rico equipamiento electrónico."
+      ],
+      "A_Serisi": [
+        "Premium compacto, ideal para ciudad.",
+        "Carácter joven y dinámico.",
+        "Paquete visual M Sport popular."
+      ],
+      "D_Serisi": [
+        "Coupé deportivo, diseño elegante.",
+        "M Sport como estándar.",
+        "Gran Coupé carrocería más popular."
+      ],
+      "diesel": "Motor d, diésel eficiente y potente.",
+      "hybrid": "Motor e, tecnología híbrida, alta eficiencia.",
+      "dct": "DCT de 7 velocidades, transmisión de doble embrague.",
+      "zf": "Steptronic de 8 velocidades (ZF), automática más fiable.",
+      "rwd": "Tracción trasera (RWD), carácter deportivo."
+    },
+    "Fortran": {
+      "Odak": [
+        "Placer de conducción nivel superior.",
+        "Líder del segmento C, cómodo.",
+        "Opciones de carrocería Hatchback/Sedán/SW."
+      ],
+      "Vista": [
+        "Compacto y ágil, auto de ciudad.",
+        "Consumo de combustible económico.",
+        "Diseño joven y dinámico."
+      ],
+      "Avger": [
+        "Pick-up potente, todoterreno y carga.",
+        "Confort de doble cabina.",
+        "Equipamiento Wildtrak nivel de lujo."
+      ],
+      "Tupa": [
+        "Confort SUV, interior espacioso.",
+        "Vehículo ideal para familias.",
+        "Tecnología moderna y seguridad."
+      ],
+      "ecoblue": "Motor diésel EcoBlue, eficiente y potente.",
+      "tdci": "Motor diésel TDCi, consumo económico.",
+      "biturbo": "Motor diésel Bi-Turbo, alto par.",
+      "hybrid": "Tecnología híbrida, ecológica y eficiente.",
+      "ecoboost": "Turbo gasolina EcoBoost, rendimiento y eficiencia.",
+      "auto10": "Automática de 10 velocidades, transmisión más moderna.",
+      "auto8": "Automática de convertidor de par de 8 velocidades, fiable.",
+      "powershift": "Transmisión automática Powershift.",
+      "4x4": "Tracción 4x4, rendimiento todoterreno nivel superior."
+    },
+    "Mercurion": {
+      "3_Serisi": [
+        "Confort premium, lujo clásico.",
+        "Diseño deportivo AMG Line.",
+        "Historial de servicio autorizado muy importante."
+      ],
+      "5_Serisi": [
+        "Sedán de lujo nivel superior.",
+        "Prestigio de auto ejecutivo.",
+        "Rico equipamiento electrónico."
+      ],
+      "1_Serisi": [
+        "Tecnología de doble pantalla MBUX.",
+        "Premium compacto, joven dinámico.",
+        "Paquete visual AMG Line importante."
+      ],
+      "GJE": [
+        "Coupé de 4 puertas, diseño deportivo.",
+        "Ventanas sin marco, detalle elegante.",
+        "Atrae a jóvenes profesionales."
+      ],
+      "8_Serisi": [
+        "Vehículo todoterreno legendario.",
+        "Versión G 63 AMG más potente.",
+        "3 bloqueos de diferencial, capacidad todoterreno pura."
+      ],
+      "diesel": "Motor d, diésel eficiente y potente.",
+      "hybrid": "Motor e, tecnología híbrida, alto rendimiento.",
+      "dct": "Automática de doble embrague 7G-DCT.",
+      "tronic": "7G/9G-Tronic, transmisión automática más fiable.",
+      "4matic": "Tracción 4MATIC, tres bloqueos de diferencial.",
+      "rwd": "Tracción trasera (RWD), carácter premium."
+    },
+    "_UNUSED_Hundar": {
+      "A10": [
+        "Hatchback fiable y económico.",
+        "Amplias opciones de equipamiento.",
+        "Repuestos baratos y fáciles."
+      ],
+      "Tecent_Red": [
+        "Potente motor diésel 1.6 CRDi.",
+        "Sedán económico, auto familiar.",
+        "Automática de convertidor de par fiable."
+      ],
+      "Tecent_White": [
+        "Estructura simple y robusta.",
+        "Costos de reparación baratos.",
+        "Uso diario económico."
+      ],
+      "A20": [
+        "Vehículo equilibrado segmento C.",
+        "Rico equipamiento estándar.",
+        "Paquete deportivo N-Line popular."
+      ],
+      "Kascon": [
+        "SUV moderno, diseño radical.",
+        "Tecnología híbrida disponible.",
+        "Interior espacioso, cómodo."
+      ],
+      "crdi": "Motor diésel CRDi, potente y eficiente.",
+      "hybrid": "Tecnología híbrida, alta eficiencia y bajo consumo.",
+      "dct": "Automática de doble embrague DCT.",
+      "auto": "Automática de convertidor de par, fiable."
+    },
+    "Koyoro": {
+      "Airoko": [
+        "Fiabilidad legendaria.",
+        "Sedán con menos averías.",
+        "Valioso incluso con alto kilometraje."
+      ],
+      "Lotus": [
+        "Calidad Toyota fiable.",
+        "Practicidad hatchback.",
+        "Versión híbrida tiene alta demanda."
+      ],
+      "Karma": [
+        "Práctico en uso urbano.",
+        "Tamaño compacto, fácil de estacionar.",
+        "Tecnología híbrida disponible."
+      ],
+      "hybrid": "Tecnología híbrida, economía de combustible muy alta.",
+      "diesel": "Motor diésel D-4D, eficiente.",
+      "cvt_hybrid": "Automática CVT, combinación perfecta con sistema híbrido.",
+      "mmt": "Transmisión semiautomática MMT (requiere uso cuidadoso).",
+      "cvt": "Automática CVT, transmisión más fiable."
+    },
+    "Audira": {
+      "B3": [
+        "Compacto premium, alta calidad.",
+        "Cabina virtual, tecnología moderna.",
+        "Dinámica de conducción deportiva."
+      ],
+      "B4": [
+        "Confort segmento D, prestigio.",
+        "Alta calidad de materiales.",
+        "Confort de viaje largo superior."
+      ],
+      "B6": [
+        "Lujo segmento E, confort nivel superior.",
+        "Matrix LED, equipamiento avanzado.",
+        "Auto ejecutivo, prestigioso."
+      ],
+      "B5": [
+        "Diseño coupé deportivo.",
+        "Líneas fluidas elegantes, notable.",
+        "Sedán deportivo prestigioso."
+      ],
+      "tdi_high": "Diésel TDI, alto par y eficiencia.",
+      "tdi": "Diésel TDI, económico y potente.",
+      "quattro": "Tracción Quattro, máxima seguridad y rendimiento.",
+      "tiptronic": "Automática Tiptronic, transmisión fiable.",
+      "multitronic": "Cambio Multitronic CVT (historial de mantenimiento importante).",
+      "stronic_check": "Automática S tronic (historial de mantenimiento debe ser revisado).",
+      "stronic": "Automática S tronic de 7 velocidades, cambio deportivo."
+    },
+    "Hanto": {
+      "Vice": [
+        "Rey de segunda mano, mantiene valor.",
+        "Calidad Honda fiable.",
+        "Sin problemas incluso con alto kilometraje."
+      ],
+      "VHL": [
+        "Líder en confort en segmento SUV.",
+        "Interior espacioso, auto familiar.",
+        "Fiabilidad Honda."
+      ],
+      "Caz": [
+        "Asientos mágicos, techo alto.",
+        "Compacto pero espacioso, práctico.",
+        "Vehículo ideal para ciudad."
+      ],
+      "hybrid_vhl": "2.0 Híbrido, economía de combustible superior.",
+      "hybrid_caz": "1.5 e:HEV híbrido, muy eficiente.",
+      "lpg": "GLP de fábrica ECO, bajo costo de combustible.",
+      "awd": "Tracción AWD, máxima seguridad.",
+      "cvt": "Automática CVT, transmisión más fiable.",
+      "rs": "Versión de rendimiento RS/Turbo, conducción deportiva."
+    }
+  },
+  "models": {
+    "descriptions": {
+      "Renauva": {
+        "Slim": "Hatchback Moderno, joven y dinámico",
+        "Magna": "Tamaño Medio Premium, cómodo",
+        "Flow": "Sedán Espacioso, confort de larga distancia",
+        "Signa": "Sedán Económico, uso práctico",
+        "Tallion": "Nueva Generación, tecnología moderna"
+      },
+      "Volkstar": {
+        "Paso": "Segmento Premium, lujo y poder",
+        "Tenis": "Premium Compacto, alta demanda",
+        "Colo": "Pequeño Premium, calidad y práctico",
+        "Jago": "Sedán Espacioso, familiar"
+      },
+      "Fialto": {
+        "Agna": "Rey del Volumen, modelo más vendido",
+        "Lagua": "Sedán Económico, simple y sólido",
+        "Zorno": "Hatchback Compacto, auto de ciudad"
+      },
+      "Oplon": {
+        "Tasra": "Calidad alemana fiable, popular",
+        "Lorisa": "Compacto, económico y fiable",
+        "Mornitia": "Segmento Premium, equipamiento de lujo"
+      },
+      "Bavora": {
+        "C Serisi": "Premium Popular, el más vendido",
+        "E Serisi": "Segmento de Lujo, el más prestigioso",
+        "A Serisi": "Premium Compacto, joven y dinámico",
+        "D Serisi": "Coupé Deportivo, elegante y potente"
+      },
+      "Fortran": {
+        "Odak": "Líder del Segmento C, placer de conducción",
+        "Vista": "Compacto, económico, dinámico",
+        "Avger": "Pick-up Potente, 4x4 todoterreno",
+        "Tupa": "Confort SUV, espacioso y moderno"
+      },
+      "Mercurion": {
+        "3 Serisi": "Confort premium, lujo clásico",
+        "5 Serisi": "Lujo de alto nivel, auto ejecutivo",
+        "1 Serisi": "Premium compacto, tecnología MBUX",
+        "GJE": "Coupé de 4 Puertas, elegancia deportiva",
+        "8 Serisi": "Todoterreno legendario, ultra lujo"
+      },
+      "_UNUSED_Hundar": {
+        "A10": "Hatchback fiable y económico",
+        "Tecent Red": "Diésel potente, sedán económico",
+        "Tecent White": "Simple y sólido, reparación barata",
+        "A20": "Segmento C equilibrado, equipamiento rico",
+        "Kascon": "SUV moderno, tecnología híbrida"
+      },
+      "Koyoro": {
+        "Airoko": "Fiabilidad legendaria, líder híbrido",
+        "Lotus": "Hatchback fiable, híbrido disponible",
+        "Karma": "Compacto práctico, tecnología híbrida"
+      },
+      "Audira": {
+        "B3": "Premium compacto, líder en tecnología",
+        "B4": "Confort segmento D, prestigio",
+        "B6": "Lujo segmento E, confort de alto nivel",
+        "B5": "Coupé deportivo, diseño elegante"
+      },
+      "Hanto": {
+        "Vice": "Rey de autos usados, fiabilidad CVT",
+        "VHL": "Confort SUV, tecnología híbrida",
+        "Kent": "Sedán económico, alta potencia",
+        "Caz": "Asientos mágicos, híbrido disponible"
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "noNotifications": "Aún No Hay Notificaciones",
+    "noNotificationsDesc": "Las nuevas ofertas y actualizaciones aparecerán aquí",
+    "markAllRead": "Marcar Todo como Leído",
+    "deleteAll": "Eliminar Todo",
+    "deleteAllConfirm": "Todas las notificaciones serán eliminadas. ¿Estás seguro?",
+    "newOffer": {
+      "title": "¡Nueva Oferta! 💰",
+      "message": "{buyer} ofreció {price} por {vehicle}"
+    },
+    "offerAccepted": {
+      "title": "¡Oferta Aceptada! ✅",
+      "message": "Tu oferta de {price} por {vehicle} ha sido aceptada"
+    },
+    "vehicleSold": {
+      "title": "¡Vehículo Vendido!",
+      "message": "{vehicle} fue vendido exitosamente por {price} TL"
+    },
+    "bulkOffer": {
+      "title": "¡Nuevas Ofertas!",
+      "message": "Recibiste {count} ofertas por tu vehículo {brand} {model}."
+    }
+  },
+  "ads": {
+    "watchAd": "Ver Anuncio",
+    "rewardReceived": "¡Recompensa Ganada!",
+    "rewardMessage": "¡Gracias! Recompensa añadida a tu saldo.",
+    "notReady": "El anuncio está cargando, por favor espera un momento..."
+  },
+  "login": {
+    "or": "o",
+    "googleSignIn": "Iniciar sesión con Google",
+    "googleLoginFailed": "Inicio de sesión con Google fallido. Por favor intenta de nuevo.",
+    "googleLoginError": "Ocurrió un error durante el inicio de sesión con Google."
+  },
+  "store": {
+    "removeAds": "Eliminar Anuncios",
+    "removeAdsDesc": "Elimina permanentemente los anuncios obligatorios.",
+    "removeAdsDialogDesc": "¿Quieres eliminar permanentemente todos los anuncios obligatorios (después de ventas y subida de nivel)?",
+    "removeAdsSuccess": "¡Anuncios Eliminados!",
+    "removeAdsSuccessDesc": "Ya no verás anuncios obligatorios. ¡Disfruta el juego!",
+    "vipPass": {
+      "title": "PASE VIP",
+      "desc": "¡Obtén todo de una vez! Galería + Peritaje Ilimitado + Sin Anuncios + Impulso de XP 24h + MEMEWE",
+      "dialogDesc": "¿Quieres comprar el PASE VIP por 5 Oro? \n\nIncluye:\n• Galería\n• Peritaje Ilimitado\n• Sin Anuncios\n• Impulso de XP 24h\n• Foto de Perfil Especial MEMEWE",
+      "success": "¡PASE VIP Activado!",
+      "successDesc": "¡Tienes todos los privilegios ahora! Disfruta el juego."
+    },
+    "purchaseSuccess": "¡Compra exitosa!",
+    "productsLoadError": "Error cargando productos",
+    "loadingProducts": "Cargando productos...",
+    "title": "TIENDA",
+    "buyGold": "Comprar Oro",
+    "convertGold": "Convertir",
+    "errorItemUnavailable": "Este artículo no está disponible actualmente.",
+    "errorServiceUnavailable": "El servicio de la tienda no está disponible.",
+    "errorUserCanceled": "Compra cancelada.",
+    "errorUnknown": "Ocurrió un error desconocido.",
+    "insufficientGold": "Oro Insuficiente",
+    "yourGold": "Tu Oro",
+    "gold": "Oro",
+    "bonus": "Bono",
+    "gameCurrency": "Moneda del Juego",
+    "realMoney": "Dinero Real",
+    "confirmConvert": "Confirmar Conversión",
+    "convertGoldTitle": "Convertir Oro a Moneda del Juego",
+    "convertGoldDesc": "Convierte tu oro a moneda del juego",
+    "exchangeRate": "Tasa de Cambio",
+    "convertNow": "Convertir Ahora",
+    "needGoldToConvert": "Necesitas oro para convertir",
+    "purchaseGold": "Comprar Oro",
+    "package": "Paquete",
+    "price": "Precio",
+    "paymentComingSoon": "El sistema de pago estará disponible pronto",
+    "paymentSystemComingSoon": "El sistema de pago no está integrado aún. ¡Estará disponible pronto!",
+    "buy": "Comprar",
+    "selectAmount": "Selecciona cantidad a convertir",
+    "youWillGet": "Obtendrás",
+    "remainingGold": "Oro Restante",
+    "convert": "Convertir",
+    "convertError": "Ocurrió un error al convertir oro",
+    "confirmConvertMessage": "¿Estás seguro de que quieres proceder con esta transacción?",
+    "goldAmount": "Cantidad de Oro",
+    "confirmButton": "Confirmar",
+    "availableGold": "Oro Disponible",
+    "enterAmount": "Por favor ingresa una cantidad",
+    "invalidNumber": "Formato de número inválido",
+    "minAmount": "Cantidad mínima",
+    "maxAmount": "Cantidad máxima",
+    "garageExpansion": "Mejoras",
+    "garageCapacity": "Capacidad del Garaje",
+    "currentLimit": "Límite Actual: {limit} Vehículos",
+    "plusOneSlot": "+1 Espacio",
+    "expandGarageTitle": "Expandir Garaje",
+    "currentLimitLabel": "Límite Actual: {limit}",
+    "newLimitLabel": "Nuevo Límite: {limit}",
+    "costLabel": "Costo: {amount} {currency}",
+    "garageExpandSuccess": "¡Garaje expandido con éxito! 🎉",
+    "minGoldError": "Debes ingresar al menos 0.1 oro",
+    "insufficientGoldError": "¡Oro insuficiente! Disponible: {amount} oro",
+    "securePaymentMessage": "Estás a punto de comprar con pago seguro.",
+    "animatedPP": {
+      "title": "Fotos de Perfil Animadas",
+      "buy": "Comprar",
+      "activate": "Activar",
+      "active": "Activo",
+      "price": "1 Oro",
+      "insufficientGold": "Oro insuficiente para comprar esta animación.",
+      "purchaseSuccess": "¡Animación comprada con éxito!",
+      "activationSuccess": "¡Foto de perfil actualizada!",
+      "names": {
+        "MEMEWE": "MEMEWE",
+        "Money": "Cara Rica",
+        "PEPE": "Pepe Genial",
+        "CoolEmoji": "Chico Genial",
+        "PepeMusic": "DJ Pepe",
+        "NyanCat": "Gato Nyan",
+        "VK": "Lanzamiento de Cohete"
+      }
+    }
+  },
+  "seller_notes": {
+    "base": {
+      "singleOwner": "Único dueño, bien mantenido y uso limpio.",
+      "damageFree": "Vehículo sin daños, bien mantenido y sin problemas.",
+      "garageCar": "Auto de garaje. Siempre usado regularmente.",
+      "familyCar": "Vehículo en venta de familia. Es un vehículo sin problemas.",
+      "allMaintenanceDone": "Todo el mantenimiento se ha hecho desde 0 km.",
+      "likeNew": "Segunda mano pero como nuevo. Historial limpio.",
+      "economic": "Vehículo económico y fiable.",
+      "original": "Original, sin pintura y sin daños."
+    },
+    "models": {
+      "Renauva_Slim": {
+        "1": "Hatchback moderno y dinámico.",
+        "2": "Ideal para uso en ciudad.",
+        "3": "Diseño joven y deportivo."
+      },
+      "Renauva_Magna": {
+        "1": "Interior cómodo y espacioso.",
+        "2": "Excelente agarre en carretera.",
+        "3": "Muy adecuado como auto familiar."
+      },
+      "Renauva_Flow": {
+        "1": "Gran volumen de equipaje y comodidad.",
+        "2": "Ideal para caminos largos."
+      },
+      "Renauva_Signa": {
+        "1": "Vehículo económico y práctico.",
+        "2": "Consumo de combustible muy bajo."
+      },
+      "Renauva_Tallion": {
+        "1": "Nueva generación, tecnología moderna.",
+        "2": "Seguro y económico para tu familia."
+      },
+      "generous": {
+        "1": "Exactamente el auto que estaba buscando, estoy dando el precio que quieres.",
+        "2": "He estado buscando este modelo por mucho tiempo, el precio no es un problema.",
+        "3": "Me gustó mucho, estoy listo para pagar la tarifa que quieres.",
+        "4": "Este auto es justo para mí, tu dinero está listo.",
+        "5": "Definitivamente quiero comprarlo, no soy flexible con el precio."
+      },
+      "Volkstar_Paso": {
+        "1": "Segmento premium, lujo y confort.",
+        "2": "Interior espacioso y alta tecnología.",
+        "3": "Elección perfecta para caminos largos."
+      },
+      "Volkstar_Tenis": {
+        "1": "Compacto pero interior espacioso.",
+        "2": "Calidad y fiabilidad Volkswagen.",
+        "3": "Alta demanda y venta rápida."
+      },
+      "Volkstar_Colo": {
+        "1": "Segmento de vehículo pequeño premium.",
+        "2": "Práctico para uso en ciudad.",
+        "3": "Prestigio Volkswagen a un precio asequible."
+      },
+      "Volkstar_Jago": {
+        "1": "Sedán con gran equipaje.",
+        "2": "Adecuado como auto familiar."
+      },
+      "Fialto_Agna": {
+        "1": "Opciones de carrocería amplia, vehículo práctico.",
+        "2": "Ideal para uso comercial y familiar.",
+        "3": "Alto volumen, venta rápida."
+      },
+      "Fialto_Lagua": {
+        "1": "Estructura simple y robusta.",
+        "2": "Sedán económico.",
+        "3": "Fiable a alto kilometraje."
+      },
+      "Fialto_Zorno": {
+        "1": "Compacto y económico.",
+        "2": "Ideal para ciudad.",
+        "3": "Bajo costo operativo."
+      },
+      "Oplon_Tasra": {
+        "1": "Calidad alemana fiable.",
+        "2": "Opción de carrocería amplia, cómoda.",
+        "3": "Disponible tanto sedán como hatchback."
+      },
+      "Oplon_Lorisa": {
+        "1": "Compacto y económico.",
+        "2": "Práctico para uso en ciudad.",
+        "3": "Transmisión automática fiable."
+      },
+      "Oplon_Mornitia": {
+        "1": "Segmento premium, equipamiento de lujo.",
+        "2": "Confort de camino largo es nivel superior.",
+        "3": "Prestigioso y fiable."
+      },
+      "Bavora_C_Serisi": {
+        "1": "Segmento premium, alto prestigio.",
+        "2": "Placer de conducción tracción trasera (RWD).",
+        "3": "Paquete M Sport es muy valioso."
+      },
+      "Bavora_E_Serisi": {
+        "1": "Segmento de lujo, el modelo más prestigioso.",
+        "2": "Volumen interior espacioso y confort.",
+        "3": "Rico equipamiento electrónico."
+      },
+      "Bavora_A_Serisi": {
+        "1": "Premium compacto, ideal para ciudad.",
+        "2": "Carácter joven y dinámico.",
+        "3": "Paquete visual M Sport es popular."
+      },
+      "Bavora_D_Serisi": {
+        "1": "Coupé deportivo, diseño elegante.",
+        "2": "M Sport es como estándar.",
+        "3": "Gran Coupé es la carrocería más popular."
+      },
+      "Fortran_Odak": {
+        "1": "Placer de conducción es nivel superior.",
+        "2": "Líder del segmento C, cómodo.",
+        "3": "Opciones de carrocería Hatchback/Sedán/SW."
+      },
+      "Fortran_Vista": {
+        "1": "Compacto y ágil, auto de ciudad.",
+        "2": "Consumo de combustible económico.",
+        "3": "Diseño joven y dinámico."
+      },
+      "Fortran_Avger": {
+        "1": "Pick-up potente, todoterreno y carga.",
+        "2": "Confort de doble cabina.",
+        "3": "Equipamiento Wildtrak nivel de lujo."
+      },
+      "Fortran_Tupa": {
+        "1": "Confort SUV, volumen interior espacioso.",
+        "2": "Vehículo ideal para familias.",
+        "3": "Tecnología moderna y seguridad."
+      },
+      "Mercurion_3_Serisi": {
+        "1": "Confort premium, lujo clásico.",
+        "2": "Diseño deportivo AMG Line.",
+        "3": "Historial de servicio autorizado es muy importante."
+      },
+      "Mercurion_5_Serisi": {
+        "1": "Sedán de lujo nivel superior.",
+        "2": "Prestigio de vehículo oficial.",
+        "3": "Rico equipamiento electrónico."
+      },
+      "Mercurion_1_Serisi": {
+        "1": "Tecnología de doble pantalla MBUX.",
+        "2": "Premium compacto, joven dinámico.",
+        "3": "Paquete visual AMG Line es importante."
+      },
+      "Mercurion_GJE": {
+        "1": "Coupé de 4 puertas, diseño deportivo.",
+        "2": "Ventanas sin marco, detalle elegante.",
+        "3": "Atrae a jóvenes profesionales."
+      },
+      "Mercurion_8_Serisi": {
+        "1": "Vehículo todoterreno legendario.",
+        "2": "G 63 AMG es la versión más potente.",
+        "3": "3 bloqueos de diferencial, capacidad todoterreno pura."
+      },
+      "_UNUSED_Hundar_A10": {
+        "1": "Hatchback fiable y económico.",
+        "2": "Amplias opciones de equipamiento.",
+        "3": "Repuestos son baratos y fáciles."
+      },
+      "_UNUSED_Hundar_Tecent Red": {
+        "1": "Potente motor diésel 1.6 CRDi.",
+        "2": "Sedán económico, auto familiar.",
+        "3": "Automática de convertidor de par fiable."
+      },
+      "_UNUSED_Hundar_Tecent White": {
+        "1": "Estructura simple y robusta.",
+        "2": "Costos de reparación baratos.",
+        "3": "Uso diario económico."
+      },
+      "_UNUSED_Hundar_A20": {
+        "1": "Vehículo equilibrado segmento C.",
+        "2": "Rico equipamiento estándar.",
+        "3": "Paquete deportivo N-Line es popular."
+      },
+      "_UNUSED_Hundar_Kascon": {
+        "1": "SUV moderno, diseño radical.",
+        "2": "Tecnología híbrida disponible.",
+        "3": "Volumen interior espacioso, cómodo."
+      },
+      "Koyoro_Airoko": {
+        "1": "Fiabilidad legendaria.",
+        "2": "Sedán con menos averías.",
+        "3": "Valioso incluso con alto kilometraje."
+      },
+      "Koyoro_Lotus": {
+        "1": "Calidad Toyota fiable.",
+        "2": "Practicidad hatchback.",
+        "3": "Versión híbrida tiene alta demanda."
+      },
+      "Koyoro_Karma": {
+        "1": "Práctico en uso urbano.",
+        "2": "Tamaño compacto, fácil estacionamiento.",
+        "3": "Tecnología híbrida disponible."
+      },
+      "Audira_B3": {
+        "1": "Premium compacto, alta calidad.",
+        "2": "Cabina virtual, tecnología moderna.",
+        "3": "Dinámica de conducción deportiva."
+      },
+      "Audira_B4": {
+        "1": "Confort segmento D, prestigio.",
+        "2": "Alta calidad de materiales.",
+        "3": "Confort de camino largo es superior."
+      },
+      "Audira_B6": {
+        "1": "Lujo segmento E, confort nivel superior.",
+        "2": "Matrix LED, equipamiento avanzado.",
+        "3": "Vehículo ejecutivo, prestigioso."
+      },
+      "Audira_B5": {
+        "1": "Diseño coupé deportivo.",
+        "2": "Líneas fluidas elegantes, notable.",
+        "3": "Sedán deportivo prestigioso."
+      },
+      "Hanto_Vice": {
+        "1": "Rey de segunda mano, conserva valor.",
+        "2": "Calidad Honda fiable.",
+        "3": "Sin problemas incluso con alto kilometraje."
+      },
+      "Hanto_VHL": {
+        "1": "Líder en confort en segmento SUV.",
+        "2": "Interior espacioso, auto familiar.",
+        "3": "Fiabilidad Honda."
+      },
+      "Hanto_Caz": {
+        "1": "Asientos mágicos, techo alto.",
+        "2": "Compacto pero espacioso, práctico.",
+        "3": "Vehículo ideal para ciudad."
+      }
+    },
+    "fuel": {
+      "Renauva_Dizel": "Motor 1.5 dCi es muy eficiente y económico.",
+      "Renauva_BenzinLPG": "GLP de fábrica, ahorro de combustible garantizado.",
+      "Renauva_Hybrid": "Ecológico con tecnología híbrida.",
+      "Volkstar_Dizel": "Motor TDI, eficiente y potente.",
+      "Fialto_Dizel": "Motor diésel Multijet, eficiente y económico.",
+      "Fialto_Hybrid": "Ahorro de combustible con tecnología híbrida.",
+      "Oplon_CDTI": "Motor diésel CDTI, eficiente y duradero.",
+      "Bavora_Dizel": "Motor d, diésel eficiente y potente.",
+      "Bavora_Hybrid": "Motor e, tecnología híbrida, alta eficiencia.",
+      "Fortran_EcoBlue": "Motor diésel EcoBlue, eficiente y potente.",
+      "Fortran_TDCi": "Motor diésel TDCi, consumo económico.",
+      "Fortran_BiTurbo": "Motor diésel Bi-Turbo, alto par.",
+      "Fortran_Hybrid": "Tecnología híbrida, ecológica y eficiente.",
+      "Fortran_Benzin": "Turbo gasolina EcoBoost, rendimiento y eficiencia.",
+      "Mercurion_Dizel": "Motor d, diésel eficiente y potente.",
+      "Mercurion_Hybrid": "Motor e, tecnología híbrida, alto rendimiento.",
+      "_UNUSED_Hundar_CRDi": "Motor diésel CRDi, potente y económico.",
+      "_UNUSED_Hundar_Hybrid": "Tecnología híbrida, alta eficiencia y bajo consumo.",
+      "Koyoro_Hybrid": "Tecnología híbrida, economía de combustible es muy alta.",
+      "Koyoro_Dizel": "Motor diésel D-4D, eficiente.",
+      "Hanto_Hybrid_20": "2.0 Híbrido, economía de combustible es superior.",
+      "Hanto_Hybrid_15": "1.5 e:HEV híbrido, muy eficiente.",
+      "Hanto_BenzinLPG": "GLP de fábrica ECO, bajo costo de combustible."
+    },
+    "transmission": {
+      "Renauva_XTronic": "Cambio automático X-Tronic CVT, placer de conducción.",
+      "Renauva_EasyR": "Cambio automático Easy-R, cómodo en ciudad.",
+      "Renauva_EDC": "EDC doble embrague, cambio rápido y seguro.",
+      "Volkstar_DSG": "Transmisión automática de doble embrague DSG.",
+      "Fialto_Dualogic": "Cambio semiautomático Dualogic.",
+      "Fialto_Auto": "Transmisión automática, conducción cómoda.",
+      "Oplon_Easytronic": "Semiautomática Easytronic (cambios de marcha notables).",
+      "Oplon_Auto": "Transmisión automática completa, cómoda y sin problemas.",
+      "Bavora_DCT": "DCT de 7 velocidades, cambio de doble embrague.",
+      "Bavora_ZF": "Steptronic de 8 velocidades (ZF), automática más fiable.",
+      "Fortran_10Auto": "Automática de 10 velocidades, transmisión más moderna.",
+      "Fortran_8Auto": "Automática de convertidor de par de 8 velocidades, fiable.",
+      "Fortran_Powershift": "Cambio automático Powershift.",
+      "Mercurion_DCT": "Automática de doble embrague 7G-DCT.",
+      "Mercurion_Tronic": "7G/9G-Tronic, transmisión automática más fiable.",
+      "_UNUSED_Hundar_DCT": "Automática de doble embrague DCT, cambio rápido.",
+      "_UNUSED_Hundar_Auto": "Automática completa de convertidor de par, sin problemas.",
+      "Koyoro_CVT_Hybrid": "Automática CVT, combinación perfecta con sistema híbrido.",
+      "Koyoro_MMT": "Cambio semiautomático MMT (requiere uso cuidadoso).",
+      "Koyoro_CVT": "Automática CVT, transmisión más fiable.",
+      "Audira_Tiptronic": "Automática Tiptronic, transmisión fiable.",
+      "Audira_Multitronic": "Cambio Multitronic CVT (historial de mantenimiento importante).",
+      "Audira_Stronic_Check": "Automática S tronic (historial de mantenimiento debe ser revisado).",
+      "Audira_Stronic": "Automática S tronic de 7 velocidades, cambio deportivo.",
+      "Hanto_CVT": "Automática CVT, transmisión más fiable."
+    },
+    "drive": {
+      "Bavora_RWD": "Tracción trasera (RWD), carácter deportivo.",
+      "Fortran_4x4": "Tracción 4x4, rendimiento todoterreno nivel superior.",
+      "Mercurion_4MATIC": "Tracción 4MATIC, tres bloqueos de diferencial.",
+      "Mercurion_RWD": "Tracción trasera (RWD), carácter premium.",
+      "Audira_Quattro": "Tracción Quattro, máxima seguridad y rendimiento.",
+      "Hanto_AWD": "Tracción total AWD, máxima seguridad."
+    },
+    "performance": {
+      "Hanto_RS": "Versión de rendimiento RS/Turbo, conducción deportiva."
+    }
+  },
+  "sell": {
+    "title": "Vender Vehículo",
+    "purchasePrice": "Precio de Compra",
+    "ownershipDuration": "Duración de Propiedad",
+    "days": "días",
+    "listForSaleButton": "Poner en Venta",
+    "noVehicles": "No Hay Vehículos para Vender",
+    "noVehiclesDesc": "No tienes ningún vehículo en tu garaje para vender ahora mismo.",
+    "salePriceLabel": "Precio de Venta",
+    "extraMargin": "+%{percent} Margen Extra",
+    "priceHint": "Ingresa precio",
+    "maxPriceHint": "Máximo: {price} TL (%{percent} beneficio)",
+    "priceRequired": "Por favor ingresa un precio",
+    "priceInvalid": "Precio inválido",
+    "priceLimitExceeded": "¡Solo puedes añadir hasta %{percent} de beneficio!",
+    "descriptionLabel": "Descripción del Anuncio",
+    "descriptionHint": "Da algo de información sobre tu vehículo...",
+    "vehicleFeatures": "Características del Vehículo",
+    "brand": "Marca",
+    "model": "Modelo",
+    "year": "Año",
+    "mileage": "Kilometraje",
+    "fuel": "Combustible",
+    "transmission": "Transmisión",
+    "engine": "Motor",
+    "drive": "Tracción",
+    "color": "Color",
+    "warranty": "Garantía",
+    "accidentRecord": "Historial de Accidentes",
+    "var": "Sí",
+    "yok": "No",
+    "creatingListing": "Creando Anuncio...",
+    "listingSuccess": "¡Anuncio creado con éxito!",
+    "listingError": "¡Fallo al crear anuncio!",
+    "listingErrorWithMessage": "Error",
+    "skillBonus": "Bono de Habilidad: ¡Puedes vender por un precio %{percent} más alto!",
+    "editButton": "Editar",
+    "removeListing": "Eliminar",
+    "listingRemoved": "Anuncio eliminado con éxito",
+    "listingUpdated": "Anuncio actualizado con éxito",
+    "listingUpdateFailed": "Fallo al actualizar anuncio",
+    "editListing": "Editar Anuncio",
+    "profitStatus": "Beneficio",
+    "lossStatus": "Pérdida"
+  },
+  "changeUsername": {
+    "title": "Cambiar Nombre de Usuario",
+    "newUsername": "Nuevo Nombre de Usuario",
+    "enterNewUsername": "Por favor ingresa un nuevo nombre de usuario",
+    "success": "¡Nombre de usuario actualizado con éxito!",
+    "usernameTaken": "Este nombre de usuario ya está en uso",
+    "firstChangeFree": "¡El primer cambio de nombre de usuario es gratis!",
+    "nextChangeAvailable": "Siguiente cambio disponible en {days} días.",
+    "changeAvailable": "Puedes cambiar tu nombre de usuario.",
+    "days": "días"
+  },
+  "tutorial": {
+    "title": "¡Bienvenido!",
+    "step1_title": "Saldo y Oro",
+    "step1_desc": "Aquí puedes ver tu dinero total y oro.",
+    "step2_title": "Tiempo de Juego",
+    "step2_desc": "Esta cuenta regresiva muestra cuándo comienza el próximo día del juego.",
+    "step3_title": "Misiones",
+    "step3_desc": "Completa misiones diarias para ganar recompensas extra.",
+    "step4_title": "Colección",
+    "step4_desc": "Completa tu colección adquiriendo diferentes modelos de vehículos.",
+    "step5_title": "Comprar Galería",
+    "step5_desc": "Abre tu propia galería para desbloquear alquiler de vehículos y más funciones.",
+    "step6_title": "Mercado",
+    "step6_desc": "Visita el mercado para comprar nuevos vehículos.",
+    "step7_title": "Vender Vehículo",
+    "step7_desc": "Vende vehículos de tu garaje para obtener ganancias.",
+    "step8_title": "Mi Garaje",
+    "step8_desc": "Gestiona todos tus vehículos propios aquí.",
+    "step9_title": "Mis Anuncios",
+    "step9_desc": "Rastrea tus vehículos puestos a la venta aquí.",
+    "step10_title": "Ofertas",
+    "step10_desc": "Gestiona ofertas entrantes y salientes aquí.",
+    "step11_title": "Tienda",
+    "step11_desc": "Visita la tienda para comprar oro y paquetes especiales.",
+    "finish": "Terminar",
+    "skip": "Omitir"
+  },
+  "permissions": {
+    "tracking_description": "Este permiso es necesario para proporcionarte anuncios más interesantes."
+  }
+}
