@@ -20,6 +20,7 @@ class LeaderboardService {
         'profileImageUrl': user.profileImageUrl,
         'level': user.level,
         'isVip': user.isVip,
+        'email': user.email, // E-posta adresini de ekle (filtreleme için)
         'lastUpdated': FieldValue.serverTimestamp(),
       };
 
@@ -46,10 +47,14 @@ class LeaderboardService {
       final querySnapshot = await _firestore
           .collection(collectionName)
           .orderBy('balance', descending: true)
-          .limit(limit)
+          .limit(limit + 5) // Filtreleme ihtimaline karşı biraz fazla çek
           .get();
 
-      return querySnapshot.docs.map((doc) => doc.data()).toList();
+      return querySnapshot.docs
+          .map((doc) => doc.data())
+          .where((data) => data['email'] != 'selimyay123@gmail.com') // Test hesabını gizle
+          .take(limit)
+          .toList();
     } catch (e) {
       print('Error fetching leaderboard: $e');
       return [];

@@ -1787,15 +1787,16 @@ class _StoreScreenState extends State<StoreScreen> {
                             Text('store.confirmConvertMessage'.tr()),
                             const SizedBox(height: 16),
                             Container(
+                              width: double.infinity,
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: Colors.amber.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              child: Column(
                                 children: [
                                   Text('store.goldAmount'.tr()),
+                                  const SizedBox(height: 4),
                                   Text(
                                     '${selectedGold.toStringAsFixed(1)} Gold',
                                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amber),
@@ -1807,15 +1808,16 @@ class _StoreScreenState extends State<StoreScreen> {
                             const Icon(Icons.arrow_downward, color: Colors.grey),
                             const SizedBox(height: 8),
                             Container(
+                              width: double.infinity,
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: Colors.green.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              child: Column(
                                 children: [
                                   Text('store.gameCurrency'.tr()),
+                                  const SizedBox(height: 4),
                                   Text(
                                     '${_formatCurrency(selectedGold * 1000000)} TL',
                                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
@@ -1843,8 +1845,8 @@ class _StoreScreenState extends State<StoreScreen> {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               CustomSnackBar(
-                                content: Text('store.insufficientGold'.tr()),
-                                backgroundColor: Colors.red,
+                                content: Text('store.purchaseSuccess'.tr()),
+                                backgroundColor: Colors.green,
                               ),
                             );
                           }
