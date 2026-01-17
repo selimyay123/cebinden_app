@@ -2570,9 +2570,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 children: [
                   // Sol: Araç Adı
                   Expanded(
-                    flex: 4,
+                    flex: 3,
                     child: Text(
-                      vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
+                      vehicle.brand,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -2585,7 +2585,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   
                   // Orta: Gelir
                   Expanded(
-                    flex: 3,
+                    flex: 4,
                     child: Center(
                       child: Text(
                         vehicle.isRented 

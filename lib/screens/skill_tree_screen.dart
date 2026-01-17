@@ -261,7 +261,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                 Text(
                   'skills.availablePoints'.tr(),
                   style: TextStyle(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -274,7 +274,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                     return Text(
                       value.toString(),
                       style: const TextStyle(
-                        color: Colors.black87,
+                        color: Colors.white,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
