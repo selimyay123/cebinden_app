@@ -32,6 +32,7 @@ import '../models/daily_quest_model.dart';
 import '../widgets/modern_alert_dialog.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/level_up_dialog.dart';
+import '../widgets/modern_button.dart';
 import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
 import 'taxi_game_screen.dart';
@@ -1181,13 +1182,16 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                           children: [
                             // Mevcut Altın
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              width: 120,
+                              height: 40,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 color: Colors.transparent,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.amber, width: 1.5),
                               ),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Icon(Icons.monetization_on, color: Colors.amber, size: 20),
                                   const SizedBox(width: 8),
@@ -1195,7 +1199,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                     _currentUser!.gold.toStringAsFixed(2),
                                     style: const TextStyle(
                                       color: Colors.amber,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -1206,29 +1210,21 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                             const SizedBox(width: 12),
                             
                             // Altın Al Butonu
-                            ElevatedButton(
+                            // Altın Al Butonu
+                            ModernButton(
+                              text: 'home.buyGold'.tr(),
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => const StoreScreen()),
                                 );
                               },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber,
-                                foregroundColor: Colors.deepPurple,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                              ),
-                              child: Text(
-                                'home.buyGold'.tr(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
+                              color: Colors.amber,
+                              textColor: Colors.deepPurple,
+                              gradientColors: [Colors.amber, Colors.amber.shade700],
+                              height: 40,
+                              width: 120,
+                              isFullWidth: false,
                             ),
                           ],
                         ),

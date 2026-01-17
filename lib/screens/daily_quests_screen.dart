@@ -17,7 +17,7 @@ class DailyQuestsScreen extends StatefulWidget {
   State<DailyQuestsScreen> createState() => _DailyQuestsScreenState();
 }
 
-class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
+class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTickerProviderStateMixin {
   final DailyQuestService _questService = DailyQuestService();
   final MissionService _missionService = MissionService();
   final DatabaseHelper _db = DatabaseHelper();
@@ -27,10 +27,36 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
   bool _isLoading = true;
   Map<String, dynamic>? _currentUser;
 
+  AnimationController? _animationController;
+  Animation<double>? _animation;
+
   @override
   void initState() {
     super.initState();
+    _initAnimation();
     _checkAndLoadQuests();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_animationController == null) {
+      _initAnimation();
+    }
+  }
+
+  void _initAnimation() {
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.2, end: 1.0).animate(_animationController!);
+  }
+
+  @override
+  void dispose() {
+    _animationController?.dispose();
+    super.dispose();
   }
 
   Future<void> _checkAndLoadQuests() async {
@@ -161,13 +187,35 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
             icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
             onPressed: () => Navigator.pop(context),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: Colors.black,
             unselectedLabelColor: Colors.black,
             indicatorColor: Colors.black,
             tabs: [
-              Tab(text: 'Günlük'), // TODO: Çeviri eklenebilir
-              Tab(text: 'Görevler'),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Günlük'), // TODO: Çeviri eklenebilir
+                    if (_getUnclaimedDailyQuestsCount() > 0) ...[
+                      const SizedBox(width: 8),
+                      _buildBlinkingBadge(_getUnclaimedDailyQuestsCount()),
+                    ],
+                  ],
+                ),
+              ),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Görevler'),
+                    if (_getUnclaimedMissionsCount() > 0) ...[
+                      const SizedBox(width: 8),
+                      _buildBlinkingBadge(_getUnclaimedMissionsCount()),
+                    ],
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -493,6 +541,38 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> {
   String _formatCurrency(double amount) {
     final formatter = NumberFormat('#,###', 'tr_TR');
     return formatter.format(amount);
+  }
+
+  int _getUnclaimedDailyQuestsCount() {
+    return _quests.where((q) => q.isCompleted && !q.isClaimed).length;
+  }
+
+  int _getUnclaimedMissionsCount() {
+    return _missions.where((m) => m.isCompleted && !m.isClaimed).length;
+  }
+
+  Widget _buildBlinkingBadge(int count) {
+    if (_animation == null) return const SizedBox.shrink();
+    
+    return FadeTransition(
+      opacity: _animation!,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.white, width: 1),
+        ),
+        child: Text(
+          count.toString(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
   }
 
   String _formatCompactNumber(double value) {

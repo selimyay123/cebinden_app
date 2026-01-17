@@ -10,6 +10,7 @@ import '../utils/currency_input_formatter.dart';
 import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
 import '../widgets/game_image.dart';
+import '../widgets/modern_button.dart';
 
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
@@ -108,7 +109,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
     try {
       final listingPrice = CurrencyInputFormatter.parse(_priceController.text);
-      final listingDescription = _descriptionController.text.trim();
+      // final listingDescription = _descriptionController.text.trim();
+      final listingDescription = ''; // Description hidden
 
       final success = await _db.listVehicleForSale(
         vehicleId: widget.vehicle.id,
@@ -198,34 +200,25 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               const SizedBox(height: 16),
 
               // Açıklama Girişi
-              _buildDescriptionInput(),
-              const SizedBox(height: 16),
+              // _buildDescriptionInput(),
+              // const SizedBox(height: 16),
 
               // Satışa Çıkar Butonu
               SizedBox(
                 width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _createListing,
-                  icon: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.check_circle),
-                  label: Text(_isLoading ? 'sell.creatingListing'.tr() : 'sell.listForSaleButton'.tr()),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.green,
+                        ),
+                      )
+                    : ModernButton(
+                        text: 'sell.listForSaleButton'.tr(),
+                        onPressed: _createListing,
+                        color: Colors.green,
+                        gradientColors: [Colors.green.shade400, Colors.green.shade700],
+                        height: 56,
+                      ),
               ),
             ],
           ),

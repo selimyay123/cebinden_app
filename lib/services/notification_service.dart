@@ -80,37 +80,82 @@ class NotificationService {
       
       if (!isEnabled) return;
 
-      // Bildirim oluştur
-      final notification = AppNotification(
-        id: 'notif_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}',
-        userId: userId,
-        type: NotificationType.newOffer, // İkon için newOffer kullanıyoruz
-        title: 'notifications.bulkOffer.title'.tr(),
-        message: 'notifications.bulkOffer.message'.trParams({
-          'brand': vehicleBrand,
-          'model': vehicleModel,
-          'count': offerCount.toString(),
-        }),
-        createdAt: DateTime.now(),
-        data: {
-          'vehicleId': vehicleId,
-          'brand': vehicleBrand,
-          'model': vehicleModel,
-          'offerCount': offerCount,
-          'isBulk': true,
-        },
-        // 🆕 Dynamic Localization
-        titleKey: 'notifications.bulkOffer.title',
-        messageKey: 'notifications.bulkOffer.message',
-        params: {
-          'brand': vehicleBrand,
-          'model': vehicleModel,
-          'count': offerCount.toString(),
-        },
+      // 🆕 CONSOLIDATION LOGIC:
+      // Önce bu araç için okunmamış bir "newOffer" bildirimi var mı kontrol et
+      final existingNotifications = await getUserNotifications(userId);
+      final existingNotification = existingNotifications.firstWhere(
+        (n) => 
+          !n.isRead && 
+          n.type == NotificationType.newOffer && 
+          n.data != null && 
+          n.data!['vehicleId'] == vehicleId,
+        orElse: () => AppNotification(
+          id: '', 
+          userId: '', 
+          type: NotificationType.system, 
+          title: '', 
+          message: '', 
+          createdAt: DateTime.now()
+        ), // Dummy object
       );
 
-      // Veritabanına kaydet
-      await _db.addNotification(notification);
+      if (existingNotification.id.isNotEmpty) {
+        // Mevcut bildirimi güncelle
+        final currentCount = existingNotification.data?['offerCount'] ?? 0;
+        final newTotalCount = (currentCount is int ? currentCount : int.tryParse(currentCount.toString()) ?? 0) + offerCount;
+        
+        // Mesajı ve datayı güncelle
+        await _db.updateNotification(existingNotification.id, {
+          'message': 'notifications.bulkOffer.message'.trParams({
+            'brand': vehicleBrand,
+            'model': vehicleModel,
+            'count': newTotalCount.toString(),
+          }),
+          'createdAt': DateTime.now().toIso8601String(), // Zamanı güncelle ki en üste çıksın
+          'data': {
+            ...existingNotification.data!,
+            'offerCount': newTotalCount,
+          },
+          'params': {
+            'brand': vehicleBrand,
+            'model': vehicleModel,
+            'count': newTotalCount.toString(),
+          }
+        });
+        
+      } else {
+        // Yeni bildirim oluştur
+        final notification = AppNotification(
+          id: 'notif_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}',
+          userId: userId,
+          type: NotificationType.newOffer, // İkon için newOffer kullanıyoruz
+          title: 'notifications.bulkOffer.title'.tr(),
+          message: 'notifications.bulkOffer.message'.trParams({
+            'brand': vehicleBrand,
+            'model': vehicleModel,
+            'count': offerCount.toString(),
+          }),
+          createdAt: DateTime.now(),
+          data: {
+            'vehicleId': vehicleId,
+            'brand': vehicleBrand,
+            'model': vehicleModel,
+            'offerCount': offerCount,
+            'isBulk': true,
+          },
+          // 🆕 Dynamic Localization
+          titleKey: 'notifications.bulkOffer.title',
+          messageKey: 'notifications.bulkOffer.message',
+          params: {
+            'brand': vehicleBrand,
+            'model': vehicleModel,
+            'count': offerCount.toString(),
+          },
+        );
+
+        // Veritabanına kaydet
+        await _db.addNotification(notification);
+      }
       
     } catch (e) {
       debugPrint('Error sending bulk notification: $e');

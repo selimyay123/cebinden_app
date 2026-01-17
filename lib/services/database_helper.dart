@@ -874,6 +874,25 @@ class DatabaseHelper {
     }
   }
 
+  // Bildirim güncelle
+  Future<bool> updateNotification(String notificationId, Map<String, dynamic> updates) async {
+    try {
+      final notificationMap = _notificationsBox.get(notificationId);
+      if (notificationMap == null) return false;
+
+      final updatedMap = Map<dynamic, dynamic>.from(notificationMap);
+      updates.forEach((key, value) {
+        updatedMap[key] = value;
+      });
+
+      await _notificationsBox.put(notificationId, updatedMap);
+      await _notificationsBox.flush();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // Kullanıcının tüm bildirimlerini getir
   Future<List<AppNotification>> getUserNotifications(String userId) async {
     try {

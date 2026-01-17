@@ -15,6 +15,7 @@ import '../models/user_model.dart';
 import 'package:lottie/lottie.dart';
 import '../widgets/modern_alert_dialog.dart';
 import '../widgets/game_image.dart';
+import '../widgets/modern_button.dart';
 
 class SellVehicleScreen extends StatefulWidget {
   const SellVehicleScreen({super.key});
@@ -342,36 +343,24 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
               width: double.infinity,
               child: Column(
                 children: [
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CreateListingScreen(vehicle: vehicle),
-                              ),
-                            );
-                            if (result == true && context.mounted) {
-                              _loadUserVehicles(); // İlan oluşturulduysa listeyi yenile
-                            }
-                          },
-                          icon: const Icon(Icons.sell, size: 18),
-                          label: Text(
-                            'sell.listForSaleButton'.tr(),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green.withOpacity(0.7),
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size(0, 48),
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                      ModernButton(
+                        text: 'sell.listForSaleButton'.tr(),
+                        onPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CreateListingScreen(vehicle: vehicle),
                             ),
-                          ),
-                        ),
+                          );
+                          if (result == true && context.mounted) {
+                            _loadUserVehicles(); // İlan oluşturulduysa listeyi yenile
+                          }
+                        },
+                        color: Colors.green,
+                        gradientColors: [Colors.green.shade400, Colors.green.shade700],
                       ),
                       
                       // Hızlı Sat Butonu (Eğer yetenek açıksa)
@@ -381,42 +370,13 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                             final level = SkillService().getSkillLevel(_currentUser!, SkillService.skillQuickSell);
                             if (level > 0) {
                               final margin = SkillService.quickSellMargins[level] ?? 0.0;
-                              return Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 8),
-                                  child: ElevatedButton(
-                                    onPressed: () => _showQuickSellConfirmation(vehicle),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange.shade800.withOpacity(0.7),
-                                      foregroundColor: Colors.white,
-                                      minimumSize: const Size(0, 48),
-                                      padding: const EdgeInsets.symmetric(vertical: 8),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: FittedBox(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(Icons.flash_on, size: 16),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            'skills.quickSell'.tr(),
-                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '(${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white.withOpacity(0.9),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: ModernButton(
+                                  text: '${'skills.quickSell'.tr()} (${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
+                                  onPressed: () => _showQuickSellConfirmation(vehicle),
+                                  color: Colors.orange,
+                                  gradientColors: [Colors.orange.shade400, Colors.deepOrange.shade700],
                                 ),
                               );
                             }

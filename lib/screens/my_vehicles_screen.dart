@@ -26,6 +26,7 @@ import '../services/xp_service.dart';
 import '../widgets/level_up_dialog.dart';
 import '../services/xp_service.dart';
 import '../widgets/level_up_dialog.dart';
+import '../widgets/modern_button.dart';
 
 class MyVehiclesScreen extends StatefulWidget {
   final String? selectedBrand; // null = marka listesi göster, brand = o markanın araçlarını göster
@@ -798,56 +799,35 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                OutlinedButton.icon(
+                ModernButton(
+                  text: 'misc.vehicleDetails'.tr(),
                   onPressed: () {
                     _showVehicleDetailsDialog(vehicle);
                   },
-                  icon: const Icon(Icons.info_outline, size: 18),
-                  label: Text('misc.vehicleDetails'.tr()),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.deepPurple,
-                    side: const BorderSide(color: Colors.deepPurple),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+                  isOutlined: true,
+                  color: Colors.deepPurple,
                 ),
                 // "Sat" butonu sadece araç satışta DEĞİLse görünsün
                 if (!vehicle.isListedForSale) ...[
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        // Satışa çıkarma ekranına git
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CreateListingScreen(vehicle: vehicle),
-                          ),
-                        );
-                        
-                        // Eğer satışa çıkarma başarılıysa listeyi yenile
-                        if (result == true) {
-                          await _loadMyVehicles();
-                        }
-                      },
-                      icon: const Icon(Icons.sell, size: 18),
-                      label: Text(
-                        'misc.sellVehicle'.tr(),
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(0, 48),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 12),
+                  ModernButton(
+                    text: 'misc.sellVehicle'.tr(),
+                    onPressed: () async {
+                      // Satışa çıkarma ekranına git
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CreateListingScreen(vehicle: vehicle),
                         ),
-                      ),
-                    ),
+                      );
+                      
+                      // Eğer satışa çıkarma başarılıysa listeyi yenile
+                      if (result == true) {
+                        await _loadMyVehicles();
+                      }
+                    },
+                    color: Colors.green,
+                    gradientColors: [Colors.green.shade400, Colors.green.shade700],
                   ),
                   
                   // Hızlı Sat Butonu (Eğer yetenek açıksa)
@@ -858,42 +838,12 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen> with RouteAware, Au
                         if (level > 0) {
                           final margin = SkillService.quickSellMargins[level] ?? 0.0;
                           return Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () => _showQuickSellConfirmation(vehicle),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange.shade800,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size(0, 48),
-                                  padding: const EdgeInsets.symmetric(vertical: 8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: FittedBox(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(Icons.flash_on, size: 16),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'skills.quickSell'.tr(),
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '(${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.white.withOpacity(0.9),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                            padding: const EdgeInsets.only(top: 12),
+                            child: ModernButton(
+                              text: '${'skills.quickSell'.tr()} (${'skills.quickSellProfit'.trParams({'percent': '%${(margin * 100).toInt()}'})})',
+                              onPressed: () => _showQuickSellConfirmation(vehicle),
+                              color: Colors.orange,
+                              gradientColors: [Colors.orange.shade400, Colors.deepOrange.shade700],
                             ),
                           );
                         }
