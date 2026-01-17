@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../models/user_model.dart';
+import '../models/user_vehicle_model.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -17,8 +18,12 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   
   User? _currentUser;
   bool _isLoading = true;
-  int _vehicleCount = 0;
-  int _pendingOffersCount = 0;
+  
+  // Garage Stats
+  int _totalVehicles = 0;
+  double _garageValue = 0;
+  String _mostExpensiveCarName = "-";
+  double _mostExpensiveCarPrice = 0;
 
   @override
   void initState() {
@@ -32,13 +37,32 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final user = await _authService.getCurrentUser();
     if (user != null) {
       final vehicles = await _db.getUserVehicles(user.id);
-      final pendingOffers = await _db.getPendingOffersCount(user.id);
+      
+      // Calculate stats
+      double totalValue = 0;
+      double maxPrice = 0;
+      String maxPriceName = "-";
+      
+      for (var vehicle in vehicles) {
+        // Assuming purchasePrice is available or we use price
+        // If purchasePrice is not available in UserVehicle, we might need to fetch it or use current price
+        // For now, let's assume we use the price field which represents current value or purchase price
+        double price = vehicle.purchasePrice; 
+        totalValue += price;
+        
+        if (price > maxPrice) {
+          maxPrice = price;
+          maxPriceName = "${vehicle.brand} ${vehicle.model}";
+        }
+      }
       
       if (mounted) {
         setState(() {
           _currentUser = user;
-          _vehicleCount = vehicles.length;
-          _pendingOffersCount = pendingOffers;
+          _totalVehicles = vehicles.length;
+          _garageValue = totalValue;
+          _mostExpensiveCarPrice = maxPrice;
+          _mostExpensiveCarName = maxPriceName;
           _isLoading = false;
         });
       }
@@ -49,98 +73,146 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     }
   }
 
+  String _formatCurrency(double value) {
+    return '\$${value.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('home.statistics'.tr()),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        title: Text(
+          'home.statistics'.tr(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.deepPurpleAccent,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _currentUser == null
-              ? Center(child: Text('auth.loginRequired'.tr()))
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildStatCard(
-                      icon: Icons.directions_car,
-                      label: 'home.totalVehicles'.tr(),
-                      value: _vehicleCount.toString(),
-                      color: Colors.blue,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/general_bg.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator(color: Colors.white))
+            : _currentUser == null
+                ? Center(child: Text('auth.loginRequired'.tr(), style: const TextStyle(color: Colors.white)))
+                : SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        children: [
+                          // Garage Stats Section
+                          _buildSectionTitle('home.myVehicles'.tr()), // Using 'My Vehicles' as title for Garage section
+                          const SizedBox(height: 16),
+                          
+                          _buildStatItem(
+                            'home.totalVehicles'.tr(),
+                            _totalVehicles.toString(),
+                          ),
+                          const SizedBox(height: 12),
+                          
+                          _buildStatItem(
+                            'stats.garage_value'.tr(),
+                            _formatCurrency(_garageValue),
+                          ),
+                          const SizedBox(height: 12),
+                          
+                          _buildStatItem(
+                            'stats.most_expensive'.tr(),
+                            _mostExpensiveCarName,
+                            subValue: _mostExpensiveCarPrice > 0 ? _formatCurrency(_mostExpensiveCarPrice) : null,
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildStatCard(
-                      icon: Icons.local_offer,
-                      label: 'home.pendingOffers'.tr(),
-                      value: _pendingOffersCount.toString(),
-                      color: Colors.orange,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildStatCard(
-                      icon: Icons.show_chart,
-                      label: 'home.totalTransactions'.tr(),
-                      value: _vehicleCount.toString(), // Geçici olarak araç sayısı kullanılıyor, home_screen ile aynı
-                      color: Colors.green,
-                    ),
-                  ],
-                ),
+                  ),
+      ),
     );
   }
 
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
+  Widget _buildSectionTitle(String title) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.white.withOpacity(0.3),
+            width: 1,
           ),
-        ],
+        ),
       ),
-      child: Row(
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String label, String value, {String? subValue}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 14,
             ),
-            child: Icon(icon, color: color, size: 32),
           ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 24,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+              ),
+              if (subValue != null)
                 Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                  subValue,
+                  style: const TextStyle(
+                    color: Colors.amber,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
         ],
       ),

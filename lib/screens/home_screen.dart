@@ -104,15 +104,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   final GlobalKey _questsCardKey = GlobalKey();
   final GlobalKey _collectionCardKey = GlobalKey();
   final GlobalKey _buyGalleryButtonKey = GlobalKey();
-  
-  // Eski keyler (artık kullanılmıyor olabilir ama referans için tutuyorum)
-  final GlobalKey _marketButtonKey = GlobalKey();
-  final GlobalKey _myVehiclesButtonKey = GlobalKey();
-  final GlobalKey _sellVehicleButtonKey = GlobalKey();
-  final GlobalKey _offersButtonKey = GlobalKey();
-  final GlobalKey _storeButtonKey = GlobalKey();
   final GlobalKey _taxiGameButtonKey = GlobalKey();
-  final GlobalKey _myListingsButtonKey = GlobalKey();
+
   
   // Kiralama geliri animasyonu için
   double _lastRentalIncome = 0.0;
@@ -3551,6 +3544,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     }
   }
 
+
+
   /// Tutorial'ı tamamlandı olarak işaretle
   Future<void> _setTutorialCompleted() async {
     if (_currentUser == null) return;
@@ -3590,23 +3585,27 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         curve: Curves.easeInOut,
       ).then((_) {
         if (!mounted) return;
-        _startTutorialPart1();
+        if (!mounted) return;
+        _startTutorialSequence();
       });
     } else {
-      _startTutorialPart1();
+      _startTutorialSequence();
     }
   }
 
-  void _startTutorialPart1() {
-    // Bölüm 1: Bakiye ve Oyun Zamanı
+  void _startTutorialSequence() {
+    // Bottom Navigation Bar Tutorial
     TutorialCoachMark(
-      targets: _createTutorialTargetsPart1(),
+      targets: _createTutorialTargets(),
       colorShadow: Colors.black,
       textSkip: "tutorial.skip".tr(),
       paddingFocus: 10,
       opacityShadow: 0.8,
       onFinish: () {
-        _startTutorialPart2();
+        _setTutorialCompleted();
+        setState(() {
+          _isTutorialActive = false;
+        });
       },
       onClickTarget: (target) {},
       onClickOverlay: (target) {},
@@ -3620,414 +3619,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     ).show(context: widget.mainScaffoldKey?.currentContext ?? context);
   }
 
-  void _startTutorialPart2() {
-    // Bölüm 2: Görevler ve Koleksiyon
-    // Biraz aşağı kaydır (Quests ve Collection görünsün diye)
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        150.0, 
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      ).then((_) {
-        if (!mounted) return;
-        
-        TutorialCoachMark(
-          targets: _createTutorialTargetsPart2(),
-          colorShadow: Colors.black,
-          textSkip: "tutorial.skip".tr(),
-          paddingFocus: 10,
-          opacityShadow: 0.8,
-          onFinish: () {
-            _startTutorialPart3();
-          },
-          onSkip: () {
-            _setTutorialCompleted();
-            setState(() {
-              _isTutorialActive = false;
-            });
-            return true;
-          },
-        ).show(context: widget.mainScaffoldKey?.currentContext ?? context);
-      });
-    }
-  }
 
-  void _startTutorialPart3() {
-    // Bölüm 3: Galeri Satın Al
-    // Galeri butonuna kaydır
-    if (_scrollController.hasClients) {
-       // Butonun context'i varsa ona kaydır, yoksa tahmin et
-       if (_buyGalleryButtonKey.currentContext != null) {
-         Scrollable.ensureVisible(
-          _buyGalleryButtonKey.currentContext!,
-          alignment: 0.5,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        ).then((_) {
-           if (!mounted) return;
-           _showTutorialPart3CoachMark();
-        });
-       } else {
-         // Fallback scroll
-         _scrollController.animateTo(
-          500.0,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        ).then((_) {
-           if (!mounted) return;
-           _showTutorialPart3CoachMark();
-        });
-       }
-    }
-  }
 
-  void _showTutorialPart3CoachMark() {
-    TutorialCoachMark(
-      targets: _createTutorialTargetsPart3(),
-      colorShadow: Colors.black,
-      textSkip: "tutorial.skip".tr(),
-      paddingFocus: 10,
-      opacityShadow: 0.8,
-      onFinish: () {
-        _startTutorialPart4();
-      },
-      onSkip: () {
-        _setTutorialCompleted();
-        setState(() {
-          _isTutorialActive = false;
-        });
-        return true;
-      },
-    ).show(context: widget.mainScaffoldKey?.currentContext ?? context);
-  }
-
-  void _startTutorialPart4() {
-    // Bölüm 4: Bottom Navigation Bar
-    // Scroll yapmadan direkt devam et (Kullanıcı isteği)
-    if (!mounted) return;
-    
-    TutorialCoachMark(
-      targets: _createTutorialTargetsPart4(),
-      colorShadow: Colors.black,
-      textSkip: "tutorial.skip".tr(),
-      paddingFocus: 10,
-      opacityShadow: 0.8,
-      onFinish: () {
-        _setTutorialCompleted();
-        setState(() {
-          _isTutorialActive = false;
-        });
-      },
-      onSkip: () {
-        _setTutorialCompleted();
-        setState(() {
-          _isTutorialActive = false;
-        });
-        return true;
-      },
-    ).show(context: widget.mainScaffoldKey?.currentContext ?? context);
-  }
-
-  void _scrollToTarget(GlobalKey key) {
-    if (key.currentContext != null) {
-      Scrollable.ensureVisible(
-        key.currentContext!,
-        alignment: 0.5, // Ortala
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  /// Tutorial Bölüm 1 (Scroll gerektirmeyen üst kısım)
-  List<TargetFocus> _createTutorialTargetsPart1() {
+  /// Tutorial Targets (Bottom Navigation Bar)
+  List<TargetFocus> _createTutorialTargets() {
     return [
-      // ADIM 1: Bakiye ve Altın
-      TargetFocus(
-        identify: "balance",
-        keyTarget: _balanceKey,
-        alignSkip: Alignment.topRight,
-        shape: ShapeLightFocus.RRect,
-        radius: 15,
-        paddingFocus: 0, // Hedefe daha yakın olması için padding'i sıfırladık
-        focusAnimationDuration: const Duration(milliseconds: 600),
-        contents: [
-          TargetContent(
-            align: ContentAlign.bottom,
-            builder: (context, controller) => Container(
-              padding: const EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'tutorial.step1_title'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20, // 24 -> 20
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8), // 12 -> 8
-                  Text(
-                    'tutorial.step1_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14, // 16 -> 14
-                    ),
-                  ),
-                  const SizedBox(height: 10), // 20 -> 10
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '1/11',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 12, // 14 -> 12
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-
-      // ADIM 2: Oyun Zamanı
-      TargetFocus(
-        identify: "game_time",
-        keyTarget: _gameTimeKey,
-        alignSkip: Alignment.topRight,
-        shape: ShapeLightFocus.RRect,
-        radius: 15,
-        focusAnimationDuration: const Duration(milliseconds: 600),
-        contents: [
-          TargetContent(
-            align: ContentAlign.top, // Düzeltildi: Üstte görünsün
-            builder: (context, controller) => Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'tutorial.step2_title'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'tutorial.step2_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '2/10',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-
-
-    ];
-  }
-
-  /// Tutorial Bölüm 2 (Scroll gerektiren alt kısım)
-  /// Tutorial Bölüm 2 (Scroll gerektiren alt kısım)
-  /// Tutorial Bölüm 2 (Görevler ve Koleksiyon)
-  List<TargetFocus> _createTutorialTargetsPart2() {
-    return [
-      // ADIM 3: Görevler
-      TargetFocus(
-        identify: "quests",
-        keyTarget: _questsCardKey,
-        alignSkip: Alignment.topRight,
-        shape: ShapeLightFocus.RRect,
-        radius: 15,
-        focusAnimationDuration: const Duration(milliseconds: 600),
-        contents: [
-          TargetContent(
-            align: ContentAlign.top, // Changed to top
-            builder: (context, controller) => Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'tutorial.step3_title'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'tutorial.step3_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '3/11',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-
-      // ADIM 4: Koleksiyon
-      TargetFocus(
-        identify: "collection",
-        keyTarget: _collectionCardKey,
-        alignSkip: Alignment.topRight,
-        shape: ShapeLightFocus.RRect,
-        radius: 15,
-        focusAnimationDuration: const Duration(milliseconds: 600),
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) => Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'tutorial.step4_title'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'tutorial.step4_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '4/11',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    ];
-  }
-  
-  /// Tutorial Bölüm 3 (Galeri Satın Al)
-  List<TargetFocus> _createTutorialTargetsPart3() {
-    return [
-      // ADIM 5: Galeri Satın Al
-      TargetFocus(
-        identify: "buy_gallery",
-        keyTarget: _buyGalleryButtonKey,
-        alignSkip: Alignment.topRight,
-        shape: ShapeLightFocus.RRect,
-        radius: 15,
-        focusAnimationDuration: const Duration(milliseconds: 600),
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) => Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'tutorial.step5_title'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'tutorial.step5_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '5/11',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    ];
-  }
-
-  /// Tutorial Bölüm 4 (Bottom Navigation Bar)
-  List<TargetFocus> _createTutorialTargetsPart4() {
-    return [
-      // ADIM 6: Market
+      // ADIM 1: Market
       TargetFocus(
         identify: "market_tab",
         keyTarget: widget.marketTabKey,
@@ -4045,7 +3642,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'tutorial.step6_title'.tr(),
+                    'tutorial.market_title'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -4054,7 +3651,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'tutorial.step6_desc'.tr(),
+                    'tutorial.market_desc'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -4062,7 +3659,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    '6/11',
+                    '1/6',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
@@ -4075,7 +3672,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         ],
       ),
 
-      // ADIM 7: Araç Sat
+      // ADIM 2: Araç Sat
       TargetFocus(
         identify: "sell_tab",
         keyTarget: widget.sellTabKey,
@@ -4093,7 +3690,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'tutorial.step7_title'.tr(),
+                    'tutorial.sell_title'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -4102,7 +3699,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'tutorial.step7_desc'.tr(),
+                    'tutorial.sell_desc'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -4110,7 +3707,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    '7/11',
+                    '2/6',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
@@ -4123,7 +3720,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         ],
       ),
 
-      // ADIM 8: Garajım
+      // ADIM 3: Garajım
       TargetFocus(
         identify: "garage_tab",
         keyTarget: widget.garageTabKey,
@@ -4141,7 +3738,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'tutorial.step8_title'.tr(),
+                    'tutorial.garage_title'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -4150,7 +3747,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'tutorial.step8_desc'.tr(),
+                    'tutorial.garage_desc'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -4158,7 +3755,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    '8/11',
+                    '3/6',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
@@ -4171,7 +3768,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         ],
       ),
 
-      // ADIM 9: İlanlarım
+      // ADIM 4: İlanlarım
       TargetFocus(
         identify: "listings_tab",
         keyTarget: widget.listingsTabKey,
@@ -4189,7 +3786,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'tutorial.step9_title'.tr(),
+                    'tutorial.listings_title'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -4198,7 +3795,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'tutorial.step9_desc'.tr(),
+                    'tutorial.listings_desc'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -4206,7 +3803,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    '9/11',
+                    '4/6',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
@@ -4219,7 +3816,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         ],
       ),
 
-      // ADIM 10: Teklifler
+      // ADIM 5: Teklifler
       TargetFocus(
         identify: "offers_tab",
         keyTarget: widget.offersTabKey,
@@ -4237,7 +3834,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'tutorial.step10_title'.tr(),
+                    'tutorial.offers_title'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -4246,7 +3843,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'tutorial.step10_desc'.tr(),
+                    'tutorial.offers_desc'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -4254,7 +3851,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    '10/11',
+                    '5/6',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
@@ -4267,7 +3864,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         ],
       ),
 
-      // ADIM 11: Mağaza
+      // ADIM 6: Mağaza
       TargetFocus(
         identify: "store_tab",
         keyTarget: widget.storeTabKey,
@@ -4285,7 +3882,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'tutorial.step11_title'.tr(),
+                    'tutorial.store_title'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -4294,7 +3891,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'tutorial.step11_desc'.tr(),
+                    'tutorial.store_desc'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -4305,7 +3902,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '11/11',
+                        '6/6',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 14,
@@ -4323,6 +3920,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                           decoration: BoxDecoration(
                             color: Colors.green,
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white, width: 1),
                           ),
                           child: Text(
                             'tutorial.finish'.tr(),
