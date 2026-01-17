@@ -145,7 +145,7 @@ flutter:
 flutter_launcher_icons:
   android: "ic_cebinden"
   ios: true
-  image_path: "assets/app_logo/cebinden_logo.png"
+  image_path: "assets/app_logo/cebinden_logo_v2.png"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/app_logo/cebinden_logo.png"
+  adaptive_icon_foreground: "assets/app_logo/cebinden_logo_adaptive.png"
   min_sdk_android: 21
