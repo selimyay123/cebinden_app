@@ -1,7 +1,4 @@
-import 'dart:io';
 import 'dart:async';
-import 'dart:ui';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,20 +7,14 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../services/notification_service.dart';
 import '../services/ad_service.dart';
-import '../services/xp_service.dart';
+
 import '../services/game_time_service.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
-import 'login_screen.dart';
-// import 'vehicle_category_screen.dart'; // YORUM: Kategori seçimi şimdilik devre dışı, doğrudan otomobil kategorisi
-import 'brand_selection_screen.dart'; // Doğrudan marka seçimi için
-import 'vehicle_detail_screen.dart';
+
+// Doğrudan marka seçimi için
 import 'opportunity_list_screen.dart';
 import 'settings_screen.dart';
-import 'my_vehicles_screen.dart';
-import 'sell_vehicle_screen.dart';
-import 'my_listings_screen.dart';
-import 'my_offers_screen.dart';
 import 'notifications_screen.dart';
 import 'store_screen.dart';
 import 'daily_quests_screen.dart';
@@ -31,11 +22,12 @@ import '../services/daily_quest_service.dart';
 import '../models/daily_quest_model.dart';
 import '../widgets/modern_alert_dialog.dart';
 import '../widgets/custom_snackbar.dart';
-import '../widgets/level_up_dialog.dart';
+import 'manage_staff_screen.dart';
+import '../services/staff_service.dart';
+
 import '../widgets/modern_button.dart';
 import '../services/daily_login_service.dart';
 import '../widgets/daily_login_dialog.dart';
-import 'taxi_game_screen.dart';
 import 'package:lottie/lottie.dart';
 import 'skill_tree_screen.dart';
 import '../services/rental_service.dart'; // Kiralama Servisi
@@ -43,7 +35,6 @@ import '../services/rental_service.dart'; // Kiralama Servisi
 import '../widgets/game_time_countdown.dart'; // 🆕 Game Time Countdown
 import 'activity_screen.dart';
 import 'leaderboard_screen.dart';
-// import 'social/social_hub_screen.dart';
 import '../services/leaderboard_service.dart';
 import '../widgets/city_skyline_painter.dart';
 import '../mixins/auto_refresh_mixin.dart';
@@ -51,7 +42,6 @@ import 'collection_screen.dart';
 import '../services/market_refresh_service.dart';
 import '../widgets/user_profile_avatar.dart';
 import '../widgets/game_image.dart';
-
 
 class HomeScreen extends StatefulWidget {
   final GlobalKey? marketTabKey;
@@ -77,12 +67,12 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with RouteAware, AutoRefreshMixin {
   final AuthService _authService = AuthService();
   final DatabaseHelper _db = DatabaseHelper();
   final AdService _adService = AdService();
   final NotificationService _notificationService = NotificationService();
-  final XPService _xpService = XPService();
   final DailyQuestService _questService = DailyQuestService();
   final DailyLoginService _loginService = DailyLoginService();
   final GameTimeService _gameTime = GameTimeService();
@@ -90,14 +80,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   final MarketRefreshService _marketService = MarketRefreshService();
   User? _currentUser;
   bool _isLoading = true;
-  int _vehicleCount = 0;
-  int _pendingOffersCount = 0; // Bekleyen teklif sayısı
+  // Bekleyen teklif sayısı
   int _collectedCount = 0;
   int _totalCollectionCount = 0;
+  int _vehicleCount = 0;
   List<UserVehicle> _userVehicles = [];
   List<UserVehicle> _userListedVehicles = []; // Satışa çıkarılan araçlar
   List<DailyQuest> _dailyQuests = []; // Günlük görevler
-  
+
   // Tutorial için GlobalKey'ler
   final GlobalKey _balanceKey = GlobalKey();
   final GlobalKey _gameTimeKey = GlobalKey();
@@ -106,22 +96,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   final GlobalKey _buyGalleryButtonKey = GlobalKey();
   final GlobalKey _taxiGameButtonKey = GlobalKey();
 
-  
   // Kiralama geliri animasyonu için
   double _lastRentalIncome = 0.0;
   bool _showRentalIncomeAnimation = false;
-  
+
+  // Fire animasyonu için
   // Fire animasyonu için
   bool _showFireAnimation = false;
-  
+
   // Tutorial aktif mi? (scroll'u engellemek için)
   bool _isTutorialActive = false;
 
   // Günlük ödül dialogu açık mı?
   bool _isDailyLoginDialogShown = false;
-  
+
   final ScrollController _scrollController = ScrollController();
   StreamSubscription? _userUpdateSubscription;
+  StreamSubscription? _staffEventSubscription;
 
   @override
   int? get tabIndex => 3; // MainScreen'deki index
@@ -137,13 +128,34 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     _initData();
     // İlk reklam yükleme
     _adService.loadRewardedAd();
-    
+
     // Gün değişimini dinle
     _gameTime.addDayChangeListener(_onGameDayChanged);
 
     // Kullanıcı güncellemelerini dinle (Skill unlock, bakiye değişimi vb.)
     _userUpdateSubscription = _db.onUserUpdate.listen((_) {
-      _loadCurrentUser();
+      if (mounted) _loadCurrentUser();
+    });
+
+    // Personel Simülasyon Dinleyicisi (Global Bildirim)
+    final staffService = StaffService(); // Singleton
+    staffService.startSimulation(); // App açıldığında çalışmaya başlasın
+
+    _staffEventSubscription = staffService.eventStream.listen((event) {
+      if (mounted) {
+        if (ModalRoute.of(context)?.isCurrent ?? false) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(event),
+              backgroundColor: Colors.green[700],
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        // Bakiyeyi güncelle
+        _loadCurrentUser();
+      }
     });
   }
 
@@ -159,18 +171,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     _gameTime.removeDayChangeListener(_onGameDayChanged);
     _adService.dispose();
     _userUpdateSubscription?.cancel();
+    _staffEventSubscription?.cancel();
     super.dispose();
   }
 
   /// Gün değiştiğinde çağrılır
   void _onGameDayChanged(int oldDay, int newDay) async {
     if (!mounted) return;
-    
+
     // Fire animasyonunu tetikle (Teklifler yenileniyor)
     setState(() {
       _showFireAnimation = true;
     });
-    
+
     // 3 saniye sonra animasyonu gizle
     Timer(const Duration(seconds: 3), () {
       if (mounted) {
@@ -179,12 +192,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         });
       }
     });
-    
+
     // Galeri sahibiyse kiralama geliri işle
     if (_currentUser != null && _currentUser!.ownsGallery) {
       await _rentalService.processDailyRental(_currentUser!.id);
     }
-    
+
     // Tekliflerin oluşması için biraz bekle ve yenile
     Future.delayed(const Duration(seconds: 2), () async {
       if (mounted) {
@@ -198,25 +211,24 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
   Future<void> _loadCurrentUser() async {
     final user = await _authService.getCurrentUser();
-    
+
     // Kullanıcının araçlarını yükle
     if (user != null) {
       // 24 saatlik bildirim sıfırlama kontrolü (arka planda)
       _notificationService.checkAndResetDailyNotifications(user.id);
-      
+
       final vehicles = await _db.getUserActiveVehicles(user.id);
       final vehicleCount = vehicles.length;
-      
+
       // Kullanıcının satışa çıkardığı araçları yükle
       final listedVehicles = await _db.getUserListedVehicles(user.id);
-      
+
       // Bekleyen teklifleri yükle
-      final pendingOffers = await _db.getPendingOffersCount(user.id);
-      
+
       // Günlük kar/zarar sıfırlama kontrolü
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      
+
       // Günlük görevleri yükle
       final quests = await _questService.checkAndGenerateQuests(user.id);
 
@@ -226,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       allModels.forEach((key, value) {
         totalModels += value.length;
       });
-      
+
       final ownedModelKeys = await _db.getOwnedModelKeys(user.id);
       final collectedCount = ownedModelKeys.length;
 
@@ -236,25 +248,28 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           _userVehicles = vehicles;
           _userListedVehicles = listedVehicles;
           _vehicleCount = vehicleCount;
-          _pendingOffersCount = pendingOffers;
           _dailyQuests = quests;
           _collectedCount = collectedCount;
           _totalCollectionCount = totalModels;
           _isLoading = false;
         });
       }
-      
+
       User updatedUser = user;
-      
+
       // Eğer son sıfırlama tarihi bugün değilse (veya null ise), sıfırla
-      if (user.lastDailyResetDate == null || 
-          DateTime(user.lastDailyResetDate!.year, user.lastDailyResetDate!.month, user.lastDailyResetDate!.day) != today) {
-        
+      if (user.lastDailyResetDate == null ||
+          DateTime(
+                user.lastDailyResetDate!.year,
+                user.lastDailyResetDate!.month,
+                user.lastDailyResetDate!.day,
+              ) !=
+              today) {
         updatedUser = user.copyWith(
           dailyStartingBalance: user.balance,
           lastDailyResetDate: now,
         );
-        
+
         await _db.updateUser(user.id, updatedUser.toJson());
       }
 
@@ -263,20 +278,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         _userVehicles = vehicles;
         _vehicleCount = vehicleCount;
         _userListedVehicles = listedVehicles;
-        _pendingOffersCount = pendingOffers;
         _isLoading = false;
       });
-      
-      
+
       // Günlük giriş bonusunu (Streak) kontrol et
       // _checkDailyStreak(); // ARTIK BURADA ÇAĞIRMIYORUZ (Sonsuz döngü/çift dialog hatası için)
-      
+
       // Günlük görevleri kontrol et/oluştur
       _questService.checkAndGenerateQuests(user.id);
-      
+
       // Liderlik tablosu için verileri senkronize et (Arka planda)
       LeaderboardService().updateUserScore(updatedUser);
-      
+
       // Kullanıcı yüklendikten sonra tutorial'ı kontrol et
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _checkAndShowTutorial();
@@ -298,10 +311,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           final moneyReward = 5000.0;
           final newBalance = _currentUser!.balance + moneyReward;
           await _db.updateUser(_currentUser!.id, {'balance': newBalance});
-          
+
           // UI'ı güncelle
           await _loadCurrentUser();
-          
+
           // Başarı mesajı göster
           if (mounted) {
             showDialog(
@@ -345,10 +358,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('ads.notReady'.tr()),
-              backgroundColor: Colors.orange.withOpacity(0.8),
+              backgroundColor: Colors.orange.withValues(alpha: 0.8),
               duration: const Duration(seconds: 2),
             ),
           );
@@ -357,40 +372,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         }
       },
     );
-  }
-
-  Future<void> _logout() async {
-    // Onay dialogu göster
-    final shouldLogout = await showDialog<bool>(
-      context: context,
-      builder: (context) => ModernAlertDialog(
-        title: 'auth.logout'.tr(),
-        content: Text(
-          'auth.logoutConfirm'.tr(),
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white70),
-        ),
-        buttonText: 'auth.logout'.tr(),
-        onPressed: () => Navigator.of(context).pop(true),
-        secondaryButtonText: 'common.cancel'.tr(),
-        onSecondaryPressed: () => Navigator.of(context).pop(false),
-        icon: Icons.logout,
-        iconColor: Colors.redAccent,
-      ),
-    );
-
-    if (shouldLogout == true) {
-      // Çıkış yap
-      await _authService.logout();
-      
-      if (!mounted) return;
-      
-      // Giriş ekranına yönlendir (Root Navigator kullanarak)
-      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    }
   }
 
   @override
@@ -434,11 +415,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       right: 8,
                       top: 8,
                       child: FutureBuilder<int>(
-                        future: NotificationService().getUnreadCount(_currentUser!.id),
+                        future: NotificationService().getUnreadCount(
+                          _currentUser!.id,
+                        ),
                         builder: (context, snapshot) {
                           final count = snapshot.data ?? 0;
                           if (count == 0) return const SizedBox.shrink();
-                          
+
                           return Container(
                             padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(
@@ -511,9 +494,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           ),
           drawer: _buildDrawer(context),
           body: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+              ? const Center(child: CircularProgressIndicator())
               : Container(
                   decoration: BoxDecoration(
                     image: GameDecorationImage(
@@ -538,13 +519,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
                                   // 🆕 Reklam ve Sayaç (Yan Yana)
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
                                     child: Row(
                                       children: [
                                         // Reklam Kartı
-                                        Expanded(
-                                          child: _buildWatchAdCard(),
-                                        ),
+                                        Expanded(child: _buildWatchAdCard()),
                                         const SizedBox(width: 12),
                                         // Oyun Zamanı Sayacı
                                         Expanded(
@@ -558,73 +539,74 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                     ),
                                   ),
                                   const SizedBox(height: 16),
-                                  
+
                                   // Günlük Görevler ve Koleksiyon (Yan Yana)
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
                                     child: Row(
                                       children: [
-                                        Expanded(child: _buildDailyQuestsCard()),
+                                        Expanded(
+                                          child: _buildDailyQuestsCard(),
+                                        ),
                                         const SizedBox(width: 12),
                                         Expanded(child: _buildCollectionCard()),
                                       ],
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(height: 16),
 
-
-                                  
                                   // Hızlı İşlemler
                                   // _buildQuickActions(), // YORUM: SliverGrid olarak aşağıya taşındı
-                                  
                                   const SizedBox(height: 16),
                                 ],
                               ),
                             ),
                           ),
                         ),
-                        
+
                         // Hızlı İşlemler (SliverGrid)
                         _buildQuickActionsSliver(),
-                        
+
                         SliverToBoxAdapter(
                           child: Center(
                             child: ConstrainedBox(
                               constraints: const BoxConstraints(maxWidth: 800),
                               child: Column(
                                 children: [
-                                  
                                   // Galeri Satın Al (sadece galeri sahibi değilse göster)
-                                  if (_currentUser != null && !_currentUser!.ownsGallery)
+                                  if (_currentUser != null &&
+                                      !_currentUser!.ownsGallery)
                                     _buildBuyGalleryButton(),
-                                  
-                                  if (_currentUser != null && !_currentUser!.ownsGallery)
+
+                                  if (_currentUser != null &&
+                                      !_currentUser!.ownsGallery)
                                     const SizedBox(height: 16),
-                                  
+
                                   // Galerim (sadece galeri sahibiyse göster)
-                                  if (_currentUser != null && _currentUser!.ownsGallery)
+                                  if (_currentUser != null &&
+                                      _currentUser!.ownsGallery)
                                     _buildMyGallerySection(),
-                                  
-                                  if (_currentUser != null && _currentUser!.ownsGallery)
+
+                                  if (_currentUser != null &&
+                                      _currentUser!.ownsGallery)
                                     const SizedBox(height: 16),
-                                  
+
                                   // İstatistikler - Ayarlara taşındı
                                   // _buildStatistics(),
-                                  
+
                                   // const SizedBox(height: 16),
-                                  
+
                                   // Son İşlemler veya Bilgilendirme - Kaldırıldı
                                   // _buildRecentActivity(),
-                                  
                                   const SizedBox(height: 24),
                                 ],
                               ),
                             ),
                           ),
                         ),
-                        
-
                       ],
                     ),
                   ),
@@ -637,8 +619,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   // Glassmorphism Container Helper
   Widget _buildGlassContainer({
     Key? key,
-    required Widget child, 
-    EdgeInsetsGeometry? padding, 
+    required Widget child,
+    EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     double borderRadius = 16,
   }) {
@@ -649,12 +631,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2), // Blur yerine yüksek opaklıkta beyaz
+        color: Colors.white.withValues(
+          alpha: 0.2,
+        ), // Blur yerine yüksek opaklıkta beyaz
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.5),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -685,10 +672,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
   Widget _buildProfileCard() {
     if (_currentUser == null) return const SizedBox.shrink();
-    
-    final isProfit = _currentUser!.profitLossPercentage >= 0;
+
     final rankColor = _getRankColor(_currentUser!.level);
-    
+
     // RepaintBoundary ile sarmalayarak gereksiz yeniden çizmeleri önlüyoruz
     return RepaintBoundary(
       child: Container(
@@ -697,14 +683,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.deepPurple.withOpacity(0.6), Colors.deepPurple.shade400.withOpacity(0.6)],
+            colors: [
+              Colors.deepPurple.withValues(alpha: 0.6),
+              Colors.deepPurple.shade400.withValues(alpha: 0.6),
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.deepPurple.withOpacity(0.5),
+              color: Colors.deepPurple.withValues(alpha: 0.5),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -718,11 +707,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               Positioned.fill(
                 child: CustomPaint(
                   painter: CitySkylinePainter(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                   ),
                 ),
               ),
-              
+
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -738,9 +727,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const SettingsScreen(highlightProfilePicture: true),
+                                builder: (context) => const SettingsScreen(
+                                  highlightProfilePicture: true,
+                                ),
                               ),
-                            ).then((_) => _loadCurrentUser()); // Geri dönünce refresh et
+                            ).then(
+                              (_) => _loadCurrentUser(),
+                            ); // Geri dönünce refresh et
                           },
                           child: Stack(
                             alignment: Alignment.center,
@@ -753,7 +746,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: rankColor.withOpacity(0.5),
+                                      color: rankColor.withValues(alpha: 0.5),
                                       blurRadius: 15,
                                       spreadRadius: 1,
                                     ),
@@ -767,13 +760,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   gradient: LinearGradient(
-                                    colors: [rankColor, rankColor.withOpacity(0.5)],
+                                    colors: [
+                                      rankColor,
+                                      rankColor.withValues(alpha: 0.5),
+                                    ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(2.5), // Çerçeve kalınlığı
+                                  padding: const EdgeInsets.all(
+                                    2.5,
+                                  ), // Çerçeve kalınlığı
                                   child: Container(
                                     decoration: const BoxDecoration(
                                       color: Colors.white,
@@ -798,12 +796,21 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                   child: Container(
                                     padding: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.7),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.7,
+                                      ),
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.deepPurple.withOpacity(0.5), width: 1),
+                                      border: Border.all(
+                                        color: Colors.deepPurple.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                        width: 1,
+                                      ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
+                                          color: Colors.black.withValues(
+                                            alpha: 0.2,
+                                          ),
                                           blurRadius: 4,
                                           offset: const Offset(0, 2),
                                         ),
@@ -821,13 +828,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                               Positioned(
                                 bottom: 0,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: rankColor,
                                     borderRadius: BorderRadius.circular(10),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),
@@ -846,9 +858,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(width: 16),
-                        
+
                         // Kullanıcı Bilgileri
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -869,22 +881,27 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                                 ],
                               ),
                             ),
-                            
+
                             const SizedBox(height: 4),
-                            
+
                             // Rütbe Başlığı
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: rankColor.withOpacity(0.3),
+                                  color: rankColor.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
                               child: Text(
-                                _getRankTitle(_currentUser!.level).toUpperCase(),
+                                _getRankTitle(
+                                  _currentUser!.level,
+                                ).toUpperCase(),
                                 style: TextStyle(
                                   color: rankColor,
                                   fontSize: 10,
@@ -897,343 +914,380 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 10),
-                        
-                        // Toplam Para (Animasyonlu)
-                        Text(
-                          'home.balance'.tr(),
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+
+                    // Toplam Para (Animasyonlu)
+                    Text(
+                      'home.balance'.tr(),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
                             children: [
-                              Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  // Görünmez Text ile alan rezerve et (Titremeyi önler)
-                                  Text(
-                                    '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
+                              // Görünmez Text ile alan rezerve et (Titremeyi önler)
+                              Text(
+                                '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
+                                style: const TextStyle(
+                                  color: Colors.transparent, // Görünmez
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              // Animasyonlu Değer
+                              TweenAnimationBuilder<double>(
+                                tween: Tween<double>(
+                                  begin:
+                                      _currentUser!.balance -
+                                      (_showRentalIncomeAnimation
+                                          ? _lastRentalIncome
+                                          : 0),
+                                  end: _currentUser!.balance,
+                                ),
+                                duration: const Duration(seconds: 2),
+                                curve: Curves.easeOut,
+                                builder: (context, value, child) {
+                                  return Text(
+                                    '${_formatCurrency(value)} ${'common.currency'.tr()}',
                                     style: const TextStyle(
-                                      color: Colors.transparent, // Görünmez
+                                      color: Colors.white,
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  // Animasyonlu Değer
-                                  TweenAnimationBuilder<double>(
-                                    tween: Tween<double>(
-                                      begin: _currentUser!.balance - (_showRentalIncomeAnimation ? _lastRentalIncome : 0),
-                                      end: _currentUser!.balance,
-                                    ),
-                                    duration: const Duration(seconds: 2),
-                                    curve: Curves.easeOut,
-                                    builder: (context, value, child) {
-                                      return Text(
-                                        '${_formatCurrency(value)} ${'common.currency'.tr()}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 32,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.5,
-                                          shadows: [
-                                            Shadow(
-                                              color: Colors.black26,
-                                              blurRadius: 8,
-                                              offset: Offset(0, 4),
-                                            ),
-                                          ],
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black26,
+                                          blurRadius: 8,
+                                          offset: Offset(0, 4),
                                         ),
-                                      );
-                                    },
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
-                              
-                              // Kiralama Geliri Göstergesi (Animasyonlu)
-                              if (_showRentalIncomeAnimation)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: TweenAnimationBuilder<double>(
-                                    tween: Tween<double>(begin: 0.0, end: 1.0),
-                                    duration: const Duration(milliseconds: 500),
-                                    builder: (context, value, child) {
-                                      return Opacity(
-                                        opacity: value,
-                                        child: Transform.translate(
-                                          offset: Offset(0, 20 * (1 - value)), // Aşağıdan yukarı kayma
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.green,
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Text(
-                                              '+${_formatCurrency(_lastRentalIncome)}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              ),
-                                            ),
+                            ],
+                          ),
+
+                          // Kiralama Geliri Göstergesi (Animasyonlu)
+                          if (_showRentalIncomeAnimation)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween<double>(begin: 0.0, end: 1.0),
+                                duration: const Duration(milliseconds: 500),
+                                builder: (context, value, child) {
+                                  return Opacity(
+                                    opacity: value,
+                                    child: Transform.translate(
+                                      offset: Offset(
+                                        0,
+                                        20 * (1 - value),
+                                      ), // Aşağıdan yukarı kayma
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
                                           ),
                                         ),
-                                      );
-                                    },
+                                        child: Text(
+                                          '+${_formatCurrency(_lastRentalIncome)}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 2),
+
+                    // Kar/Zarar Göstergesi
+                    Builder(
+                      builder: (context) {
+                        // Günlük kar/zarar hesabı
+                        final dailyStartingBalance =
+                            _currentUser!.dailyStartingBalance;
+                        final currentBalance = _currentUser!.balance;
+                        final dailyProfit =
+                            currentBalance - dailyStartingBalance;
+
+                        // Yüzdelik hesaplarken küsüratı at (User request)
+                        // Örn: 346.702.29 -> 346702 üzerinden yüzde hesapla
+                        final dailyProfitInt = dailyProfit.truncateToDouble();
+
+                        double percentage = 0.0;
+                        if (dailyStartingBalance > 0) {
+                          percentage =
+                              (dailyProfitInt / dailyStartingBalance) * 100;
+                        }
+
+                        final isProfit = dailyProfit >= 0;
+                        final profitColor = isProfit
+                            ? Colors.greenAccent
+                            : Colors.redAccent;
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isProfit
+                                    ? Icons.trending_up
+                                    : Icons.trending_down,
+                                color: profitColor,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '%${percentage.abs().toStringAsFixed(1)} (${_formatCurrency(dailyProfit)})',
+                                style: TextStyle(
+                                  color: profitColor,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Seviye ${_currentUser!.level}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: _currentUser!.levelProgress,
+                            backgroundColor: Colors.black.withValues(
+                              alpha: 0.2,
+                            ),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Colors.amber,
+                            ),
+                            minHeight: 8,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (_currentUser!.isXpBoostActive)
+                                Container(
+                                  margin: const EdgeInsets.only(right: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 1,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'X2',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
+                              Text(
+                                '${_currentUser!.xp} XP',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                  fontSize: 10,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        
-                        const SizedBox(height: 2),
-                        
-                        // Kar/Zarar Göstergesi
-                        Builder(
-                          builder: (context) {
-                            // Günlük kar/zarar hesabı
-                            final dailyStartingBalance = _currentUser!.dailyStartingBalance;
-                            final currentBalance = _currentUser!.balance;
-                            final dailyProfit = currentBalance - dailyStartingBalance;
-                            
-                            // Yüzdelik hesaplarken küsüratı at (User request)
-                            // Örn: 346.702.29 -> 346702 üzerinden yüzde hesapla
-                            final dailyProfitInt = dailyProfit.truncateToDouble();
-                            
-                            double percentage = 0.0;
-                            if (dailyStartingBalance > 0) {
-                              percentage = (dailyProfitInt / dailyStartingBalance) * 100;
-                            }
-                            
-                            final isProfit = dailyProfit >= 0;
-                            final profitColor = isProfit ? Colors.greenAccent : Colors.redAccent;
-                            
-                            return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isProfit ? Icons.trending_up : Icons.trending_down,
-                                    color: profitColor,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '%${percentage.abs().toStringAsFixed(1)} (${_formatCurrency(dailyProfit)})',
-                                    style: TextStyle(
-                                      color: profitColor,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Yetenek Ağacı Butonu
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SkillTreeScreen(),
+                          ),
+                        ).then((_) => _loadCurrentUser());
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 14,
                         ),
-                        
-                        const SizedBox(height: 10),
-                        
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurpleAccent.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Seviye ${_currentUser!.level}',
+                              'home.tasks'.tr(),
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
+                                fontSize: 16,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: _currentUser!.levelProgress,
-                                backgroundColor: Colors.black.withOpacity(0.2),
-                                valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
-                                minHeight: 8,
-                              ),
-                            ),
-                            const SizedBox(height: 1),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (_currentUser!.isXpBoostActive)
-                                    Container(
-                                      margin: const EdgeInsets.only(right: 4),
-                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                      decoration: BoxDecoration(
-                                        color: Colors.amber,
-                                        borderRadius: BorderRadius.circular(4),
+                            if (_currentUser != null &&
+                                _currentUser!.skillPoints > 0) ...[
+                              const SizedBox(width: 8),
+                              PulseBadge(
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 24,
+                                    minHeight: 24,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      _currentUser!.skillPoints.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      child: const Text(
-                                        'X2',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  Text(
-                                    '${_currentUser!.xp} XP',
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.6),
-                                      fontSize: 10,
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ),
-                        
-                        const SizedBox(height: 12),
+                      ),
+                    ),
 
-                        // Yetenek Ağacı Butonu
-                        GestureDetector(
-                          onTap: () {
+                    const SizedBox(height: 12),
+
+                    // Altın Al Butonu
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Mevcut Altın
+                        Container(
+                          width: 120,
+                          height: 40,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.amber, width: 1.5),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.monetization_on,
+                                color: Colors.amber,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _currentUser!.gold.toStringAsFixed(2),
+                                style: const TextStyle(
+                                  color: Colors.amber,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        // Altın Al Butonu
+                        // Altın Al Butonu
+                        ModernButton(
+                          text: 'home.buyGold'.tr(),
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const SkillTreeScreen(),
+                                builder: (context) => const StoreScreen(),
                               ),
-                            ).then((_) => _loadCurrentUser());
+                            );
                           },
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                            decoration: BoxDecoration(
-                              color: Colors.deepPurpleAccent.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.white.withOpacity(0.5)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'home.tasks'.tr(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                if (_currentUser != null && _currentUser!.skillPoints > 0) ...[
-                                  const SizedBox(width: 8),
-                                  PulseBadge(
-                                    child: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      constraints: const BoxConstraints(
-                                        minWidth: 24,
-                                        minHeight: 24,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          _currentUser!.skillPoints.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 12),
-                        
-                        // Altın Al Butonu
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Mevcut Altın
-                            Container(
-                              width: 120,
-                              height: 40,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.amber, width: 1.5),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.monetization_on, color: Colors.amber, size: 20),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    _currentUser!.gold.toStringAsFixed(2),
-                                    style: const TextStyle(
-                                      color: Colors.amber,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            
-                            const SizedBox(width: 12),
-                            
-                            // Altın Al Butonu
-                            // Altın Al Butonu
-                            ModernButton(
-                              text: 'home.buyGold'.tr(),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const StoreScreen()),
-                                );
-                              },
-                              color: Colors.amber,
-                              textColor: Colors.deepPurple,
-                              gradientColors: [Colors.amber, Colors.amber.shade700],
-                              height: 40,
-                              width: 120,
-                              isFullWidth: false,
-                            ),
-                          ],
+                          color: Colors.amber,
+                          textColor: Colors.deepPurple,
+                          gradientColors: [Colors.amber, Colors.amber.shade700],
+                          height: 40,
+                          width: 120,
+                          isFullWidth: false,
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
+        ),
+      ),
     );
-    }
-  
-
-  
-
+  }
 
   Widget _buildWatchAdCard() {
     return Container(
@@ -1250,19 +1304,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 gradient: LinearGradient(
                   colors: [
                     const Color(0xFF2E003E), // Dark Purple
-                    Colors.deepPurple.shade700.withOpacity(0.7),
+                    Colors.deepPurple.shade700.withValues(alpha: 0.7),
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.amber.withOpacity(0.3),
+                  color: Colors.amber.withValues(alpha: 0.3),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.deepPurple.withOpacity(0.4),
+                    color: Colors.deepPurple.withValues(alpha: 0.4),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -1282,7 +1336,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 8),
 
                   // Orta Kısım - Yazılar
@@ -1304,9 +1358,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         ),
                         const SizedBox(height: 2),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -1326,7 +1383,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               ),
             ),
           ),
-          
+
           // FREE Badge (Sağ Üst Köşe)
           Positioned(
             top: -6,
@@ -1343,12 +1400,15 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.red.withOpacity(0.4),
+                      color: Colors.red.withValues(alpha: 0.4),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
                   ],
-                  border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   'common.free'.tr(),
@@ -1373,129 +1433,129 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     if (_dailyQuests.isEmpty) return const SizedBox.shrink();
 
     final completedCount = _dailyQuests.where((q) => q.isCompleted).length;
-    final claimedCount = _dailyQuests.where((q) => q.isClaimed).length;
+
     final totalCount = _dailyQuests.length;
-    final hasRewardsToClaim = _dailyQuests.any((q) => q.isCompleted && !q.isClaimed);
+    final hasRewardsToClaim = _dailyQuests.any(
+      (q) => q.isCompleted && !q.isClaimed,
+    );
 
     return GestureDetector(
-        onTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const DailyQuestsScreen(),
-            ),
-          );
-          _loadCurrentUser(); // Geri dönünce yenile
-        },
-        child: SizedBox(
-          key: _questsCardKey,
-          height: 100, // Sabit yükseklik
-          child: _buildGlassContainer(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Başlık (Üstte)
-                Text(
-                  'quests.title'.tr(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14, // Biraz küçülttük
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DailyQuestsScreen()),
+        );
+        _loadCurrentUser(); // Geri dönünce yenile
+      },
+      child: SizedBox(
+        key: _questsCardKey,
+        height: 100, // Sabit yükseklik
+        child: _buildGlassContainer(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Başlık (Üstte)
+              Text(
+                'quests.title'.tr(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14, // Biraz küçülttük
+                ),
+              ),
+
+              const Spacer(), // Aradaki boşluğu doldur
+              // Alt Kısım (İkon ve İstatistik)
+              Row(
+                children: [
+                  // İkon
+                  Container(
+                    padding: const EdgeInsets.all(8), // Padding azaltıldı
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.assignment_outlined,
+                      color: Colors.blue,
+                      size: 20, // İkon küçültüldü
+                    ),
                   ),
-                ),
-                
-                const Spacer(), // Aradaki boşluğu doldur
-                
-                // Alt Kısım (İkon ve İstatistik)
-                Row(
-                  children: [
-                    // İkon
-                    Container(
-                      padding: const EdgeInsets.all(8), // Padding azaltıldı
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.assignment_outlined,
-                        color: Colors.blue,
-                        size: 20, // İkon küçültüldü
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    
-                    // Metinler
-                    // Metinler
-                    Expanded(
-                      child: hasRewardsToClaim
-                          ? PulseBadge(
-                              child: Text(
-                                '$completedCount/$totalCount',
-                                style: const TextStyle(
-                                  color: Colors.green,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            )
-                          : Text(
+                  const SizedBox(width: 16),
+
+                  // Metinler
+                  // Metinler
+                  Expanded(
+                    child: hasRewardsToClaim
+                        ? PulseBadge(
+                            child: Text(
                               '$completedCount/$totalCount',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                                fontWeight: FontWeight.normal,
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                    ),
-                    
-                    // Sağ taraf (Badge veya Ok)
-                    if (hasRewardsToClaim)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          '!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                          )
+                        : Text(
+                            '$completedCount/$totalCount',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      )
-                    else
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 14,
-                        color: Colors.grey,
+                  ),
+
+                  // Sağ taraf (Badge veya Ok)
+                  if (hasRewardsToClaim)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
                       ),
-                  ],
-                ),
-              ],
-            ),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        '!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    )
+                  else
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: Colors.grey,
+                    ),
+                ],
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 
   // Koleksiyon Kartı
   Widget _buildCollectionCard() {
     if (_currentUser == null) return const SizedBox.shrink();
-    
+
     return GestureDetector(
       key: _collectionCardKey,
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const CollectionScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const CollectionScreen()),
         ).then((_) => _loadCurrentUser());
       },
       child: _buildGlassContainer(
@@ -1508,7 +1568,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
+                    color: Colors.purple.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -1531,7 +1591,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               ],
             ),
             const SizedBox(height: 12),
-            
+
             // İlerleme Çubuğu ve Metin
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1561,9 +1621,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: _totalCollectionCount > 0 ? _collectedCount / _totalCollectionCount : 0,
-                    backgroundColor: Colors.purple.withOpacity(0.1),
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.purple.shade400),
+                    value: _totalCollectionCount > 0
+                        ? _collectedCount / _totalCollectionCount
+                        : 0,
+                    backgroundColor: Colors.purple.withValues(alpha: 0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.purple.shade400,
+                    ),
                     minHeight: 6,
                   ),
                 ),
@@ -1574,8 +1638,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       ),
     );
   }
-
-
 
   Widget _buildQuickActionsSliver() {
     final quickActions = _getQuickActions();
@@ -1589,33 +1651,29 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           mainAxisSpacing: 12,
           childAspectRatio: 1.3,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final action = quickActions[index];
-            
-            // Tutorial için key'leri atıyoruz
-            Key? buttonKey;
-            final label = quickActions[index]['label'] as String;
-            
-            if (label == 'home.taxi'.tr()) {
-              buttonKey = _taxiGameButtonKey;
-            }
-            
-            return _buildActionButton(
-              key: buttonKey,
-              icon: quickActions[index]['icon'] as IconData?,
-              imagePath: quickActions[index]['imagePath'] as String?,
-              label: label,
-              color: quickActions[index]['color'] as Color,
-              onTap: quickActions[index]['onTap'] as VoidCallback,
-              badge: quickActions[index]['badge'] as int?,
-              reward: quickActions[index]['reward'] as String?,
-              animationPath: quickActions[index]['animationPath'] as String?,
-              showAnimation: quickActions[index]['showAnimation'] as bool? ?? false,
-            );
-          },
-          childCount: quickActions.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          // Tutorial için key'leri atıyoruz
+          Key? buttonKey;
+          final label = quickActions[index]['label'] as String;
+
+          if (label == 'home.taxi'.tr()) {
+            buttonKey = _taxiGameButtonKey;
+          }
+
+          return _buildActionButton(
+            key: buttonKey,
+            icon: quickActions[index]['icon'] as IconData?,
+            imagePath: quickActions[index]['imagePath'] as String?,
+            label: label,
+            color: quickActions[index]['color'] as Color,
+            onTap: quickActions[index]['onTap'] as VoidCallback,
+            badge: quickActions[index]['badge'] as int?,
+            reward: quickActions[index]['reward'] as String?,
+            animationPath: quickActions[index]['animationPath'] as String?,
+            showAnimation:
+                quickActions[index]['showAnimation'] as bool? ?? false,
+          );
+        }, childCount: quickActions.length),
       ),
     );
   }
@@ -1756,7 +1814,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: _buildGlassContainer(
-        padding: EdgeInsets.zero, // Padding'i kaldırdık, içeriği kendimiz yöneteceğiz
+        padding: EdgeInsets
+            .zero, // Padding'i kaldırdık, içeriği kendimiz yöneteceğiz
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -1771,9 +1830,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      padding: imagePath != null ? EdgeInsets.zero : const EdgeInsets.all(8),
+                      padding: imagePath != null
+                          ? EdgeInsets.zero
+                          : const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: imagePath != null ? Colors.transparent : color.withOpacity(0.1),
+                        color: imagePath != null
+                            ? Colors.transparent
+                            : color.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: imagePath != null
@@ -1783,15 +1846,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                               height: 80,
                               fit: BoxFit.contain,
                             )
-                          : Icon(
-                              icon,
-                              color: color,
-                              size: 28,
-                            ),
+                          : Icon(icon, color: color, size: 28),
                     ),
-                    
 
-                      
                     // Animasyon (Fire vb.)
                     if (showAnimation && animationPath != null)
                       Positioned(
@@ -1808,7 +1865,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 ),
               ),
             ),
-            
+
             // Banner / Tabela (En altta)
             Positioned(
               bottom: 12, // Ayakları kaldırdık, konumu koruduk
@@ -1816,24 +1873,32 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withOpacity(0.8), // Koyu mor renk (Reklam kartı ile uyumlu)
+                    color: Colors.deepPurple.withValues(
+                      alpha: 0.8,
+                    ), // Koyu mor renk (Reklam kartı ile uyumlu)
                     borderRadius: BorderRadius.circular(6),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
                     ],
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
                   child: Text(
-                    label.toUpperCase().split(' ').first, // Sadece ilk kelimeyi alıp BÜYÜK HARF yapıyoruz
+                    label
+                        .toUpperCase()
+                        .split(' ')
+                        .first, // Sadece ilk kelimeyi alıp BÜYÜK HARF yapıyoruz
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 13, // Yazıyı biraz büyüttük
@@ -1885,7 +1950,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.2),
+                  color: Colors.amber.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -1904,13 +1969,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     );
   }
 
-
-
   // ============================================================================
   // YORUM: Garaj/Galeri Özelliği - İleride farklı kurgu için ayrılmış
   // Şimdilik "Araçlarım" butonu direkt MyVehiclesScreen sayfasına gidiyor
   // ============================================================================
-  
+
   /*
   // Kullanıcının Araçları (Dashboard'da özet gösterim)
   Widget _buildMyVehicles() {
@@ -1922,7 +1985,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -2056,7 +2119,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.withOpacity(0.1),
+                          color: Colors.deepPurple.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -2142,167 +2205,176 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     return RepaintBoundary(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          key: _buyGalleryButtonKey,
-          onTap: () => _showGalleryInfoDialog(),
+        child: Material(
+          elevation: 4,
           borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.deepPurple.shade800, Colors.deepPurple.shade600],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.deepPurple.withOpacity(0.5),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
+          child: InkWell(
+            key: _buyGalleryButtonKey,
+            onTap: () => _showGalleryInfoDialog(),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.deepPurple.shade800,
+                    Colors.deepPurple.shade600,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
-            ),
-            child: Stack(
-              children: [
-                // Arka Plan Deseni (Şehir Silüeti)
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Opacity(
-                      opacity: 0.3,
-                      child: CustomPaint(
-                        painter: CitySkylinePainter(
-                          color: Colors.black,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.deepPurple.withValues(alpha: 0.5),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  // Arka Plan Deseni (Şehir Silüeti)
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Opacity(
+                        opacity: 0.3,
+                        child: CustomPaint(
+                          painter: CitySkylinePainter(color: Colors.black),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                Row(
-                  children: [
-                    // Sol taraf - Animasyon
-                    Lottie.asset(
-                      'assets/animations/gallery_v2.json',
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                    ),
-                    const SizedBox(width: 16),
-                    
-                    // Orta taraf - Bilgiler
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'home.buyGallery'.tr(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black26,
-                                  blurRadius: 2,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'home.professionalBusiness'.tr(),
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          // Fiyat Etiketi
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.deepPurple,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              '${_formatCurrency(galleryPrice)} TL',
+                  Row(
+                    children: [
+                      // Sol taraf - Animasyon
+                      Lottie.asset(
+                        'assets/animations/gallery_v2.json',
+                        width: 70,
+                        height: 70,
+                        fit: BoxFit.cover,
+                      ),
+                      const SizedBox(width: 16),
+
+                      // Orta taraf - Bilgiler
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'home.buyGallery'.tr(),
                               style: const TextStyle(
-                                color: Colors.white,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 11,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black26,
+                                    blurRadius: 2,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 2),
+                            Text(
+                              'home.professionalBusiness'.tr(),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            // Fiyat Etiketi
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurple,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                '${_formatCurrency(galleryPrice)} TL',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    
-                    // Sağ taraf - Ok İkonu
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        shape: BoxShape.circle,
+
+                      // Sağ taraf - Ok İkonu
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   // Galeri Satın Alma İşlemi
   Future<void> _purchaseGallery() async {
     const galleryPrice = 10000000.0; // 10 Milyon TL
-    
+
     if (_currentUser == null) return;
-    
+
     // Bakiye kontrolü
     if (_currentUser!.balance < galleryPrice) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           behavior: SnackBarBehavior.floating,
           content: Text('home.galleryInsufficientFunds'.tr()),
-          backgroundColor: Colors.red.withOpacity(0.8),
+          backgroundColor: Colors.red.withValues(alpha: 0.8),
           duration: const Duration(seconds: 3),
         ),
       );
       return;
     }
-    
+
     // Onay dialogu
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => ModernAlertDialog(
         title: 'home.buyGallery'.tr(),
         content: Text(
-          'home.galleryPrice'.tr() + ': ${_formatCurrency(galleryPrice)} TL\n\n' +
-          'common.continue'.tr() + '?',
+          'home.galleryPrice'.tr() +
+              ': ${_formatCurrency(galleryPrice)} TL\n\n' +
+              'common.continue'.tr() +
+              '?',
           style: const TextStyle(fontSize: 16, color: Colors.white),
         ),
         buttonText: 'common.continue'.tr(),
@@ -2313,25 +2385,26 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         iconColor: Colors.deepPurple,
       ),
     );
-    
+
     if (confirmed != true) return;
-    
+
     // Satın alma işlemi
     final newBalance = _currentUser!.balance - galleryPrice;
     final updatedUser = _currentUser!.copyWith(
       balance: newBalance,
       ownsGallery: true,
       galleryPurchaseDate: DateTime.now(),
-      garageLimit: _currentUser!.garageLimit + 5, // Galeri satın alımında +5 araç limiti
+      garageLimit:
+          _currentUser!.garageLimit + 5, // Galeri satın alımında +5 araç limiti
     );
-    
+
     await _db.updateUser(_currentUser!.id, updatedUser.toJson());
-    
+
     // UI'ı güncelle
     await _loadCurrentUser();
-    
+
     if (!mounted) return;
-    
+
     // Başarı mesajı
     showDialog(
       context: context,
@@ -2372,7 +2445,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.deepPurple.shade700.withOpacity(0.7), Colors.deepPurple.shade500.withOpacity(0.7)],
+          colors: [
+            Colors.deepPurple.shade700.withValues(alpha: 0.7),
+            Colors.deepPurple.shade500.withValues(alpha: 0.7),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -2422,18 +2498,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.verified,
-                      color: Colors.white,
-                      size: 16,
-                    ),
+                    Icon(Icons.verified, color: Colors.white, size: 16),
                     const SizedBox(width: 4),
                     Text(
                       'common.active'.tr(),
@@ -2448,21 +2523,21 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               ),
             ],
           ),
-          
+
           const SizedBox(height: 5),
-          
+
           // Kiraya Ver Butonu
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _showRentOutDialog,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.withOpacity(0.5),
+                backgroundColor: Colors.blue.withValues(alpha: 0.5),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.blue.withOpacity(0.5)),
+                  side: BorderSide(color: Colors.blue.withValues(alpha: 0.5)),
                 ),
                 elevation: 0,
               ),
@@ -2472,7 +2547,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               ),
             ),
           ),
-          
+
           const SizedBox(height: 8),
 
           // Fırsat Alımları Butonu
@@ -2488,24 +2563,56 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple.withOpacity(0.5),
+                backgroundColor: Colors.purple.withValues(alpha: 0.5),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.purple.withOpacity(0.5)),
+                  side: BorderSide(color: Colors.purple.withValues(alpha: 0.5)),
                 ),
                 elevation: 0,
               ),
               child: Text(
-                'gallery.opportunityPurchases'.tr(),
+                'home.opportunityPurchases'.tr(),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          
+
+          const SizedBox(height: 8),
+
+          // 🆕 Personel Yönetimi Butonu
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManageStaffScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.people_outline, size: 20),
+              label: Text(
+                'staff.manage_staff'.tr(defaultValue: 'Personel Yönetimi'),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal.withValues(alpha: 0.5),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.teal.withValues(alpha: 0.5)),
+                ),
+                elevation: 0,
+              ),
+            ),
+          ),
+
           const SizedBox(height: 16),
-          
+
           // Kiradaki Araçlar Listesi
           _buildRentedVehiclesList(),
         ],
@@ -2515,7 +2622,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
   Widget _buildRentedVehiclesList() {
     // Kiradaki araçları filtrele
-    final rentedVehicles = _userVehicles.where((v) => v.isRented || v.canCollectRentalIncome).toList();
+    final rentedVehicles = _userVehicles
+        .where((v) => v.isRented || v.canCollectRentalIncome)
+        .toList();
 
     if (rentedVehicles.isEmpty) {
       return Center(
@@ -2550,8 +2659,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           itemCount: rentedVehicles.length,
           itemBuilder: (context, index) {
             final vehicle = rentedVehicles[index];
-            final dailyIncome = vehicle.purchasePrice * RentalService.dailyRentalRate;
-            
+            final dailyIncome =
+                vehicle.purchasePrice * RentalService.dailyRentalRate;
+
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
@@ -2575,15 +2685,15 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       textAlign: TextAlign.start,
                     ),
                   ),
-                  
+
                   // Orta: Gelir
                   Expanded(
                     flex: 4,
                     child: Center(
                       child: Text(
-                        vehicle.isRented 
-                          ? '+${_formatCurrency(dailyIncome)} TL'
-                          : '+${_formatCurrency(vehicle.pendingRentalIncome)} TL',
+                        vehicle.isRented
+                            ? '+${_formatCurrency(dailyIncome)} TL'
+                            : '+${_formatCurrency(vehicle.pendingRentalIncome)} TL',
                         style: const TextStyle(
                           color: Colors.greenAccent,
                           fontWeight: FontWeight.bold,
@@ -2593,7 +2703,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       ),
                     ),
                   ),
-                  
+
                   // Sağ: Buton
                   Expanded(
                     flex: 3,
@@ -2604,42 +2714,59 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                         child: ElevatedButton(
                           onPressed: vehicle.canCollectRentalIncome
                               ? () async {
-                                  final incomeToCollect = vehicle.pendingRentalIncome;
-                                  final success = await _rentalService.collectRentalIncome(
-                                    _currentUser!.id,
-                                    vehicle.id,
-                                  );
+                                  final incomeToCollect =
+                                      vehicle.pendingRentalIncome;
+                                  final success = await _rentalService
+                                      .collectRentalIncome(
+                                        _currentUser!.id,
+                                        vehicle.id,
+                                      );
                                   if (success && mounted) {
                                     // Kiralama geliri animasyonunu tetikle
                                     setState(() {
                                       _lastRentalIncome = incomeToCollect;
                                       _showRentalIncomeAnimation = true;
                                     });
-                                    
-                                    // 3 saniye sonra animasyonu gizle
-                                    Future.delayed(const Duration(seconds: 3), () {
-                                      if (mounted) {
-                                        setState(() {
-                                          _showRentalIncomeAnimation = false;
-                                        });
-                                      }
-                                    });
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      CustomSnackBar(
-                                        content: Text('gallery.incomeCollected'.tr()),
-                                        backgroundColor: Colors.green,
-                                      ),
+                                    // 3 saniye sonra animasyonu gizle
+                                    Future.delayed(
+                                      const Duration(seconds: 3),
+                                      () {
+                                        if (mounted) {
+                                          setState(() {
+                                            _showRentalIncomeAnimation = false;
+                                          });
+                                        }
+                                      },
                                     );
-                                    _loadCurrentUser(); // Listeyi yenile
+
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        CustomSnackBar(
+                                          content: Text(
+                                            'gallery.incomeCollected'.tr(),
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                      _loadCurrentUser(); // Listeyi yenile
+                                    }
                                   }
                                 }
                               : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber.withOpacity(0.7),
+                            backgroundColor: Colors.amber.withValues(
+                              alpha: 0.7,
+                            ),
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: Colors.white.withOpacity(0.1),
-                            disabledForegroundColor: Colors.white.withOpacity(0.3),
+                            disabledBackgroundColor: Colors.white.withValues(
+                              alpha: 0.1,
+                            ),
+                            disabledForegroundColor: Colors.white.withValues(
+                              alpha: 0.3,
+                            ),
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
@@ -2668,8 +2795,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
   Future<void> _showRentOutDialog() async {
     // Kiralanabilir araçları getir
-    final rentableVehicles = await _rentalService.getRentableVehicles(_currentUser!.id);
-    
+    final rentableVehicles = await _rentalService.getRentableVehicles(
+      _currentUser!.id,
+    );
+
     if (!mounted) return;
 
     if (rentableVehicles.isEmpty) {
@@ -2703,7 +2832,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (sbContext, setState) => ModernAlertDialog(
-          title: '${'gallery.rentOutTitle'.tr()} ($remainingSlots ${'gallery.slotsLeft'.tr()})',
+          title:
+              '${'gallery.rentOutTitle'.tr()} ($remainingSlots ${'gallery.slotsLeft'.tr()})',
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
@@ -2711,28 +2841,33 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               itemCount: rentableVehicles.length,
               itemBuilder: (context, index) {
                 final vehicle = rentableVehicles[index];
-                final dailyIncome = vehicle.purchasePrice * RentalService.dailyRentalRate;
+                final dailyIncome =
+                    vehicle.purchasePrice * RentalService.dailyRentalRate;
                 final isSelected = selectedVehicleIds.contains(vehicle.id);
                 // Eğer seçim hakkı dolduysa ve bu araç seçili değilse, disable et
-                final isDisabled = !isSelected && selectedVehicleIds.length >= remainingSlots;
+                final isDisabled =
+                    !isSelected && selectedVehicleIds.length >= remainingSlots;
 
                 return CheckboxListTile(
                   value: isSelected,
-                  onChanged: isDisabled 
-                    ? null 
-                    : (bool? value) {
-                        setState(() {
-                          if (value == true) {
-                            if (selectedVehicleIds.length < remainingSlots) {
-                              selectedVehicleIds.add(vehicle.id);
+                  onChanged: isDisabled
+                      ? null
+                      : (bool? value) {
+                          setState(() {
+                            if (value == true) {
+                              if (selectedVehicleIds.length < remainingSlots) {
+                                selectedVehicleIds.add(vehicle.id);
+                              }
+                            } else {
+                              selectedVehicleIds.remove(vehicle.id);
                             }
-                          } else {
-                            selectedVehicleIds.remove(vehicle.id);
-                          }
-                        });
-                      },
+                          });
+                        },
                   title: Text(
-                    vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
+                    vehicle.fullName.replaceAll(
+                      'Serisi',
+                      'vehicles.series'.tr(),
+                    ),
                     style: TextStyle(
                       color: isDisabled ? Colors.white38 : Colors.white,
                     ),
@@ -2744,7 +2879,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                     ),
                   ),
                   secondary: Icon(
-                    Icons.car_rental, 
+                    Icons.car_rental,
                     color: isDisabled ? Colors.white30 : Colors.white70,
                   ),
                   activeColor: Colors.deepPurpleAccent,
@@ -2761,12 +2896,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               ? null
               : () async {
                   Navigator.pop(dialogContext);
-                  
+
                   // Seçilen araçları kiraya ver
                   for (final vehicleId in selectedVehicleIds) {
                     await _rentalService.rentVehicle(vehicleId);
                   }
-                  
+
                   // Başarı mesajı
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -2782,7 +2917,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       ),
                     );
                   }
-                  
+
                   // Ekranı yenile
                   _loadCurrentUser();
                 },
@@ -2794,17 +2929,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   }
 
   // Galeri Avantaj Item
-  Widget _buildGalleryBenefit({
-    required IconData icon,
-    required String title,
-  }) {
+  Widget _buildGalleryBenefit({required IconData icon, required String title}) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: Colors.white.withValues(alpha: 0.9),
-          size: 18,
-        ),
+        Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 18),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -2815,11 +2943,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
             ),
           ),
         ),
-        Icon(
-          Icons.check_circle,
-          color: Colors.white,
-          size: 16,
-        ),
+        Icon(Icons.check_circle, color: Colors.white, size: 16),
       ],
     );
   }
@@ -2858,15 +2982,15 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
               title: 'home.advantage5Title'.tr(),
             ),
             const SizedBox(height: 20),
-            
+
             // Fiyat Bilgisi
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.deepPurple.withOpacity(0.1),
+                color: Colors.deepPurple.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.deepPurple.withOpacity(0.3),
+                  color: Colors.deepPurple.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -2909,297 +3033,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     );
   }
 
-  // Avantaj Item Widget
-  Widget _buildAdvantageItem({
-    required IconData icon,
-    required String title,
-    required String description,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.deepPurple.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.deepPurple,
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[600],
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-
-
-  // İlanlarım (Satışa çıkarılan araçlar)
-  Widget _buildMyListings() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Başlık
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.store, color: Colors.deepPurple),
-                    const SizedBox(width: 8),
-                    Text(
-                      'home.myListings'.tr(),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${_userListedVehicles.length} ${'home.listingCount'.tr()}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const Divider(height: 1),
-          
-          // İlan listesi
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _userListedVehicles.length > 3 ? 3 : _userListedVehicles.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final vehicle = _userListedVehicles[index];
-              return _buildListingCard(vehicle);
-            },
-          ),
-          
-          // Tümünü gör butonu (eğer 3'ten fazla ilan varsa)
-          if (_userListedVehicles.length > 3)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextButton.icon(
-                onPressed: () {
-                  // TODO: Tüm ilanları göster
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('home.viewAllListingsComingSoon'.tr()),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.arrow_forward),
-                label: Text('${'home.viewAllListings'.tr()} (${_userListedVehicles.length})'),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.deepPurple,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   // İlan kartı
-  Widget _buildListingCard(UserVehicle vehicle) {
-    return InkWell(
-      onTap: () {
-        // TODO: İlan detay sayfasına git
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('home.listingDetailComingSoon'.tr()),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Araç ikonu
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.directions_car,
-                color: Colors.green,
-                size: 30,
-              ),
-            ),
-            const SizedBox(width: 12),
-            
-            // Araç bilgileri
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    vehicle.fullName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${_formatCurrency(vehicle.listingPrice ?? 0)} TL',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Tarih ve durum
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'common.active'.tr(),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange[800],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${vehicle.daysOwned} ${'misc.days'.tr()}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   // Para formatı
   String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(2).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final months = [
-      'Ocak',
-      'Şubat',
-      'Mart',
-      'Nisan',
-      'Mayıs',
-      'Haziran',
-      'Temmuz',
-      'Ağustos',
-      'Eylül',
-      'Ekim',
-      'Kasım',
-      'Aralık'
-    ];
-
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-  // Sayı formatı (1000 → 1.000)
-  String _formatNumber(int number) {
-    return number.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return amount
+        .toStringAsFixed(2)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 
   // Drawer (Yan Menü)
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         child: Column(
           children: [
             // Drawer Header
@@ -3229,10 +3079,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 3,
-                      ),
+                      border: Border.all(color: Colors.white, width: 3),
                     ),
                     child: UserProfileAvatar(
                       imageUrl: _currentUser?.profileImageUrl,
@@ -3253,19 +3100,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       ),
                     ),
                     const SizedBox(height: 4),
-                Text(
-                  '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                    Text(
+                      '${_formatCurrency(_currentUser!.balance)} ${'common.currency'.tr()}',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ],
                 ],
               ),
             ),
-            
+
             // Menü Öğeleri
             Expanded(
               child: ListView(
@@ -3281,14 +3128,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                     isSelected: true, // Dashboard seçili
                   ),
                   _buildDrawerItem(
-                  icon: Icons.school,
-                  title: 'tutorial.title'.tr(),
-                  onTap: () {
-                    Navigator.pop(context); // Drawer'ı kapat
-                    // Tutorial'ı başlat
-                    _showTutorial();
-                  },
-                ),
+                    icon: Icons.school,
+                    title: 'tutorial.title'.tr(),
+                    onTap: () {
+                      Navigator.pop(context); // Drawer'ı kapat
+                      // Tutorial'ı başlat
+                      _showTutorial();
+                    },
+                  ),
                   _buildDrawerItem(
                     icon: Icons.assignment,
                     title: 'quests.title'.tr(),
@@ -3390,7 +3237,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                     },
                   ),
                   */
-
                   _buildDrawerItem(
                     icon: Icons.leaderboard,
                     title: 'drawer.leaderboard'.tr(),
@@ -3437,15 +3283,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                 ],
               ),
             ),
-            
+
             // Ayarlar (En Altta)
             Container(
               decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(
-                    color: Colors.grey.shade200,
-                    width: 1,
-                  ),
+                  top: BorderSide(color: Colors.grey.shade200, width: 1),
                 ),
               ),
               child: _buildDrawerItem(
@@ -3519,12 +3362,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
         ],
       ),
       selected: isSelected,
-      selectedTileColor: Colors.deepPurple.withOpacity(0.1),
+      selectedTileColor: Colors.deepPurple.withValues(alpha: 0.1),
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 4,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
     );
   }
 
@@ -3534,9 +3374,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
   Future<void> _checkAndShowTutorial() async {
     // Tutorial kontrolü - Artık User modelinden kontrol ediliyor
     if (_currentUser == null) return;
-    
+
     final tutorialCompleted = _currentUser!.isTutorialCompleted;
-    
+
     // Tutorial daha önce gösterilmediyse ve kullanıcı giriş yapmışsa göster
     if (!tutorialCompleted && mounted) {
       await Future.delayed(const Duration(milliseconds: 800));
@@ -3544,22 +3384,20 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
     }
   }
 
-
-
   /// Tutorial'ı tamamlandı olarak işaretle
   Future<void> _setTutorialCompleted() async {
     if (_currentUser == null) return;
-    
+
     try {
       // Firestore'da güncelle
       final updatedUser = _currentUser!.copyWith(isTutorialCompleted: true);
       await _db.updateUser(_currentUser!.id, updatedUser.toJson());
-      
+
       // Local state'i güncelle
       setState(() {
         _currentUser = updatedUser;
       });
-      
+
       // SharedPreferences'ı da güncelle (yedek olarak)
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('tutorial_completed', true);
@@ -3579,15 +3417,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
     // Eğer sayfa aşağı kaydırılmışsa önce yukarı kaydır
     if (_scrollController.hasClients && _scrollController.offset > 0) {
-      _scrollController.animateTo(
-        0.0,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      ).then((_) {
-        if (!mounted) return;
-        if (!mounted) return;
-        _startTutorialSequence();
-      });
+      _scrollController
+          .animateTo(
+            0.0,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          )
+          .then((_) {
+            if (!mounted) return;
+            if (!mounted) return;
+            _startTutorialSequence();
+          });
     } else {
       _startTutorialSequence();
     }
@@ -3618,8 +3458,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       },
     ).show(context: widget.mainScaffoldKey?.currentContext ?? context);
   }
-
-
 
   /// Tutorial Targets (Bottom Navigation Bar)
   List<TargetFocus> _createTutorialTargets() {
@@ -3652,16 +3490,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   const SizedBox(height: 12),
                   Text(
                     'tutorial.market_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     '1/6',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -3700,16 +3535,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   const SizedBox(height: 12),
                   Text(
                     'tutorial.sell_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     '2/6',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -3748,16 +3580,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   const SizedBox(height: 12),
                   Text(
                     'tutorial.garage_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     '3/6',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -3796,16 +3625,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   const SizedBox(height: 12),
                   Text(
                     'tutorial.listings_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     '4/6',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -3844,16 +3670,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   const SizedBox(height: 12),
                   Text(
                     'tutorial.offers_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     '5/6',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -3892,10 +3715,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                   const SizedBox(height: 12),
                   Text(
                     'tutorial.store_desc'.tr(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   Row(
@@ -3904,7 +3724,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
                       Text(
                         '6/6',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -3942,18 +3762,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       ),
     ];
   }
-  
+
   // ========== XP SİSTEMİ METODLARI ==========
-  
+
   // ========== GÜNLÜK GİRİŞ (STREAK) SİSTEMİ ==========
-  
+
   /// Günlük giriş bonusunu kontrol et ve dialog göster
   Future<void> _checkDailyStreak() async {
     if (_currentUser == null) return;
-    
+
     // Servisten kontrol et
     final status = await _loginService.checkStreak(_currentUser!.id);
-    
+
     // Eğer ödül alınabilirse ve dialog zaten açık değilse dialog göster
     if (status['canClaim'] == true && mounted && !_isDailyLoginDialogShown) {
       // İLK GİRİŞ KONTROLÜ:
@@ -3967,11 +3787,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
 
       // Biraz gecikmeli göster ki UI yüklensin
       await Future.delayed(const Duration(milliseconds: 1000));
-      
+
       if (!mounted || _isDailyLoginDialogShown) return;
-      
+
       _isDailyLoginDialogShown = true;
-      
+
       showDialog(
         context: context,
         barrierDismissible: false, // Ödül almadan kapatamasın (isteğe bağlı)
@@ -3981,10 +3801,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
           onClaim: () async {
             // Ödül alındıktan sonra kullanıcıyı yenile ve konfeti patlat
             await _loadCurrentUser();
-            
+
             // 🎯 Günlük Görev Güncellemesi: Günlük Giriş
-            await _questService.updateProgress(_currentUser!.id, QuestType.login, 1);
-            
+            await _questService.updateProgress(
+              _currentUser!.id,
+              QuestType.login,
+              1,
+            );
+
             // Basit bir snackbar veya animasyon
             // if (mounted) {
             //   ScaffoldMessenger.of(context).showSnackBar(
@@ -4007,115 +3831,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware, AutoRefreshMix
       // await _questService.updateProgress(_currentUser!.id, QuestType.login, 1);
     }
   }
-  
+
   /// XP kazanım animasyonu göster
-  void _showXPGainAnimation(XPGainResult result) {
-    if (result.xpGained <= 0 || !mounted) return;
-    
-    final overlay = Overlay.of(context);
-    late OverlayEntry entry;
-    
-    entry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).size.height * 0.4,
-        left: 0,
-        right: 0,
-        child: TweenAnimationBuilder(
-          duration: const Duration(milliseconds: 800),
-          tween: Tween<double>(begin: 0, end: 1),
-          onEnd: () {
-            Future.delayed(const Duration(seconds: 2), () {
-              entry.remove();
-            });
-          },
-          builder: (context, double value, child) {
-            return Transform.scale(
-              scale: value,
-              child: Opacity(
-                opacity: value,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Colors.amber, Colors.orange],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.amber.withOpacity(0.6),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.stars,
-                          color: Colors.white,
-                          size: 32,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '+${result.xpGained} XP',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-    
-    overlay.insert(entry);
-  }
-  
+
   /// Seviye atlama dialogu göster
-  Future<void> _showLevelUpDialog(XPGainResult result) async {
-    if (!mounted || result.rewards == null) return;
-    
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => LevelUpDialog(
-        reward: result.rewards!,
-      ),
-    );
 
-    // Dialog kapandıktan sonra reklam göster
-    await AdService().showInterstitialAd(force: true);
-  }
-
-  
   /// XP Kazandır (diğer entegrasyon noktaları için helper)
-  Future<void> _awardXP(XPGainResult result) async {
-    if (!result.hasGain || !mounted) return;
-    
-    // Kullanıcıyı yenile
-    await _loadCurrentUser();
-    
-    // XP animasyonu göster
-    _showXPGainAnimation(result);
-    
-    // Seviye atlandıysa dialog göster
-    if (result.leveledUp) {
-      await Future.delayed(const Duration(milliseconds: 1500));
-      await _showLevelUpDialog(result);
-    }
-  }
 }
 
 class WiggleBadge extends StatefulWidget {
@@ -4127,7 +3848,8 @@ class WiggleBadge extends StatefulWidget {
   State<WiggleBadge> createState() => _WiggleBadgeState();
 }
 
-class _WiggleBadgeState extends State<WiggleBadge> with SingleTickerProviderStateMixin {
+class _WiggleBadgeState extends State<WiggleBadge>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   Timer? _timer;
@@ -4169,16 +3891,12 @@ class _WiggleBadgeState extends State<WiggleBadge> with SingleTickerProviderStat
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Transform.rotate(
-          angle: _animation.value,
-          child: child,
-        );
+        return Transform.rotate(angle: _animation.value, child: child);
       },
       child: widget.child,
     );
   }
 }
-
 
 class PulseBadge extends StatefulWidget {
   final Widget child;
@@ -4188,7 +3906,8 @@ class PulseBadge extends StatefulWidget {
   State<PulseBadge> createState() => _PulseBadgeState();
 }
 
-class _PulseBadgeState extends State<PulseBadge> with SingleTickerProviderStateMixin {
+class _PulseBadgeState extends State<PulseBadge>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -4199,10 +3918,11 @@ class _PulseBadgeState extends State<PulseBadge> with SingleTickerProviderStateM
       duration: const Duration(milliseconds: 800),
       vsync: this,
     )..repeat(reverse: true);
-    
-    _animation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -4213,9 +3933,6 @@ class _PulseBadgeState extends State<PulseBadge> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _animation,
-      child: widget.child,
-    );
+    return ScaleTransition(scale: _animation, child: widget.child);
   }
 }

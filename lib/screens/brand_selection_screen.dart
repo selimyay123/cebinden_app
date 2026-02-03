@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
 import 'model_selection_screen.dart';
-import 'main_screen.dart';
 
 import '../models/user_model.dart';
-import '../models/vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/skill_service.dart';
 import 'vehicle_detail_screen.dart';
@@ -44,7 +42,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
     _loadUser();
     // Gün değişimini dinle (Hızlı Al hakkını güncellemek için)
     _gameTime.currentGameDay.addListener(_onDayChanged);
-    
+
     // Kullanıcı güncellemelerini dinle (Skill unlock vb. için)
     _userUpdateSubscription = _db.onUserUpdate.listen((_) {
       _loadUser();
@@ -95,189 +93,211 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
             }
             return true;
           },
-          child: Builder(builder: (context) {
-        // Simülasyon araç markaları (telif riski olmayan isimler)
-        final brands = [
-          {
-            'name': 'Audira', // Audi
-            'originalHint': 'Alman lüks performansı',
-            'color': Colors.grey[800]!,
-            'icon': 'A',
-            'imagePath': 'assets/images/brands/audira.png',
-          },
-          {
-            'name': 'Bavora', // BMW
-            'originalHint': 'Bavyera motoru',
-            'color': Colors.blue[700]!,
-            'icon': 'B',
-            'imagePath': 'assets/images/brands/bavora.png',
-          },
-          {
-            'name': 'Fialto', // Fiat
-            'originalHint': 'İtalyan pratikliği',
-            'color': Colors.red[600]!,
-            'icon': 'F',
-            'imagePath': 'assets/images/brands/fialto.png',
-          },
-          {
-            'name': 'Fortran', // Ford
-            'originalHint': 'Amerikan klasiği',
-            'color': Colors.blue[900]!,
-            'icon': 'F',
-            'imagePath': 'assets/images/brands/fortran.png',
-          },
-          // {
-          //   'name': 'Hundar', // Hyundai
-          //   'originalHint': 'Kore teknolojisi',
-          //   'color': Colors.grey[700]!,
-          //   'icon': 'H',
-          //   'imagePath': 'assets/images/brands/hundar.png',
-          // },
-          {
-            'name': 'Hanto',
-            'originalHint': 'Japon güvenilirliği',
-            'color': Colors.red[700]!,
-            'icon': 'H',
-            'imagePath': 'assets/images/brands/hanto.png',
-          },
-          {
-            'name': 'Mercurion', // Mercedes
-            'originalHint': 'Alman lüksü',
-            'color': Colors.grey[600]!,
-            'icon': 'M',
-            'imagePath': 'assets/images/brands/mercurion.png',
-          },
-          {
-            'name': 'Oplon', // Opel
-            'originalHint': 'Alman pratikliği',
-            'color': Colors.yellow[700]!,
-            'icon': 'O',
-            'imagePath': 'assets/images/brands/oplon.png',
-          },
-          {
-            'name': 'Renauva', // Renault
-            'originalHint': 'Fransız inovasyonu',
-            'color': Colors.yellow[800]!,
-            'icon': 'R',
-            'imagePath': 'assets/images/brands/renauva.png',
-          },
-          {
-            'name': 'Koyoro', // Toyota
-            'originalHint': 'Japon mükemmelliği',
-            'color': Colors.red[600]!,
-            'icon': 'T',
-            'imagePath': 'assets/images/brands/koyoro.png',
-          },
-          {
-            'name': 'Volkstar', // Volkswagen
-            'originalHint': 'Halkın arabası',
-            'color': Colors.blue[700]!,
-            'icon': 'V',
-            'imagePath': 'assets/images/brands/volkstar.png',
-          },
-        ];
+          child: Builder(
+            builder: (context) {
+              // Simülasyon araç markaları (telif riski olmayan isimler)
+              final brands = [
+                {
+                  'name': 'Audira', // Audi
+                  'originalHint': 'Alman lüks performansı',
+                  'color': Colors.grey[800]!,
+                  'icon': 'A',
+                  'imagePath': 'assets/images/brands/audira.png',
+                },
+                {
+                  'name': 'Bavora', // BMW
+                  'originalHint': 'Bavyera motoru',
+                  'color': Colors.blue[700]!,
+                  'icon': 'B',
+                  'imagePath': 'assets/images/brands/bavora.png',
+                },
+                {
+                  'name': 'Fialto', // Fiat
+                  'originalHint': 'İtalyan pratikliği',
+                  'color': Colors.red[600]!,
+                  'icon': 'F',
+                  'imagePath': 'assets/images/brands/fialto.png',
+                },
+                {
+                  'name': 'Fortran', // Ford
+                  'originalHint': 'Amerikan klasiği',
+                  'color': Colors.blue[900]!,
+                  'icon': 'F',
+                  'imagePath': 'assets/images/brands/fortran.png',
+                },
+                // {
+                //   'name': 'Hundar', // Hyundai
+                //   'originalHint': 'Kore teknolojisi',
+                //   'color': Colors.grey[700]!,
+                //   'icon': 'H',
+                //   'imagePath': 'assets/images/brands/hundar.png',
+                // },
+                {
+                  'name': 'Hanto',
+                  'originalHint': 'Japon güvenilirliği',
+                  'color': Colors.red[700]!,
+                  'icon': 'H',
+                  'imagePath': 'assets/images/brands/hanto.png',
+                },
+                {
+                  'name': 'Mercurion', // Mercedes
+                  'originalHint': 'Alman lüksü',
+                  'color': Colors.grey[600]!,
+                  'icon': 'M',
+                  'imagePath': 'assets/images/brands/mercurion.png',
+                },
+                {
+                  'name': 'Oplon', // Opel
+                  'originalHint': 'Alman pratikliği',
+                  'color': Colors.yellow[700]!,
+                  'icon': 'O',
+                  'imagePath': 'assets/images/brands/oplon.png',
+                },
+                {
+                  'name': 'Renauva', // Renault
+                  'originalHint': 'Fransız inovasyonu',
+                  'color': Colors.yellow[800]!,
+                  'icon': 'R',
+                  'imagePath': 'assets/images/brands/renauva.png',
+                },
+                {
+                  'name': 'Koyoro', // Toyota
+                  'originalHint': 'Japon mükemmelliği',
+                  'color': Colors.red[600]!,
+                  'icon': 'T',
+                  'imagePath': 'assets/images/brands/koyoro.png',
+                },
+                {
+                  'name': 'Volkstar', // Volkswagen
+                  'originalHint': 'Halkın arabası',
+                  'color': Colors.blue[700]!,
+                  'icon': 'V',
+                  'imagePath': 'assets/images/brands/volkstar.png',
+                },
+              ];
 
-        // Alfabetik sırala
-        brands.sort(
-          (a, b) => (a['name'] as String).compareTo(b['name'] as String),
-        );
+              // Alfabetik sırala
+              brands.sort(
+                (a, b) => (a['name'] as String).compareTo(b['name'] as String),
+              );
 
-        return Scaffold(
-          backgroundColor: Colors.transparent, // Gradient için transparent yapıyoruz
-          extendBodyBehindAppBar: true, // Gradient'in AppBar arkasına geçmesi için (isteğe bağlı, şimdilik normal bırakalım)
-          appBar: AppBar(
-            title: Text('vehicles.selectBrand'.tr()),
-            actions: [
-
-            ],
-            backgroundColor: widget.categoryColor,
-            foregroundColor: Colors.white,
-            elevation: 0,
-          ),
-          body: Container(
-            decoration: BoxDecoration(
-              image: GameDecorationImage(
-                assetPath: 'assets/images/general_bg.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: _isLoading 
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-              children: [
-                // AppBar ve Status Bar yüksekliği kadar boşluk bırak
-                SizedBox(height: kToolbarHeight + MediaQuery.of(context).padding.top),
-                
-                // Bilgilendirme Banner
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  color: widget.categoryColor.withOpacity(0.1),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.deepPurpleAccent, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          '${'vehicles.categoryInfoAuto'.tr()} ${widget.categoryName}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+              return Scaffold(
+                backgroundColor:
+                    Colors.transparent, // Gradient için transparent yapıyoruz
+                extendBodyBehindAppBar:
+                    true, // Gradient'in AppBar arkasına geçmesi için (isteğe bağlı, şimdilik normal bırakalım)
+                appBar: AppBar(
+                  title: Text('vehicles.selectBrand'.tr()),
+                  actions: [],
+                  backgroundColor: widget.categoryColor,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
                 ),
-
-                // Marka Listesi
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: brands.length + 2, // +1 for "Tüm Modeller", +1 for "Rastgele Marka"
-                    itemBuilder: (context, index) {
-                      // İlk item "Tüm Modeller"
-                      if (index == 0) {
-                        return Column(
+                body: Container(
+                  decoration: BoxDecoration(
+                    image: GameDecorationImage(
+                      assetPath: 'assets/images/general_bg.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
                           children: [
-                            _buildAllBrandsCard(context),
-                            if (_currentUser != null && 
-                                _skillService.getSkillLevel(_currentUser!, SkillService.skillQuickBuy) > 0)
-                              _buildQuickBuyCard(context),
+                            // AppBar ve Status Bar yüksekliği kadar boşluk bırak
+                            SizedBox(
+                              height:
+                                  kToolbarHeight +
+                                  MediaQuery.of(context).padding.top,
+                            ),
+
+                            // Bilgilendirme Banner
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              color: widget.categoryColor.withOpacity(0.1),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: Colors.deepPurpleAccent,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      '${'vehicles.categoryInfoAuto'.tr()} ${widget.categoryName}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Marka Listesi
+                            Expanded(
+                              child: ListView.builder(
+                                padding: const EdgeInsets.all(16),
+                                itemCount:
+                                    brands.length +
+                                    2, // +1 for "Tüm Modeller", +1 for "Rastgele Marka"
+                                itemBuilder: (context, index) {
+                                  // İlk item "Tüm Modeller"
+                                  if (index == 0) {
+                                    return Column(
+                                      children: [
+                                        _buildAllBrandsCard(context),
+                                        if (_currentUser != null &&
+                                            _skillService.getSkillLevel(
+                                                  _currentUser!,
+                                                  SkillService.skillQuickBuy,
+                                                ) >
+                                                0)
+                                          _buildQuickBuyCard(context),
+                                      ],
+                                    );
+                                  }
+
+                                  // İkinci item "Rastgele Marka"
+                                  if (index == 1) {
+                                    return _buildRandomBrandCard(
+                                      context,
+                                      brands,
+                                    );
+                                  }
+
+                                  // Diğer markalar
+                                  final brand = brands[index - 2];
+                                  return _buildBrandCard(
+                                    context,
+                                    name: brand['name'] as String,
+                                    hint: 'brands.hints.${brand['name']}'.tr(),
+                                    color: brand['color'] as Color,
+                                    icon: brand['icon'] as String,
+                                    imagePath: brand['imagePath'] as String?,
+                                  );
+                                },
+                              ),
+                            ),
                           ],
-                        );
-                      }
-
-                      // İkinci item "Rastgele Marka"
-                      if (index == 1) {
-                        return _buildRandomBrandCard(context, brands);
-                      }
-
-                      // Diğer markalar
-                      final brand = brands[index - 2];
-                      return _buildBrandCard(
-                        context,
-                        name: brand['name'] as String,
-                        hint: 'brands.hints.${brand['name']}'.tr(),
-                        color: brand['color'] as Color,
-                        icon: brand['icon'] as String,
-                        imagePath: brand['imagePath'] as String?,
-                      );
-                    },
-                  ),
+                        ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
-        );
-          }),
         );
       },
     );
   }
 
-  Widget _buildRandomBrandCard(BuildContext context, List<Map<String, Object>> brands) {
+  Widget _buildRandomBrandCard(
+    BuildContext context,
+    List<Map<String, Object>> brands,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
@@ -289,7 +309,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
           onTap: () async {
             // Rastgele bir marka seç
             final randomBrand = (brands..shuffle()).first;
-            
+
             // Seçilen markaya göre MODEL SEÇİM sayfasına git
             await Navigator.push(
               context,
@@ -325,7 +345,11 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ),
                 const SizedBox(width: 12),
                 // Arrow
-                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 16,
+                ),
               ],
             ),
           ),
@@ -379,7 +403,11 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ),
                 const SizedBox(width: 12),
                 // Arrow
-                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 16,
+                ),
               ],
             ),
           ),
@@ -515,8 +543,11 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
   }
 
   Widget _buildQuickBuyCard(BuildContext context) {
-    final remainingUses = _skillService.getRemainingDailyUses(_currentUser!, SkillService.skillQuickBuy);
-    
+    final remainingUses = _skillService.getRemainingDailyUses(
+      _currentUser!,
+      SkillService.skillQuickBuy,
+    );
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
@@ -538,7 +569,9 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                   ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Colors.red.shade700,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   margin: const EdgeInsets.all(16),
                 ),
               );
@@ -569,13 +602,22 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
             await Future.delayed(const Duration(milliseconds: 2500));
 
             try {
-              final vehicle = await _skillService.findQuickBuyVehicle(_currentUser!);
-              
-              if (mounted) Navigator.of(context, rootNavigator: true).pop(); // Dialog'u kapat
+              final vehicle = await _skillService.findQuickBuyVehicle(
+                _currentUser!,
+              );
+
+              if (mounted)
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pop(); // Dialog'u kapat
 
               if (vehicle != null) {
                 // Kullanım hakkını düş
-                await _skillService.recordSkillUsage(_currentUser!.id, SkillService.skillQuickBuy);
+                await _skillService.recordSkillUsage(
+                  _currentUser!.id,
+                  SkillService.skillQuickBuy,
+                );
                 await _loadUser(); // Kullanıcıyı güncelle
 
                 if (mounted) {
@@ -583,7 +625,8 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => VehicleDetailScreen(vehicle: vehicle),
+                      builder: (context) =>
+                          VehicleDetailScreen(vehicle: vehicle),
                     ),
                   );
                 }
@@ -600,14 +643,20 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                       ),
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.orange.shade800,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       margin: const EdgeInsets.all(16),
                     ),
                   );
                 }
               }
             } catch (e) {
-              if (mounted) Navigator.of(context, rootNavigator: true).pop(); // Dialog'u kapat
+              if (mounted)
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pop(); // Dialog'u kapat
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -620,7 +669,9 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                     ),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Colors.red.shade900,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     margin: const EdgeInsets.all(16),
                   ),
                 );
@@ -650,7 +701,10 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ),
                 // Remaining Uses
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black26,
                     borderRadius: BorderRadius.circular(8),
@@ -665,7 +719,11 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ),
                 const SizedBox(width: 12),
                 // Arrow
-                const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 16,
+                ),
               ],
             ),
           ),

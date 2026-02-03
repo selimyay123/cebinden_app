@@ -6,9 +6,7 @@ import '../services/daily_quest_service.dart';
 import '../services/mission_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
-import '../services/xp_service.dart';
 import '../widgets/level_up_dialog.dart';
-import 'main_screen.dart';
 
 class DailyQuestsScreen extends StatefulWidget {
   const DailyQuestsScreen({super.key});
@@ -17,11 +15,12 @@ class DailyQuestsScreen extends StatefulWidget {
   State<DailyQuestsScreen> createState() => _DailyQuestsScreenState();
 }
 
-class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTickerProviderStateMixin {
+class _DailyQuestsScreenState extends State<DailyQuestsScreen>
+    with SingleTickerProviderStateMixin {
   final DailyQuestService _questService = DailyQuestService();
   final MissionService _missionService = MissionService();
   final DatabaseHelper _db = DatabaseHelper();
-  
+
   List<DailyQuest> _quests = [];
   List<Mission> _missions = [];
   bool _isLoading = true;
@@ -50,7 +49,10 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.2, end: 1.0).animate(_animationController!);
+    _animation = Tween<double>(
+      begin: 0.2,
+      end: 1.0,
+    ).animate(_animationController!);
   }
 
   @override
@@ -61,7 +63,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
 
   Future<void> _checkAndLoadQuests() async {
     setState(() => _isLoading = true);
-    
+
     final user = await _db.getCurrentUser();
     if (user != null) {
       _currentUser = user;
@@ -78,10 +80,10 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
       setState(() => _isLoading = false);
       return;
     }
-    
+
     final quests = await _questService.getTodayQuests(_currentUser!['id']);
     final missions = await _missionService.getUserMissions(_currentUser!['id']);
-    
+
     if (mounted) {
       setState(() {
         _quests = quests;
@@ -94,13 +96,18 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
   Future<void> _claimReward(DailyQuest quest) async {
     if (_currentUser == null) return;
 
-    final result = await _questService.claimReward(_currentUser!['id'], quest.id);
+    final result = await _questService.claimReward(
+      _currentUser!['id'],
+      quest.id,
+    );
     if (result != null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text(
               'quests.rewardClaimed'.trParams({
@@ -111,17 +118,15 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
             backgroundColor: Colors.green.withOpacity(0.8),
           ),
         );
-        
+
         if (result.leveledUp && result.rewards != null) {
           await showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => LevelUpDialog(
-              reward: result.rewards!,
-            ),
+            builder: (context) => LevelUpDialog(reward: result.rewards!),
           );
         }
-        
+
         _loadData(); // Listeyi yenile
       }
     } else {
@@ -129,7 +134,9 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.red.withOpacity(0.8),
             content: Text('quests.claimFailed'.tr()),
@@ -142,13 +149,18 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
   Future<void> _claimMissionReward(Mission mission) async {
     if (_currentUser == null) return;
 
-    final result = await _missionService.claimReward(_currentUser!['id'], mission.id);
+    final result = await _missionService.claimReward(
+      _currentUser!['id'],
+      mission.id,
+    );
     if (result != null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text(
               'quests.rewardClaimed'.trParams({
@@ -159,14 +171,12 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
             backgroundColor: Colors.green.withOpacity(0.8),
           ),
         );
-        
+
         if (result.leveledUp && result.rewards != null) {
           await showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => LevelUpDialog(
-              reward: result.rewards!,
-            ),
+            builder: (context) => LevelUpDialog(reward: result.rewards!),
           );
         }
 
@@ -230,7 +240,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
             children: [
               // 1. Sekme: Günlük Görevler
               _buildDailyQuestsList(),
-              
+
               // 2. Sekme: Başarımlar / Görevler
               _buildMissionsList(),
             ],
@@ -244,7 +254,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    
+
     if (_quests.isEmpty) {
       return Center(child: Text('quests.noQuests'.tr()));
     }
@@ -304,7 +314,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                    child: Text(
+                  child: Text(
                     _getLocalizedDescription(quest),
                     style: const TextStyle(
                       fontSize: 16,
@@ -390,7 +400,10 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
   Widget _buildMissionCard(Mission mission) {
     final isCompleted = mission.isCompleted;
     final isClaimed = mission.isClaimed;
-    final progress = (mission.currentValue / mission.targetValue).clamp(0.0, 1.0);
+    final progress = (mission.currentValue / mission.targetValue).clamp(
+      0.0,
+      1.0,
+    );
 
     return Card(
       color: Colors.deepPurpleAccent.withOpacity(0.9),
@@ -522,16 +535,24 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
 
     // Eski sistem: Hardcoded stringleri yakala ve çevir
     if (quest.description.contains('araç satın al')) {
-      return 'quests.descriptions.buyVehicle'.trParams({'count': quest.targetCount.toString()});
+      return 'quests.descriptions.buyVehicle'.trParams({
+        'count': quest.targetCount.toString(),
+      });
     }
     if (quest.description.contains('araç sat')) {
-      return 'quests.descriptions.sellVehicle'.trParams({'count': quest.targetCount.toString()});
+      return 'quests.descriptions.sellVehicle'.trParams({
+        'count': quest.targetCount.toString(),
+      });
     }
     if (quest.description.contains('teklif gönder')) {
-      return 'quests.descriptions.makeOffer'.trParams({'count': quest.targetCount.toString()});
+      return 'quests.descriptions.makeOffer'.trParams({
+        'count': quest.targetCount.toString(),
+      });
     }
     if (quest.description.contains('kâr et')) {
-      return 'quests.descriptions.earnProfit'.trParams({'amount': _formatCurrency(quest.targetCount.toDouble())});
+      return 'quests.descriptions.earnProfit'.trParams({
+        'amount': _formatCurrency(quest.targetCount.toDouble()),
+      });
     }
 
     // Hiçbiri değilse olduğu gibi göster
@@ -553,7 +574,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen> with SingleTicker
 
   Widget _buildBlinkingBadge(int count) {
     if (_animation == null) return const SizedBox.shrink();
-    
+
     return FadeTransition(
       opacity: _animation!,
       child: Container(

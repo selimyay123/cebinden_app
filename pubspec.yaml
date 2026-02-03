@@ -116,6 +116,7 @@ flutter:
   assets:
     - assets/images/app_logo/
     - assets/images/general_bg.png
+    - assets/images/general_bg_dark.png
     - assets/images/vip_pass_bg.png
     - assets/images/splash_screen.jpeg
     - assets/images/icons/

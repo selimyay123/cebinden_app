@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
-import 'main_screen.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -11,9 +10,7 @@ class AboutScreen extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('about.title'.tr()),
-        actions: [
-
-        ],
+        actions: [],
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -71,8 +68,7 @@ class AboutScreen extends StatelessWidget {
             _buildInfoCard(
               icon: Icons.info_outline,
               title: 'about.aboutApp'.tr(),
-              content:
-                  'about.description'.tr(),
+              content: 'about.description'.tr(),
             ),
 
             const SizedBox(height: 12),
@@ -81,8 +77,7 @@ class AboutScreen extends StatelessWidget {
             _buildInfoCard(
               icon: Icons.star_outline,
               title: 'about.features'.tr(),
-              content:
-                  'about.featuresList'.tr(),
+              content: 'about.featuresList'.tr(),
             ),
 
             const SizedBox(height: 12),
@@ -91,8 +86,7 @@ class AboutScreen extends StatelessWidget {
             _buildInfoCard(
               icon: Icons.contact_mail_outlined,
               title: 'about.contactTitle'.tr(),
-              content:
-                  'about.contactContent'.tr(),
+              content: 'about.contactContent'.tr(),
             ),
 
             const SizedBox(height: 20),
@@ -113,10 +107,7 @@ class AboutScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'about.disclaimer'.tr(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[700],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                     ),
                   ),
                 ],
@@ -191,15 +182,8 @@ class AboutScreen extends StatelessWidget {
           child: Icon(icon, color: Colors.deepPurple),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
       ],
     );
   }
 }
-

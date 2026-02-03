@@ -3,7 +3,6 @@ import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import '../services/database_helper.dart';
 import '../models/user_model.dart';
-import 'main_screen.dart';
 
 class ChangeUsernameScreen extends StatefulWidget {
   final String userId;
@@ -57,7 +56,9 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
       _statusColor = Colors.green;
     } else {
       if (_user!.lastUsernameChangeDate != null) {
-        final daysSinceLastChange = DateTime.now().difference(_user!.lastUsernameChangeDate!).inDays;
+        final daysSinceLastChange = DateTime.now()
+            .difference(_user!.lastUsernameChangeDate!)
+            .inDays;
         if (daysSinceLastChange >= 7) {
           _canChange = true;
           _statusMessage = 'changeUsername.changeAvailable'.tr();
@@ -65,7 +66,9 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
         } else {
           _canChange = false;
           final daysRemaining = 7 - daysSinceLastChange;
-          _statusMessage = 'changeUsername.nextChangeAvailable'.trParams({'days': daysRemaining.toString()});
+          _statusMessage = 'changeUsername.nextChangeAvailable'.trParams({
+            'days': daysRemaining.toString(),
+          });
           _statusColor = Colors.red;
         }
       } else {
@@ -109,7 +112,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
       });
       return;
     }
-    
+
     // Küfür kontrolü
     if (_authService.hasProfanity(newUsername)) {
       setState(() {
@@ -138,7 +141,9 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           behavior: SnackBarBehavior.floating,
           content: Text('changeUsername.success'.tr()),
           backgroundColor: Colors.green.withOpacity(0.8),
@@ -159,9 +164,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('changeUsername.title'.tr()),
-        actions: [
-
-        ],
+        actions: [],
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -201,7 +204,9 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                         decoration: BoxDecoration(
                           color: _statusColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: _statusColor.withOpacity(0.3)),
+                          border: Border.all(
+                            color: _statusColor.withOpacity(0.3),
+                          ),
                         ),
                         child: Text(
                           _statusMessage,
@@ -212,7 +217,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                           ),
                         ),
                       ),
-                    
+
                     const SizedBox(height: 40),
 
                     // Hata Mesajı
@@ -223,11 +228,17 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                         decoration: BoxDecoration(
                           color: Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.red.withOpacity(0.3)),
+                          border: Border.all(
+                            color: Colors.red.withOpacity(0.3),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -256,7 +267,10 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                          borderSide: const BorderSide(
+                            color: Colors.deepPurple,
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -264,7 +278,9 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
 
                     // Kaydet Butonu
                     ElevatedButton(
-                      onPressed: _isLoading || !_canChange ? null : _changeUsername,
+                      onPressed: _isLoading || !_canChange
+                          ? null
+                          : _changeUsername,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurple,
                         foregroundColor: Colors.white,
@@ -280,7 +296,9 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : Text(

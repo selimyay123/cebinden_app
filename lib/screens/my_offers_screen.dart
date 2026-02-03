@@ -31,10 +31,12 @@ import '../services/ad_service.dart';
 
 class MyOffersScreen extends StatefulWidget {
   final int initialTab;
-  final String? selectedBrand; // null = marka listesi göster, brand = o markanın tekliflerini göster
-  final String? selectedVehicleId; // null = araç listesi göster, vehicleId = o aracın tekliflerini göster
+  final String?
+  selectedBrand; // null = marka listesi göster, brand = o markanın tekliflerini göster
+  final String?
+  selectedVehicleId; // null = araç listesi göster, vehicleId = o aracın tekliflerini göster
   final bool isIncoming; // true = gelen teklifler, false = gönderilen teklifler
-  
+
   const MyOffersScreen({
     Key? key,
     this.initialTab = 0,
@@ -55,17 +57,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   final MarketRefreshService _marketService = MarketRefreshService();
   final AssetService _assetService = AssetService();
 
-
-
   // Gelen teklifler (kullanıcının ilanlarına gelen)
   List<Offer> _incomingOffers = [];
   Map<String, List<Offer>> _incomingOffersByVehicle = {};
   Map<String, List<Offer>> _incomingOffersByBrand = {}; // Markaya göre grupla
 
-
-
   bool _isLoading = true;
-  bool _shouldRefreshParent = false; // Üst ekrana güncelleme sinyali göndermek için
+  bool _shouldRefreshParent =
+      false; // Üst ekrana güncelleme sinyali göndermek için
   StreamSubscription? _offerUpdateSubscription;
 
   @override
@@ -100,7 +99,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   @override
   void dispose() {
-
     _offerUpdateSubscription?.cancel();
     super.dispose();
   }
@@ -143,11 +141,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           _incomingOffersByBrand[offer.vehicleBrand]!.add(offer);
         }
       }
-
-
-    } catch (e) {
-      
-    }
+    } catch (e) {}
 
     setState(() => _isLoading = false);
   }
@@ -171,24 +165,21 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     if (widget.selectedBrand != null && widget.selectedVehicleId != null) {
       return _buildVehicleOffersScreen();
     }
-    
+
     // Eğer sadece marka seçilmişse, o markanın araçlarını göster
     if (widget.selectedBrand != null) {
       return _buildVehicleListScreen();
     }
-    
+
     // Aksi takdirde, tab view ile marka listelerini göster
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('offers.title'.tr()),
-        actions: [
-
-        ],
+        actions: [],
         backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
         elevation: 0,
-
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -209,10 +200,15 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
-                          color: Colors.deepPurple.shade50.withValues(alpha: 0.9),
+                          color: Colors.deepPurple.shade50.withValues(
+                            alpha: 0.9,
+                          ),
                           child: Row(
                             children: [
-                              const Icon(Icons.info_outline, color: Colors.deepPurple),
+                              const Icon(
+                                Icons.info_outline,
+                                color: Colors.deepPurple,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -251,31 +247,25 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         width: size,
         height: size,
         fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => Icon(
-          Icons.inbox,
-          size: size * 0.8,
-          color: color,
-        ),
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.inbox, size: size * 0.8, color: color),
       );
     }
-    
+
     return Image.asset(
       assetPath,
       width: size,
       height: size,
       fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) => Icon(
-        Icons.inbox,
-        size: size * 0.8,
-        color: color,
-      ),
+      errorBuilder: (context, error, stackTrace) =>
+          Icon(Icons.inbox, size: size * 0.8, color: color),
     );
   }
 
   // Marka listesi (Grid view)
   Widget _buildBrandList() {
     final brandMap = _incomingOffersByBrand;
-    
+
     return RefreshIndicator(
       onRefresh: _loadOffers,
       child: GridView.builder(
@@ -298,8 +288,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   // Marka kartı widget'ı
   Widget _buildBrandCard(String brand, int offerCount) {
-    final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepPurple);
-    
+    final brandColor = BrandColors.getColor(
+      brand,
+      defaultColor: Colors.deepPurple,
+    );
+
     return InkWell(
       onTap: () async {
         final result = await Navigator.push(
@@ -337,14 +330,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               bottom: -20,
               child: Opacity(
                 opacity: 0.1,
-                child: _buildBrandLogo(
-                  brand,
-                  size: 120,
-                  color: brandColor,
-                ),
+                child: _buildBrandLogo(brand, size: 120, color: brandColor),
               ),
             ),
-            
+
             // İçerik
             Padding(
               padding: const EdgeInsets.all(16),
@@ -381,7 +370,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       ),
                     ),
                   ),
-                  
+
                   // Marka İsmi
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,13 +385,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        offerCount == 1 
-                          ? '1 ${'misc.offer'.tr()}' 
-                          : '$offerCount ${'misc.offers'.tr()}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                        ),
+                        offerCount == 1
+                            ? '1 ${'misc.offer'.tr()}'
+                            : '$offerCount ${'misc.offers'.tr()}',
+                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -418,7 +404,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   // Seçili markanın araçlarını gösteren ekran (YENİ ARA EKRAN)
   Widget _buildVehicleListScreen() {
     final brandOffers = _incomingOffersByBrand[widget.selectedBrand] ?? [];
-    
+
     // Araca göre grupla
     Map<String, List<Offer>> offersByVehicle = {};
     for (var offer in brandOffers) {
@@ -427,7 +413,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       }
       offersByVehicle[offer.vehicleId]!.add(offer);
     }
-    
+
     // SADECE BEKLEYENLERİ FİLTRELE: Sadece bekleyen teklifi olan araçları göster
     Map<String, List<Offer>> activeVehicles = {};
     for (var entry in offersByVehicle.entries) {
@@ -437,14 +423,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         activeVehicles[entry.key] = vehicleOffers;
       }
     }
-    
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('${widget.selectedBrand} ${'offers.title'.tr()}'),
-        actions: [
-
-        ],
+        actions: [],
         backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -467,43 +451,43 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                  Icon(
-                                    Icons.check_circle_outline,
-                                    size: 80,
+                                Icon(
+                                  Icons.check_circle_outline,
+                                  size: 80,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'myVehicles.noActiveOffers'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
                                     color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(0, 1),
+                                        blurRadius: 2,
+                                        color: Colors.black54,
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'myVehicles.noActiveOffers'.tr(),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      shadows: [
-                                        Shadow(
-                                          offset: Offset(0, 1),
-                                          blurRadius: 2,
-                                          color: Colors.black54,
-                                        ),
-                                      ],
-                                    ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'myVehicles.noPendingOffersForBrand'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                        offset: Offset(0, 1),
+                                        blurRadius: 2,
+                                        color: Colors.black54,
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'myVehicles.noPendingOffersForBrand'.tr(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                      shadows: [
-                                        Shadow(
-                                          offset: Offset(0, 1),
-                                          blurRadius: 2,
-                                          color: Colors.black54,
-                                        ),
-                                      ],
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ],
                             ),
                           )
@@ -513,9 +497,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                               padding: const EdgeInsets.all(16),
                               itemCount: activeVehicles.length,
                               itemBuilder: (context, index) {
-                                final vehicleId = activeVehicles.keys.elementAt(index);
+                                final vehicleId = activeVehicles.keys.elementAt(
+                                  index,
+                                );
                                 final offers = activeVehicles[vehicleId]!;
-                                return _buildVehicleSelectionCard(vehicleId, offers);
+                                return _buildVehicleSelectionCard(
+                                  vehicleId,
+                                  offers,
+                                );
                               },
                             ),
                           ),
@@ -529,24 +518,24 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   // Seçili aracın tekliflerini gösteren ekran
   Widget _buildVehicleOffersScreen() {
     final brandOffers = _incomingOffersByBrand[widget.selectedBrand] ?? [];
-    
+
     // Seçili aracın tekliflerini filtrele
-    final vehicleOffers = brandOffers.where((offer) => 
-      offer.vehicleId == widget.selectedVehicleId
-    ).toList();
-    
+    final vehicleOffers = brandOffers
+        .where((offer) => offer.vehicleId == widget.selectedVehicleId)
+        .toList();
+
     // Araç bilgisi için ilk teklifi al
     final firstOffer = vehicleOffers.isNotEmpty ? vehicleOffers.first : null;
-    
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(firstOffer != null 
-          ? '${firstOffer.vehicleBrand} ${firstOffer.vehicleModel}'
-          : 'myVehicles.offers'.tr()),
-        actions: [
-
-        ],
+        title: Text(
+          firstOffer != null
+              ? '${firstOffer.vehicleBrand} ${firstOffer.vehicleModel}'
+              : 'myVehicles.offers'.tr(),
+        ),
+        actions: [],
         backgroundColor: Colors.deepPurple.withOpacity(0.9),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -554,7 +543,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: _getBackgroundImageProvider('assets/images/general_bg_dark.png'),
+            image: _getBackgroundImageProvider(
+              'assets/images/general_bg_dark.png',
+            ),
             fit: BoxFit.cover,
           ),
         ),
@@ -572,9 +563,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                               padding: const EdgeInsets.all(16),
                               children: [
                                 // Araç Bilgi Kartı
-                                if (firstOffer != null) _buildVehicleInfoCard(firstOffer),
+                                if (firstOffer != null)
+                                  _buildVehicleInfoCard(firstOffer),
                                 const SizedBox(height: 16),
-                                
+
                                 // "Tüm Teklifleri Reddet" Butonu (Sadece gelen tekliflerde ve bekleyen teklif varsa)
                                 if (vehicleOffers.any((o) => o.isPending()))
                                   Container(
@@ -583,18 +575,28 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                       child: SizedBox(
                                         height: 36,
                                         child: ElevatedButton.icon(
-                                          onPressed: () => _rejectAllOffers(vehicleOffers),
+                                          onPressed: () =>
+                                              _rejectAllOffers(vehicleOffers),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.red.shade50.withValues(alpha: 0.9),
+                                            backgroundColor: Colors.red.shade50
+                                                .withValues(alpha: 0.9),
                                             foregroundColor: Colors.red,
                                             elevation: 0,
-                                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                            ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(18),
-                                              side: BorderSide(color: Colors.red.shade200),
+                                              borderRadius:
+                                                  BorderRadius.circular(18),
+                                              side: BorderSide(
+                                                color: Colors.red.shade200,
+                                              ),
                                             ),
                                           ),
-                                          icon: const Icon(Icons.delete_sweep, size: 18),
+                                          icon: const Icon(
+                                            Icons.delete_sweep,
+                                            size: 18,
+                                          ),
                                           label: Text(
                                             'myVehicles.rejectAll'.tr(),
                                             style: const TextStyle(
@@ -606,7 +608,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                       ),
                                     ),
                                   ),
-                                
+
                                 // Teklif Listesi
                                 ...vehicleOffers.map((offer) {
                                   return _buildIncomingOfferCard(offer);
@@ -638,7 +640,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black,
-              
             ),
           ),
           const SizedBox(height: 8),
@@ -666,8 +667,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   Widget _buildVehicleSelectionCard(String vehicleId, List<Offer> offers) {
     final firstOffer = offers.first;
     final pendingOffers = offers.where((o) => o.isPending()).toList();
-    final acceptedOffers = offers.where((o) => o.status == OfferStatus.accepted).toList();
-    final rejectedOffers = offers.where((o) => o.status == OfferStatus.rejected).toList();
+    final acceptedOffers = offers
+        .where((o) => o.status == OfferStatus.accepted)
+        .toList();
+    final rejectedOffers = offers
+        .where((o) => o.status == OfferStatus.rejected)
+        .toList();
 
     return Card(
       color: Colors.white.withValues(alpha: 0.9),
@@ -688,7 +693,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
             ),
           );
-          
+
           // Eğer teklifler silindi/değişti ise listeyi yenile
           if (result == true && mounted) {
             _loadOffers();
@@ -715,12 +720,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: _buildVehicleImage(
-                      firstOffer.vehicleImageUrl, 
-                      100, 
-                      75, 
-                      brand: firstOffer.vehicleBrand, 
-                      model: firstOffer.vehicleModel, 
-                      vehicleId: firstOffer.vehicleId
+                      firstOffer.vehicleImageUrl,
+                      100,
+                      75,
+                      brand: firstOffer.vehicleBrand,
+                      model: firstOffer.vehicleModel,
+                      vehicleId: firstOffer.vehicleId,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -748,7 +753,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ),
                         const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.deepPurple,
                             borderRadius: BorderRadius.circular(20),
@@ -781,9 +789,27 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Expanded(child: _buildStatChip('myVehicles.statusPending'.tr(), pendingOffers.length, Colors.orange)),
-                  Expanded(child: _buildStatChip('myVehicles.statusAccepted'.tr(), acceptedOffers.length, Colors.green)),
-                  Expanded(child: _buildStatChip('myVehicles.statusRejected'.tr(), rejectedOffers.length, Colors.red)),
+                  Expanded(
+                    child: _buildStatChip(
+                      'myVehicles.statusPending'.tr(),
+                      pendingOffers.length,
+                      Colors.orange,
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildStatChip(
+                      'myVehicles.statusAccepted'.tr(),
+                      acceptedOffers.length,
+                      Colors.green,
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildStatChip(
+                      'myVehicles.statusRejected'.tr(),
+                      rejectedOffers.length,
+                      Colors.red,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -805,7 +831,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           gradient: LinearGradient(
             colors: [
               Colors.deepPurple.shade50.withValues(alpha: 0.9),
-              Colors.white.withValues(alpha: 0.9)
+              Colors.white.withValues(alpha: 0.9),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -818,12 +844,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: _buildVehicleImage(
-                offer.vehicleImageUrl, 
-                120, 
-                90, 
-                brand: offer.vehicleBrand, 
-                model: offer.vehicleModel, 
-                vehicleId: offer.vehicleId
+                offer.vehicleImageUrl,
+                120,
+                90,
+                brand: offer.vehicleBrand,
+                model: offer.vehicleModel,
+                vehicleId: offer.vehicleId,
               ),
             ),
             const SizedBox(width: 16),
@@ -845,20 +871,24 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                      Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${offer.vehicleYear}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.deepPurple,
                       borderRadius: BorderRadius.circular(20),
@@ -915,7 +945,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 ),
               ),
               const SizedBox(width: 8),
-              
+
               // Mesaj Balonu
               Flexible(
                 child: Column(
@@ -959,12 +989,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ],
                       ),
                     ),
-                    
+
                     // Balon
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple.withOpacity(0.6), // Mor arka plan
+                        color: Colors.deepPurple.withOpacity(
+                          0.6,
+                        ), // Mor arka plan
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(4),
                           topRight: Radius.circular(16),
@@ -994,10 +1026,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 color: Colors.white, // Beyaz yazı
                               ),
                             ),
-                          
+
                           const SizedBox(height: 8),
-                          Divider(height: 16, color: Colors.white.withOpacity(0.2)),
-                          
+                          Divider(
+                            height: 16,
+                            color: Colors.white.withOpacity(0.2),
+                          ),
+
                           // Teklif Fiyatı
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -1024,27 +1059,39 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           FutureBuilder<UserVehicle?>(
                             future: _db.getUserVehicleById(offer.vehicleId),
                             builder: (context, snapshot) {
-                              if (!snapshot.hasData || snapshot.data == null) return const SizedBox();
-                              
+                              if (!snapshot.hasData || snapshot.data == null)
+                                return const SizedBox();
+
                               final vehicle = snapshot.data!;
-                              final profitLoss = offer.offerPrice - vehicle.purchasePrice;
-                              final profitLossPercentage = (profitLoss / vehicle.purchasePrice) * 100;
+                              final profitLoss =
+                                  offer.offerPrice - vehicle.purchasePrice;
+                              final profitLossPercentage =
+                                  (profitLoss / vehicle.purchasePrice) * 100;
                               final isProfit = profitLoss >= 0;
-                              final color = isProfit ? Colors.greenAccent : Colors.redAccent; // Daha parlak renkler
+                              final color = isProfit
+                                  ? Colors.greenAccent
+                                  : Colors.redAccent; // Daha parlak renkler
 
                               return Container(
                                 margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: color.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: color.withOpacity(0.5)),
+                                  border: Border.all(
+                                    color: color.withOpacity(0.5),
+                                  ),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      isProfit ? Icons.trending_up : Icons.trending_down,
+                                      isProfit
+                                          ? Icons.trending_up
+                                          : Icons.trending_down,
                                       size: 14,
                                       color: color,
                                     ),
@@ -1078,7 +1125,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               const SizedBox(width: 40), // Sağdan boşluk
             ],
           ),
-          
+
           // 2. Kullanıcı Cevabı (Sağ - Renkli Balon)
           if (!offer.isPending() || offer.counterOfferAmount != null) ...[
             const SizedBox(height: 16),
@@ -1087,7 +1134,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(width: 40), // Soldan boşluk
-                
                 // Mesaj Balonu
                 Flexible(
                   child: Column(
@@ -1114,19 +1160,19 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            _buildUserResponseContent(offer),
-                          ],
+                          children: [_buildUserResponseContent(offer)],
                         ),
                       ),
-                      
+
                       // Durum (Okundu vs.)
                       Padding(
                         padding: const EdgeInsets.only(top: 4, right: 4),
                         child: Icon(
                           Icons.done_all,
                           size: 14,
-                          color: _getUserResponseColor(offer).withOpacity(1.0), // Koyu ton
+                          color: _getUserResponseColor(
+                            offer,
+                          ).withOpacity(1.0), // Koyu ton
                         ),
                       ),
                     ],
@@ -1135,12 +1181,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ],
             ),
           ],
-          
+
           // 3. Aksiyon Butonları (Hızlı Cevap Barı)
           if (offer.isPending()) ...[
             const SizedBox(height: 12),
             Container(
-              margin: const EdgeInsets.only(left: 48), // Avatar hizasından başla
+              margin: const EdgeInsets.only(
+                left: 48,
+              ), // Avatar hizasından başla
               child: Row(
                 children: [
                   // Kabul Et
@@ -1161,32 +1209,40 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     ),
                   ),
                   const SizedBox(width: 8),
-                  
+
                   // Karşı Teklif
                   Expanded(
                     flex: 2, // Daha geniş
                     child: ElevatedButton.icon(
-                      onPressed: () => _showCounterOfferDialogForIncoming(offer, null),
+                      onPressed: () =>
+                          _showCounterOfferDialogForIncoming(offer, null),
                       icon: const Icon(Icons.swap_horiz, size: 16),
                       label: Text(
                         'offers.counter'.tr(),
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple.shade50.withOpacity(0.9),
+                        backgroundColor: Colors.deepPurple.shade50.withOpacity(
+                          0.9,
+                        ),
                         foregroundColor: Colors.deepPurple,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.deepPurple.withOpacity(0.5)),
+                          side: BorderSide(
+                            color: Colors.deepPurple.withOpacity(0.5),
+                          ),
                         ),
                         visualDensity: VisualDensity.compact,
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  
+
                   // Reddet
                   Expanded(
                     child: ElevatedButton(
@@ -1251,7 +1307,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-            'negotiation.counter.3'.trParams({'amount': _formatCurrency(offer.counterOfferAmount!)}),
+            'negotiation.counter.3'.trParams({
+              'amount': _formatCurrency(offer.counterOfferAmount!),
+            }),
             style: const TextStyle(color: Colors.black87),
           ),
         ],
@@ -1272,41 +1330,48 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
     );
   }
 
-  Widget _buildVehicleImage(String imageUrl, double width, double height, {String? brand, String? model, String? vehicleId}) {
+  Widget _buildVehicleImage(
+    String imageUrl,
+    double width,
+    double height, {
+    String? brand,
+    String? model,
+    String? vehicleId,
+  }) {
     // 1. URL boşsa veya null ise fallback dene
     if (imageUrl.isEmpty) {
       if (brand != null && model != null) {
-        final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+        final fallbackPath = VehicleUtils.getVehicleImage(
+          brand,
+          model,
+          vehicleId: vehicleId,
+        );
         if (fallbackPath != null) {
           // Fallback path de indirilmiş olabilir mi?
           final file = _assetService.getLocalFile(fallbackPath);
           if (file.existsSync()) {
-             return Image.file(
-               file,
-               width: width,
-               height: height,
-               fit: BoxFit.contain,
-               errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
-             );
+            return Image.file(
+              file,
+              width: width,
+              height: height,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  _buildGenericCarIcon(width, height),
+            );
           }
-          
+
           return Image.asset(
             fallbackPath,
             width: width,
             height: height,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+            errorBuilder: (context, error, stackTrace) =>
+                _buildGenericCarIcon(width, height),
           );
         }
       }
@@ -1322,26 +1387,32 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           if (brand != null && model != null) {
-            final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+            final fallbackPath = VehicleUtils.getVehicleImage(
+              brand,
+              model,
+              vehicleId: vehicleId,
+            );
             if (fallbackPath != null) {
-               // Fallback path de indirilmiş olabilir mi?
-               final file = _assetService.getLocalFile(fallbackPath);
-               if (file.existsSync()) {
-                  return Image.file(
-                    file,
-                    width: width,
-                    height: height,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
-                  );
-               }
-              
+              // Fallback path de indirilmiş olabilir mi?
+              final file = _assetService.getLocalFile(fallbackPath);
+              if (file.existsSync()) {
+                return Image.file(
+                  file,
+                  width: width,
+                  height: height,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildGenericCarIcon(width, height),
+                );
+              }
+
               return Image.asset(
                 fallbackPath,
                 width: width,
                 height: height,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildGenericCarIcon(width, height),
               );
             }
           }
@@ -1349,7 +1420,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         },
       );
     }
-    
+
     // 3. Local Asset veya İndirilmiş Dosya
     // Önce indirilmiş dosya var mı bak
     try {
@@ -1360,7 +1431,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           width: width,
           height: height,
           fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildGenericCarIcon(width, height),
         );
       }
     } catch (e) {
@@ -1375,27 +1447,33 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) {
         if (brand != null && model != null) {
-          final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+          final fallbackPath = VehicleUtils.getVehicleImage(
+            brand,
+            model,
+            vehicleId: vehicleId,
+          );
           // Eğer fallback path farklıysa onu dene
           if (fallbackPath != null && fallbackPath != imageUrl) {
-             // Fallback path de indirilmiş olabilir mi?
-             final file = _assetService.getLocalFile(fallbackPath);
-             if (file.existsSync()) {
-                return Image.file(
-                  file,
-                  width: width,
-                  height: height,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
-                );
-             }
-            
+            // Fallback path de indirilmiş olabilir mi?
+            final file = _assetService.getLocalFile(fallbackPath);
+            if (file.existsSync()) {
+              return Image.file(
+                file,
+                width: width,
+                height: height,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildGenericCarIcon(width, height),
+              );
+            }
+
             return Image.asset(
               fallbackPath,
               width: width,
               height: height,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+              errorBuilder: (context, error, stackTrace) =>
+                  _buildGenericCarIcon(width, height),
             );
           }
         }
@@ -1421,16 +1499,28 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       future: _db.getUserVehicleById(offer.vehicleId),
       builder: (context, snapshot) {
         final vehicle = snapshot.data;
-        return _buildOfferTileContent(offer, vehicle, percentDiff, isGoodOffer, compact);
+        return _buildOfferTileContent(
+          offer,
+          vehicle,
+          percentDiff,
+          isGoodOffer,
+          compact,
+        );
       },
     );
   }
 
-  Widget _buildOfferTileContent(Offer offer, UserVehicle? vehicle, double percentDiff, bool isGoodOffer, bool compact) {
+  Widget _buildOfferTileContent(
+    Offer offer,
+    UserVehicle? vehicle,
+    double percentDiff,
+    bool isGoodOffer,
+    bool compact,
+  ) {
     // Kar/Zarar hesaplama
     double? profitLoss;
     double? profitLossPercentage;
-    
+
     if (vehicle != null) {
       profitLoss = offer.offerPrice - vehicle.purchasePrice;
       profitLossPercentage = (profitLoss / vehicle.purchasePrice) * 100;
@@ -1442,10 +1532,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       decoration: BoxDecoration(
         color: _getOfferBackgroundColor(offer),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getOfferBorderColor(offer),
-          width: 1.5,
-        ),
+        border: Border.all(color: _getOfferBorderColor(offer), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1512,7 +1599,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   Row(
                     children: [
                       Icon(
-                        percentDiff >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                        percentDiff >= 0
+                            ? Icons.arrow_upward
+                            : Icons.arrow_downward,
                         size: 14,
                         color: percentDiff >= 0 ? Colors.green : Colors.red,
                       ),
@@ -1537,10 +1626,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: profitLoss >= 0 ? Colors.green.shade50 : Colors.red.shade50,
+                color: profitLoss >= 0
+                    ? Colors.green.shade50
+                    : Colors.red.shade50,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: profitLoss >= 0 ? Colors.green.shade300 : Colors.red.shade300,
+                  color: profitLoss >= 0
+                      ? Colors.green.shade300
+                      : Colors.red.shade300,
                   width: 1.5,
                 ),
               ),
@@ -1552,17 +1645,25 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       Row(
                         children: [
                           Icon(
-                            profitLoss >= 0 ? Icons.trending_up : Icons.trending_down,
-                            color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                            profitLoss >= 0
+                                ? Icons.trending_up
+                                : Icons.trending_down,
+                            color: profitLoss >= 0
+                                ? Colors.green.shade700
+                                : Colors.red.shade700,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            profitLoss >= 0 ? 'misc.profit'.tr() : 'misc.loss'.tr(),
+                            profitLoss >= 0
+                                ? 'misc.profit'.tr()
+                                : 'misc.loss'.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                              color: profitLoss >= 0
+                                  ? Colors.green.shade700
+                                  : Colors.red.shade700,
                             ),
                           ),
                         ],
@@ -1572,7 +1673,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                          color: profitLoss >= 0
+                              ? Colors.green.shade700
+                              : Colors.red.shade700,
                         ),
                       ),
                     ],
@@ -1583,17 +1686,16 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     children: [
                       Text(
                         'misc.profitLossRatio'.tr(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
-                        ),
+                        style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                       ),
                       Text(
                         '${profitLossPercentage! >= 0 ? '+' : ''}${profitLossPercentage.toStringAsFixed(1)}%',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: profitLoss >= 0 ? Colors.green.shade700 : Colors.red.shade700,
+                          color: profitLoss >= 0
+                              ? Colors.green.shade700
+                              : Colors.red.shade700,
                         ),
                       ),
                     ],
@@ -1604,10 +1706,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     children: [
                       Text(
                         'misc.purchasePrice'.tr(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                       Text(
                         '${_formatCurrency(vehicle!.purchasePrice)} TL',
@@ -1681,7 +1780,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => _showCounterOfferDialogForIncoming(offer, vehicle),
+                onPressed: () =>
+                    _showCounterOfferDialogForIncoming(offer, vehicle),
                 icon: const Icon(Icons.local_offer, size: 20),
                 label: Text('offers.sendCounterOffer'.tr()),
                 style: OutlinedButton.styleFrom(
@@ -1726,7 +1826,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                offer.status == OfferStatus.accepted ? 'misc.acceptedStatus'.tr() : 'misc.rejectedStatus'.tr(),
+                offer.status == OfferStatus.accepted
+                    ? 'misc.acceptedStatus'.tr()
+                    : 'misc.rejectedStatus'.tr(),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
@@ -1780,10 +1882,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   }
 
   String _formatCurrency(double value) {
-    return value.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return value
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 
   String _formatDate(DateTime date) {
@@ -1830,7 +1934,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       ),
                     ],
                   ),
-
                 ],
               ),
             ),
@@ -1847,8 +1950,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
     if (confirmed == true) {
       // 🎬 Satış animasyonunu oynat ve teklifi kabul et (paralel)
-      final xpResult = await _playSellingAnimation(_offerService.acceptOffer(offer));
-      
+      final xpResult = await _playSellingAnimation(
+        _offerService.acceptOffer(offer),
+      );
+
       // 📺 Reklam Göster (Zorunlu)
       await AdService().showInterstitialAd();
 
@@ -1858,7 +1963,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptSuccess'.tr()),
               backgroundColor: Colors.green.withOpacity(0.8),
@@ -1870,11 +1977,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             await showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (context) => LevelUpDialog(
-                reward: xpResult.rewards!,
-              ),
+              builder: (context) => LevelUpDialog(reward: xpResult.rewards!),
             );
-            
+
             // Dialog kapandıktan sonra reklam göster
             await AdService().showInterstitialAd();
           }
@@ -1882,12 +1987,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           // Listeyi yenile
           await _loadOffers();
           _shouldRefreshParent = true;
-          
+
           // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
           if (widget.selectedVehicleId != null) {
-            final remainingOffers = _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
+            final remainingOffers =
+                _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
             final hasPendingOffers = remainingOffers.any((o) => o.isPending());
-            
+
             if (!hasPendingOffers) {
               // Artık bekleyen teklif yok, en başa (marka listesine) dön
               Navigator.of(context).popUntil((route) => route.isFirst);
@@ -1898,7 +2004,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptError'.tr()),
               backgroundColor: Colors.red.withOpacity(0.8),
@@ -1920,10 +2028,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('offer.acceptCounterConfirmMessage'.trParams({
-              'brand': offer.vehicleBrand,
-              'model': offer.vehicleModel,
-            })),
+            Text(
+              'offer.acceptCounterConfirmMessage'.trParams({
+                'brand': offer.vehicleBrand,
+                'model': offer.vehicleModel,
+              }),
+            ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
@@ -1962,7 +2072,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'offer.balanceInfo'.trParams({'amount': _formatCurrency(offer.counterOfferAmount!)}),
+                    'offer.balanceInfo'.trParams({
+                      'amount': _formatCurrency(offer.counterOfferAmount!),
+                    }),
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       fontSize: 12,
@@ -1985,7 +2097,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
     if (confirmed == true) {
       // 🎬 Satış animasyonunu oynat ve teklifi kabul et (paralel)
-      final result = await _playSellingAnimation(_offerService.acceptCounterOffer(offer));
+      final result = await _playSellingAnimation(
+        _offerService.acceptCounterOffer(offer),
+      );
 
       // 📺 Reklam Göster (Zorunlu)
       await AdService().showInterstitialAd();
@@ -1995,7 +2109,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('offer.counterOfferAcceptedSuccess'.tr()),
               backgroundColor: Colors.green.withOpacity(0.8),
@@ -2007,9 +2123,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
-              content: Text(result['error'] ?? 'purchase.insufficientBalance'.tr()),
+              content: Text(
+                result['error'] ?? 'purchase.insufficientBalance'.tr(),
+              ),
               backgroundColor: Colors.red.withOpacity(0.8),
             ),
           );
@@ -2024,10 +2144,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       context: context,
       builder: (context) => ModernAlertDialog(
         title: 'offers.rejectCounterOfferTitle'.tr(),
-        content: Text('offers.rejectCounterOfferMessage'.trParams({
-          'brand': offer.vehicleBrand,
-          'model': offer.vehicleModel,
-        })),
+        content: Text(
+          'offers.rejectCounterOfferMessage'.trParams({
+            'brand': offer.vehicleBrand,
+            'model': offer.vehicleModel,
+          }),
+        ),
         buttonText: 'offer.rejectAndDelete'.tr(),
         onPressed: () => Navigator.pop(context, true),
         secondaryButtonText: 'common.cancel'.tr(),
@@ -2044,7 +2166,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text('offer.counterOfferRejectedSuccess'.tr()),
             backgroundColor: Colors.red.withOpacity(0.8),
@@ -2052,31 +2176,25 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         );
         _loadOffers();
         _shouldRefreshParent = true;
-        
+
         // Badge'i güncelle
         // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
-
       }
     }
   }
-
-
-
-
-
-
-
 
   // Tüm bekleyen teklifleri reddet (YENİ)
   Future<void> _rejectAllOffers(List<Offer> offers) async {
     // Sadece bekleyen teklifleri filtrele
     final pendingOffers = offers.where((o) => o.isPending()).toList();
-    
+
     if (pendingOffers.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           behavior: SnackBarBehavior.floating,
           content: Text('misc.noPendingToReject'.tr()),
           backgroundColor: Colors.deepPurple.withOpacity(0.8),
@@ -2109,7 +2227,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
       // Tüm teklifleri reddet
       int successCount = 0;
-      
+
       for (var offer in pendingOffers) {
         bool success = await _offerService.rejectOffer(offer);
         if (success) successCount++;
@@ -2122,9 +2240,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
-              content: Text('✅ ${'offers.rejectAllSuccess'.trParams({'count': successCount.toString()})}'),
+              content: Text(
+                '✅ ${'offers.rejectAllSuccess'.trParams({'count': successCount.toString()})}',
+              ),
               backgroundColor: Colors.green.withOpacity(0.8),
             ),
           );
@@ -2132,9 +2254,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
-              content: Text('⚠️ ${'offers.rejectAllPartialSuccess'.trParams({'count': successCount.toString(), 'total': pendingOffers.length.toString()})}'),
+              content: Text(
+                '⚠️ ${'offers.rejectAllPartialSuccess'.trParams({'count': successCount.toString(), 'total': pendingOffers.length.toString()})}',
+              ),
               backgroundColor: Colors.deepPurple.withOpacity(0.8),
             ),
           );
@@ -2143,11 +2269,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         // Listeyi yenile
         await _loadOffers();
         _shouldRefreshParent = true;
-        
+
         // Badge'i güncelle
         // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
 
-        
         // Eğer tüm bekleyen teklifler silindiyse, en başa (marka listesine) dön
         if (successCount > 0 && widget.selectedVehicleId != null) {
           // Araç detay ekranındayız, en başa dön
@@ -2164,7 +2289,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       context: context,
       builder: (context) => ModernAlertDialog(
         title: 'offer.rejectTitle'.tr(),
-        content: Text('${offer.buyerName} ${_formatCurrency(offer.offerPrice)} ${'common.currency'.tr()} ${'offers.rejectConfirmMessage'.tr()}\n\n${'offer.rejectWarning'.tr()}'),
+        content: Text(
+          '${offer.buyerName} ${_formatCurrency(offer.offerPrice)} ${'common.currency'.tr()} ${'offers.rejectConfirmMessage'.tr()}\n\n${'offer.rejectWarning'.tr()}',
+        ),
         buttonText: 'offer.rejectAndDelete'.tr(),
         onPressed: () => Navigator.pop(context, true),
         secondaryButtonText: 'common.cancel'.tr(),
@@ -2187,28 +2314,29 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('✅ ${'offer.rejectSuccess'.tr()}'),
               backgroundColor: Colors.green.withOpacity(0.8),
-                            duration: const Duration(seconds: 3),
-
+              duration: const Duration(seconds: 3),
             ),
           );
 
           // Listeyi yenile
           await _loadOffers();
           _shouldRefreshParent = true;
-          
+
           // Badge'i güncelle
           // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
 
-          
           // Eğer bu araç detay ekranında isek ve artık bekleyen teklif kalmadıysa, geri dön
           if (widget.selectedVehicleId != null) {
-            final remainingOffers = _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
+            final remainingOffers =
+                _incomingOffersByVehicle[widget.selectedVehicleId] ?? [];
             final hasPendingOffers = remainingOffers.any((o) => o.isPending());
-            
+
             if (!hasPendingOffers) {
               // Artık bekleyen teklif yok, en başa (marka listesine) dön
               Navigator.of(context).popUntil((route) => route.isFirst);
@@ -2218,7 +2346,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptError'.tr()),
               backgroundColor: Colors.red.withOpacity(0.8),
@@ -2229,14 +2359,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     }
   }
 
-
-
-
-
   /// Satın alma animasyonunu oynat
   Future<void> _playPurchaseAnimation() async {
     if (!mounted) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -2264,17 +2390,20 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     await Future.delayed(const Duration(milliseconds: 2000));
 
     if (mounted) {
-      Navigator.of(context, rootNavigator: true).pop(); // Animasyon overlay'ini kapat
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pop(); // Animasyon overlay'ini kapat
     }
   }
 
   /// Satış animasyonunu oynat (YENİ)
   Future<T?> _playSellingAnimation<T>(Future<T> work) async {
     if (!mounted) return null;
-    
+
     T? result;
     bool workDone = false;
-    
+
     // İşlemi başlat
     final workFuture = work.then((value) {
       result = value;
@@ -2335,14 +2464,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
     // En az 2 saniye animasyon için bekle
     final animationDelay = Future.delayed(const Duration(milliseconds: 2000));
-    
+
     // Hem animasyonun hem de işin bitmesini bekle
     await Future.wait([animationDelay, workFuture]);
 
     if (mounted) {
-      Navigator.of(context, rootNavigator: true).pop(); // Animasyon overlay'ini kapat
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pop(); // Animasyon overlay'ini kapat
     }
-    
+
     return result;
   }
 
@@ -2421,8 +2553,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(height: 80), // Space for the floating image
-                      
+                      const SizedBox(
+                        height: 80,
+                      ), // Space for the floating image
                       // Congratulations Title
                       Text(
                         'purchase.congratulations'.tr(),
@@ -2434,7 +2567,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // Vehicle Name
                       Text(
                         '${offer.vehicleBrand} ${offer.vehicleModel}',
@@ -2446,7 +2579,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ),
                       ),
                       const SizedBox(height: 4),
-                      
+
                       // Successfully Purchased Text
                       Text(
                         'purchase.successfullyPurchased'.tr(),
@@ -2457,9 +2590,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Success Info Card
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -2475,7 +2608,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.stars, color: Colors.amber, size: 20),
+                                const Icon(
+                                  Icons.stars,
+                                  color: Colors.amber,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'This vehicle is now yours!',
@@ -2499,9 +2636,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 32),
-                      
+
                       // Modern Gradient Button
                       Container(
                         width: double.infinity,
@@ -2547,7 +2684,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 ),
               ),
             ),
-            
+
             // Floating Vehicle Image or Icon
             Positioned(
               top: 0,
@@ -2555,10 +2692,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 width: 150,
                 height: 100,
                 child: offer.vehicleImageUrl.isNotEmpty
-                    ? Image.asset(
-                        offer.vehicleImageUrl,
-                        fit: BoxFit.contain,
-                      )
+                    ? Image.asset(offer.vehicleImageUrl, fit: BoxFit.contain)
                     : const Icon(
                         Icons.directions_car,
                         size: 60,
@@ -2572,13 +2706,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
   }
 
-
-
   /// Karşı teklif gönderme dialogunu göster
 
-
   /// Gelen teklife karşı teklif gönderme dialogunu göster
-  Future<void> _showCounterOfferDialogForIncoming(Offer offer, UserVehicle? vehicle) async {
+  Future<void> _showCounterOfferDialogForIncoming(
+    Offer offer,
+    UserVehicle? vehicle,
+  ) async {
     // Eğer araç bilgisi yoksa (Chat ekranından geliyorsa), veritabanından çek
     UserVehicle? targetVehicle = vehicle;
     if (targetVehicle == null) {
@@ -2600,14 +2734,15 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   }
 
   /// Gelen teklife karşı teklif gönder
-  Future<void> _submitCounterOfferForIncoming(Offer originalOffer, double counterOfferAmount) async {
+  Future<void> _submitCounterOfferForIncoming(
+    Offer originalOffer,
+    double counterOfferAmount,
+  ) async {
     // Loading göster
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
@@ -2628,7 +2763,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
       if (decision == 'accept') {
         // ✅ KABUL EDİLDİ: Animasyon ve SnackBar göster
-        
+
         // Animasyonu oynat (Fake bir future ile)
         await _playSellingAnimation(Future.value(true));
 
@@ -2637,7 +2772,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('offer.counterOfferAcceptedSuccess'.tr()),
               backgroundColor: Colors.green.withOpacity(0.8),
@@ -2661,7 +2798,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text('offers.counterOfferError'.tr()),
             backgroundColor: Colors.red.withOpacity(0.8),
@@ -2672,7 +2811,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   }
 
   /// Gelen teklife karşı teklif sonuç dialogunu göster
-  void _showCounterOfferResultDialogForIncoming(Map<String, dynamic> result, Offer originalOffer) {
+  void _showCounterOfferResultDialogForIncoming(
+    Map<String, dynamic> result,
+    Offer originalOffer,
+  ) {
     final decision = result['decision'] as String;
     final response = result['response'] as String;
     final newCounterOffer = result['counterOffer'] as double?;
@@ -2713,10 +2855,12 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              response.startsWith('offerService.') 
+              response.startsWith('offerService.')
                   ? (decision == 'counter' && newCounterOffer != null
-                      ? response.trParams({'amount': _formatCurrency(newCounterOffer)})
-                      : response.tr())
+                        ? response.trParams({
+                            'amount': _formatCurrency(newCounterOffer),
+                          })
+                        : response.tr())
                   : response,
               style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
@@ -2732,7 +2876,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('offer.newCounterOffer'.tr(), style: const TextStyle(color: Colors.white70)),
+                    Text(
+                      'offer.newCounterOffer'.tr(),
+                      style: const TextStyle(color: Colors.white70),
+                    ),
                     Text(
                       '${_formatCurrency(newCounterOffer)} TL',
                       style: const TextStyle(
@@ -2754,15 +2901,19 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: Colors.lightBlueAccent, size: 20),
+                  const Icon(
+                    Icons.info_outline,
+                    color: Colors.lightBlueAccent,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      decision == 'accept' 
+                      decision == 'accept'
                           ? 'offers.acceptSuccess'.tr()
                           : decision == 'reject'
-                              ? 'offer.buyerRejectedMessage'.tr()
-                              : 'offer.negotiationContinueMessage'.tr(),
+                          ? 'offer.buyerRejectedMessage'.tr()
+                          : 'offer.negotiationContinueMessage'.tr(),
                       style: const TextStyle(
                         fontSize: 13,
                         color: Colors.lightBlueAccent,
@@ -2849,7 +3000,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ] else ...[
             Expanded(
               child: ElevatedButton(
-                onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                onPressed: () =>
+                    Navigator.of(context, rootNavigator: true).pop(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.deepPurple,
@@ -2872,11 +3024,16 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     try {
       // 1. Bakiyeyi düş
       final newBalance = user.balance - offer.counterOfferAmount!;
-      bool balanceUpdated = await _db.updateUser(user.id, {'balance': newBalance});
+      bool balanceUpdated = await _db.updateUser(user.id, {
+        'balance': newBalance,
+      });
       if (!balanceUpdated) return false;
 
       // 2. Teklifi kabul edildi olarak işaretle
-      bool offerUpdated = await _db.updateOfferStatus(offer.offerId, OfferStatus.accepted);
+      bool offerUpdated = await _db.updateOfferStatus(
+        offer.offerId,
+        OfferStatus.accepted,
+      );
       if (!offerUpdated) {
         // Rollback
         await _db.updateUser(user.id, {'balance': user.balance});
@@ -2884,44 +3041,61 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       }
 
       // Aracı bulmaya çalış (MarketRefreshService'den)
-    final marketService = MarketRefreshService();
-    final activeListings = marketService.getActiveListings();
-    Vehicle? sourceVehicle;
-    
-    try {
-      sourceVehicle = activeListings.firstWhere((v) => v.id == offer.vehicleId);
-    } catch (e) {
-      sourceVehicle = null;
-    }
-    
-    // Fallback değerler
-    final random = Random();
-    final colors = ['Beyaz', 'Siyah', 'Gri', 'Kırmızı', 'Mavi', 'Gümüş', 'Kahverengi', 'Yeşil'];
-    final fuelTypes = ['Benzin', 'Dizel', 'Hybrid'];
-    final transmissions = ['Manuel', 'Otomatik'];
-    final engineSizes = ['1.0', '1.2', '1.4', '1.6', '2.0'];
+      final marketService = MarketRefreshService();
+      final activeListings = marketService.getActiveListings();
+      Vehicle? sourceVehicle;
 
-    // 3. Aracı kullanıcıya ekle
-    final userVehicle = UserVehicle.purchase(
-      userId: user.id,
-      vehicleId: offer.vehicleId,
-      brand: offer.vehicleBrand,
-      model: offer.vehicleModel,
-      year: offer.vehicleYear,
-      mileage: sourceVehicle?.mileage ?? (10000 + random.nextInt(190000)),
-      purchasePrice: offer.counterOfferAmount!,
-      color: sourceVehicle?.color ?? colors[random.nextInt(colors.length)],
-      fuelType: sourceVehicle?.fuelType ?? fuelTypes[random.nextInt(fuelTypes.length)],
-      transmission: sourceVehicle?.transmission ?? transmissions[random.nextInt(transmissions.length)],
-      engineSize: sourceVehicle?.engineSize ?? engineSizes[random.nextInt(engineSizes.length)],
-      driveType: sourceVehicle?.driveType ?? 'Önden',
-      hasWarranty: sourceVehicle?.hasWarranty ?? false,
-      hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
-      score: sourceVehicle?.score ?? 75,
-      bodyType: sourceVehicle?.bodyType ?? 'Sedan',
-      horsepower: sourceVehicle?.horsepower ?? 100,
-      imageUrl: offer.vehicleImageUrl,
-    );
+      try {
+        sourceVehicle = activeListings.firstWhere(
+          (v) => v.id == offer.vehicleId,
+        );
+      } catch (e) {
+        sourceVehicle = null;
+      }
+
+      // Fallback değerler
+      final random = Random();
+      final colors = [
+        'Beyaz',
+        'Siyah',
+        'Gri',
+        'Kırmızı',
+        'Mavi',
+        'Gümüş',
+        'Kahverengi',
+        'Yeşil',
+      ];
+      final fuelTypes = ['Benzin', 'Dizel', 'Hybrid'];
+      final transmissions = ['Manuel', 'Otomatik'];
+      final engineSizes = ['1.0', '1.2', '1.4', '1.6', '2.0'];
+
+      // 3. Aracı kullanıcıya ekle
+      final userVehicle = UserVehicle.purchase(
+        userId: user.id,
+        vehicleId: offer.vehicleId,
+        brand: offer.vehicleBrand,
+        model: offer.vehicleModel,
+        year: offer.vehicleYear,
+        mileage: sourceVehicle?.mileage ?? (10000 + random.nextInt(190000)),
+        purchasePrice: offer.counterOfferAmount!,
+        color: sourceVehicle?.color ?? colors[random.nextInt(colors.length)],
+        fuelType:
+            sourceVehicle?.fuelType ??
+            fuelTypes[random.nextInt(fuelTypes.length)],
+        transmission:
+            sourceVehicle?.transmission ??
+            transmissions[random.nextInt(transmissions.length)],
+        engineSize:
+            sourceVehicle?.engineSize ??
+            engineSizes[random.nextInt(engineSizes.length)],
+        driveType: sourceVehicle?.driveType ?? 'Önden',
+        hasWarranty: sourceVehicle?.hasWarranty ?? false,
+        hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
+        score: sourceVehicle?.score ?? 75,
+        bodyType: sourceVehicle?.bodyType ?? 'Sedan',
+        horsepower: sourceVehicle?.horsepower ?? 100,
+        imageUrl: offer.vehicleImageUrl,
+      );
 
       bool vehicleAdded = await _db.addUserVehicle(userVehicle);
       if (!vehicleAdded) {
@@ -2934,10 +3108,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       // Badge'i güncelle
       // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
 
-
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -2952,21 +3124,20 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     } catch (e) {
       debugPrint('Error checking local asset: $e');
     }
-    
+
     // 2. Yoksa varsayılan (açık tema) görseli kullan (Fallback)
     // Eğer koyu tema görseli assets içinde yoksa, açık tema görselini kullan
     // Bu sayede uygulama çökmez.
     if (assetPath.contains('general_bg_dark.png')) {
-       // Koyu tema görseli bulunamadıysa açık tema görselini dene
-       return const AssetImage('assets/images/general_bg.png');
+      // Koyu tema görseli bulunamadıysa açık tema görselini dene
+      return const AssetImage('assets/images/general_bg.png');
     }
-    
+
     return AssetImage(assetPath);
   }
 }
 
 /// Binlik ayırıcı input formatter (Teklif Ver gibi)
-
 
 class _CounterOfferDialog extends StatefulWidget {
   final Offer offer;
@@ -2983,7 +3154,8 @@ class _CounterOfferDialog extends StatefulWidget {
   State<_CounterOfferDialog> createState() => _CounterOfferDialogState();
 }
 
-class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTickerProviderStateMixin {
+class _CounterOfferDialogState extends State<_CounterOfferDialog>
+    with SingleTickerProviderStateMixin {
   late TextEditingController _amountController;
   final _formKey = GlobalKey<FormState>();
   double _acceptanceChance = 0.0;
@@ -3013,7 +3185,10 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
   Future<void> _loadBonus() async {
     _currentUser = await _authService.getCurrentUser();
     if (_currentUser != null) {
-      final level = _skillService.getSkillLevel(_currentUser!, SkillService.skillSweetTalk);
+      final level = _skillService.getSkillLevel(
+        _currentUser!,
+        SkillService.skillSweetTalk,
+      );
       _sweetTalkBonus = SkillService.sweetTalkBonuses[level] ?? 0.0;
     }
     _updateAcceptanceChance(_amountController.text);
@@ -3046,10 +3221,12 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
   }
 
   String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return amount
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 
   @override
@@ -3064,7 +3241,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
     } catch (e) {
       currentPrice = 0;
     }
-    
+
     double? profit;
     double? profitPercent;
     bool isProfit = false;
@@ -3072,8 +3249,8 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
     if (widget.vehicle != null) {
       profit = currentPrice - widget.vehicle!.purchasePrice;
       isProfit = profit >= 0;
-      profitPercent = widget.vehicle!.purchasePrice > 0 
-          ? (profit / widget.vehicle!.purchasePrice) * 100 
+      profitPercent = widget.vehicle!.purchasePrice > 0
+          ? (profit / widget.vehicle!.purchasePrice) * 100
           : 0;
     }
 
@@ -3133,7 +3310,10 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                       children: [
                         Text(
                           'offers.buyerOffer'.tr(),
-                          style: const TextStyle(color: Colors.white70, fontSize: 13),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
                         ),
                         ScaleTransition(
                           scale: _pulseAnimation,
@@ -3154,11 +3334,17 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                       children: [
                         Text(
                           'vehicles.listingPrice'.tr(),
-                          style: const TextStyle(color: Colors.white70, fontSize: 13),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
                         ),
                         Text(
                           '${_formatCurrency(maxOffer)} TL',
-                          style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -3166,7 +3352,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 🆕 Probability Bar (Gradient with Slider)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -3174,13 +3360,24 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('offer.acceptanceChance'.tr(), style: const TextStyle(fontSize: 12, color: Colors.white70)),
-                      Text('%${(_acceptanceChance * 100).toStringAsFixed(0)}', 
+                      Text(
+                        'offer.acceptanceChance'.tr(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      Text(
+                        '%${(_acceptanceChance * 100).toStringAsFixed(0)}',
                         style: TextStyle(
-                          fontSize: 12, 
-                          fontWeight: FontWeight.bold, 
-                          color: _acceptanceChance > 0.7 ? Colors.greenAccent : (_acceptanceChance > 0.3 ? Colors.orangeAccent : Colors.redAccent)
-                        )
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: _acceptanceChance > 0.7
+                              ? Colors.greenAccent
+                              : (_acceptanceChance > 0.3
+                                    ? Colors.orangeAccent
+                                    : Colors.redAccent),
+                        ),
                       ),
                     ],
                   ),
@@ -3193,7 +3390,10 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                         colors: [Colors.red, Colors.orange, Colors.green],
                         stops: [0.0, 0.5, 1.0],
                       ),
-                      border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Stack(
                       clipBehavior: Clip.none,
@@ -3203,8 +3403,9 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeOut,
                           alignment: Alignment(
-                            (_acceptanceChance * 2) - 1, // Map 0.0..1.0 to -1.0..1.0
-                            0.0
+                            (_acceptanceChance * 2) -
+                                1, // Map 0.0..1.0 to -1.0..1.0
+                            0.0,
                           ),
                           child: Container(
                             width: 20,
@@ -3213,8 +3414,12 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                               color: Colors.white,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: _acceptanceChance > 0.7 ? Colors.green : (_acceptanceChance > 0.3 ? Colors.orange : Colors.red),
-                                width: 2
+                                color: _acceptanceChance > 0.7
+                                    ? Colors.green
+                                    : (_acceptanceChance > 0.3
+                                          ? Colors.orange
+                                          : Colors.red),
+                                width: 2,
                               ),
                               boxShadow: [
                                 BoxShadow(
@@ -3238,10 +3443,14 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isProfit ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                    color: isProfit
+                        ? Colors.green.withOpacity(0.2)
+                        : Colors.red.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isProfit ? Colors.green.withOpacity(0.5) : Colors.red.withOpacity(0.5),
+                      color: isProfit
+                          ? Colors.green.withOpacity(0.5)
+                          : Colors.red.withOpacity(0.5),
                     ),
                   ),
                   child: Row(
@@ -3256,7 +3465,9 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                         child: Text(
                           '${isProfit ? 'offer.profit'.tr() : 'offer.loss'.tr()}: ${_formatCurrency(profit.abs())} ${'common.currency'.tr()} (%${profitPercent!.abs().toStringAsFixed(1)})',
                           style: TextStyle(
-                            color: isProfit ? Colors.greenAccent : Colors.redAccent,
+                            color: isProfit
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -3268,7 +3479,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
               ],
 
               const SizedBox(height: 16),
-              
+
               // Karşı Teklif Girişi
               TextFormField(
                 controller: _amountController,
@@ -3284,17 +3495,22 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
                 decoration: InputDecoration(
                   labelText: 'offers.yourCounterOffer'.tr(),
                   labelStyle: const TextStyle(color: Colors.white70),
-                  hintText: '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} TL',
+                  hintText:
+                      '${_formatCurrency(minOffer)} - ${_formatCurrency(maxOffer)} TL',
                   hintStyle: const TextStyle(color: Colors.white38),
                   suffixText: 'common.currency'.tr(),
                   suffixStyle: const TextStyle(color: Colors.white70),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.3),
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.3),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -3330,12 +3546,15 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog> with SingleTic
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           Navigator.of(context, rootNavigator: true).pop();
-          final newOffer = double.parse(_amountController.text.replaceAll('.', ''));
+          final newOffer = double.parse(
+            _amountController.text.replaceAll('.', ''),
+          );
           widget.onSend(newOffer);
         }
       },
       secondaryButtonText: 'common.cancel'.tr(),
-      onSecondaryPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+      onSecondaryPressed: () =>
+          Navigator.of(context, rootNavigator: true).pop(),
     );
   }
 }
@@ -3354,7 +3573,7 @@ class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
 
     // Sadece sayıları al
     final numericValue = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     if (numericValue.isEmpty) {
       return newValue.copyWith(text: '');
     }
@@ -3370,4 +3589,3 @@ class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
     );
   }
 }
-

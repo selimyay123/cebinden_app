@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
-import 'dart:math'; // Random için
+// Random için
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../models/user_model.dart';
 import '../utils/currency_input_formatter.dart';
-import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
 import '../widgets/game_image.dart';
 import '../widgets/modern_button.dart';
@@ -15,10 +14,7 @@ import '../widgets/modern_button.dart';
 class CreateListingScreen extends StatefulWidget {
   final UserVehicle vehicle;
 
-  const CreateListingScreen({
-    super.key,
-    required this.vehicle,
-  });
+  const CreateListingScreen({super.key, required this.vehicle});
 
   @override
   State<CreateListingScreen> createState() => _CreateListingScreenState();
@@ -31,8 +27,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   final _descriptionController = TextEditingController();
   bool _isLoading = false;
   User? _currentUser;
-  
-
 
   @override
   void initState() {
@@ -41,19 +35,15 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     // Yetenek çarpanını sonradan yükleyeceğiz
     final suggestedPrice = widget.vehicle.purchasePrice * 1.1;
     _priceController.text = CurrencyInputFormatter.format(suggestedPrice);
-    
+
     _loadUserAndCalculateBonus();
   }
-
-
 
   Future<void> _loadUserAndCalculateBonus() async {
     final userMap = await _db.getCurrentUser();
     if (userMap != null) {
       final user = User.fromJson(userMap);
       setState(() => _currentUser = user);
-      
-
     }
   }
 
@@ -67,7 +57,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   /// Satışa koyma animasyonunu oynat
   Future<void> _playListForSaleAnimation() async {
     if (!mounted) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -94,7 +84,10 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     await Future.delayed(const Duration(milliseconds: 2500));
 
     if (mounted) {
-      Navigator.of(context, rootNavigator: true).pop(); // Animasyon overlay'ini kapat
+      Navigator.of(
+        context,
+        rootNavigator: true,
+      ).pop(); // Animasyon overlay'ini kapat
     }
   }
 
@@ -128,7 +121,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text('sell.listingSuccess'.tr()),
             backgroundColor: Colors.green.withOpacity(0.8),
@@ -140,7 +135,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text('sell.listingError'.tr()),
             backgroundColor: Colors.red.withOpacity(0.8),
@@ -152,7 +149,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           behavior: SnackBarBehavior.floating,
           content: Text('${'sell.listingErrorWithMessage'.tr()}: $e'),
           backgroundColor: Colors.red.withOpacity(0.8),
@@ -172,9 +171,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('sell.title'.tr()),
-        actions: [
-
-        ],
+        actions: [],
         elevation: 0,
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
@@ -208,15 +205,16 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 width: double.infinity,
                 child: _isLoading
                     ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.green,
-                        ),
+                        child: CircularProgressIndicator(color: Colors.green),
                       )
                     : ModernButton(
                         text: 'sell.listForSaleButton'.tr(),
                         onPressed: _createListing,
                         color: Colors.green,
-                        gradientColors: [Colors.green.shade400, Colors.green.shade700],
+                        gradientColors: [
+                          Colors.green.shade400,
+                          Colors.green.shade700,
+                        ],
                         height: 56,
                       ),
               ),
@@ -230,9 +228,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   Widget _buildVehicleInfoCard() {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -246,10 +242,16 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               ),
               child: Builder(
                 builder: (context) {
-                  final imageUrl = (widget.vehicle.imageUrl != null && widget.vehicle.imageUrl!.isNotEmpty)
+                  final imageUrl =
+                      (widget.vehicle.imageUrl != null &&
+                          widget.vehicle.imageUrl!.isNotEmpty)
                       ? widget.vehicle.imageUrl
-                      : VehicleUtils.getVehicleImage(widget.vehicle.brand, widget.vehicle.model, vehicleId: widget.vehicle.id);
-                  
+                      : VehicleUtils.getVehicleImage(
+                          widget.vehicle.brand,
+                          widget.vehicle.model,
+                          vehicleId: widget.vehicle.id,
+                        );
+
                   if (imageUrl != null) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -259,22 +261,27 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                         height: 80,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
-                          final correctPath = VehicleUtils.getVehicleImage(widget.vehicle.brand, widget.vehicle.model, vehicleId: widget.vehicle.id);
-                          
+                          final correctPath = VehicleUtils.getVehicleImage(
+                            widget.vehicle.brand,
+                            widget.vehicle.model,
+                            vehicleId: widget.vehicle.id,
+                          );
+
                           if (correctPath != null && correctPath != imageUrl) {
                             return GameImage(
                               assetPath: correctPath,
                               width: 80,
                               height: 80,
                               fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) => const Icon(
-                                Icons.directions_car,
-                                size: 40,
-                                color: Colors.deepPurple,
-                              ),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.directions_car,
+                                    size: 40,
+                                    color: Colors.deepPurple,
+                                  ),
                             );
                           }
-                          
+
                           return const Icon(
                             Icons.directions_car,
                             size: 40,
@@ -290,7 +297,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                       color: Colors.deepPurple,
                     );
                   }
-                }
+                },
               ),
             ),
             const SizedBox(width: 16),
@@ -308,18 +315,12 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                   const SizedBox(height: 4),
                   Text(
                     '${widget.vehicle.year} • ${_formatNumber(widget.vehicle.mileage)} km',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${'sell.purchasePrice'.tr()}: ${_formatCurrency(widget.vehicle.purchasePrice)} TL',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -334,18 +335,21 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     // 🆕 DİNAMİK KÂR LİMİTİ
     // Standart limit: %15
     double profitMargin = 0.15;
-    
-
 
     double discountRate = 0.0;
 
     // Eğer araç indirimli alındıysa, indirim oranı kadar ekstra kâr limiti ekle
-    if (widget.vehicle.originalListingPrice != null && widget.vehicle.originalListingPrice! > widget.vehicle.purchasePrice) {
-      discountRate = (widget.vehicle.originalListingPrice! - widget.vehicle.purchasePrice) / widget.vehicle.originalListingPrice!;
+    if (widget.vehicle.originalListingPrice != null &&
+        widget.vehicle.originalListingPrice! > widget.vehicle.purchasePrice) {
+      discountRate =
+          (widget.vehicle.originalListingPrice! -
+              widget.vehicle.purchasePrice) /
+          widget.vehicle.originalListingPrice!;
       profitMargin += discountRate;
     }
 
-    final maxPrice = (widget.vehicle.purchasePrice * (1 + profitMargin)).roundToDouble();
+    final maxPrice = (widget.vehicle.purchasePrice * (1 + profitMargin))
+        .roundToDouble();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,10 +359,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           children: [
             Text(
               'sell.salePriceLabel'.tr(),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             if (discountRate > 0)
               Container(
@@ -370,10 +371,16 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.trending_up, size: 14, color: Colors.green),
+                    const Icon(
+                      Icons.trending_up,
+                      size: 14,
+                      color: Colors.green,
+                    ),
                     const SizedBox(width: 4),
                     Text(
-                      'sell.extraMargin'.trParams({'percent': (discountRate * 100).toStringAsFixed(0)}),
+                      'sell.extraMargin'.trParams({
+                        'percent': (discountRate * 100).toStringAsFixed(0),
+                      }),
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.green,
@@ -400,16 +407,17 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             hintText: 'sell.priceHint'.tr(),
             prefixText: 'TL ',
             suffixText: 'TL',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[100],
             helperText: 'sell.maxPriceHint'.trParams({
               'price': _formatCurrency(maxPrice),
               'percent': (profitMargin * 100).toStringAsFixed(0),
             }),
-            helperStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            helperStyle: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -428,26 +436,32 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             return null;
           },
         ),
-        
+
         // 🆕 Kar/Zarar Göstergesi
         if (_priceController.text.isNotEmpty) ...[
           Builder(
             builder: (context) {
-              final currentPrice = CurrencyInputFormatter.parse(_priceController.text);
+              final currentPrice = CurrencyInputFormatter.parse(
+                _priceController.text,
+              );
               final profit = currentPrice - widget.vehicle.purchasePrice;
               final isProfit = profit >= 0;
-              final profitPercent = widget.vehicle.purchasePrice > 0 
-                  ? (profit / widget.vehicle.purchasePrice) * 100 
+              final profitPercent = widget.vehicle.purchasePrice > 0
+                  ? (profit / widget.vehicle.purchasePrice) * 100
                   : 0;
-              
+
               return Container(
                 margin: const EdgeInsets.only(top: 8),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isProfit ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  color: isProfit
+                      ? Colors.green.withOpacity(0.1)
+                      : Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isProfit ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+                    color: isProfit
+                        ? Colors.green.withOpacity(0.3)
+                        : Colors.red.withOpacity(0.3),
                   ),
                 ),
                 child: Row(
@@ -463,9 +477,13 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isProfit ? 'sell.profitStatus'.tr() : 'sell.lossStatus'.tr(),
+                            isProfit
+                                ? 'sell.profitStatus'.tr()
+                                : 'sell.lossStatus'.tr(),
                             style: TextStyle(
-                              color: isProfit ? Colors.green[700] : Colors.red[700],
+                              color: isProfit
+                                  ? Colors.green[700]
+                                  : Colors.red[700],
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -474,7 +492,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                           Text(
                             '${isProfit ? '+' : ''}${_formatCurrency(profit)} TL (%${profitPercent.abs().toStringAsFixed(1)})',
                             style: TextStyle(
-                              color: isProfit ? Colors.green[900] : Colors.red[900],
+                              color: isProfit
+                                  ? Colors.green[900]
+                                  : Colors.red[900],
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),
@@ -485,7 +505,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                   ],
                 ),
               );
-            }
+            },
           ),
         ],
         const SizedBox(height: 8),
@@ -499,10 +519,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       children: [
         Text(
           'sell.descriptionLabel'.tr(),
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -511,9 +528,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           maxLength: 500,
           decoration: InputDecoration(
             hintText: 'sell.descriptionHint'.tr(),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[100],
           ),
@@ -522,13 +537,13 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     );
   }
 
-
-
   String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return amount
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 
   String _formatNumber(int number) {
@@ -538,4 +553,3 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     );
   }
 }
-
