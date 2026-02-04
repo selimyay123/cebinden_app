@@ -6,9 +6,10 @@ import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
 import '../models/notification_model.dart';
 import '../models/activity_model.dart';
-import '../models/activity_model.dart';
+
 import 'leaderboard_service.dart';
 import 'cloud_service.dart';
+import '../models/vehicle_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -18,7 +19,8 @@ class DatabaseHelper {
   // Box isimleri
   static const String usersBox = 'users';
   static const String currentUserBox = 'current_user';
-  static const String userVehiclesBox = 'user_vehicles'; // Kullanıcıların araçları
+  static const String userVehiclesBox =
+      'user_vehicles'; // Kullanıcıların araçları
   static const String offersBox = 'offers'; // Teklifler
   static const String notificationsBox = 'notifications'; // Bildirimler
   static const String favoritesBox = 'favorites'; // Favori ilanlar
@@ -28,7 +30,7 @@ class DatabaseHelper {
   // Initialize Hive
   static Future<void> init() async {
     await Hive.initFlutter();
-    
+
     // Boxları aç
     final usersBoxInstance = await Hive.openBox<Map>(usersBox);
     final currentUserBoxInstance = await Hive.openBox<String>(currentUserBox);
@@ -39,13 +41,11 @@ class DatabaseHelper {
     final dailyQuestsBoxInstance = await Hive.openBox<Map>(dailyQuestsBox);
     final activitiesBoxInstance = await Hive.openBox<Map>(activitiesBox);
     final missionsBoxInstance = await Hive.openBox<Map>(missionsBox);
-    
+
     // Debug: Tüm kullanıcıları listele
     if (usersBoxInstance.isNotEmpty) {
-            for (var entry in usersBoxInstance.toMap().entries) {
-              }
-    } else {
-          }
+      for (var entry in usersBoxInstance.toMap().entries) {}
+    } else {}
   }
 
   // Stream controller for vehicle updates
@@ -66,7 +66,7 @@ class DatabaseHelper {
 
   // Users box'ını al
   Box<Map> get _usersBox => Hive.box<Map>(usersBox);
-  
+
   // Current user box'ını al
   Box<String> get _currentUserBox => Hive.box<String>(currentUserBox);
 
@@ -78,7 +78,7 @@ class DatabaseHelper {
       final userMap = Map<dynamic, dynamic>.from(user);
       await _usersBox.put(userId, userMap);
       await _usersBox.flush(); // Verileri diske yaz
-      
+
       // Firestore'a da kaydet (Leaderboard için)
       try {
         final userObj = User.fromJson(userMap.cast<String, dynamic>());
@@ -99,16 +99,15 @@ class DatabaseHelper {
   // Kullanıcı adına göre kullanıcı bul
   Future<Map<String, dynamic>?> getUserByUsername(String username) async {
     try {
-                  
       final users = _usersBox.values;
       for (final user in users) {
-                if (user['username'] == username) {
-                    return Map<String, dynamic>.from(user);
+        if (user['username'] == username) {
+          return Map<String, dynamic>.from(user);
         }
       }
-            return null;
+      return null;
     } catch (e) {
-            return null;
+      return null;
     }
   }
 
@@ -118,7 +117,7 @@ class DatabaseHelper {
       final user = _usersBox.get(userId);
       return user != null ? Map<String, dynamic>.from(user) : null;
     } catch (e) {
-            return null;
+      return null;
     }
   }
 
@@ -138,7 +137,7 @@ class DatabaseHelper {
       }
       return await getUserById(userId);
     } catch (e) {
-            return null;
+      return null;
     }
   }
 
@@ -154,7 +153,7 @@ class DatabaseHelper {
       final users = _usersBox.values;
       return users.map((user) => Map<String, dynamic>.from(user)).toList();
     } catch (e) {
-            return [];
+      return [];
     }
   }
 
@@ -168,7 +167,6 @@ class DatabaseHelper {
     try {
       final existingUser = await getUserById(userId);
       if (existingUser == null) {
-        
         return false;
       }
 
@@ -180,11 +178,11 @@ class DatabaseHelper {
 
       await _usersBox.put(userId, updatedUser);
       await _usersBox.flush();
-      
+
       // Firestore'a da senkronize et (Leaderboard için)
       // Sadece bakiye, level veya profil resmi değiştiyse güncelleme yap
-      if (updates.containsKey('balance') || 
-          updates.containsKey('level') || 
+      if (updates.containsKey('balance') ||
+          updates.containsKey('level') ||
           updates.containsKey('profileImageUrl') ||
           updates.containsKey('username')) {
         try {
@@ -195,7 +193,7 @@ class DatabaseHelper {
           print('Firestore sync error: $e');
         }
       }
-      
+
       // 🆕 Cloud Save Sync (Her güncellemede)
       try {
         final userObj = User.fromJson(updatedUser.cast<String, dynamic>());
@@ -203,11 +201,10 @@ class DatabaseHelper {
       } catch (e) {
         print('Cloud save error: $e');
       }
-      
+
       _userUpdateController.add(null);
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -225,51 +222,53 @@ class DatabaseHelper {
       for (var vehicle in userVehicles) {
         await _userVehiclesBox.delete(vehicle.id);
       }
-      
+
       // 2. Kullanıcının tekliflerini sil (Hem alıcı hem satıcı olduğu)
       final allOffers = _offersBox.values;
       final offersToDelete = <String>[];
-      
+
       for (var offerMap in allOffers) {
         final offer = Offer.fromJson(Map<String, dynamic>.from(offerMap));
         if (offer.sellerId == userId || offer.buyerId == userId) {
           offersToDelete.add(offer.offerId);
         }
       }
-      
+
       for (var offerId in offersToDelete) {
         await _offersBox.delete(offerId);
       }
-      
+
       // 3. Kullanıcının bildirimlerini sil
       final allNotifications = _notificationsBox.values;
       final notificationsToDelete = <String>[];
-      
+
       for (var notifMap in allNotifications) {
-        final notif = AppNotification.fromJson(Map<String, dynamic>.from(notifMap));
+        final notif = AppNotification.fromJson(
+          Map<String, dynamic>.from(notifMap),
+        );
         if (notif.userId == userId) {
           notificationsToDelete.add(notif.id);
         }
       }
-      
+
       for (var notifId in notificationsToDelete) {
         await _notificationsBox.delete(notifId);
       }
-      
+
       // 4. Görev ilerlemelerini sil (Missions)
       final allMissions = _missionsBox.keys;
       final missionsToDelete = <dynamic>[];
-      
+
       for (var key in allMissions) {
         if (key.toString().startsWith('${userId}_')) {
           missionsToDelete.add(key);
         }
       }
-      
+
       for (var key in missionsToDelete) {
         await _missionsBox.delete(key);
       }
-      
+
       // 5. Günlük görevleri sil (Daily Quests)
       // Daily quests genellikle 'daily_quests' box'ında tutulur.
       // Ancak yapısını tam bilmediğimiz için, eğer userId ile ilişkili ise silelim.
@@ -278,10 +277,9 @@ class DatabaseHelper {
       if (_dailyQuestsBox.containsKey(userId)) {
         await _dailyQuestsBox.delete(userId);
       }
-      
+
       // 6. Son olarak kullanıcıyı sil
       return await deleteUser(userId);
-      
     } catch (e) {
       print('Error deleting user data: $e');
       return false;
@@ -299,10 +297,9 @@ class DatabaseHelper {
 
       await _usersBox.delete(userId);
       await _usersBox.flush();
-      
+
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -337,18 +334,56 @@ class DatabaseHelper {
       await _userVehiclesBox.put(vehicle.id, vehicleMap);
       await _userVehiclesBox.flush();
       _vehicleUpdateController.add(null);
-      
+
       // 🆕 Cloud Save Sync
       try {
         await CloudService().saveVehicle(vehicle);
       } catch (e) {
         print('Cloud save vehicle error: $e');
       }
-      
+
       return true;
     } catch (e) {
-      
       return false;
+    }
+  }
+
+  // Kullanıcının araç sayısını getir (Wrapper)
+  Future<int> getVehicleCount(String userId) async {
+    return await getUserVehicleCount(userId);
+  }
+
+  // Kullanıcı için araç satın al (Agent tarafından)
+  Future<UserVehicle?> buyVehicleForUser(
+    String userId,
+    Vehicle vehicle,
+    double purchasePrice, {
+    bool isOpportunity = false,
+  }) async {
+    try {
+      // 1. UserVehicle oluştur
+      final userVehicle = UserVehicle.fromVehicle(
+        vehicle,
+        userId,
+        purchasePrice: purchasePrice,
+      );
+
+      // 2. Aracı ekle
+      final success = await addUserVehicle(userVehicle);
+      if (!success) return null;
+
+      // 3. Kullanıcı bakiyesini düş
+      final userMap = await getUserById(userId);
+      if (userMap != null) {
+        final currentBalance = (userMap['balance'] as num).toDouble();
+        final newBalance = currentBalance - purchasePrice;
+        await updateUser(userId, {'balance': newBalance});
+      }
+
+      return userVehicle;
+    } catch (e) {
+      print('Error buying vehicle for user: $e');
+      return null;
     }
   }
 
@@ -369,7 +404,12 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> addMissionProgress(String userId, String missionId, bool isCompleted, bool isClaimed) async {
+  Future<void> addMissionProgress(
+    String userId,
+    String missionId,
+    bool isCompleted,
+    bool isClaimed,
+  ) async {
     try {
       final id = const Uuid().v4();
       final missionData = {
@@ -390,7 +430,12 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> updateMissionProgress(String userId, String missionId, bool isCompleted, bool isClaimed) async {
+  Future<void> updateMissionProgress(
+    String userId,
+    String missionId,
+    bool isCompleted,
+    bool isClaimed,
+  ) async {
     try {
       final key = '${userId}_$missionId';
       final existing = _missionsBox.get(key);
@@ -409,24 +454,24 @@ class DatabaseHelper {
     }
   }
 
-
   // Kullanıcının tüm araçlarını getir
   Future<List<UserVehicle>> getUserVehicles(String userId) async {
     try {
       final allVehicles = _userVehiclesBox.values;
       final userVehicles = <UserVehicle>[];
-      
+
       for (final vehicleMap in allVehicles) {
-        final vehicle = UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap));
+        final vehicle = UserVehicle.fromJson(
+          Map<String, dynamic>.from(vehicleMap),
+        );
         if (vehicle.userId == userId) {
           userVehicles.add(vehicle);
         }
       }
-      
+
       // Satın alma tarihine göre sırala (en yeni en üstte)
       userVehicles.sort((a, b) => b.purchaseDate.compareTo(a.purchaseDate));
-      
-      
+
       return userVehicles;
     } catch (e) {
       return [];
@@ -450,7 +495,6 @@ class DatabaseHelper {
       final allVehicles = await getUserVehicles(userId);
       return allVehicles.where((v) => !v.isSold).toList();
     } catch (e) {
-      
       return [];
     }
   }
@@ -461,7 +505,6 @@ class DatabaseHelper {
       final allVehicles = await getUserVehicles(userId);
       return allVehicles.where((v) => v.isSold).toList();
     } catch (e) {
-      
       return [];
     }
   }
@@ -470,11 +513,13 @@ class DatabaseHelper {
   Future<List<UserVehicle>> getAllUserVehicles() async {
     try {
       final vehicles = _userVehiclesBox.values
-          .map((vehicleMap) => UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap)))
+          .map(
+            (vehicleMap) =>
+                UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap)),
+          )
           .toList();
       return vehicles;
     } catch (e) {
-      
       return [];
     }
   }
@@ -490,7 +535,6 @@ class DatabaseHelper {
       final allVehicles = await getUserVehicles(userId);
       return allVehicles.where((v) => v.isListedForSale && !v.isSold).toList();
     } catch (e) {
-      
       return [];
     }
   }
@@ -501,7 +545,6 @@ class DatabaseHelper {
       final vehicles = await getUserActiveVehicles(userId);
       return vehicles.length;
     } catch (e) {
-      
       return 0;
     }
   }
@@ -513,17 +556,18 @@ class DatabaseHelper {
       if (vehicleMap == null) return null;
       return UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap));
     } catch (e) {
-      
       return null;
     }
   }
 
   // Kullanıcının aracını güncelle
-  Future<bool> updateUserVehicle(String vehicleId, Map<String, dynamic> updates) async {
+  Future<bool> updateUserVehicle(
+    String vehicleId,
+    Map<String, dynamic> updates,
+  ) async {
     try {
       final existingVehicle = await getUserVehicleById(vehicleId);
       if (existingVehicle == null) {
-        
         return false;
       }
 
@@ -536,18 +580,19 @@ class DatabaseHelper {
       await _userVehiclesBox.put(vehicleId, vehicleMap);
       await _userVehiclesBox.flush();
       _vehicleUpdateController.add(null);
-      
+
       // 🆕 Cloud Save Sync
       try {
-        final updatedVehicleObj = UserVehicle.fromJson(Map<String, dynamic>.from(vehicleMap));
+        final updatedVehicleObj = UserVehicle.fromJson(
+          Map<String, dynamic>.from(vehicleMap),
+        );
         await CloudService().saveVehicle(updatedVehicleObj);
       } catch (e) {
         print('Cloud update vehicle error: $e');
       }
-      
+
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -566,7 +611,6 @@ class DatabaseHelper {
         'listedDate': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      
       return false;
     }
   }
@@ -580,7 +624,6 @@ class DatabaseHelper {
         'saleDate': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      
       return false;
     }
   }
@@ -595,30 +638,33 @@ class DatabaseHelper {
       await _userVehiclesBox.delete(vehicleId);
       await _userVehiclesBox.flush();
       _vehicleUpdateController.add(null);
-      
+
       // 🆕 Cloud Save Sync
       if (userId != null) {
         try {
-           await CloudService().deleteVehicle(userId, vehicleId);
+          await CloudService().deleteVehicle(userId, vehicleId);
         } catch (e) {
           print('Cloud delete vehicle error: $e');
         }
       }
-      
+
       return true;
     } catch (e) {
-      
       return false;
     }
   }
+
+  // Kullanıcı için araç satın al (Agent tarafından)
 
   // Kullanıcının toplam harcamasını hesapla
   Future<double> getUserTotalSpent(String userId) async {
     try {
       final vehicles = await getUserVehicles(userId);
-      return vehicles.fold<double>(0.0, (double sum, vehicle) => sum + vehicle.purchasePrice);
+      return vehicles.fold<double>(
+        0.0,
+        (double sum, vehicle) => sum + vehicle.purchasePrice,
+      );
     } catch (e) {
-      
       return 0.0;
     }
   }
@@ -632,7 +678,6 @@ class DatabaseHelper {
         return sum + pl;
       });
     } catch (e) {
-      
       return 0.0;
     }
   }
@@ -650,11 +695,10 @@ class DatabaseHelper {
       final offerMap = Map<dynamic, dynamic>.from(offer.toJson());
       await _offersBox.put(offer.offerId, offerMap);
       await _offersBox.flush();
-      
+
       notifyOfferUpdate(); // 🔔 UI'ı bilgilendir
       return true;
     } catch (e) {
-
       return false;
     }
   }
@@ -666,7 +710,6 @@ class DatabaseHelper {
       if (offerMap == null) return null;
       return Offer.fromJson(Map<String, dynamic>.from(offerMap));
     } catch (e) {
-      
       return null;
     }
   }
@@ -675,16 +718,17 @@ class DatabaseHelper {
   Future<List<Offer>> getOffersBySellerId(String sellerId) async {
     try {
       final offers = _offersBox.values
-          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .map(
+            (offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)),
+          )
           .where((offer) => offer.sellerId == sellerId)
           .toList();
-      
+
       // Tarihe göre sırala (en yeni en üstte)
       offers.sort((a, b) => b.offerDate.compareTo(a.offerDate));
-      
+
       return offers;
     } catch (e) {
-      
       return [];
     }
   }
@@ -693,16 +737,17 @@ class DatabaseHelper {
   Future<List<Offer>> getOffersByVehicleId(String vehicleId) async {
     try {
       final offers = _offersBox.values
-          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .map(
+            (offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)),
+          )
           .where((offer) => offer.vehicleId == vehicleId)
           .toList();
-      
+
       // Tarihe göre sırala (en yeni en üstte)
       offers.sort((a, b) => b.offerDate.compareTo(a.offerDate));
-      
+
       return offers;
     } catch (e) {
-      
       return [];
     }
   }
@@ -713,9 +758,10 @@ class DatabaseHelper {
       final now = DateTime.now();
       final offers = await getOffersBySellerId(sellerId);
       // SADECE gelen teklifleri say (isUserOffer == false)
-      return offers.where((offer) => offer.isPending(now) && !offer.isUserOffer).toList();
+      return offers
+          .where((offer) => offer.isPending(now) && !offer.isUserOffer)
+          .toList();
     } catch (e) {
-      
       return [];
     }
   }
@@ -724,16 +770,17 @@ class DatabaseHelper {
   Future<List<Offer>> getOffersByBuyerId(String buyerId) async {
     try {
       final offers = _offersBox.values
-          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .map(
+            (offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)),
+          )
           .where((offer) => offer.buyerId == buyerId && offer.isUserOffer)
           .toList();
-      
+
       // Tarihe göre sırala (en yeni en üstte)
       offers.sort((a, b) => b.offerDate.compareTo(a.offerDate));
-      
+
       return offers;
     } catch (e) {
-      
       return [];
     }
   }
@@ -744,7 +791,6 @@ class DatabaseHelper {
       final offers = await getPendingOffersBySellerId(sellerId);
       return offers.length;
     } catch (e) {
-      
       return 0;
     }
   }
@@ -754,7 +800,6 @@ class DatabaseHelper {
     try {
       final offerMap = _offersBox.get(offerId);
       if (offerMap == null) {
-        
         return false;
       }
 
@@ -765,11 +810,10 @@ class DatabaseHelper {
 
       await _offersBox.put(offerId, updatedMap);
       await _offersBox.flush();
-      
+
       notifyOfferUpdate(); // 🔔 UI'ı bilgilendir
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -779,7 +823,6 @@ class DatabaseHelper {
     try {
       return await updateOffer(offerId, {'status': status.index});
     } catch (e) {
-      
       return false;
     }
   }
@@ -789,30 +832,31 @@ class DatabaseHelper {
     try {
       await _offersBox.delete(offerId);
       await _offersBox.flush();
-      
+
       notifyOfferUpdate(); // 🔔 UI'ı bilgilendir
       return true;
     } catch (e) {
-      
       return false;
     }
   }
 
   // Belirli bir araç için diğer tüm teklifleri reddet
-  Future<bool> rejectOtherOffers(String vehicleId, String acceptedOfferId) async {
+  Future<bool> rejectOtherOffers(
+    String vehicleId,
+    String acceptedOfferId,
+  ) async {
     try {
       final offers = await getOffersByVehicleId(vehicleId);
-      
+
       for (var offer in offers) {
-        if (offer.offerId != acceptedOfferId && offer.status == OfferStatus.pending) {
+        if (offer.offerId != acceptedOfferId &&
+            offer.status == OfferStatus.pending) {
           await updateOfferStatus(offer.offerId, OfferStatus.rejected);
         }
       }
-      
-      
+
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -821,34 +865,30 @@ class DatabaseHelper {
   Future<void> expireOldOffers() async {
     try {
       final allOffers = _offersBox.values
-          .map((offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)))
+          .map(
+            (offerMap) => Offer.fromJson(Map<String, dynamic>.from(offerMap)),
+          )
           .toList();
-      
+
       for (var offer in allOffers) {
         if (offer.isExpired()) {
           await updateOfferStatus(offer.offerId, OfferStatus.expired);
         }
       }
-      
-      
-    } catch (e) {
-      
-    }
+    } catch (e) {}
   }
 
   // Tüm teklifleri temizle (belirli bir araç için)
   Future<bool> deleteOffersForVehicle(String vehicleId) async {
     try {
       final offers = await getOffersByVehicleId(vehicleId);
-      
+
       for (var offer in offers) {
         await deleteOffer(offer.offerId);
       }
-      
-      
+
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -866,16 +906,18 @@ class DatabaseHelper {
       final notificationMap = Map<dynamic, dynamic>.from(notification.toJson());
       await _notificationsBox.put(notification.id, notificationMap);
       await _notificationsBox.flush();
-      
+
       return true;
     } catch (e) {
-      
       return false;
     }
   }
 
   // Bildirim güncelle
-  Future<bool> updateNotification(String notificationId, Map<String, dynamic> updates) async {
+  Future<bool> updateNotification(
+    String notificationId,
+    Map<String, dynamic> updates,
+  ) async {
     try {
       final notificationMap = _notificationsBox.get(notificationId);
       if (notificationMap == null) return false;
@@ -901,13 +943,12 @@ class DatabaseHelper {
           .where((n) => n['userId'] == userId)
           .map((n) => AppNotification.fromJson(Map<String, dynamic>.from(n)))
           .toList();
-      
+
       // Tarihe göre sırala (en yeni üstte)
       userNotifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      
+
       return userNotifications;
     } catch (e) {
-      
       return [];
     }
   }
@@ -918,7 +959,6 @@ class DatabaseHelper {
       final notifications = await getUserNotifications(userId);
       return notifications.where((n) => !n.isRead).length;
     } catch (e) {
-      
       return 0;
     }
   }
@@ -934,7 +974,6 @@ class DatabaseHelper {
       }
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -950,7 +989,6 @@ class DatabaseHelper {
       }
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -962,7 +1000,6 @@ class DatabaseHelper {
       await _notificationsBox.flush();
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -976,7 +1013,6 @@ class DatabaseHelper {
       }
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -986,14 +1022,16 @@ class DatabaseHelper {
     try {
       final allNotifications = _notificationsBox.values;
       final notificationsToDelete = <String>[];
-      
+
       for (var notifMap in allNotifications) {
-        final notif = AppNotification.fromJson(Map<String, dynamic>.from(notifMap));
+        final notif = AppNotification.fromJson(
+          Map<String, dynamic>.from(notifMap),
+        );
         if (notif.data != null && notif.data!['vehicleId'] == vehicleId) {
           notificationsToDelete.add(notif.id);
         }
       }
-      
+
       for (var notifId in notificationsToDelete) {
         await _notificationsBox.delete(notifId);
       }
@@ -1025,21 +1063,24 @@ class DatabaseHelper {
   }
 
   // Kullanıcının belirli bir tarihteki görevlerini getir
-  Future<List<Map<String, dynamic>>> getUserDailyQuests(String userId, DateTime date) async {
+  Future<List<Map<String, dynamic>>> getUserDailyQuests(
+    String userId,
+    DateTime date,
+  ) async {
     try {
       final allQuests = _dailyQuestsBox.values;
       final userQuests = <Map<String, dynamic>>[];
-      
+
       for (var quest in allQuests) {
         final questDate = DateTime.parse(quest['date'] as String);
-        if (quest['userId'] == userId && 
-            questDate.year == date.year && 
-            questDate.month == date.month && 
+        if (quest['userId'] == userId &&
+            questDate.year == date.year &&
+            questDate.month == date.month &&
             questDate.day == date.day) {
           userQuests.add(Map<String, dynamic>.from(quest));
         }
       }
-      
+
       return userQuests;
     } catch (e) {
       return [];
@@ -1060,7 +1101,10 @@ class DatabaseHelper {
   }
 
   // Görevi güncelle
-  Future<bool> updateDailyQuest(String questId, Map<String, dynamic> updates) async {
+  Future<bool> updateDailyQuest(
+    String questId,
+    Map<String, dynamic> updates,
+  ) async {
     try {
       final questMap = _dailyQuestsBox.get(questId);
       if (questMap == null) return false;
@@ -1072,7 +1116,7 @@ class DatabaseHelper {
 
       await _dailyQuestsBox.put(questId, updatedMap);
       await _dailyQuestsBox.flush();
-      
+
       return true;
     } catch (e) {
       return false;
@@ -1084,14 +1128,14 @@ class DatabaseHelper {
     try {
       final keysToDelete = <String>[];
       final allQuests = _dailyQuestsBox.toMap();
-      
+
       allQuests.forEach((key, value) {
         final questDate = DateTime.parse(value['date'] as String);
         if (questDate.isBefore(beforeDate)) {
           keysToDelete.add(key as String);
         }
       });
-      
+
       await _dailyQuestsBox.deleteAll(keysToDelete);
       await _dailyQuestsBox.flush();
     } catch (e) {
@@ -1124,17 +1168,19 @@ class DatabaseHelper {
     try {
       final allActivities = _activitiesBox.values;
       final userActivities = <Activity>[];
-      
+
       for (var activityMap in allActivities) {
-        final activity = Activity.fromJson(Map<String, dynamic>.from(activityMap));
+        final activity = Activity.fromJson(
+          Map<String, dynamic>.from(activityMap),
+        );
         if (activity.userId == userId) {
           userActivities.add(activity);
         }
       }
-      
+
       // Tarihe göre sırala (en yeni en üstte)
       userActivities.sort((a, b) => b.date.compareTo(a.date));
-      
+
       return userActivities;
     } catch (e) {
       return [];

@@ -140,6 +140,7 @@
     "speed": "Speed",
     "negotiation": "Negotiation",
     "daily_sales_success": "{count} cars sold today!",
+    "daily_purchase_success": "{count} cars purchased today!",
     "daily_sales_none": "No cars were sold today.",
     "daily_sales_no_cars": "You have agents but no cars to sell!",
     "fire_button": "Dismiss Staff",
@@ -149,7 +150,10 @@
     "hire_confirm_desc": "Do you want to hire {name} for a daily salary of {salary}?",
     "staff_resigned": "All your staff have resigned due to insufficient balance!",
     "hire_success": "{name} joined the team!",
-    "fire_success": "Parted ways with {name}."
+    "fire_success": "Parted ways with {name}.",
+    "department_full": "Department is full! (Max: {limit})",
+    "no_personnel_in_dept": "No personnel in this department.",
+    "market_knowledge": "Market Knowledge"
   },
   "home": {
     "title": "Dashboard",

@@ -161,6 +161,7 @@
     "speed": "Hız",
     "negotiation": "Pazarlık",
     "daily_sales_success": "Bugün {count} araç satıldı!",
+    "daily_purchase_success": "Bugün {count} araç satın alındı!",
     "daily_sales_none": "Bugün hiç araç satışı olmadı.",
     "daily_sales_no_cars": "Temsilcileriniz var ama satacak araç yok!",
     "fire_button": "İşten Çıkar",
@@ -170,7 +171,10 @@
     "hire_confirm_desc": "{name} isimli personeli günlük {salary} maaş karşılığında işe almak istiyor musunuz?",
     "staff_resigned": "Yetersiz bakiye nedeniyle tüm personeliniz istifa etti!",
     "hire_success": "{name} ekibe katıldı!",
-    "fire_success": "{name} ile yollar ayrıldı."
+    "fire_success": "{name} ile yollar ayrıldı.",
+    "department_full": "Departman dolu! (Maks: {limit})",
+    "no_personnel_in_dept": "Bu departmanda personel yok.",
+    "market_knowledge": "Piyasa Bilgisi"
   },
   "home": {
     "title": "Dashboard",

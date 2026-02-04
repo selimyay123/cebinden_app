@@ -12,29 +12,48 @@ class ManageStaffScreen extends StatefulWidget {
   State<ManageStaffScreen> createState() => _ManageStaffScreenState();
 }
 
-class _ManageStaffScreenState extends State<ManageStaffScreen> {
+class _ManageStaffScreenState extends State<ManageStaffScreen>
+    with SingleTickerProviderStateMixin {
   final StaffService _staffService = StaffService();
   List<Staff> _staff = [];
   StreamSubscription? _eventSubscription;
+  late TabController _tabController;
+  Timer? _uiTimer; // Progress bar animasyonu için
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _loadStaff();
-    // Simülasyonu başlat (Eğer zaten çalışmıyorsa)
-    _staffService.startSimulation();
+
+    // Gerçek zamanlı simülasyonu başlat
+    _staffService.startRealTimeLoop();
+
+    // UI Güncelleme Timer'ı (Progress Bar için)
+    _uiTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (mounted) {
+        setState(() {
+          // Sadece UI'yi tetikle, logic StaffService'de dönüyor
+        });
+      }
+    });
 
     // Olayları dinle
     _eventSubscription = _staffService.eventStream.listen((event) {
-      if (mounted && (ModalRoute.of(context)?.isCurrent ?? false)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(event),
-            backgroundColor: Colors.green[700],
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      if (mounted) {
+        // Eğer event sadece bir action bildirimi ise (örn: staff_action_123), ignore et veya barı sıfırla
+        if (event.startsWith('staff_action_')) {
+          // Bar otomatik güncelleniyor zaten
+        } else if (ModalRoute.of(context)?.isCurrent ?? false) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(event),
+              backgroundColor: Colors.green[700],
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     });
   }
@@ -42,9 +61,8 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
   @override
   void dispose() {
     _eventSubscription?.cancel();
-    // Ekrandan çıkınca simülasyon dursun mu?
-    // Genelde oyun arka planda devam etsin istenir ama şimdilik durduralım veya açık bırakalım.
-    // _staffService.stopSimulation(); // İsteğe bağlı
+    _tabController.dispose();
+    _uiTimer?.cancel();
     super.dispose();
   }
 
@@ -58,13 +76,11 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => ModernAlertDialog(
-        title: 'staff.fire_confirm_title'.tr(
-          defaultValue: 'Personeli İşten Çıkar',
-        ),
+        title: 'staff.fire_confirm_title'.tr(),
         icon: Icons.person_remove_rounded,
         isDestructive: true,
         content: Text('staff.fire_confirm_desc'.trParams({'name': staff.name})),
-        buttonText: 'staff.fire_button'.tr(defaultValue: 'İşten Çıkar'),
+        buttonText: 'staff.fire_button'.tr(),
         onPressed: () async {
           await _staffService.fireStaff(staff.id);
           if (mounted) {
@@ -85,7 +101,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             );
           }
         },
-        secondaryButtonText: 'common.cancel'.tr(defaultValue: 'İptal'),
+        secondaryButtonText: 'common.cancel'.tr(),
         onSecondaryPressed: () => Navigator.of(dialogContext).pop(),
       ),
     );
@@ -95,7 +111,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) => ModernAlertDialog(
-        title: 'staff.hire_confirm_title'.tr(defaultValue: 'Personeli İşe Al'),
+        title: 'staff.hire_confirm_title'.tr(),
         icon: Icons.person_add_rounded,
         content: Text(
           'staff.hire_confirm_desc'.trParams({
@@ -103,15 +119,20 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             'salary': candidate.salary.toStringAsFixed(0),
           }),
         ),
-        buttonText: 'staff.hire_button'.tr(defaultValue: 'İşe Al'),
+        buttonText: 'staff.hire_button'.tr(),
         onPressed: () {
           _hireStaff(candidate);
-          // 1. Önce dialoğu kapat (dialogContext ile)
-          Navigator.of(dialogContext).pop();
-          // 2. Sonra aday listesini (BottomSheet) kapat (ekranın context'i ile)
-          Navigator.of(context).pop();
+          Navigator.of(dialogContext).pop(); // Dialog
+          Navigator.of(context).pop(); // BottomSheet
+
+          // İlgili sekmeye geç
+          if (candidate.role == StaffRole.buyer) {
+            _tabController.animateTo(1);
+          } else {
+            _tabController.animateTo(0);
+          }
         },
-        secondaryButtonText: 'common.cancel'.tr(defaultValue: 'İptal'),
+        secondaryButtonText: 'common.cancel'.tr(),
         onSecondaryPressed: () => Navigator.of(dialogContext).pop(),
       ),
     );
@@ -119,50 +140,44 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Colors.transparent, // Arka plan Container'dan gelecek
-        appBar: AppBar(
-          title: Text('staff.title'.tr(defaultValue: 'Personel Yönetimi')),
-          backgroundColor: Colors.deepPurple,
-          foregroundColor: Colors.white,
-          centerTitle: true,
-          bottom: _staff.isEmpty
-              ? null
-              : TabBar(
-                  indicatorColor: Colors.white,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white70,
-                  tabs: [
-                    Tab(
-                      text: 'staff.cat_sales'.tr(defaultValue: 'Satış Ekibi'),
-                      icon: const Icon(Icons.campaign_outlined),
-                    ),
-                    Tab(
-                      text: 'staff.cat_buyer'.tr(
-                        defaultValue: 'Satın Alma Ekibi',
-                      ),
-                      icon: const Icon(Icons.shopping_cart_outlined),
-                    ),
-                  ],
-                ),
-        ),
-        floatingActionButton: _staff.isEmpty
+    return Scaffold(
+      backgroundColor: Colors.transparent, // Arka plan Container'dan gelecek
+      appBar: AppBar(
+        title: Text('staff.title'.tr()),
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        bottom: _staff.isEmpty
             ? null
-            : FloatingActionButton.extended(
-                onPressed: _showHireOptionsDialog,
-                label: Text(
-                  'staff.hire_button'.tr(defaultValue: 'Personel Al'),
-                ),
-                icon: const Icon(Icons.add),
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
+            : TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                tabs: [
+                  Tab(
+                    text: 'staff.cat_sales'.tr(),
+                    icon: const Icon(Icons.campaign_outlined),
+                  ),
+                  Tab(
+                    text: 'staff.cat_buyer'.tr(),
+                    icon: const Icon(Icons.shopping_cart_outlined),
+                  ),
+                ],
               ),
-        body: Container(
-          color: Colors.black,
-          child: _staff.isEmpty ? _buildEmptyState() : _buildTabBarView(),
-        ),
+      ),
+      floatingActionButton: _staff.isEmpty
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _showHireOptionsDialog,
+              label: Text('staff.hire_button'.tr()),
+              icon: const Icon(Icons.add),
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+            ),
+      body: Container(
+        color: Colors.black,
+        child: _staff.isEmpty ? _buildEmptyState() : _buildTabBarView(),
       ),
     );
   }
@@ -172,6 +187,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
     final buyerStaff = _staff.where((s) => s.role == StaffRole.buyer).toList();
 
     return TabBarView(
+      controller: _tabController,
       children: [_buildStaffList(salesStaff), _buildStaffList(buyerStaff)],
     );
   }
@@ -201,7 +217,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
 
             // Başlık
             Text(
-              'staff.empty_title'.tr(defaultValue: 'Henüz Personeliniz Yok'),
+              'staff.empty_title'.tr(),
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -213,10 +229,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
 
             // Açıklama
             Text(
-              'staff.empty_desc'.tr(
-                defaultValue:
-                    'İşlerinizi otomatikleştirmek ve gelirinizi artırmak için profesyonel bir ekip kurun.',
-              ),
+              'staff.empty_desc'.tr(),
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.white,
@@ -234,7 +247,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                 onPressed: _showHireOptionsDialog,
                 icon: const Icon(Icons.add, size: 24),
                 label: Text(
-                  'staff.hire_button'.tr(defaultValue: 'Personel İşe Al'),
+                  'staff.hire_button'.tr(),
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -260,16 +273,9 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
   Widget _buildStaffList(List<Staff> staffList) {
     if (staffList.isEmpty) {
       return Center(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Text(
-            'Bu departmanda personel yok.',
-            style: TextStyle(color: Colors.grey[800], fontSize: 16),
-          ),
+        child: Text(
+          'staff.no_personnel_in_dept'.tr(),
+          style: TextStyle(color: Colors.white, fontSize: 16),
         ),
       );
     }
@@ -278,6 +284,22 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
       itemCount: staffList.length,
       itemBuilder: (context, index) {
         final staff = staffList[index];
+
+        // Progress Bar Hesaplama
+        final now = DateTime.now();
+        final diff = now.difference(staff.lastActionTime).inMilliseconds;
+        final totalMs = staff.actionIntervalSeconds * 1000;
+        final progress = (diff / totalMs).clamp(0.0, 1.0);
+
+        String skillText = "";
+        String speedText = "${staff.actionIntervalSeconds}s";
+
+        if (staff is SalesAgent) {
+          skillText = "%${(staff.skill * 100).toInt()} Başarı";
+        } else if (staff is BuyerAgent) {
+          skillText = "%${(staff.skill * 100).toInt()} Başarı";
+        }
+
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
@@ -325,7 +347,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${'staff.daily_salary'.tr(defaultValue: 'Günlük Maaş')}: ${staff.salary.toStringAsFixed(0)} TL',
+                            '${'staff.daily_salary'.tr()}: ${staff.salary.toStringAsFixed(0)} TL',
                             style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 14,
@@ -337,34 +359,61 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                     // Ayarlar butonu
                     IconButton(
                       icon: const Icon(Icons.settings, color: Colors.white70),
-                      onPressed: () {
-                        // Gelecekte detaylar için kullanılabilir
-                      },
+                      onPressed: () {},
                     ),
                   ],
                 ),
-                // Alt Kısım: Satış Temsilcisi ise Statlar
-                if (staff is SalesAgent) ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Divider(color: Colors.white24),
-                  ),
-                  _buildStatBar(
-                    'staff.persuasion'.tr(defaultValue: 'İkna'),
-                    staff.persuasion,
-                    textColor: Colors.white,
-                  ),
-                  _buildStatBar(
-                    'staff.speed'.tr(defaultValue: 'Hız'),
-                    staff.speed / 2.0,
-                    textColor: Colors.white,
-                  ),
-                  _buildStatBar(
-                    'staff.negotiation'.tr(defaultValue: 'Pazarlık'),
-                    staff.negotiationSkill * 2,
-                    textColor: Colors.white,
-                  ),
-                ],
+
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  child: Divider(color: Colors.white24),
+                ),
+
+                // İŞLEM İLERLEME ÇUBUĞU
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "İşlem Durumu",
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                        Text(
+                          "${(progress * 100).toInt()}%",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.black26,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.greenAccent,
+                      ),
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // STATLAR (Basit)
+                Row(
+                  children: [
+                    _buildSimpleStat("Hız", speedText, Icons.timer),
+                    const SizedBox(width: 16),
+                    _buildSimpleStat("Yetenek", skillText, Icons.star),
+                  ],
+                ),
+
                 // İŞTEN ÇIKAR BUTONU
                 const SizedBox(height: 16),
                 SizedBox(
@@ -373,7 +422,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                     onPressed: () => _showFireConfirmDialog(staff),
                     icon: const Icon(Icons.person_remove_outlined, size: 20),
                     label: Text(
-                      'staff.fire_button'.tr(defaultValue: 'İşten Çıkar'),
+                      'staff.fire_button'.tr(),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -395,16 +444,51 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
     );
   }
 
+  Widget _buildSimpleStat(String label, String value, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white10,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment:
+              MainAxisAlignment.center, // Center content horizontally
+          children: [
+            Icon(icon, color: Colors.white70, size: 16),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _getRoleName(StaffRole role) {
     switch (role) {
       case StaffRole.buyer:
-        return 'staff.role_buyer'.tr(defaultValue: 'Satın Alma Uzmanı');
+        return 'staff.role_buyer'.tr();
       case StaffRole.sales:
-        return 'staff.role_sales'.tr(defaultValue: 'Satış Danışmanı');
-      case StaffRole.technical:
-        return 'staff.role_tech'.tr(defaultValue: 'Teknik Servis');
-      case StaffRole.accountant:
-        return 'staff.role_accountant'.tr(defaultValue: 'Muhasebeci');
+        return 'staff.role_sales'.tr();
+      default:
+        return role.toString();
     }
   }
 
@@ -424,7 +508,6 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tutamaç
             Center(
               child: Container(
                 width: 40,
@@ -436,10 +519,8 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Başlık
             Text(
-              'staff.hire_category_title'.tr(defaultValue: 'Departman Seç'),
+              'staff.hire_category_title'.tr(),
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -448,14 +529,10 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'staff.hire_category_desc'.tr(
-                defaultValue: 'Hangi departman için personel arıyorsunuz?',
-              ),
+              'staff.hire_category_desc'.tr(),
               style: const TextStyle(fontSize: 14, color: Colors.white70),
             ),
             const SizedBox(height: 24),
-
-            // Kategoriler Grid
             LayoutBuilder(
               builder: (context, constraints) {
                 return GridView.count(
@@ -464,19 +541,16 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 1.1, // Kareye yakın
-                  // İki öğeyi ortalamak için padding veya alignment kullanılabilir fakat GridView zaten genişliğe yayılır.
+                  childAspectRatio: 1.1,
                   children: [
                     _buildCategoryCard(
-                      title: 'staff.cat_sales'.tr(
-                        defaultValue: 'Satış Temsilcisi',
-                      ),
+                      title: 'staff.cat_sales'.tr(),
                       icon: Icons.campaign_outlined,
                       color: Colors.green,
                       onTap: () => _handleCategorySelect(StaffRole.sales),
                     ),
                     _buildCategoryCard(
-                      title: 'staff.cat_buyer'.tr(defaultValue: 'Satın Alımcı'),
+                      title: 'staff.cat_buyer'.tr(),
                       icon: Icons.shopping_cart_outlined,
                       color: Colors.blue,
                       onTap: () => _handleCategorySelect(StaffRole.buyer),
@@ -510,45 +584,34 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             width: 2,
           ),
         ),
-        child: Stack(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isLocked
-                          ? Colors.grey[300]
-                          : color.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 32,
-                      color: isLocked ? Colors.grey : color,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isLocked ? Colors.white38 : Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isLocked
+                    ? Colors.grey[300]
+                    : color.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: isLocked ? Colors.grey : color,
               ),
             ),
-            if (isLocked)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Icon(Icons.lock, size: 16, color: Colors.grey[400]),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isLocked ? Colors.white38 : Colors.white,
               ),
+              textAlign: TextAlign.center,
+            ),
+            if (isLocked) Icon(Icons.lock, size: 16, color: Colors.grey[400]),
           ],
         ),
       ),
@@ -561,19 +624,19 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
     if (roleCount >= limit) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${_getRoleName(role)} departmanı dolu! (Max: $limit)'),
+          content: Text(
+            'staff.department_full'.trParams({'limit': limit.toString()}),
+          ),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
-
-    Navigator.pop(context); // Kategori dialogunu kapat
+    Navigator.pop(context);
     _showCandidateDialog(role);
   }
 
   void _showCandidateDialog(StaffRole role) {
-    // Rastgele 3 aday oluştur
     final candidates = _staffService.generateCandidates(role);
 
     showModalBottomSheet(
@@ -590,7 +653,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
         child: Column(
           children: [
             Text(
-              '${'staff.searching'.tr(defaultValue: 'Adaylar')}: ${_getRoleName(role)}',
+              '${'staff.searching'.tr()}: ${_getRoleName(role)}',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -603,6 +666,15 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                 itemCount: candidates.length,
                 itemBuilder: (context, index) {
                   final candidate = candidates[index];
+
+                  String skillText = "";
+                  String speedText = "${candidate.actionIntervalSeconds}s";
+                  if (candidate is SalesAgent) {
+                    skillText = "${(candidate.skill * 100).toInt()}%";
+                  } else if (candidate is BuyerAgent) {
+                    skillText = "${(candidate.skill * 100).toInt()}%";
+                  }
+
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
@@ -635,7 +707,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '${'staff.daily_salary'.tr(defaultValue: 'Günlük Maaş')}: ${candidate.salary.toStringAsFixed(0)} TL',
+                                    '${'staff.daily_salary'.tr()}: ${candidate.salary.toStringAsFixed(0)} TL',
                                     style: const TextStyle(
                                       color: Colors.white70,
                                       fontSize: 13,
@@ -646,27 +718,14 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                             ),
                           ],
                         ),
-                        if (candidate is SalesAgent) ...[
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Divider(color: Colors.white24),
-                          ),
-                          _buildStatBar(
-                            'staff.persuasion'.tr(defaultValue: 'İkna'),
-                            candidate.persuasion,
-                            textColor: Colors.white,
-                          ),
-                          _buildStatBar(
-                            'staff.speed'.tr(defaultValue: 'Hız'),
-                            candidate.speed / 2.0,
-                            textColor: Colors.white,
-                          ),
-                          _buildStatBar(
-                            'staff.negotiation'.tr(defaultValue: 'Pazarlık'),
-                            candidate.negotiationSkill * 2,
-                            textColor: Colors.white,
-                          ),
-                        ],
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            _buildSimpleStat("Hız", speedText, Icons.timer),
+                            const SizedBox(width: 12),
+                            _buildSimpleStat("Yetenek", skillText, Icons.star),
+                          ],
+                        ),
                         const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
@@ -681,7 +740,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                             child: Text(
-                              'staff.hire_button'.tr(defaultValue: 'İşe Al'),
+                              'staff.hire_button'.tr(),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -696,32 +755,6 @@ class _ManageStaffScreenState extends State<ManageStaffScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStatBar(String label, double value, {Color? textColor}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 60,
-            child: Text(
-              label,
-              style: TextStyle(fontSize: 12, color: textColor),
-            ),
-          ),
-          Expanded(
-            child: LinearProgressIndicator(
-              value: value.clamp(0.0, 1.0),
-              backgroundColor: Colors.white24,
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-              minHeight: 6,
-              borderRadius: BorderRadius.circular(3),
-            ),
-          ),
-        ],
       ),
     );
   }

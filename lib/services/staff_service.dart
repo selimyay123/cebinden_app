@@ -2,8 +2,9 @@ import '../models/staff_model.dart';
 import 'dart:async';
 import 'database_helper.dart';
 import 'localization_service.dart';
-import 'game_time_service.dart';
+// import '../services/game_time_service.dart';
 import 'activity_service.dart';
+import 'market_refresh_service.dart';
 import '../models/user_vehicle_model.dart';
 
 class StaffService {
@@ -13,7 +14,7 @@ class StaffService {
 
   // Geçici olarak bellek içi liste (İleride DB'ye taşınacak)
   List<Staff> _myStaff = [];
-  bool _isListening = false; // Simülasyonun aktif olup olmadığını takip eder
+  // Simülasyonun aktif olup olmadığını takip eder
 
   List<Staff> get myStaff => _myStaff;
 
@@ -39,114 +40,31 @@ class StaffService {
     return total;
   }
 
-  // Aday Listesi Oluştur
-  List<Staff> generateCandidates(StaffRole role) {
-    List<Staff> candidates = [];
-    for (int i = 0; i < 3; i++) {
-      String id =
-          DateTime.now().millisecondsSinceEpoch.toString() + i.toString();
-      String name = generateRandomName();
-      double baseSalary = 0;
-      int efficiency = 50 + (DateTime.now().microsecond % 40); // 50-90 arası
-
-      if (role == StaffRole.sales) {
-        // Rastgele yetenek dağılımı
-        double negotiation =
-            0.0 + (DateTime.now().microsecond % 20) / 100.0; // 0.0 - 0.20
-        double persuasion =
-            0.3 + (DateTime.now().microsecond % 50) / 100.0; // 0.3 - 0.8
-        double speed =
-            0.8 + (DateTime.now().microsecond % 120) / 100.0; // 0.8 - 2.0
-
-        // Maaş Hesaplama (Statlara göre)
-        baseSalary =
-            2000 + (negotiation * 10000) + (persuasion * 5000) + (speed * 1000);
-
-        candidates.add(
-          SalesAgent(
-            id: id,
-            name: name,
-            salary: baseSalary.roundToDouble(),
-            efficiency: efficiency,
-            hiredDate: DateTime.now(),
-            negotiationSkill: negotiation,
-            persuasion: persuasion,
-            speed: speed,
-          ),
-        );
-      } else if (role == StaffRole.buyer) {
-        baseSalary = 3000 + (efficiency * 50);
-        candidates.add(
-          BuyerAgent(
-            id: id,
-            name: name,
-            salary: baseSalary.roundToDouble(),
-            efficiency: efficiency,
-            hiredDate: DateTime.now(),
-          ),
-        );
-      }
-    }
-    return candidates;
-  }
-
-  // Rastgele İsim Üreteci (Mock İçin)
-  String generateRandomName() {
-    final names = [
-      'Ahmet',
-      'Mehmet',
-      'Ayşe',
-      'Fatma',
-      'Ali',
-      'Zeynep',
-      'Can',
-      'Elif',
-      'Burak',
-      'Ceren',
-    ];
-    final surnames = [
-      'Yılmaz',
-      'Kaya',
-      'Demir',
-      'Çelik',
-      'Şahin',
-      'Yıldız',
-      'Öztürk',
-      'Arslan',
-      'Koç',
-    ];
-    names.shuffle();
-    surnames.shuffle();
-    return '${names.first} ${surnames.first}';
-  }
-
   // Günlük Satış Özeti için Stream
   final _eventController = StreamController<String>.broadcast();
   Stream<String> get eventStream => _eventController.stream;
 
-  void startSimulation() {
-    if (_isListening) return; // Zaten dinliyorsak tekrar ekleme
+  Timer? _simulatorTimer;
 
-    // GameTimeService'e abone ol (Eğer değilsek)
-    GameTimeService().addDayChangeListener(_onDayChange);
-    _isListening = true;
-    print("Staff Simulation Subscribed to GameTimeService.");
+  // Real-Time Simülasyonu Başlat
+  void startRealTimeLoop() {
+    if (_simulatorTimer != null && _simulatorTimer!.isActive) return;
+
+    print("Staff Real-Time Simulation Started.");
+    // Her saniye kontrol et
+    _simulatorTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _checkStaffActivity();
+    });
   }
 
-  void _onDayChange(int oldDay, int newDay) {
-    print("Game Day Changed ($oldDay -> $newDay). Running Staff Loop...");
-    _runGameLoop();
+  void stopRealTimeLoop() {
+    _simulatorTimer?.cancel();
+    _simulatorTimer = null;
+    print("Staff Real-Time Simulation Stopped.");
   }
 
-  void stopSimulation() {
-    if (!_isListening) return;
-
-    GameTimeService().removeDayChangeListener(_onDayChange);
-    _isListening = false;
-    print("Staff Simulation Unsubscribed from GameTimeService.");
-  }
-
-  void _runGameLoop() async {
+  // Periyodik Kontrol
+  void _checkStaffActivity() async {
     if (_myStaff.isEmpty) return;
 
     final db = DatabaseHelper();
@@ -154,79 +72,240 @@ class StaffService {
     if (userMap == null) return;
     final String userId = userMap['id'];
 
-    // 1. Maaş Kontrolü ve Ödeme
-    final double dailyWages = calculateDailyWages();
-    final currentBalance = (userMap['balance'] as num).toDouble();
+    // Maaş ödemesi (Basitlik için hala günlük veya işlem başı olabilir ama şimdilik pas geçiyoruz)
+    // Gerçek zamanlıda maaş belki dakikalık düşebilir ama şimdilik karmaşıklık katmayalım.
 
-    if (currentBalance < dailyWages) {
-      // Maaşları ödeyecek bakiye yok! İstifa etsinler.
-      _myStaff.clear();
-      _eventController.add(
-        'staff.staff_resigned'.tr(
-          defaultValue:
-              'Yetersiz bakiye nedeniyle tüm personeliniz istifa etti!',
-        ),
-      );
-      return;
+    for (var staff in _myStaff) {
+      final now = DateTime.now();
+      final difference = now.difference(staff.lastActionTime).inSeconds;
+
+      // Süre dolduysa işlem yap
+      if (difference >= staff.actionIntervalSeconds) {
+        if (staff.role == StaffRole.buyer) {
+          await _processBuyerAgent(staff as BuyerAgent, userId, db, userMap);
+        } else if (staff.role == StaffRole.sales) {
+          await _processSalesAgent(staff as SalesAgent, userId, db);
+        }
+
+        // İşlem zamanını güncelle
+        staff.lastActionTime = now;
+        // UI güncellemesi için stream'e bilgi at (Progress bar reset için)
+        _eventController.add('staff_action_${staff.id}');
+      }
     }
+  }
 
-    if (dailyWages > 0) {
-      final newBalance = currentBalance - dailyWages;
-      await db.updateUser(userId, {'balance': newBalance});
-      print("Staff Wages Paid: -$dailyWages TL. New Balance: $newBalance TL");
-    }
-
-    // 2. Satılabilir araçları getir (Listede olmayan ve satılmamış)
-    // Sahibinin garajındaki araçlar: Satılık değil + Satılmamış
-    // Kiralık araçlar da satılabilir (istek üzerine)
+  Future<void> _processSalesAgent(
+    SalesAgent agent,
+    String userId,
+    DatabaseHelper db,
+  ) async {
+    // Satılabilir araçları getir
     List<dynamic> allVehicles = await db.getUserVehicles(userId);
     List<dynamic> availableVehicles = allVehicles.where((v) {
       return !v.isListedForSale && !v.isSold;
     }).toList();
 
-    int loopSalesCount = 0;
-    bool hasSalesAgents = _myStaff.any((s) => s.role == StaffRole.sales);
-    int initialAvailableCount = availableVehicles.length;
+    if (availableVehicles.isEmpty) return; // Satacak araç yok
 
-    for (var staff in _myStaff) {
-      if (staff.role == StaffRole.sales) {
-        // Eğer satılacak araç yoksa satış temsilcisi boşta bekler
-        if (availableVehicles.isEmpty) continue;
+    final result = agent.work();
+    final success = await _handleSalesAgentWork(
+      agent,
+      result,
+      availableVehicles,
+      userId,
+    );
 
-        final result = staff.work();
-        final success = await _handleSalesAgentWork(
-          staff as SalesAgent,
-          result,
-          availableVehicles,
+    if (success) {
+      _eventController.add(
+        'staff.daily_sales_success'.trParams({'count': '1'}),
+      );
+    }
+  }
+
+  Future<void> _processBuyerAgent(
+    BuyerAgent agent,
+    String userId,
+    DatabaseHelper db,
+    Map<String, dynamic> userMap,
+  ) async {
+    final int currentVehicleCount = await db.getUserVehicleCount(userId);
+    final int garageLimit = (userMap['garageLimit'] as num? ?? 10).toInt();
+
+    if (currentVehicleCount >= garageLimit) {
+      // Yer yok
+      return;
+    }
+
+    final double currentBalance = (userMap['balance'] as num).toDouble();
+    final result = agent.work();
+
+    final success = await _handleBuyerAgentWork(
+      agent,
+      result,
+      currentBalance,
+      userId,
+    );
+
+    if (success) {
+      _eventController.add(
+        'staff.daily_purchase_success'.trParams({'count': '1'}),
+      );
+    }
+  }
+
+  // Aday Listesi Oluştur (GÜNCEL)
+  List<Staff> generateCandidates(StaffRole role) {
+    List<Staff> candidates = [];
+    for (int i = 0; i < 3; i++) {
+      String id =
+          DateTime.now().millisecondsSinceEpoch.toString() + i.toString();
+      String name = generateRandomName();
+      double baseSalary = 0;
+
+      // Rastgele Skill (0.5 - 0.95) - Daha yüksek yetenek
+      double skill = 0.5 + (DateTime.now().microsecond % 45) / 100.0;
+
+      // Rastgele Speed (10s - 30s arası interval) - Çok daha hızlı
+      // Speed multiplier: 2.0 (yavaş) - 6.0 (hızlı)
+      // Interval = 60 / speed. Örn: speed 6.0 -> 10 sn. speed 2.0 -> 30 sn.
+      double speedMultiplier = 2.0 + (DateTime.now().microsecond % 400) / 100.0;
+      int interval = (60 / speedMultiplier).round().clamp(10, 30);
+
+      if (role == StaffRole.sales) {
+        // Maaş Hesaplama (Hıza göre artış)
+        baseSalary = 3000 + (skill * 5000) + (speedMultiplier * 2000);
+
+        candidates.add(
+          SalesAgent(
+            id: id,
+            name: name,
+            salary: baseSalary.roundToDouble(),
+            hiredDate: DateTime.now(),
+            skill: skill,
+            speed: speedMultiplier,
+            actionIntervalSeconds: interval,
+          ),
+        );
+      } else if (role == StaffRole.buyer) {
+        // Maaş Hesaplama
+        baseSalary = 3500 + (skill * 6000) + (speedMultiplier * 2000);
+
+        candidates.add(
+          BuyerAgent(
+            id: id,
+            name: name,
+            salary: baseSalary.roundToDouble(),
+            hiredDate: DateTime.now(),
+            skill: skill,
+            speed: speedMultiplier,
+            actionIntervalSeconds: interval,
+          ),
+        );
+      }
+    }
+    return candidates;
+  }
+
+  Future<bool> _handleBuyerAgentWork(
+    BuyerAgent agent,
+    Map<String, dynamic> result,
+    double currentBalance,
+    String userId,
+  ) async {
+    // Şans Faktörü: Piyasa Bilgisi + Rastgelelik
+    final double successChance = result['success_chance'] ?? 0.5;
+    final double randomRoll = (DateTime.now().microsecond % 1000) / 1000.0;
+
+    // Şansı artırıyoruz: 1.2 çarpanı (Daha agresif alım)
+    final double adjustedChance = successChance * 1.2;
+
+    if (randomRoll < adjustedChance) {
+      // Araç Bulma: Gerçek market ilanlarından seç
+      final marketService = MarketRefreshService();
+
+      // Tüm aktif ilanları al (Normal + Fırsat)
+      final activeVehicles = marketService.getActiveListings();
+      final opportunityListings = marketService.getOpportunityListings();
+      // Fırsat ilanlarından araçları çek
+      final opportunityVehicles = opportunityListings
+          .map((l) => l.vehicle)
+          .toList();
+
+      final allVehicles = [...activeVehicles, ...opportunityVehicles];
+
+      if (allVehicles.isEmpty) {
+        // allVehicles.isEmpty olmalı
+        print("Buyer ${agent.name}: Market is empty.");
+        return false;
+      }
+
+      // Bütçeye uygun araçları filtrele (Max bütçe veya kullanıcı bakiyesi)
+      final double budgetLimit = agent.maxBudgetPerVehicle > 0
+          ? (agent.maxBudgetPerVehicle < currentBalance
+                ? agent.maxBudgetPerVehicle
+                : currentBalance)
+          : currentBalance;
+
+      final affordableVehicles = allVehicles
+          .where((v) => v.price <= budgetLimit)
+          .toList();
+
+      if (affordableVehicles.isEmpty) {
+        print(
+          "Buyer ${agent.name}: No affordable vehicles found (Budget: ${budgetLimit.toStringAsFixed(0)}).",
+        );
+        return false;
+      }
+
+      // Rastgele bir araç seç (İleride tercih edilen markaya göre de seçebilir)
+      final randomIndex =
+          DateTime.now().microsecond % affordableVehicles.length;
+      final vehicle = affordableVehicles[randomIndex];
+
+      // Fiyat Kontrolü
+      double basePrice = vehicle.price;
+      double discountMargin = result['discount_margin'] ?? 0.0;
+
+      // Pazarlık Yap (Fiyatı düşür)
+      double finalPrice = basePrice * (1.0 - discountMargin);
+
+      // Bakiye yetiyor mu? (Tekrar check, pazarlık sonrası)
+      if (currentBalance >= finalPrice) {
+        final db = DatabaseHelper();
+
+        // Satın Al
+        final purchasedVehicle = await db.buyVehicleForUser(
           userId,
+          vehicle,
+          finalPrice,
+          isOpportunity: true, // İstatistiklerde fırsat gibi görünsün
         );
-        if (success) loopSalesCount++;
-      }
-      // Diğer roller...
-    }
 
-    // --- Günlük Rapor (Snack Bar için) ---
-    if (hasSalesAgents) {
-      if (loopSalesCount > 0) {
-        _eventController.add(
-          'staff.daily_sales_success'.trParams({
-            'count': loopSalesCount.toString(),
-          }),
-        );
-      } else if (initialAvailableCount == 0) {
-        _eventController.add(
-          'staff.daily_sales_no_cars'.tr(
-            defaultValue: 'Temsilcileriniz var ama satacak araç yok!',
-          ),
-        );
+        if (purchasedVehicle != null) {
+          // İlanı marketten kaldır (Başkası alamasın)
+          // Hangi listede olduğunu bilemediğimiz için her ikisinden de silmeyi dene
+          marketService.removeListing(vehicle.id);
+          marketService.removeOpportunityListing(vehicle.id);
+
+          // Aktivite Kaydı
+          await ActivityService().logVehiclePurchase(userId, purchasedVehicle);
+
+          String logMsg =
+              "🚙 ${agent.name} bir araç satın aldı!\nAraç: ${vehicle.brand} ${vehicle.model}\nFiyat: -${finalPrice.toStringAsFixed(0)} TL (Piyasa: ${basePrice.toStringAsFixed(0)})";
+          print(logMsg);
+          return true;
+        }
       } else {
-        _eventController.add(
-          'staff.daily_sales_none'.tr(
-            defaultValue: 'Bugün hiç araç satışı olmadı.',
-          ),
-        );
+        // Bakiye yetmedi (Pazarlığa rağmen)
+        print("Buyer ${agent.name} found car but insufficient funds.");
       }
+    } else {
+      print(
+        "Buyer ${agent.name}: Search failed (Roll: $randomRoll > Chance: $adjustedChance)",
+      );
     }
+    return false;
   }
 
   Future<bool> _handleSalesAgentWork(
@@ -237,10 +316,9 @@ class StaffService {
   ) async {
     // Şans Faktörü: İkna kabiliyeti + Rastgelelik
     final double successChance = result['success_chance'] ?? 0.5;
-    // Satış ihtimalini biraz dengeleyelim
-    // User 5 game day beklediği halde satılmadığını belirtti.
-    // Çarpanı 0.5'e (İkna gücünün yarısı) çıkaralım.
-    final double adjustedChance = successChance * 0.5;
+    // Satış ihtimalini cezalandırmıyoruz, hatta bonus verebiliriz
+    // 0.5 çarpanını kaldırdık -> 1.0 (veya 1.1)
+    final double adjustedChance = successChance * 1.1;
     final double randomRoll = (DateTime.now().microsecond % 1000) / 1000.0;
 
     if (randomRoll < adjustedChance && availableVehicles.isNotEmpty) {
@@ -289,5 +367,35 @@ class StaffService {
       }
     }
     return false;
+  }
+
+  // Rastgele İsim Üreteci
+  String generateRandomName() {
+    final names = [
+      'Ahmet',
+      'Mehmet',
+      'Ayşe',
+      'Fatma',
+      'Ali',
+      'Zeynep',
+      'Can',
+      'Elif',
+      'Burak',
+      'Ceren',
+    ];
+    final surnames = [
+      'Yılmaz',
+      'Kaya',
+      'Demir',
+      'Çelik',
+      'Şahin',
+      'Yıldız',
+      'Öztürk',
+      'Arslan',
+      'Koç',
+    ];
+    names.shuffle();
+    surnames.shuffle();
+    return '${names.first} ${surnames.first}';
   }
 }

@@ -138,11 +138,16 @@ class _HomeScreenState extends State<HomeScreen>
     });
 
     // Personel Simülasyon Dinleyicisi (Global Bildirim)
-    final staffService = StaffService(); // Singleton
-    staffService.startSimulation(); // App açıldığında çalışmaya başlasın
+    final staffService = StaffService();
+    // Simülasyonu başlat (Real-Time loop)
+    staffService.startRealTimeLoop();
 
+    // Olayları dinle
     _staffEventSubscription = staffService.eventStream.listen((event) {
       if (mounted) {
+        // İlgisiz eventleri (progress güncellemeleri) yoksay
+        if (event.startsWith('staff_action_')) return;
+
         if (ModalRoute.of(context)?.isCurrent ?? false) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

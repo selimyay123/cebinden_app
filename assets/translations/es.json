@@ -147,7 +147,10 @@
     "hire_confirm_desc": "¿Deseas contratar a {name} por un salario diario de {salary}?",
     "staff_resigned": "¡Todo su personal ha dimitido por falta de saldo!",
     "hire_success": "¡{name} se unió al equipo!",
-    "fire_success": "Caminos separados con {name}."
+    "fire_success": "Caminos separados con {name}.",
+    "department_full": "¡Departamento lleno! (Máx: {limit})",
+    "no_personnel_in_dept": "No hay personal en este departamento.",
+    "market_knowledge": "Conocimiento del Mercado"
   },
   "home": {
     "title": "Panel de Control",

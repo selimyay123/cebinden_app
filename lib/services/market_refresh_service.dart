@@ -3409,6 +3409,62 @@ class MarketRefreshService {
   void removeOpportunityListing(String vehicleId) {
     _opportunityListings.removeWhere((l) => l.vehicle.id == vehicleId);
   }
+
+  // ===========================================================================
+  // AGENT İÇİN ARAÇ OLUŞTURMA (ON DEMAND)
+  // ===========================================================================
+
+  /// Satın alımcı personeli için rastgele bir araç oluşturur.
+  /// Bu araç listelere eklenmez, doğrudan döndürülür.
+  Vehicle generateRandomVehicleForAgent() {
+    // Rastgele marka/model seç
+    final brand = _brandSpawnRates.keys.elementAt(
+      _random.nextInt(_brandSpawnRates.length),
+    );
+    final models = _modelsByBrand[brand]!;
+    // Model yoksa (ki olmamalı) recursion yap veya varsayılan dön
+    if (models.isEmpty) return generateRandomVehicleForAgent();
+
+    final model = models[_random.nextInt(models.length)];
+
+    // Rastgele yıl (Son 15 yıl)
+    final year = 2010 + _random.nextInt(16); // 2010-2025
+
+    // Kilometre (Yıla göre mantıklı bir aralık)
+    final age = 2026 - year;
+    final mileage = (age * 10000) + _random.nextInt(50000);
+
+    // Rastgele özellikler
+    final color = _colors[_random.nextInt(_colors.length)];
+    final fuel = _fuelTypes[_random.nextInt(_fuelTypes.length)];
+    final transmission = _transmissions[_random.nextInt(_transmissions.length)];
+    final city = _cities[_random.nextInt(_cities.length)];
+
+    // Geçici araç oluştur (Fiyatı hesaplamak için)
+    final tempVehicle = Vehicle.create(
+      brand: brand,
+      model: model,
+      year: year,
+      mileage: mileage,
+      price: 1000000, // Geçici
+      location: city,
+      color: color,
+      fuelType: fuel,
+      transmission: transmission,
+      engineSize: '1.6', // Basitleştirildi, detaylı logic çok uzun
+      driveType: 'Önden',
+      description: 'Agent found this car',
+      bodyType: 'Sedan',
+      horsepower: 100,
+      sellerType: 'Sahibinden',
+    );
+
+    // Piyasa değerini hesapla
+    double marketValue = _calculateEstimatedMarketValue(tempVehicle);
+
+    // Fiyatı piyasa değerine eşitle (Pazarlık sonra yapılacak)
+    return tempVehicle.copyWith(price: marketValue);
+  }
 }
 
 /// Pazar ilanı wrapper
