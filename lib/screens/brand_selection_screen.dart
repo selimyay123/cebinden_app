@@ -559,7 +559,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
           onTap: () async {
             if (remainingUses <= 0) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                SnackBar(duration: const Duration(milliseconds: 1500), 
                   content: Row(
                     children: [
                       const Icon(Icons.info_outline, color: Colors.white),
@@ -633,7 +633,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
               } else {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    SnackBar(duration: const Duration(milliseconds: 1500), 
                       content: Row(
                         children: [
                           const Icon(Icons.search_off, color: Colors.white),
@@ -659,7 +659,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ).pop(); // Dialog'u kapat
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  SnackBar(duration: const Duration(milliseconds: 1500), 
                     content: Row(
                       children: [
                         const Icon(Icons.error_outline, color: Colors.white),

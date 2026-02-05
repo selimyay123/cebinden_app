@@ -72,7 +72,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
       await _loadData();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(
+          CustomSnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text('activity.cleared'.tr()),
             backgroundColor: Colors.green,
           ),

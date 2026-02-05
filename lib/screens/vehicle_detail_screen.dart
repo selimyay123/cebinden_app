@@ -35,10 +35,7 @@ import 'main_screen.dart';
 class VehicleDetailScreen extends StatefulWidget {
   final Vehicle vehicle;
 
-  const VehicleDetailScreen({
-    super.key,
-    required this.vehicle,
-  });
+  const VehicleDetailScreen({super.key, required this.vehicle});
 
   @override
   State<VehicleDetailScreen> createState() => _VehicleDetailScreenState();
@@ -67,10 +64,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   void initState() {
     super.initState();
     _vehicle = widget.vehicle;
-    _sellerProfile = SellerProfile.generateRandom(seed: widget.vehicle.id.hashCode);
+    _sellerProfile = SellerProfile.generateRandom(
+      seed: widget.vehicle.id.hashCode,
+    );
     _tabController = TabController(length: 2, vsync: this);
     _loadCurrentUser();
-    
+
     // Kullanıcı güncellemelerini dinle
     _userUpdateSubscription = _db.onUserUpdate.listen((_) {
       _loadCurrentUser();
@@ -102,7 +101,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     if (_isFavorite) {
       // Favoriden kaldır
-      final success = await _favoriteService.removeFavorite(_currentUser!.id, _vehicle.id);
+      final success = await _favoriteService.removeFavorite(
+        _currentUser!.id,
+        _vehicle.id,
+      );
       if (success) {
         setState(() {
           _isFavorite = false;
@@ -111,18 +113,23 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
               content: Text('favorites.removedFromFavorites'.tr()),
               backgroundColor: Colors.orange.withOpacity(0.8),
-              duration: const Duration(seconds: 2),
+              duration: const Duration(milliseconds: 1500),
             ),
           );
         }
       }
     } else {
       // Favorilere ekle
-      final success = await _favoriteService.addFavorite(_currentUser!.id, _vehicle);
+      final success = await _favoriteService.addFavorite(
+        _currentUser!.id,
+        _vehicle,
+      );
       if (success) {
         setState(() {
           _isFavorite = true;
@@ -137,7 +144,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               behavior: SnackBarBehavior.floating,
               content: Text('favorites.addedToFavorites'.tr()),
               backgroundColor: Colors.green.withOpacity(0.8),
-              duration: const Duration(seconds: 2),
+              duration: const Duration(milliseconds: 1500),
             ),
           );
         }
@@ -154,245 +161,265 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           children: [
             Scaffold(
               body: CustomScrollView(
-        slivers: [
-          // Resim ve AppBar
-          SliverAppBar(
-            expandedHeight: 300,
-            pinned: true,
-            backgroundColor: Colors.deepPurple,
-            actions: [
-
-              // Favori Butonu
-              if (_currentUser != null)
-                IconButton(
-                  icon: Icon(
-                    _isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: _isFavorite ? Colors.red : Colors.white,
-                  ),
-                  onPressed: _toggleFavorite,
-                  tooltip: _isFavorite 
-                      ? 'favorites.removeFromFavorites'.tr() 
-                      : 'favorites.addToFavorites'.tr(),
-                ),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                color: Colors.grey[300],
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // Araç Resmi veya Placeholder
-                    if (_vehicle.imageUrl != null && _vehicle.imageUrl!.isNotEmpty)
-                      Center(
-                        child: AspectRatio(
-                          aspectRatio: 120 / 140, // Liste ekranındaki gerçek oran (Container width: 120)
-                          child: VehicleImage(
-                            vehicle: _vehicle,
-                            fit: BoxFit.contain,
+                slivers: [
+                  // Resim ve AppBar
+                  SliverAppBar(
+                    expandedHeight: 300,
+                    pinned: true,
+                    backgroundColor: Colors.deepPurple,
+                    actions: [
+                      // Favori Butonu
+                      if (_currentUser != null)
+                        IconButton(
+                          icon: Icon(
+                            _isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: _isFavorite ? Colors.red : Colors.white,
                           ),
+                          onPressed: _toggleFavorite,
+                          tooltip: _isFavorite
+                              ? 'favorites.removeFromFavorites'.tr()
+                              : 'favorites.addToFavorites'.tr(),
                         ),
-                      )
-                    else
-                      Icon(
-                        Icons.directions_car,
-                        size: 120,
-                        color: Colors.grey[400],
-                      ),
-                    // Gradient overlay
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 80,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.7),
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // İçerik
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Başlık ve Fiyat
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  color: Colors.white,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                          const SizedBox(width: 4),
-                          Text(
-                            _vehicle.location,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ],
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Container(
+                        color: Colors.grey[300],
+                        child: Stack(
+                          fit: StackFit.expand,
                           children: [
-                            Text(
-                              'vehicles.price'.tr(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w500,
+                            // Araç Resmi veya Placeholder
+                            if (_vehicle.imageUrl != null &&
+                                _vehicle.imageUrl!.isNotEmpty)
+                              Center(
+                                child: AspectRatio(
+                                  aspectRatio:
+                                      120 /
+                                      140, // Liste ekranındaki gerçek oran (Container width: 120)
+                                  child: VehicleImage(
+                                    vehicle: _vehicle,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              )
+                            else
+                              Icon(
+                                Icons.directions_car,
+                                size: 120,
+                                color: Colors.grey[400],
                               ),
-                            ),
-                            Flexible(
-                              child: _buildPriceDisplay(),
+                            // Gradient overlay
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withOpacity(0.7),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 8),
+                  // İçerik
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Başlık ve Fiyat
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _vehicle.fullName.replaceAll(
+                                  'Serisi',
+                                  'vehicles.series'.tr(),
+                                ),
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _vehicle.location,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.deepPurple.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'vehicles.price'.tr(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Flexible(child: _buildPriceDisplay()),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
-                // Tab Bar
-                Container(
+                        const SizedBox(height: 8),
+
+                        // Tab Bar
+                        Container(
+                          color: Colors.white,
+                          child: TabBar(
+                            controller: _tabController,
+                            labelColor: Colors.deepPurple,
+                            unselectedLabelColor: Colors.grey,
+                            indicatorColor: Colors.deepPurple,
+                            indicatorWeight: 3,
+                            tabs: [
+                              Tab(text: 'vehicles.listingInfo'.tr()),
+                              Tab(text: 'vehicles.description'.tr()),
+                            ],
+                          ),
+                        ),
+
+                        // Tab Content - Dinamik yükseklik
+                        AnimatedBuilder(
+                          animation: _tabController,
+                          builder: (context, child) {
+                            return _tabController.index == 0
+                                ? _buildSpecificationsTab()
+                                : _buildDescriptionTab();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              bottomNavigationBar: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
                   color: Colors.white,
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: Colors.deepPurple,
-                    unselectedLabelColor: Colors.grey,
-                    indicatorColor: Colors.deepPurple,
-                    indicatorWeight: 3,
-                    tabs: [
-                      Tab(text: 'vehicles.listingInfo'.tr()),
-                      Tab(text: 'vehicles.description'.tr()),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Row(
+                    children: [
+                      // Teklif Ver Butonu
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _currentUser != null
+                              ? () => _showMakeOfferDialog()
+                              : null,
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            side: const BorderSide(
+                              color: Colors.deepPurple,
+                              width: 2,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'purchase.makeOffer'.tr(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Satın Al Butonu
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _currentUser != null
+                              ? () => _showPurchaseDialog()
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Colors.deepPurple,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'purchase.title'.tr(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
-
-                // Tab Content - Dinamik yükseklik
-                AnimatedBuilder(
-                  animation: _tabController,
-                  builder: (context, child) {
-                    return _tabController.index == 0
-                        ? _buildSpecificationsTab()
-                        : _buildDescriptionTab();
-                  },
+              ),
+            ),
+            // Loading Indicator
+            if (_isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(color: Colors.deepOrange),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
+              ),
           ],
-        ),
-        child: SafeArea(
-          child: Row(
-            children: [
-              // Teklif Ver Butonu
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _currentUser != null ? () => _showMakeOfferDialog() : null,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: Colors.deepPurple, width: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'purchase.makeOffer'.tr(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Satın Al Butonu
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _currentUser != null ? () => _showPurchaseDialog() : null,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'purchase.title'.tr(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-        ),
-        // Loading Indicator
-        if (_isLoading)
-          Container(
-            color: Colors.black.withOpacity(0.5),
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: Colors.deepOrange,
-              ),
-            ),
-          ),
-      ],
-    );
+        );
       },
     );
   }
@@ -411,8 +438,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     // Ekspertiz sonrası fiyat değişimi kontrolü
     // Eğer ekspertiz yapıldıysa ve fiyat düştüyse, eski fiyatı çizili göster
-    final bool priceDropped = _vehicle.isExpertiseDone && _vehicle.price < _vehicle.declaredPrice;
-    
+    final bool priceDropped =
+        _vehicle.isExpertiseDone && _vehicle.price < _vehicle.declaredPrice;
+
     // Yetenek indirimi
     // Yetenek indirimi
     final multiplier = 1.0;
@@ -450,7 +478,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.analytics_outlined, color: Colors.blueGrey, size: 20),
+                    const Icon(
+                      Icons.analytics_outlined,
+                      color: Colors.blueGrey,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'skills.marketInsider'.tr(),
@@ -505,7 +537,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           if (priceDropped)
             Text(
               'expertise.value'.tr(),
-              style: TextStyle(fontSize: 12, color: Colors.green[700], fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.green[700],
+                fontWeight: FontWeight.bold,
+              ),
             ),
           Text(
             '${_formatCurrency(_vehicle.price)} TL',
@@ -549,7 +585,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           if (priceDropped)
             Text(
               'expertise.value'.tr(),
-              style: TextStyle(fontSize: 12, color: Colors.green[700], fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.green[700],
+                fontWeight: FontWeight.bold,
+              ),
             ),
           Text(
             '${_formatCurrency(_vehicle.price)} TL',
@@ -570,126 +610,135 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final currentBalance = _currentUser!.balance;
     // Yetenek indirimi uygula
     final vehiclePrice = _vehicle.price;
-    
+
     final remainingBalance = currentBalance - vehiclePrice;
     final canAfford = remainingBalance >= 0;
 
-      showDialog(
-        context: context,
-        builder: (dialogContext) => ModernAlertDialog(
-          title: 'purchase.confirm'.tr(),
-          icon: canAfford ? Icons.info_outline : Icons.warning_amber,
-          iconColor: canAfford ? Colors.deepPurple : Colors.orange,
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${'common.dear'.tr()} ${_currentUser!.username},',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+    showDialog(
+      context: context,
+      builder: (dialogContext) => ModernAlertDialog(
+        title: 'purchase.confirm'.tr(),
+        icon: canAfford ? Icons.info_outline : Icons.warning_amber,
+        iconColor: canAfford ? Colors.deepPurple : Colors.orange,
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${'common.dear'.tr()} ${_currentUser!.username},',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
+              ),
+              const SizedBox(height: 16),
+              _buildInfoRow(
+                'purchase.vehicle'.tr(),
+                _vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr()),
+              ),
+              const Divider(),
+              _buildInfoRow(
+                'purchase.currentBalance'.tr(),
+                '${_formatCurrency(currentBalance)} ${_currentUser!.currency}',
+              ),
+              _buildInfoRow(
+                'purchase.vehiclePrice'.tr(),
+                '${_formatCurrency(vehiclePrice)} TL',
+                valueColor: Colors.red,
+              ),
+              const Divider(thickness: 2),
+              _buildInfoRow(
+                'purchase.remainingBalance'.tr(),
+                '${_formatCurrency(remainingBalance)} ${_currentUser!.currency}',
+                valueColor: canAfford ? Colors.green : Colors.red,
+                isBold: true,
+              ),
+              if (!canAfford) ...[
                 const SizedBox(height: 16),
-                _buildInfoRow('purchase.vehicle'.tr(), _vehicle.fullName.replaceAll('Serisi', 'vehicles.series'.tr())),
-                const Divider(),
-                _buildInfoRow(
-                  'purchase.currentBalance'.tr(),
-                  '${_formatCurrency(currentBalance)} ${_currentUser!.currency}',
-                ),
-                _buildInfoRow(
-                  'purchase.vehiclePrice'.tr(),
-                  '${_formatCurrency(vehiclePrice)} TL',
-                  valueColor: Colors.red,
-                ),
-                const Divider(thickness: 2),
-                _buildInfoRow(
-                  'purchase.remainingBalance'.tr(),
-                  '${_formatCurrency(remainingBalance)} ${_currentUser!.currency}',
-                  valueColor: canAfford ? Colors.green : Colors.red,
-                  isBold: true,
-                ),
-                if (!canAfford) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.warning, color: Colors.orange, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '${'purchase.insufficientBalance'.tr()} ${_formatCurrency(vehiclePrice - currentBalance)} ${_currentUser!.currency} ${'purchase.missing'.tr()}',
-                            style: const TextStyle(
-                              color: Colors.orange,
-                              fontSize: 13,
-                            ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning, color: Colors.orange, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${'purchase.insufficientBalance'.tr()} ${_formatCurrency(vehiclePrice - currentBalance)} ${_currentUser!.currency} ${'purchase.missing'.tr()}',
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontSize: 13,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(dialogContext); // Dialogu kapat
-                        Navigator.pop(context); // Detay sayfasını kapat (Outer context)
-                        ScreenRefreshService().requestTabChange(6); // Mağaza sayfasına git
-                      },
-                      icon: const Icon(Icons.store, size: 18),
-                      label: Text('myVehicles.goToStore'.tr()),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-                const SizedBox(height: 16),
-                Text(
-                  'purchase.confirmMessage'.tr(),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(dialogContext); // Dialogu kapat
+                      Navigator.pop(
+                        context,
+                      ); // Detay sayfasını kapat (Outer context)
+                      ScreenRefreshService().requestTabChange(
+                        6,
+                      ); // Mağaza sayfasına git
+                    },
+                    icon: const Icon(Icons.store, size: 18),
+                    label: Text('myVehicles.goToStore'.tr()),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
                 ),
               ],
-            ),
+              const SizedBox(height: 16),
+              Text(
+                'purchase.confirmMessage'.tr(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
-          buttonText: 'purchase.title'.tr(),
-          onPressed: canAfford
-              ? () {
-                  Navigator.pop(dialogContext);
-                  _processPurchase();
-                }
-              : () {}, // Disabled handled by logic inside content or logic here? ModernAlertDialog doesn't support disabled button yet.
-                       // Wait, ModernAlertDialog button is always enabled. I should probably add logic to ModernAlertDialog to support disabled state or just handle it here.
-                       // Since I can't easily change ModernAlertDialog signature again without updating all usages, I'll just keep it enabled but maybe show a snackbar or just do nothing if clicked when not affordable?
-                       // Actually, the original code had `onPressed: canAfford ? ... : null`. 
-                       // I will modify ModernAlertDialog to accept `onPressed: null` to disable button? No, `VoidCallback` is required.
-                       // I'll just pass a no-op function if not affordable, but the button will look enabled.
-                       // Better: I'll add a check inside the onPressed.
-          secondaryButtonText: 'common.cancel'.tr(),
-          onSecondaryPressed: () => Navigator.pop(dialogContext),
         ),
-      );
+        buttonText: 'purchase.title'.tr(),
+        onPressed: canAfford
+            ? () {
+                Navigator.pop(dialogContext);
+                _processPurchase();
+              }
+            : () {}, // Disabled handled by logic inside content or logic here? ModernAlertDialog doesn't support disabled button yet.
+        // Wait, ModernAlertDialog button is always enabled. I should probably add logic to ModernAlertDialog to support disabled state or just handle it here.
+        // Since I can't easily change ModernAlertDialog signature again without updating all usages, I'll just keep it enabled but maybe show a snackbar or just do nothing if clicked when not affordable?
+        // Actually, the original code had `onPressed: canAfford ? ... : null`.
+        // I will modify ModernAlertDialog to accept `onPressed: null` to disable button? No, `VoidCallback` is required.
+        // I'll just pass a no-op function if not affordable, but the button will look enabled.
+        // Better: I'll add a check inside the onPressed.
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(dialogContext),
+      ),
+    );
   }
 
   Future<void> _processPurchase() async {
     if (_currentUser == null) return;
 
     // Garaj limiti kontrolü
-    final currentVehicleCount = await _db.getUserVehicleCount(_currentUser!.id);
+    final currentVehicleCount = await _db.getUserPersonalVehicleCount(
+      _currentUser!.id,
+    );
     if (currentVehicleCount >= _currentUser!.garageLimit) {
       if (!mounted) return;
       showDialog(
@@ -716,7 +765,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           buttonText: 'myVehicles.goToStore'.tr(),
           onPressed: () {
             Navigator.pop(dialogContext); // Dialogu kapat
-            Navigator.pop(context); // Detay sayfasını kapat (Outer context kullan)
+            Navigator.pop(
+              context,
+            ); // Detay sayfasını kapat (Outer context kullan)
             // Mağaza sayfasına yönlendir (HomeScreen üzerinden)
             ScreenRefreshService().requestTabChange(6); // 6: Store Tab
           },
@@ -733,12 +784,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     try {
       // 1️⃣ Bakiyeyi düş (İndirimli fiyat)
       final finalPrice = _vehicle.price;
-      
+
       final newBalance = _currentUser!.balance - finalPrice;
-      final balanceUpdateSuccess = await _db.updateUser(
-        _currentUser!.id,
-        {'balance': newBalance},
-      );
+      final balanceUpdateSuccess = await _db.updateUser(_currentUser!.id, {
+        'balance': newBalance,
+      });
 
       if (!balanceUpdateSuccess) {
         throw Exception('errors.balanceUpdateFailed'.tr());
@@ -767,29 +817,29 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         bodyType: _vehicle.bodyType,
         horsepower: _vehicle.horsepower,
         imageUrl: _vehicle.imageUrl,
-        originalListingPrice: _vehicle.price, // 🆕 Orijinal ilan fiyatını kaydet
+        originalListingPrice:
+            _vehicle.price, // 🆕 Orijinal ilan fiyatını kaydet
       );
-      
+
       final vehicleAddSuccess = await _db.addUserVehicle(userVehicle);
-      
+
       // 4️⃣ İlanı kaldır (Marketten sil)
       _marketService.removeListing(_vehicle.id);
 
       if (!vehicleAddSuccess) {
         // Bakiyeyi geri yükle
-        await _db.updateUser(
-          _currentUser!.id,
-          {'balance': _currentUser!.balance},
-        );
+        await _db.updateUser(_currentUser!.id, {
+          'balance': _currentUser!.balance,
+        });
         throw Exception('errors.vehicleAddFailed'.tr());
       }
 
       // 4️⃣ Kullanıcıyı güncelle
       await _loadCurrentUser();
-      
+
       // 💎 XP Kazandır (Araç Satın Alma)
       final xpResult = await _xpService.onVehiclePurchase(_currentUser!.id);
-      
+
       // 5️⃣ Başarılı! Kutlama göster
       HapticFeedback.heavyImpact(); // Güçlü titreşim - satın alma anı
       // XP Animasyonu göster (confetti ile birlikte)
@@ -798,7 +848,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       }
 
       // 🎯 Günlük Görev Güncellemesi: Araç Satın Alma
-      await _questService.updateProgress(_currentUser!.id, QuestType.buyVehicle, 1, brand: _vehicle.brand);
+      await _questService.updateProgress(
+        _currentUser!.id,
+        QuestType.buyVehicle,
+        1,
+        brand: _vehicle.brand,
+      );
 
       // Aktivite kaydı
       await ActivityService().logVehiclePurchase(_currentUser!.id, userVehicle);
@@ -807,13 +862,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
       // Başarılı dialogu göster
       _showPurchaseSuccessDialog(_currentUser!.balance);
-
     } catch (e) {
       // ❌ Hata durumu
-      
-      
+
       if (!mounted) return;
-      
+
       showDialog(
         context: context,
         builder: (context) => ModernAlertDialog(
@@ -842,13 +895,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
-          ),
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           Text(
             value,
             style: TextStyle(
@@ -863,10 +910,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
   Widget _buildExpertiseCard() {
-    final bool hasIssues = _vehicle.isExpertiseDone && 
-        (_vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord || 
-         _vehicle.declaredMileage != _vehicle.mileage ||
-         _vehicle.declaredPartConditions.toString() != _vehicle.partConditions.toString());
+    final bool hasIssues =
+        _vehicle.isExpertiseDone &&
+        (_vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord ||
+            _vehicle.declaredMileage != _vehicle.mileage ||
+            _vehicle.declaredPartConditions.toString() !=
+                _vehicle.partConditions.toString());
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -880,7 +929,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             offset: const Offset(0, 2),
           ),
         ],
-        border: _vehicle.isExpertiseDone 
+        border: _vehicle.isExpertiseDone
             ? Border.all(color: hasIssues ? Colors.red : Colors.green, width: 2)
             : null,
       ),
@@ -893,19 +942,21 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               Row(
                 children: [
                   Icon(
-                    Icons.fact_check, 
-                    color: _vehicle.isExpertiseDone 
+                    Icons.fact_check,
+                    color: _vehicle.isExpertiseDone
                         ? (hasIssues ? Colors.red : Colors.green)
-                        : Colors.deepPurple, 
-                    size: 24
+                        : Colors.deepPurple,
+                    size: 24,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    _vehicle.isExpertiseDone ? 'expertise.reportTitle'.tr() : 'expertise.statusTitle'.tr(),
+                    _vehicle.isExpertiseDone
+                        ? 'expertise.reportTitle'.tr()
+                        : 'expertise.statusTitle'.tr(),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: _vehicle.isExpertiseDone 
+                      color: _vehicle.isExpertiseDone
                           ? (hasIssues ? Colors.red : Colors.green)
                           : Colors.black87,
                     ),
@@ -914,13 +965,20 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               ),
               if (_vehicle.isExpertiseDone)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: hasIssues ? Colors.red.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
+                    color: hasIssues
+                        ? Colors.red.withValues(alpha: 0.1)
+                        : Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    hasIssues ? 'expertise.issueFound'.tr() : 'expertise.clean'.tr(),
+                    hasIssues
+                        ? 'expertise.issueFound'.tr()
+                        : 'expertise.clean'.tr(),
                     style: TextStyle(
                       color: hasIssues ? Colors.red : Colors.green,
                       fontWeight: FontWeight.bold,
@@ -941,11 +999,24 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               width: double.infinity,
               child: Builder(
                 builder: (context) {
-                  final hasSkill = _currentUser != null && _skillService.getSkillLevel(_currentUser!, SkillService.skillExpertiseExpert) > 0;
-                  final remainingUses = _currentUser != null ? _skillService.getRemainingDailyUses(_currentUser!, SkillService.skillExpertiseExpert) : 0;
-                  final hasUnlimitedExpertise = _currentUser?.hasUnlimitedExpertise ?? false;
-                  final isFree = hasUnlimitedExpertise || (hasSkill && remainingUses > 0);
-                  
+                  final hasSkill =
+                      _currentUser != null &&
+                      _skillService.getSkillLevel(
+                            _currentUser!,
+                            SkillService.skillExpertiseExpert,
+                          ) >
+                          0;
+                  final remainingUses = _currentUser != null
+                      ? _skillService.getRemainingDailyUses(
+                          _currentUser!,
+                          SkillService.skillExpertiseExpert,
+                        )
+                      : 0;
+                  final hasUnlimitedExpertise =
+                      _currentUser?.hasUnlimitedExpertise ?? false;
+                  final isFree =
+                      hasUnlimitedExpertise || (hasSkill && remainingUses > 0);
+
                   // Calculate dynamic cost for display
                   double cost = 0.0;
                   if (!isFree) {
@@ -959,20 +1030,26 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   if (hasUnlimitedExpertise) {
                     buttonText = '${'skills.freeExpertise'.tr()} (VIP)';
                   } else if (isFree) {
-                    buttonText = '${'skills.freeExpertise'.tr()} ($remainingUses/3)';
+                    buttonText =
+                        '${'skills.freeExpertise'.tr()} ($remainingUses/3)';
                   } else {
-                    buttonText = '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)';
+                    buttonText =
+                        '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)';
                   }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: _currentUser != null ? () => _showExpertiseDialog(isFree: isFree) : null,
+                        onPressed: _currentUser != null
+                            ? () => _showExpertiseDialog(isFree: isFree)
+                            : null,
                         icon: Icon(isFree ? Icons.auto_awesome : Icons.search),
                         label: Text(buttonText),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isFree ? Colors.indigo : Colors.deepPurple,
+                          backgroundColor: isFree
+                              ? Colors.indigo
+                              : Colors.deepPurple,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
@@ -984,7 +1061,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             // Reklam yükleniyor mu kontrol et
                             if (!AdService().isAdReady) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('common.adNotReady'.tr())),
+                                SnackBar(
+                                  content: Text('common.adNotReady'.tr()),
+                                ),
                               );
                               // Reklam yüklemeyi dene
                               AdService().loadRewardedAd();
@@ -992,17 +1071,20 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             }
 
                             // Reklamı göster
-                            final rewardEarned = await AdService().showRewardedAd(
-                              onRewarded: (reward) {
-                                // Ödül kazanıldı, ücretsiz ekspertiz yap
-                                _performExpertise(0, isFree: true);
-                              },
-                            );
+                            final rewardEarned = await AdService()
+                                .showRewardedAd(
+                                  onRewarded: (reward) {
+                                    // Ödül kazanıldı, ücretsiz ekspertiz yap
+                                    _performExpertise(0, isFree: true);
+                                  },
+                                );
 
                             if (!rewardEarned) {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('common.adFailed'.tr())),
+                                  SnackBar(
+                                    content: Text('common.adFailed'.tr()),
+                                  ),
                                 );
                               }
                             }
@@ -1016,30 +1098,37 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       ],
                     ],
                   );
-                }
+                },
               ),
             ),
           ] else ...[
             // Rapor Detayları
             _buildExpertiseRow(
-              'expertise.accidentRecord'.tr(), 
-              _vehicle.declaredAccidentRecord ? 'expertise.exists'.tr() : 'expertise.none'.tr(),
-              _vehicle.hasAccidentRecord ? 'expertise.exists'.tr() : 'expertise.none'.tr(),
-              isIssue: _vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord
+              'expertise.accidentRecord'.tr(),
+              _vehicle.declaredAccidentRecord
+                  ? 'expertise.exists'.tr()
+                  : 'expertise.none'.tr(),
+              _vehicle.hasAccidentRecord
+                  ? 'expertise.exists'.tr()
+                  : 'expertise.none'.tr(),
+              isIssue:
+                  _vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord,
             ),
             const Divider(),
             _buildExpertiseRow(
-              'expertise.mileage'.tr(), 
+              'expertise.mileage'.tr(),
               '${_formatNumber(_vehicle.declaredMileage)} km',
               '${_formatNumber(_vehicle.mileage)} km',
-              isIssue: _vehicle.declaredMileage != _vehicle.mileage
+              isIssue: _vehicle.declaredMileage != _vehicle.mileage,
             ),
             const Divider(),
             _buildExpertiseRow(
-              'expertise.partsCondition'.tr(), 
+              'expertise.partsCondition'.tr(),
               _checkPartsStatus(_vehicle.declaredPartConditions),
               _checkPartsStatus(_vehicle.partConditions),
-              isIssue: _vehicle.declaredPartConditions.toString() != _vehicle.partConditions.toString()
+              isIssue:
+                  _vehicle.declaredPartConditions.toString() !=
+                  _vehicle.partConditions.toString(),
             ),
           ],
         ],
@@ -1053,25 +1142,45 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     return '$issueCount ${'expertise.partsIssue'.tr()}';
   }
 
-  Widget _buildExpertiseRow(String label, String declared, String real, {required bool isIssue}) {
+  Widget _buildExpertiseRow(
+    String label,
+    String declared,
+    String real, {
+    required bool isIssue,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           Expanded(
             flex: 2,
-            child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
           ),
           Expanded(
             flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${'expertise.declared'.tr()} $declared', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text(
+                  '${'expertise.declared'.tr()} $declared',
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
                 if (isIssue)
-                  Text('${'expertise.real'.tr()} $real', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+                  Text(
+                    '${'expertise.real'.tr()} $real',
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 else
-                  Text('expertise.verified'.tr(), style: const TextStyle(color: Colors.green, fontSize: 13)),
+                  Text(
+                    'expertise.verified'.tr(),
+                    style: const TextStyle(color: Colors.green, fontSize: 13),
+                  ),
               ],
             ),
           ),
@@ -1086,7 +1195,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
   Future<void> _showExpertiseDialog({bool isFree = false}) async {
     if (_currentUser == null) return;
-    
+
     if (_currentUser!.hasUnlimitedExpertise) {
       isFree = true;
     }
@@ -1096,10 +1205,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       // Dinamik ekspertiz ücreti: Araç fiyatının %0.5'i
       // Min: 5.000 TL, Max: 50.000 TL
       double calculatedFee = _vehicle.price * 0.005;
-      
+
       if (calculatedFee < 5000.0) calculatedFee = 5000.0;
       if (calculatedFee > 50000.0) calculatedFee = 50000.0;
-      
+
       // 50 TL'nin katlarına yuvarla
       cost = (calculatedFee / 50).ceil() * 50.0;
     }
@@ -1109,18 +1218,22 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     showDialog(
       context: context,
       builder: (context) => ModernAlertDialog(
-        title: isFree ? 'skills.freeExpertise'.tr() : 'expertise.dialogTitle'.tr(),
+        title: isFree
+            ? 'skills.freeExpertise'.tr()
+            : 'expertise.dialogTitle'.tr(),
         icon: isFree ? Icons.auto_awesome : Icons.fact_check,
         iconColor: isFree ? Colors.indigo : Colors.deepPurple,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(isFree 
-              ? (_currentUser!.hasUnlimitedExpertise 
-                  ? 'skills.unlimitedExpertiseDesc'.tr() 
-                  : 'skills.expertiseExpertDesc'.tr())
-              : 'expertise.dialogMessage'.tr()),
+            Text(
+              isFree
+                  ? (_currentUser!.hasUnlimitedExpertise
+                        ? 'skills.unlimitedExpertiseDesc'.tr()
+                        : 'skills.expertiseExpertDesc'.tr())
+                  : 'expertise.dialogMessage'.tr(),
+            ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1129,8 +1242,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Text(
                   isFree ? 'common.free'.tr() : '${_formatCurrency(cost)} TL',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold, 
-                    color: isFree ? Colors.green : Colors.red
+                    fontWeight: FontWeight.bold,
+                    color: isFree ? Colors.green : Colors.red,
                   ),
                 ),
               ],
@@ -1140,12 +1253,17 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
                   'expertise.insufficientBalance'.tr(),
-                  style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.red[700],
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
           ],
         ),
-        buttonText: isFree ? 'common.continue'.tr() : 'expertise.confirmAndPay'.tr(),
+        buttonText: isFree
+            ? 'common.continue'.tr()
+            : 'expertise.confirmAndPay'.tr(),
         onPressed: (canAfford || isFree)
             ? () {
                 Navigator.pop(context);
@@ -1161,7 +1279,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   Future<void> _performExpertise(double cost, {bool isFree = false}) async {
     // 1. Ödemeyi al veya kullanım kaydet
     if (isFree) {
-      await _skillService.recordSkillUsage(_currentUser!.id, SkillService.skillExpertiseExpert);
+      await _skillService.recordSkillUsage(
+        _currentUser!.id,
+        SkillService.skillExpertiseExpert,
+      );
     } else {
       final newBalance = _currentUser!.balance - cost;
       await _db.updateUser(_currentUser!.id, {'balance': newBalance});
@@ -1170,7 +1291,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     // 2. Animasyon göster
     if (!mounted) return;
-    
+
     bool isDialogShowing = true;
     showDialog(
       context: context,
@@ -1188,22 +1309,24 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         ),
       ),
     ).then((_) => isDialogShowing = false);
-  
+
     await Future.delayed(const Duration(seconds: 3)); // Animasyon süresi
-    
+
     if (!mounted) return;
-    
+
     // Sadece dialog hala açıksa kapat
     if (isDialogShowing) {
-      Navigator.of(context, rootNavigator: true).pop(); 
+      Navigator.of(context, rootNavigator: true).pop();
     }
 
     // 3. Gerçek değerleri hesapla ve güncelle
     // Eğer yalan varsa, fiyatı gerçek değerlere göre güncelle
     double newPrice = _vehicle.price;
-    bool hasLies = _vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord || 
-                   _vehicle.declaredMileage != _vehicle.mileage ||
-                   _vehicle.declaredPartConditions.toString() != _vehicle.partConditions.toString();
+    bool hasLies =
+        _vehicle.declaredAccidentRecord != _vehicle.hasAccidentRecord ||
+        _vehicle.declaredMileage != _vehicle.mileage ||
+        _vehicle.declaredPartConditions.toString() !=
+            _vehicle.partConditions.toString();
 
     if (hasLies) {
       newPrice = _marketService.generateRealisticPrice(
@@ -1227,17 +1350,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         // En az %5 indirim uygula
         newPrice = _vehicle.declaredPrice * 0.95;
       }
-      
+
       // Fiyatı güncelle
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text('expertise.issuesFoundMessage'.tr()),
             backgroundColor: Colors.red.withOpacity(0.8),
-            duration: const Duration(seconds: 4),
+            duration: const Duration(milliseconds: 1500),
           ),
         );
       }
@@ -1246,7 +1371,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             content: Text('expertise.cleanMessage'.tr()),
             backgroundColor: Colors.green.withOpacity(0.8),
@@ -1262,7 +1389,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         // declaredPrice değişmez, böylece referans olarak kalır
       );
     });
-    
+
     // Market servisindeki ilanı güncelle (Kalıcılık için)
     _marketService.updateListing(_vehicle);
   }
@@ -1280,9 +1407,18 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             title: 'vehicles.listingInfo'.tr(),
             icon: Icons.info_outline,
             children: [
-              _buildInfoRow('vehicles.listingNo'.tr(), '#${_vehicle.id.substring(0, 8).toUpperCase()}'),
-              _buildInfoRow('vehicles.listingDate'.tr(), _formatDate(_vehicle.listedAt)),
-              _buildInfoRow('vehicles.sellerType'.tr(), 'vehicles.${_vehicle.sellerType}'.tr()),
+              _buildInfoRow(
+                'vehicles.listingNo'.tr(),
+                '#${_vehicle.id.substring(0, 8).toUpperCase()}',
+              ),
+              _buildInfoRow(
+                'vehicles.listingDate'.tr(),
+                _formatDate(_vehicle.listedAt),
+              ),
+              _buildInfoRow(
+                'vehicles.sellerType'.tr(),
+                'vehicles.${_vehicle.sellerType}'.tr(),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -1293,7 +1429,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               _buildInfoRow('vehicles.brand'.tr(), _vehicle.brand),
               _buildInfoRow('vehicles.model'.tr(), _vehicle.model),
               _buildInfoRow('vehicles.year'.tr(), _vehicle.year.toString()),
-              _buildInfoRow('vehicles.condition'.tr(), 'vehicles.${_vehicle.condition}'.tr()),
+              _buildInfoRow(
+                'vehicles.condition'.tr(),
+                'vehicles.${_vehicle.condition}'.tr(),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -1301,15 +1440,39 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             title: 'vehicles.technicalSpecs'.tr(),
             icon: Icons.settings,
             children: [
-              _buildInfoRow('vehicles.bodyType'.tr(), 'vehicles.${_vehicle.bodyType.toLowerCase()}'.tr()),
-              _buildInfoRow('vehicles.engineSize'.tr(), '${_vehicle.engineSize} L'),
-              _buildInfoRow('vehicles.horsepower'.tr(), '${_vehicle.horsepower} HP'),
-              _buildInfoRow('vehicles.fuelType'.tr(), 'vehicles.${_vehicle.fuelType}'.tr()),
-              _buildInfoRow('vehicles.transmission'.tr(), 'vehicles.${_vehicle.transmission}'.tr()),
-              _buildInfoRow('vehicles.driveType'.tr(), 'vehicles.${_vehicle.driveType}'.tr()),
-              _buildInfoRow('vehicles.mileage'.tr(), '${_formatNumber(_vehicle.mileage)} km'),
+              _buildInfoRow(
+                'vehicles.bodyType'.tr(),
+                'vehicles.${_vehicle.bodyType.toLowerCase()}'.tr(),
+              ),
+              _buildInfoRow(
+                'vehicles.engineSize'.tr(),
+                '${_vehicle.engineSize} L',
+              ),
+              _buildInfoRow(
+                'vehicles.horsepower'.tr(),
+                '${_vehicle.horsepower} HP',
+              ),
+              _buildInfoRow(
+                'vehicles.fuelType'.tr(),
+                'vehicles.${_vehicle.fuelType}'.tr(),
+              ),
+              _buildInfoRow(
+                'vehicles.transmission'.tr(),
+                'vehicles.${_vehicle.transmission}'.tr(),
+              ),
+              _buildInfoRow(
+                'vehicles.driveType'.tr(),
+                'vehicles.${_vehicle.driveType}'.tr(),
+              ),
+              _buildInfoRow(
+                'vehicles.mileage'.tr(),
+                '${_formatNumber(_vehicle.mileage)} km',
+              ),
               if (_vehicle.color != 'Standart')
-                _buildInfoRow('vehicles.color'.tr(), 'vehicles.${_vehicle.color}'.tr()),
+                _buildInfoRow(
+                  'vehicles.color'.tr(),
+                  'vehicles.${_vehicle.color}'.tr(),
+                ),
             ],
           ),
           const SizedBox(height: 12),
@@ -1319,13 +1482,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             children: [
               _buildInfoRow(
                 'vehicles.warrantyStatus'.tr(),
-                _vehicle.hasWarranty ? '✅ ${'vehicles.available'.tr()}' : '❌ ${'vehicles.notAvailable'.tr()}',
+                _vehicle.hasWarranty
+                    ? '✅ ${'vehicles.available'.tr()}'
+                    : '❌ ${'vehicles.notAvailable'.tr()}',
                 valueColor: _vehicle.hasWarranty ? Colors.green : Colors.red,
               ),
               _buildInfoRow(
                 'vehicles.accidentRecord'.tr(),
-                _vehicle.hasAccidentRecord ? '⚠️ ${'vehicles.yes'.tr()}' : '✅ ${'vehicles.no'.tr()}',
-                valueColor: _vehicle.hasAccidentRecord ? Colors.red : Colors.green,
+                _vehicle.hasAccidentRecord
+                    ? '⚠️ ${'vehicles.yes'.tr()}'
+                    : '✅ ${'vehicles.no'.tr()}',
+                valueColor: _vehicle.hasAccidentRecord
+                    ? Colors.red
+                    : Colors.green,
               ),
             ],
           ),
@@ -1348,7 +1517,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               children: [
                 Row(
                   children: [
-                    Icon(Icons.build_circle, color: Colors.deepPurple, size: 20),
+                    Icon(
+                      Icons.build_circle,
+                      color: Colors.deepPurple,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'vehicles.paintedOrReplacedParts'.tr(),
@@ -1419,7 +1592,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 color: Colors.grey[800],
               ),
             ),
-
           ],
         ),
       ),
@@ -1469,10 +1641,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
   String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return amount
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 
   String _formatNumber(int number) {
@@ -1483,24 +1657,31 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('dd MMMM yyyy', LocalizationService().currentLanguage == 'tr' ? 'tr_TR' : 'en_US').format(date);
+    return DateFormat(
+      'dd MMMM yyyy',
+      LocalizationService().currentLanguage == 'tr' ? 'tr_TR' : 'en_US',
+    ).format(date);
   }
 
   /// Teklif verme dialogunu göster
   Future<void> _showMakeOfferDialog() async {
     final TextEditingController offerController = TextEditingController();
-    
+
     // 🆕 Initialize SellerProfile with deterministic seed
-    final sellerProfile = SellerProfile.generateRandom(seed: _vehicle.id.hashCode);
+    final sellerProfile = SellerProfile.generateRandom(
+      seed: _vehicle.id.hashCode,
+    );
     double acceptanceChance = 0.0;
 
     // Önceden reddedilmiş teklif var mı kontrol et
     if (_currentUser != null) {
       final previousOffers = await _db.getOffersByBuyerId(_currentUser!.id);
-      final rejectedOffer = previousOffers.where((o) => 
-        o.vehicleId == _vehicle.id && 
-        o.status == OfferStatus.rejected
-      ).firstOrNull;
+      final rejectedOffer = previousOffers
+          .where(
+            (o) =>
+                o.vehicleId == _vehicle.id && o.status == OfferStatus.rejected,
+          )
+          .firstOrNull;
 
       if (rejectedOffer != null) {
         // Reddedilmiş teklif varsa kullanıcıyı bilgilendir
@@ -1543,10 +1724,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   const SizedBox(height: 8),
                   Text(
                     '${'offer.listingPrice'.tr()}: ${_formatCurrency(_vehicle.price)} TL',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
+                    style: const TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -1572,11 +1750,16 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                        borderSide: const BorderSide(
+                          color: Colors.deepPurpleAccent,
+                        ),
                       ),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.1),
-                      prefixIcon: const Icon(Icons.attach_money, color: Colors.white70),
+                      prefixIcon: const Icon(
+                        Icons.attach_money,
+                        color: Colors.white70,
+                      ),
                     ),
                     onChanged: (value) {
                       if (value.isEmpty) {
@@ -1585,23 +1768,24 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         });
                         return;
                       }
-                      
-                      final offerAmount = double.tryParse(value.replaceAll('.', '')) ?? 0;
-                      
+
+                      final offerAmount =
+                          double.tryParse(value.replaceAll('.', '')) ?? 0;
+
                       // Calculate acceptance chance using SellerProfile
                       double chance = _sellerProfile.calculateAcceptanceChance(
-                        offerPrice: offerAmount, 
-                        listingPrice: _vehicle.price, 
-                        buyerUser: _currentUser
+                        offerPrice: offerAmount,
+                        listingPrice: _vehicle.price,
+                        buyerUser: _currentUser,
                       );
-                      
+
                       setState(() {
                         acceptanceChance = chance.clamp(0.0, 1.0);
                       });
                     },
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Kabul Edilme İhtimali Barı
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1609,13 +1793,24 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('offer.acceptanceChance'.tr(), style: const TextStyle(fontSize: 12, color: Colors.white70)),
-                          Text('%${(acceptanceChance * 100).toStringAsFixed(0)}', 
+                          Text(
+                            'offer.acceptanceChance'.tr(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          Text(
+                            '%${(acceptanceChance * 100).toStringAsFixed(0)}',
                             style: TextStyle(
-                              fontSize: 12, 
-                              fontWeight: FontWeight.bold, 
-                              color: acceptanceChance > 0.7 ? Colors.greenAccent : (acceptanceChance > 0.3 ? Colors.orangeAccent : Colors.redAccent)
-                            )
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: acceptanceChance > 0.7
+                                  ? Colors.greenAccent
+                                  : (acceptanceChance > 0.3
+                                        ? Colors.orangeAccent
+                                        : Colors.redAccent),
+                            ),
                           ),
                         ],
                       ),
@@ -1628,7 +1823,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             colors: [Colors.red, Colors.orange, Colors.green],
                             stops: [0.0, 0.5, 1.0],
                           ),
-                          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1,
+                          ),
                         ),
                         child: Stack(
                           clipBehavior: Clip.none,
@@ -1638,8 +1836,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOut,
                               alignment: Alignment(
-                                (acceptanceChance * 2) - 1, // Map 0.0..1.0 to -1.0..1.0
-                                0.0
+                                (acceptanceChance * 2) -
+                                    1, // Map 0.0..1.0 to -1.0..1.0
+                                0.0,
                               ),
                               child: Container(
                                 width: 20,
@@ -1648,8 +1847,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                   color: Colors.white,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: acceptanceChance > 0.7 ? Colors.green : (acceptanceChance > 0.3 ? Colors.orange : Colors.red),
-                                    width: 2
+                                    color: acceptanceChance > 0.7
+                                        ? Colors.green
+                                        : (acceptanceChance > 0.3
+                                              ? Colors.orange
+                                              : Colors.red),
+                                    width: 2,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
@@ -1676,7 +1879,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     elevation: 8,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     behavior: SnackBarBehavior.floating,
                     content: Text('offer.enterAmountError'.tr()),
                     backgroundColor: Colors.red.withOpacity(0.8),
@@ -1692,7 +1897,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     elevation: 8,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     behavior: SnackBarBehavior.floating,
                     content: Text('offer.invalidAmountError'.tr()),
                     backgroundColor: Colors.red.withOpacity(0.8),
@@ -1705,7 +1912,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     elevation: 8,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     behavior: SnackBarBehavior.floating,
                     content: Text('offer.offerTooHighError'.tr()),
                     backgroundColor: Colors.red.withOpacity(0.8),
@@ -1724,7 +1933,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       ),
     );
   }
-
 
   void _showConfirmOfferDialog(double offerAmount) {
     showDialog(
@@ -1830,13 +2038,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     try {
       // 10 saniye timeout ekle
-      final result = await _offerService.submitUserOffer(
-        userId: _currentUser!.id,
-        userName: _currentUser!.username,
-        vehicle: _vehicle,
-        offerPrice: offerAmount,
-        message: null,
-      ).timeout(const Duration(seconds: 10));
+      final result = await _offerService
+          .submitUserOffer(
+            userId: _currentUser!.id,
+            userName: _currentUser!.username,
+            vehicle: _vehicle,
+            offerPrice: offerAmount,
+            message: null,
+          )
+          .timeout(const Duration(seconds: 10));
 
       // Loading kapat
       if (mounted) {
@@ -1851,7 +2061,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             SnackBar(
               elevation: 6,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               backgroundColor: Colors.red.shade600,
               content: Row(
                 children: [
@@ -1860,7 +2072,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   Expanded(
                     child: Text(
                       result['error'] ?? 'Unknown error',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -1870,17 +2085,21 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         }
         return;
       }
-      
+
       // 💎 XP Kazandır (Teklif Gönderme)
       final xpResult = await _xpService.onOfferMade(_currentUser!.id);
       if (xpResult.hasGain && mounted) {
         // Sessiz XP (küçük miktar, animasyon gösterme)
         // _showXPGainAnimationOverlay(xpResult); // İsteğe bağlı
       }
-      
+
       // 🎯 Günlük Görev Güncellemesi: Teklif Gönderme
-      await _questService.updateProgress(_currentUser!.id, QuestType.makeOffer, 1);
-      
+      await _questService.updateProgress(
+        _currentUser!.id,
+        QuestType.makeOffer,
+        1,
+      );
+
       // Eğer teklif kabul edildiyse ekstra XP ve Satın Alma İşlemleri
       if (result['decision'] == 'accept') {
         final acceptXP = await _xpService.onOfferAccepted(_currentUser!.id);
@@ -1918,7 +2137,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           SnackBar(
             elevation: 6,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             backgroundColor: Colors.red.shade600,
             content: Row(
               children: [
@@ -1927,7 +2148,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Expanded(
                   child: Text(
                     e.toString(),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -1980,10 +2204,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                response,
-                style: const TextStyle(fontSize: 16),
-              ),
+              Text(response, style: const TextStyle(fontSize: 16)),
               if (counterOffer != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -2035,10 +2256,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     Expanded(
                       child: Text(
                         'offer.viewInMyOffers'.tr(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.blue[900],
-                        ),
+                        style: TextStyle(fontSize: 13, color: Colors.blue[900]),
                       ),
                     ),
                   ],
@@ -2051,7 +2269,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (decision == 'counter' && counterOffer != null && offer != null) ...[
+                if (decision == 'counter' &&
+                    counterOffer != null &&
+                    offer != null) ...[
                   // Accept Button
                   ElevatedButton(
                     onPressed: () {
@@ -2069,7 +2289,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     child: Text('offers.accept'.tr()),
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Reject Button (Instead of Close)
                   ElevatedButton(
                     onPressed: () {
@@ -2115,8 +2335,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     });
 
     try {
-      final result = await _offerService.acceptCounterOffer(offer).timeout(const Duration(seconds: 10));
-      
+      final result = await _offerService
+          .acceptCounterOffer(offer)
+          .timeout(const Duration(seconds: 10));
+
       // Loading kapat
       if (mounted) {
         setState(() {
@@ -2146,7 +2368,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             SnackBar(
               elevation: 6,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               backgroundColor: Colors.red.shade600,
               content: Row(
                 children: [
@@ -2155,7 +2379,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   Expanded(
                     child: Text(
                       result['error'] ?? 'common.error'.tr(),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -2171,13 +2398,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           _isLoading = false;
         });
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 6,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             backgroundColor: Colors.red.shade600,
             content: Row(
               children: [
@@ -2186,7 +2415,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Expanded(
                   child: Text(
                     'errors.errorWithDetail'.trParams({'detail': e.toString()}),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -2196,14 +2428,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       }
     }
   }
-  
+
   /// Satın alma animasyonunu oynat
   Future<void> _playPurchaseAnimation() async {
     if (!mounted) return;
-    
+
     // Dialog'u kapatmak için navigator'ı önceden al (Root navigator kullan)
     final navigator = Navigator.of(context, rootNavigator: true);
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -2215,8 +2447,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Dönen çekiç/tokmak animasyonu
-                Lottie.asset(
-                  'assets/animations/buy_car.json',
+              Lottie.asset(
+                'assets/animations/buy_car.json',
                 width: 300,
                 height: 300,
                 repeat: false, // Sadece 1 kez oynat
@@ -2231,7 +2463,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     await Future.delayed(const Duration(milliseconds: 2000));
 
     // Dialog'u kapat (mounted kontrolüne gerek yok çünkü navigator'ı capture ettik)
-    navigator.pop(); 
+    navigator.pop();
   }
 
   /// Satın alma başarılı dialogunu göster
@@ -2273,8 +2505,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(height: 110), // Space for the floating image
-                      
+                      const SizedBox(
+                        height: 110,
+                      ), // Space for the floating image
                       // Congratulations Title
                       Text(
                         'purchase.congratulations'.tr(),
@@ -2286,7 +2519,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // Vehicle Name
                       Text(
                         _vehicle.fullName,
@@ -2298,7 +2531,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         ),
                       ),
                       const SizedBox(height: 4),
-                      
+
                       // Successfully Purchased Text
                       Text(
                         'purchase.successfullyPurchased'.tr(),
@@ -2309,9 +2542,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Success Info Card
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -2327,7 +2560,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.stars, color: Colors.amber, size: 20),
+                                const Icon(
+                                  Icons.stars,
+                                  color: Colors.amber,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   '${'purchase.successMessage'.tr()}',
@@ -2351,9 +2588,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 32),
-                      
+
                       // Modern Gradient Button
                       Container(
                         width: double.infinity,
@@ -2375,8 +2612,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context); // Dialogu kapat (Root navigator)
-                            screenNavigator.pop(true); // Ekranı kapat (Tab navigator)
+                            Navigator.pop(
+                              context,
+                            ); // Dialogu kapat (Root navigator)
+                            screenNavigator.pop(
+                              true,
+                            ); // Ekranı kapat (Tab navigator)
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -2400,7 +2641,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 ),
               ),
             ),
-            
+
             // Floating Vehicle Image or Icon
             Positioned(
               top: 24,
@@ -2426,14 +2667,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
   // ========== XP SİSTEMİ METODLARI ==========
-  
+
   /// XP kazanım animasyonu göster (overlay)
   void _showXPGainAnimationOverlay(XPGainResult result) {
     if (result.xpGained <= 0 || !mounted) return;
-    
+
     final overlay = Overlay.of(context);
     late OverlayEntry entry;
-    
+
     entry = OverlayEntry(
       builder: (context) => Positioned(
         top: MediaQuery.of(context).padding.top + 10, // AppBar hizası
@@ -2466,7 +2707,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       ),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.deepPurple, Colors.deepPurple.shade300],
+                          colors: [
+                            Colors.deepPurple,
+                            Colors.deepPurple.shade300,
+                          ],
                         ),
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
@@ -2505,30 +2749,25 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         ),
       ),
     );
-    
+
     overlay.insert(entry);
   }
-  
+
   /// Seviye atlama dialogu göster
   Future<void> _showLevelUpDialog(XPGainResult result) async {
     if (!mounted || result.rewards == null) return;
-    
+
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => LevelUpDialog(
-        reward: result.rewards!,
-      ),
+      builder: (context) => LevelUpDialog(reward: result.rewards!),
     );
 
     // Dialog kapandıktan sonra reklam göster
     await AdService().showInterstitialAd(force: true);
   }
 
-
-
   /// Karşı teklif gönderme dialogunu göster
-
 
   /// Karşı teklifi reddet
   Future<void> _handleRejectCounterOffer(Offer offer) async {
@@ -2539,7 +2778,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
     try {
       final success = await _offerService.rejectCounterOffer(offer);
-      
+
       // Loading kapat
       if (mounted) {
         setState(() {
@@ -2553,7 +2792,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             SnackBar(
               elevation: 6,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               backgroundColor: Colors.orange.shade600,
               content: Row(
                 children: [
@@ -2562,7 +2803,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   Expanded(
                     child: Text(
                       'offer.rejected'.tr(),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -2576,7 +2820,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             SnackBar(
               elevation: 6,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               backgroundColor: Colors.red.shade600,
               content: Row(
                 children: [
@@ -2585,7 +2831,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   Expanded(
                     child: Text(
                       'common.error'.tr(),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -2601,13 +2850,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           _isLoading = false;
         });
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 6,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             backgroundColor: Colors.red.shade600,
             content: Row(
               children: [
@@ -2616,7 +2867,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 Expanded(
                   child: Text(
                     e.toString(),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -2626,7 +2880,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       }
     }
   }
-
 }
 
 /// Binlik ayracı ekleyen TextInputFormatter
@@ -2644,7 +2897,7 @@ class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
 
     // Sadece sayıları al
     final numericValue = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     if (numericValue.isEmpty) {
       return newValue.copyWith(text: '');
     }
@@ -2660,4 +2913,3 @@ class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
     );
   }
 }
-

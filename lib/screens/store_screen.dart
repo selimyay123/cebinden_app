@@ -45,7 +45,7 @@ class _StoreScreenState extends State<StoreScreen> {
   void _handlePurchaseEvent(String event) {
     if (event == 'success') {
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
+        CustomSnackBar(duration: const Duration(milliseconds: 1500), 
           content: Text('store.purchaseSuccess'.tr()),
           backgroundColor: Colors.green,
         ),
@@ -56,7 +56,7 @@ class _StoreScreenState extends State<StoreScreen> {
       final errorMessage = _getLocalizedErrorMessage(rawError);
       
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
+        CustomSnackBar(duration: const Duration(milliseconds: 1500), 
           content: Text(errorMessage),
           backgroundColor: Colors.red,
         ),
@@ -64,7 +64,7 @@ class _StoreScreenState extends State<StoreScreen> {
     } else if (event.startsWith('info:')) {
       final infoMessage = event.substring(6); // 'info: ' length
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
+        CustomSnackBar(duration: const Duration(milliseconds: 1500), 
           content: Text(infoMessage),
           backgroundColor: Colors.blue,
         ),
@@ -131,7 +131,7 @@ class _StoreScreenState extends State<StoreScreen> {
                     await _loadCurrentUser();
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        CustomSnackBar(content: const Text('VIP Status Reset!')),
+                        CustomSnackBar(duration: const Duration(milliseconds: 1500), content: const Text('VIP Status Reset!')),
                       );
                     }
                   },
@@ -404,7 +404,7 @@ class _StoreScreenState extends State<StoreScreen> {
           } else {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar(
+              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('store.insufficientGold'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -791,7 +791,7 @@ class _StoreScreenState extends State<StoreScreen> {
           } else {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar(
+              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('store.insufficientGold'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -1141,7 +1141,7 @@ class _StoreScreenState extends State<StoreScreen> {
             
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                CustomSnackBar(
+                CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                   content: Text('store.garageExpandSuccess'.tr()),
                   backgroundColor: Colors.green,
                 ),
@@ -1150,7 +1150,7 @@ class _StoreScreenState extends State<StoreScreen> {
           } else {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar(
+              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('store.insufficientGold'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -1310,7 +1310,7 @@ class _StoreScreenState extends State<StoreScreen> {
           } else {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar(
+              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('store.insufficientGold'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -1490,7 +1490,7 @@ class _StoreScreenState extends State<StoreScreen> {
           } else {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar(
+              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('store.insufficientGold'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -1844,7 +1844,7 @@ class _StoreScreenState extends State<StoreScreen> {
                           
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              CustomSnackBar(
+                              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                                 content: Text('store.purchaseSuccess'.tr()),
                                 backgroundColor: Colors.green,
                               ),
@@ -2146,7 +2146,7 @@ class _StoreScreenState extends State<StoreScreen> {
           } else {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              CustomSnackBar(
+              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('store.insufficientGold'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -2301,7 +2301,7 @@ class _StoreScreenState extends State<StoreScreen> {
   Future<void> _purchasePP(String name) async {
     if (_currentUser!.gold < 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(content: Text('store.animatedPP.insufficientGold'.tr()), backgroundColor: Colors.red),
+        CustomSnackBar(duration: const Duration(milliseconds: 1500), content: Text('store.animatedPP.insufficientGold'.tr()), backgroundColor: Colors.red),
       );
       return;
     }
@@ -2346,7 +2346,7 @@ class _StoreScreenState extends State<StoreScreen> {
       await _loadCurrentUser();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(content: Text('store.animatedPP.purchaseSuccess'.tr()), backgroundColor: Colors.green),
+          CustomSnackBar(duration: const Duration(milliseconds: 1500), content: Text('store.animatedPP.purchaseSuccess'.tr()), backgroundColor: Colors.green),
         );
       }
     }
@@ -2360,7 +2360,7 @@ class _StoreScreenState extends State<StoreScreen> {
     await _loadCurrentUser();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(content: Text('store.animatedPP.activationSuccess'.tr()), backgroundColor: Colors.green),
+        CustomSnackBar(duration: const Duration(milliseconds: 1500), content: Text('store.animatedPP.activationSuccess'.tr()), backgroundColor: Colors.green),
       );
     }
   }

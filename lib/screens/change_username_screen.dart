@@ -139,7 +139,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        SnackBar(duration: const Duration(milliseconds: 1500), 
           elevation: 8,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

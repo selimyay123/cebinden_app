@@ -339,7 +339,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
     // Bakiye kontrolü
     if (_currentUser!.balance < vehicle.price) {
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
+        CustomSnackBar(duration: const Duration(milliseconds: 1500), 
           content: Text('purchase.insufficientBalance'.tr()),
           backgroundColor: Colors.red,
         ),
@@ -351,7 +351,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
     final activeVehicles = await _db.getUserActiveVehicles(_currentUser!.id);
     if (activeVehicles.length >= _currentUser!.garageLimit) {
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(
+        CustomSnackBar(duration: const Duration(milliseconds: 1500), 
           content: Text('errors.garageFull'.tr()),
           backgroundColor: Colors.red,
         ),
@@ -383,7 +383,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       // 4. Başarı mesajı ve yenileme
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(
+          CustomSnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text('purchase.purchaseSuccess'.tr()),
             backgroundColor: Colors.green,
           ),
@@ -394,7 +394,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(
+          CustomSnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text('Hata oluştu: $e'),
             backgroundColor: Colors.red,
           ),

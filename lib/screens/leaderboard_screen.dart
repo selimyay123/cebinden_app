@@ -267,7 +267,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       await FriendService().sendFriendRequest(_currentUser!.id, toUserId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          SnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text('drawer.social.requestSent'.tr()),
             backgroundColor: Colors.green,
           ),
@@ -276,7 +276,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          SnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text('Hata: $e'), // "Request already sent" or "Already friends"
             backgroundColor: Colors.orange,
           ),
@@ -298,7 +298,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     if (hasReported) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(
+          CustomSnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text('report.alreadyReported'.tr()),
             backgroundColor: Colors.orange,
           ),
@@ -417,14 +417,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         if (mounted) {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              CustomSnackBar(
+                              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                                 content: Text('report.success'.tr()),
                                 backgroundColor: Colors.green,
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              CustomSnackBar(
+                              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
                                 content: Text('report.error'.tr()),
                                 backgroundColor: Colors.red,
                               ),

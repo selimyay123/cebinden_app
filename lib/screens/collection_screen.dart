@@ -362,7 +362,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 4),
+        duration: const Duration(milliseconds: 1500),
       ),
     );
   }

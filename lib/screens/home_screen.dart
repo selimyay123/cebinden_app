@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen>
             SnackBar(
               content: Text(event),
               backgroundColor: Colors.green[700],
-              duration: const Duration(seconds: 3),
+              duration: const Duration(milliseconds: 1500),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -369,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen>
               behavior: SnackBarBehavior.floating,
               content: Text('ads.notReady'.tr()),
               backgroundColor: Colors.orange.withValues(alpha: 0.8),
-              duration: const Duration(seconds: 2),
+              duration: const Duration(milliseconds: 1500),
             ),
           );
           // Yeni reklam yükle
@@ -2364,7 +2364,7 @@ class _HomeScreenState extends State<HomeScreen>
           behavior: SnackBarBehavior.floating,
           content: Text('home.galleryInsufficientFunds'.tr()),
           backgroundColor: Colors.red.withValues(alpha: 0.8),
-          duration: const Duration(seconds: 3),
+          duration: const Duration(milliseconds: 1500),
         ),
       );
       return;

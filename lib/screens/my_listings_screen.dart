@@ -563,7 +563,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                         await _loadFavoriteListings();
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            SnackBar(duration: const Duration(milliseconds: 1500), 
                               elevation: 8,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               behavior: SnackBarBehavior.floating,
@@ -932,7 +932,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
           
           if (success && mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              SnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('sell.listingUpdated'.tr()),
                 backgroundColor: Colors.green,
               ),
@@ -940,7 +940,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             _loadUserListedVehicles(); // Listeyi yenile
           } else if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              SnackBar(duration: const Duration(milliseconds: 1500), 
                 content: Text('sell.listingUpdateFailed'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -976,7 +976,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
 
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                SnackBar(duration: const Duration(milliseconds: 1500), 
                   content: Text('sell.listingRemoved'.tr()),
                   backgroundColor: Colors.green,
                 ),

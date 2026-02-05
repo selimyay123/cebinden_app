@@ -168,7 +168,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       final success = await _adminService.dismissReport(reportId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          SnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text(success ? 'admin.reportDismissed'.tr() : 'admin.error'.tr()),
             backgroundColor: success ? Colors.grey : Colors.red,
           ),
@@ -213,7 +213,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          SnackBar(duration: const Duration(milliseconds: 1500), 
             content: Text(success ? 'admin.userBanned'.tr() : 'admin.error'.tr()),
             backgroundColor: success ? Colors.green : Colors.red,
           ),

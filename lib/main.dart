@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'services/notification_service.dart';
 import 'screens/resource_download_screen.dart';
 import 'services/database_helper.dart';
 import 'services/favorite_service.dart';
@@ -11,13 +13,26 @@ import 'services/ad_service.dart';
 import 'services/game_time_service.dart';
 import 'services/market_refresh_service.dart';
 import 'services/offer_service.dart';
+import 'services/staff_service.dart';
 import 'utils/route_observer.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase'i initialize et
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Arka plan bildirimlerini dinle
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Bildirim servisini başlat (Kanal oluşturma vb.)
+  await NotificationService().initialize();
 
   // Hive database'i initialize et
   await DatabaseHelper.init();
@@ -42,6 +57,9 @@ void main() async {
 
   // Günlük teklif sistemini başlat
   await OfferService().initialize();
+
+  // Personel servisini başlat
+  await StaffService().init();
 
   runApp(const CebindenApp());
 }

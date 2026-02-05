@@ -6,6 +6,7 @@ import '../models/user_vehicle_model.dart';
 import '../models/offer_model.dart';
 import '../models/notification_model.dart';
 import '../models/activity_model.dart';
+import '../models/staff_model.dart';
 
 import 'leaderboard_service.dart';
 import 'cloud_service.dart';
@@ -26,6 +27,7 @@ class DatabaseHelper {
   static const String favoritesBox = 'favorites'; // Favori ilanlar
   static const String dailyQuestsBox = 'daily_quests'; // Günlük görevler
   static const String missionsBox = 'missions'; // Başarımlar/Görevler
+  static const String staffBox = 'staff'; // Personel
 
   // Initialize Hive
   static Future<void> init() async {
@@ -40,7 +42,8 @@ class DatabaseHelper {
     final favoritesBoxInstance = await Hive.openBox<Map>(favoritesBox);
     final dailyQuestsBoxInstance = await Hive.openBox<Map>(dailyQuestsBox);
     final activitiesBoxInstance = await Hive.openBox<Map>(activitiesBox);
-    final missionsBoxInstance = await Hive.openBox<Map>(missionsBox);
+    await Hive.openBox<Map>(missionsBox);
+    await Hive.openBox<Map>(staffBox);
 
     // Debug: Tüm kullanıcıları listele
     if (usersBoxInstance.isNotEmpty) {
@@ -359,6 +362,7 @@ class DatabaseHelper {
     Vehicle vehicle,
     double purchasePrice, {
     bool isOpportunity = false,
+    bool isStaffPurchased = false,
   }) async {
     try {
       // 1. UserVehicle oluştur
@@ -366,6 +370,7 @@ class DatabaseHelper {
         vehicle,
         userId,
         purchasePrice: purchasePrice,
+        isStaffPurchased: isStaffPurchased,
       );
 
       // 2. Aracı ekle
@@ -539,11 +544,31 @@ class DatabaseHelper {
     }
   }
 
-  // Kullanıcının araç sayısını getir
+  // Kullanıcının araç sayısını getir (Toplam - Eski metod)
   Future<int> getUserVehicleCount(String userId) async {
     try {
       final vehicles = await getUserActiveVehicles(userId);
       return vehicles.length;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Kullanıcının ŞAHSİ (Manuel) araç sayısını getir
+  Future<int> getUserPersonalVehicleCount(String userId) async {
+    try {
+      final vehicles = await getUserActiveVehicles(userId);
+      return vehicles.where((v) => v.isStaffPurchased != true).length;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Kullanıcının PERSONEL (Otomatik) araç sayısını getir
+  Future<int> getUserStaffVehicleCount(String userId) async {
+    try {
+      final vehicles = await getUserActiveVehicles(userId);
+      return vehicles.where((v) => v.isStaffPurchased == true).length;
     } catch (e) {
       return 0;
     }
@@ -1157,6 +1182,19 @@ class DatabaseHelper {
       final activityMap = Map<dynamic, dynamic>.from(activity.toJson());
       await _activitiesBox.put(activity.id, activityMap);
       await _activitiesBox.flush();
+
+      // Limit kontrolü (En fazla 50 aktivite)
+      final userActivities = await getUserActivities(activity.userId);
+      if (userActivities.length > 50) {
+        // getUserActivities zaten tarihe göre sıralı (yeni en üstte)
+        // 50. indexten sonrasını sil (en eskiler)
+        final activitiesToDelete = userActivities.sublist(50);
+        for (var act in activitiesToDelete) {
+          await _activitiesBox.delete(act.id);
+        }
+        await _activitiesBox.flush();
+      }
+
       return true;
     } catch (e) {
       return false;
@@ -1208,6 +1246,58 @@ class DatabaseHelper {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  // ============================================================================
+  // STAFF (Personeller)
+  // ============================================================================
+
+  // Staff box'ını al
+  Box<Map> get _staffBox => Hive.box<Map>(staffBox);
+
+  // Personel ekle
+  Future<bool> addStaff(Staff staff) async {
+    try {
+      final staffMap = Map<dynamic, dynamic>.from(staff.toJson());
+      await _staffBox.put(staff.id, staffMap);
+      await _staffBox.flush();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Personel sil
+  Future<bool> removeStaff(String staffId) async {
+    try {
+      await _staffBox.delete(staffId);
+      await _staffBox.flush();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Tüm personelleri getir
+  Future<List<Staff>> getAllStaff() async {
+    try {
+      final allStaff = _staffBox.values;
+      final staffList = <Staff>[];
+
+      for (var staffMap in allStaff) {
+        final map = Map<String, dynamic>.from(staffMap);
+        // Role göre doğru sınıfı oluştur
+        if (map['role'] == StaffRole.buyer.toString()) {
+          staffList.add(BuyerAgent.fromJson(map));
+        } else if (map['role'] == StaffRole.sales.toString()) {
+          staffList.add(SalesAgent.fromJson(map));
+        }
+      }
+
+      return staffList;
+    } catch (e) {
+      return [];
     }
   }
 }

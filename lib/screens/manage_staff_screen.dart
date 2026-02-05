@@ -49,7 +49,7 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
             SnackBar(
               content: Text(event),
               backgroundColor: Colors.green[700],
-              duration: const Duration(seconds: 3),
+              duration: const Duration(milliseconds: 1500),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -370,6 +370,32 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
                 ),
 
                 // İŞLEM İLERLEME ÇUBUĞU
+                // Sözleşme Durumu
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.date_range, color: Colors.white70, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        'staff.contract_remaining'.trParams({
+                          'days':
+                              (StaffService.CONTRACT_DURATION_DAYS -
+                                      DateTime.now()
+                                          .difference(staff.hiredDate)
+                                          .inDays)
+                                  .toString(),
+                        }),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -620,14 +646,19 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
 
   void _handleCategorySelect(StaffRole role) {
     final roleCount = _staff.where((s) => s.role == role).length;
-    final limit = role == StaffRole.sales ? 3 : 5;
+    final limit = (role == StaffRole.sales || role == StaffRole.buyer) ? 2 : 5;
     if (roleCount >= limit) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        SnackBar(duration: const Duration(milliseconds: 1500), 
           content: Text(
             'staff.department_full'.trParams({'limit': limit.toString()}),
+            style: const TextStyle(color: Colors.white),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
       return;

@@ -12,22 +12,38 @@ class StaffService {
   factory StaffService() => _instance;
   StaffService._internal();
 
+  static const int CONTRACT_DURATION_DAYS = 3; // 3 Günlük Sözleşme
+
   // Geçici olarak bellek içi liste (İleride DB'ye taşınacak)
   List<Staff> _myStaff = [];
-  // Simülasyonun aktif olup olmadığını takip eder
 
+  // Simülasyonun aktif olup olmadığını takip eder
   List<Staff> get myStaff => _myStaff;
+
+  Future<void> init() async {
+    _myStaff = await DatabaseHelper().getAllStaff();
+  }
 
   // Personel İşe Al
   Future<bool> hireStaff(Staff staff) async {
+    // Limit Kontrolü
+    if (staff.role == StaffRole.sales || staff.role == StaffRole.buyer) {
+      final count = _myStaff.where((s) => s.role == staff.role).length;
+      if (count >= 2) {
+        return false;
+      }
+    }
+
     // TODO: Bakiye kontrolü ve DB işlemi
     _myStaff.add(staff);
+    await DatabaseHelper().addStaff(staff);
     return true;
   }
 
   // Personel Kov
   Future<bool> fireStaff(String staffId) async {
     _myStaff.removeWhere((s) => s.id == staffId);
+    await DatabaseHelper().removeStaff(staffId);
     return true;
   }
 
@@ -72,10 +88,12 @@ class StaffService {
     if (userMap == null) return;
     final String userId = userMap['id'];
 
-    // Maaş ödemesi (Basitlik için hala günlük veya işlem başı olabilir ama şimdilik pas geçiyoruz)
-    // Gerçek zamanlıda maaş belki dakikalık düşebilir ama şimdilik karmaşıklık katmayalım.
+    // 1. Sözleşme Süresi Kontrolü
+    _checkExpiredContracts();
 
-    for (var staff in _myStaff) {
+    // 2. Aktivite Kontrolü
+    for (var staff in List<Staff>.from(_myStaff)) {
+      // List.from ile kopya üzerinde dönüyoruz çünkü işlem sırasında silinebilir
       final now = DateTime.now();
       final difference = now.difference(staff.lastActionTime).inSeconds;
 
@@ -95,6 +113,24 @@ class StaffService {
     }
   }
 
+  // Süresi dolan personelleri kontrol et ve çıkar
+  void _checkExpiredContracts() {
+    final now = DateTime.now();
+    final expiredStaff = _myStaff.where((s) {
+      final daysWorked = now.difference(s.hiredDate).inDays;
+      return daysWorked >= CONTRACT_DURATION_DAYS;
+    }).toList();
+
+    for (var staff in expiredStaff) {
+      fireStaff(staff.id); // Otomatik işten çıkar
+      _eventController.add(
+        'staff.contract_expired'.trParams({'name': staff.name}),
+      );
+      // Opsiyonel: Bildirim veya Aktivite geçmişine ekle
+      // _activityService.log... (Şimdilik sadece snackbar/event ile yetinelim)
+    }
+  }
+
   Future<void> _processSalesAgent(
     SalesAgent agent,
     String userId,
@@ -103,7 +139,8 @@ class StaffService {
     // Satılabilir araçları getir
     List<dynamic> allVehicles = await db.getUserVehicles(userId);
     List<dynamic> availableVehicles = allVehicles.where((v) {
-      return !v.isListedForSale && !v.isSold;
+      // Sadece satılık olmayan, satılmamış ve PERSONEL tarafından alınmış araçları satabilir
+      return !v.isListedForSale && !v.isSold && (v.isStaffPurchased == true);
     }).toList();
 
     if (availableVehicles.isEmpty) return; // Satacak araç yok
@@ -129,7 +166,7 @@ class StaffService {
     DatabaseHelper db,
     Map<String, dynamic> userMap,
   ) async {
-    final int currentVehicleCount = await db.getUserVehicleCount(userId);
+    final int currentVehicleCount = await db.getUserStaffVehicleCount(userId);
     final int garageLimit = (userMap['garageLimit'] as num? ?? 10).toInt();
 
     if (currentVehicleCount >= garageLimit) {
@@ -163,8 +200,8 @@ class StaffService {
       String name = generateRandomName();
       double baseSalary = 0;
 
-      // Rastgele Skill (0.5 - 0.95) - Daha yüksek yetenek
-      double skill = 0.5 + (DateTime.now().microsecond % 45) / 100.0;
+      // Rastgele Skill (0.30 - 0.70) - Maks %70
+      double skill = 0.30 + (DateTime.now().microsecond % 41) / 100.0;
 
       // Rastgele Speed (10s - 30s arası interval) - Çok daha hızlı
       // Speed multiplier: 2.0 (yavaş) - 6.0 (hızlı)
@@ -280,6 +317,7 @@ class StaffService {
           vehicle,
           finalPrice,
           isOpportunity: true, // İstatistiklerde fırsat gibi görünsün
+          isStaffPurchased: true, // Staff tarafından alındı
         );
 
         if (purchasedVehicle != null) {

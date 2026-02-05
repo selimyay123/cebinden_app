@@ -127,7 +127,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             behavior: SnackBarBehavior.floating,
             content: Text('sell.listingSuccess'.tr()),
             backgroundColor: Colors.green.withOpacity(0.8),
-            duration: const Duration(seconds: 2),
+            duration: const Duration(milliseconds: 1500),
           ),
         );
         Navigator.pop(context, true); // Başarılı olduğunu bildir

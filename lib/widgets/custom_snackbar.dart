@@ -5,18 +5,16 @@ class CustomSnackBar extends SnackBar {
     Key? key,
     required Widget content,
     Color? backgroundColor,
-    Duration duration = const Duration(seconds: 3),
+    Duration duration = const Duration(milliseconds: 1500),
     SnackBarAction? action,
   }) : super(
-          key: key,
-          content: content,
-          backgroundColor: (backgroundColor ?? Colors.black).withOpacity(0.8),
-          elevation: 8,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          behavior: SnackBarBehavior.floating,
-          duration: duration,
-          action: action,
-        );
+         key: key,
+         content: content,
+         backgroundColor: (backgroundColor ?? Colors.black).withOpacity(0.8),
+         elevation: 8,
+         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+         behavior: SnackBarBehavior.floating,
+         duration: duration,
+         action: action,
+       );
 }

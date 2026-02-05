@@ -37,7 +37,9 @@
     "title": "Market"
   },
   "garage": {
-    "title": "Garage"
+    "title": "Garage",
+    "tab_personal": "Personal",
+    "tab_commercial": "Commercial"
   },
   "common": {
     "yes": "Yes",
@@ -153,7 +155,8 @@
     "fire_success": "Parted ways with {name}.",
     "department_full": "Department is full! (Max: {limit})",
     "no_personnel_in_dept": "No personnel in this department.",
-    "market_knowledge": "Market Knowledge"
+    "market_knowledge": "Market Knowledge",
+    "single_staff_limit_error": "You can only have one employee in this role. Please dismiss the existing one first."
   },
   "home": {
     "title": "Dashboard",
@@ -1218,6 +1221,8 @@
     "sellVehicle": "Sell",
     "vehicleDetailComingSoon": "Vehicle detail page coming soon...",
     "sellFeatureComingSoon": "Sell vehicle feature coming soon...",
+    "tab_personal": "Personal",
+    "tab_commercial": "Commercial",
     "vehicleLimit": "Vehicle Limit",
     "vehicle": "vehicle"
   },

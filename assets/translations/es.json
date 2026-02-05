@@ -35,7 +35,9 @@
     "title": "Mercado"
   },
   "garage": {
-    "title": "Garaje"
+    "title": "Garaje",
+    "tab_personal": "Personal",
+    "tab_commercial": "Comercial"
   },
   "common": {
     "yes": "Sí",
@@ -150,7 +152,8 @@
     "fire_success": "Caminos separados con {name}.",
     "department_full": "¡Departamento lleno! (Máx: {limit})",
     "no_personnel_in_dept": "No hay personal en este departamento.",
-    "market_knowledge": "Conocimiento del Mercado"
+    "market_knowledge": "Conocimiento del Mercado",
+    "single_staff_limit_error": "Solo puede tener un empleado en este puesto. Por favor, despida al empleado actual primero."
   },
   "home": {
     "title": "Panel de Control",

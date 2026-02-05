@@ -23,13 +23,13 @@ class UserVehicle {
   final int score; // İlan skoru (Vehicle'dan alınır, arka plan)
   final String bodyType; // Kasa tipi
   final int horsepower; // Motor gücü
-  
+
   // Satışa çıkarma bilgileri
   final bool isListedForSale; // Araç satışa çıkarılmış mı?
   final double? listingPrice; // İlan fiyatı
   final String? listingDescription; // İlan açıklaması
   final DateTime? listedDate; // Satışa çıkarıldığı tarih
-  
+
   // Kiralama bilgisi
   final bool isRented; // Araç kirada mı?
 
@@ -38,11 +38,15 @@ class UserVehicle {
   final double? salePrice;
   final DateTime? saleDate;
 
-  final double? originalListingPrice; // Satın alındığındaki ilan fiyatı (Kâr limiti hesabı için)
-  
+  final double?
+  originalListingPrice; // Satın alındığındaki ilan fiyatı (Kâr limiti hesabı için)
+
   // Manuel kiralama geliri toplama
-  final double pendingRentalIncome; // Toplanmayı bekleyen kira geliri
-  final bool canCollectRentalIncome; // Gelir toplanabilir mi? (Gün bittiğinde true olur)
+  final double pendingRentalIncome;
+  final bool canCollectRentalIncome;
+
+  // Staff Garage Integration
+  final bool isStaffPurchased; // Personel tarafından mı alındı?
 
   UserVehicle({
     required this.id,
@@ -76,6 +80,7 @@ class UserVehicle {
     this.originalListingPrice,
     this.pendingRentalIncome = 0.0,
     this.canCollectRentalIncome = false,
+    this.isStaffPurchased = false,
   });
 
   // Factory constructor: Yeni araç satın alma
@@ -99,6 +104,7 @@ class UserVehicle {
     required int horsepower,
     String? imageUrl,
     double? originalListingPrice,
+    bool isStaffPurchased = false,
   }) {
     return UserVehicle(
       id: const Uuid().v4(),
@@ -124,6 +130,7 @@ class UserVehicle {
       originalListingPrice: originalListingPrice,
       pendingRentalIncome: 0.0,
       canCollectRentalIncome: false,
+      isStaffPurchased: isStaffPurchased,
     );
   }
 
@@ -132,6 +139,7 @@ class UserVehicle {
     dynamic vehicle, // Vehicle tipinde ama import sorunu olmasın diye dynamic
     String userId, {
     required double purchasePrice,
+    bool isStaffPurchased = false,
   }) {
     return UserVehicle(
       id: const Uuid().v4(),
@@ -157,6 +165,7 @@ class UserVehicle {
       originalListingPrice: null,
       pendingRentalIncome: 0.0,
       canCollectRentalIncome: false,
+      isStaffPurchased: isStaffPurchased,
     );
   }
 
@@ -184,16 +193,29 @@ class UserVehicle {
       bodyType: json['bodyType'] as String? ?? 'Sedan',
       horsepower: json['horsepower'] as int? ?? 100,
       isListedForSale: json['isListedForSale'] as bool? ?? false,
-      listingPrice: json['listingPrice'] != null ? (json['listingPrice'] as num).toDouble() : null,
+      listingPrice: json['listingPrice'] != null
+          ? (json['listingPrice'] as num).toDouble()
+          : null,
       listingDescription: json['listingDescription'] as String?,
-      listedDate: json['listedDate'] != null ? DateTime.parse(json['listedDate'] as String) : null,
+      listedDate: json['listedDate'] != null
+          ? DateTime.parse(json['listedDate'] as String)
+          : null,
       isRented: json['isRented'] as bool? ?? false,
       isSold: json['isSold'] as bool? ?? false,
-      salePrice: json['salePrice'] != null ? (json['salePrice'] as num).toDouble() : null,
-      saleDate: json['saleDate'] != null ? DateTime.parse(json['saleDate'] as String) : null,
-      originalListingPrice: json['originalListingPrice'] != null ? (json['originalListingPrice'] as num).toDouble() : null,
-      pendingRentalIncome: json['pendingRentalIncome'] != null ? (json['pendingRentalIncome'] as num).toDouble() : 0.0,
+      salePrice: json['salePrice'] != null
+          ? (json['salePrice'] as num).toDouble()
+          : null,
+      saleDate: json['saleDate'] != null
+          ? DateTime.parse(json['saleDate'] as String)
+          : null,
+      originalListingPrice: json['originalListingPrice'] != null
+          ? (json['originalListingPrice'] as num).toDouble()
+          : null,
+      pendingRentalIncome: json['pendingRentalIncome'] != null
+          ? (json['pendingRentalIncome'] as num).toDouble()
+          : 0.0,
       canCollectRentalIncome: json['canCollectRentalIncome'] as bool? ?? false,
+      isStaffPurchased: json['isStaffPurchased'] as bool? ?? false,
     );
   }
 
@@ -229,6 +251,7 @@ class UserVehicle {
       'originalListingPrice': originalListingPrice,
       'pendingRentalIncome': pendingRentalIncome,
       'canCollectRentalIncome': canCollectRentalIncome,
+      'isStaffPurchased': isStaffPurchased,
     };
   }
 
@@ -297,6 +320,7 @@ class UserVehicle {
       originalListingPrice: originalListingPrice,
       pendingRentalIncome: pendingRentalIncome,
       canCollectRentalIncome: canCollectRentalIncome,
+      isStaffPurchased: isStaffPurchased,
     );
   }
 
@@ -337,13 +361,12 @@ class UserVehicle {
       originalListingPrice: originalListingPrice,
       pendingRentalIncome: pendingRentalIncome,
       canCollectRentalIncome: canCollectRentalIncome,
+      isStaffPurchased: isStaffPurchased,
     );
   }
 
   // Kiralama durumu değişikliği için kopyalama
-  UserVehicle copyWithRent({
-    required bool isRented,
-  }) {
+  UserVehicle copyWithRent({required bool isRented}) {
     return UserVehicle(
       id: id,
       userId: userId,
@@ -376,6 +399,7 @@ class UserVehicle {
       originalListingPrice: originalListingPrice,
       pendingRentalIncome: pendingRentalIncome,
       canCollectRentalIncome: canCollectRentalIncome,
+      isStaffPurchased: isStaffPurchased,
     );
   }
 
@@ -412,6 +436,7 @@ class UserVehicle {
     double? originalListingPrice,
     double? pendingRentalIncome,
     bool? canCollectRentalIncome,
+    bool? isStaffPurchased,
   }) {
     return UserVehicle(
       id: id ?? this.id,
@@ -444,8 +469,9 @@ class UserVehicle {
       saleDate: saleDate ?? this.saleDate,
       originalListingPrice: originalListingPrice ?? this.originalListingPrice,
       pendingRentalIncome: pendingRentalIncome ?? this.pendingRentalIncome,
-      canCollectRentalIncome: canCollectRentalIncome ?? this.canCollectRentalIncome,
+      canCollectRentalIncome:
+          canCollectRentalIncome ?? this.canCollectRentalIncome,
+      isStaffPurchased: isStaffPurchased ?? this.isStaffPurchased,
     );
   }
 }
-

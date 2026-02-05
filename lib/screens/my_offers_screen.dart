@@ -2320,7 +2320,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               behavior: SnackBarBehavior.floating,
               content: Text('✅ ${'offer.rejectSuccess'.tr()}'),
               backgroundColor: Colors.green.withOpacity(0.8),
-              duration: const Duration(seconds: 3),
+              duration: const Duration(milliseconds: 1500),
             ),
           );
 

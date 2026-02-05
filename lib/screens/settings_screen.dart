@@ -168,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> with LocalizationMixin,
           behavior: SnackBarBehavior.floating,
           content: Text('settings.languageChanged'.tr()),
           backgroundColor: Colors.green.withOpacity(0.8),
-          duration: const Duration(seconds: 2),
+          duration: const Duration(milliseconds: 1500),
         ),
       );
       

@@ -37,7 +37,9 @@
     "title": "Market"
   },
   "garage": {
-    "title": "Garaj"
+    "title": "Garaj",
+    "tab_personal": "Şahsi",
+    "tab_commercial": "Ticari"
   },
   "common": {
     "yes": "Evet",
@@ -141,6 +143,9 @@
   "staff": {
     "title": "Personel Yönetimi",
     "manage_staff": "Personel Yönetimi",
+    "contract_expired": "{name} adlı personelin sözleşmesi bittiği için ayrıldı.",
+    "contract_remaining": "Sözleşme: {days} Gün Kaldı",
+    "hire_success": "{name} işe alındı!",
     "empty_title": "Henüz Personeliniz Yok",
     "empty_desc": "İşlerinizi otomatikleştirmek ve gelirinizi artırmak için profesyonel bir ekip kurun.",
     "hire_button": "Personel İşe Al",
@@ -174,7 +179,8 @@
     "fire_success": "{name} ile yollar ayrıldı.",
     "department_full": "Departman dolu! (Maks: {limit})",
     "no_personnel_in_dept": "Bu departmanda personel yok.",
-    "market_knowledge": "Piyasa Bilgisi"
+    "market_knowledge": "Piyasa Bilgisi",
+    "single_staff_limit_error": "Bu pozisyonda sadece tek bir çalışanınız olabilir. Lütfen önce mevcut çalışanı işten çıkarın."
   },
   "home": {
     "title": "Dashboard",
@@ -1222,6 +1228,8 @@
     "sellVehicle": "Sat",
     "vehicleDetailComingSoon": "Araç detay sayfası yakında...",
     "sellFeatureComingSoon": "Araç satış özelliği yakında...",
+    "tab_personal": "Şahsi",
+    "tab_commercial": "Ticari",
     "vehicleLimit": "Araç Limiti",
     "vehicle": "araç"
   },

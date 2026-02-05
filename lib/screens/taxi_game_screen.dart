@@ -342,7 +342,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                             
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                SnackBar(duration: const Duration(milliseconds: 1500), 
                                   elevation: 8,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   behavior: SnackBarBehavior.floating,
@@ -356,7 +356,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                           },
                           onAdNotReady: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              SnackBar(duration: const Duration(milliseconds: 1500), 
                                 elevation: 8,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 behavior: SnackBarBehavior.floating,
