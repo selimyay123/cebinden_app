@@ -12,6 +12,7 @@ abstract class Staff {
 
   DateTime lastActionTime; // Son işlem zamanı
   int actionIntervalSeconds; // Kaç saniyede bir işlem yapacağı
+  bool isPaused; // Çalışmayı durdurdu mu?
 
   Staff({
     required this.id,
@@ -23,6 +24,7 @@ abstract class Staff {
     required this.hiredDate,
     DateTime? lastActionTime,
     this.actionIntervalSeconds = 60,
+    this.isPaused = false,
   }) : lastActionTime = lastActionTime ?? DateTime.now();
 
   // Her personel çalışır ama farklı iş yapar

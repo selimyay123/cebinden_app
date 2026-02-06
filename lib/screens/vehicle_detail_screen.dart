@@ -1031,7 +1031,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     buttonText = '${'skills.freeExpertise'.tr()} (VIP)';
                   } else if (isFree) {
                     buttonText =
-                        '${'skills.freeExpertise'.tr()} ($remainingUses/3)';
+                        '${'skills.freeExpertise'.tr()} ($remainingUses/${SkillService.skillDefinitions[SkillService.skillExpertiseExpert]!['dailyLimit']})';
                   } else {
                     buttonText =
                         '${'expertise.performActionNoPrice'.tr()} (${_formatCurrency(cost)} TL)';

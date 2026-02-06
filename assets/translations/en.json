@@ -47,6 +47,7 @@
     "ok": "OK",
     "pleaseWait": "Please wait...",
     "cancel": "Cancel",
+    "add": "Add",
     "confirm": "Confirm",
     "userNotFound": "User not found",
     "save": "Save",
@@ -77,7 +78,10 @@
     "attention": "Attention!",
     "retry": "Retry",
     "remaining": "remaining",
-    "free": "FREE"
+    "free": "FREE",
+    "money_suffix_m": "M",
+    "money_suffix_b": "B",
+    "money_prefix_less_than": "<"
   },
   "errors": {
     "balanceUpdateFailed": "Balance could not be updated",
@@ -126,7 +130,15 @@
     "empty_desc": "Build a professional team to automate your business and increase your income.",
     "hire_button": "Hire Staff",
     "hire_category_title": "Select Department",
-    "hire_category_desc": "Which department are you hiring for?",
+    "hire_category_desc": "Select the department for new staff",
+    "pause_work": "Pause Work",
+    "resume_work": "Resume Work",
+    "pause_confirm_title": "Pause Work?",
+    "resume_confirm_title": "Resume Work?",
+    "pause_confirm_desc": "Do you want to pause {name}'s operations? Contract time will continue.",
+    "resume_confirm_desc": "Do you want to resume {name}'s operations?",
+    "pause_success": "{name} paused.",
+    "resume_success": "{name} resumed.",
     "cat_buyer": "Buyer",
     "cat_sales": "Sales Representative",
     "cat_tech": "Technical",
@@ -828,7 +840,7 @@
     "availablePoints": "Skill Point",
     "activeSkills": "Active Skills",
     "quickBuy": "Quick Buy",
-    "quickBuyDesc": "Allows you to instantly find and view details of vehicles within a specific score range. Higher levels unlock higher score vehicles.",
+    "quickBuyDesc": "Allows you to instantly find and view details of vehicles within a specific score range. Can be used 1 time per game day. Higher levels unlock higher score vehicles.",
     "quickSell": "Quick Sell",
     "quickSellDesc": "Allows you to instantly sell your owned vehicles with a profit margin. Profit rate increases as level increases.",
     "quickSellProfit": "Profit: {percent}",
@@ -839,7 +851,7 @@
     "lowballerDesc": "Increases the probability of sellers accepting your offer during negotiation when buying a vehicle.",
     "lowballerBonus": "Acceptance Chance: +{percent}",
     "expertiseExpert": "Expertise Expert",
-    "expertiseExpertDesc": "Allows you to perform 3 free expertises every game day.",
+    "expertiseExpertDesc": "Allows you to perform 1 free expertise every game day.",
     "upgradeConfirmationTitle": "Upgrade Confirmation",
     "upgradeConfirmationMessage": "Are you sure you want to upgrade {skill} for {cost} SP?",
     "watchAd": "Free Expertise (Watch Ad)",
@@ -978,6 +990,7 @@
       "title": "Social",
       "friends": "Friends",
       "requests": "Requests",
+      "addFriendConfirm": "Do you want to add user {0} as a friend?",
       "search": "Search",
       "searchHint": "Search username...",
       "removeFriend": "Remove Friend",
@@ -2185,5 +2198,44 @@
   },
   "permissions": {
     "tracking_description": "This permission is required to provide you with more interesting ads."
+  },
+  "social": {
+    "chat": {
+      "title": "Chat",
+      "quick_message": "Quick Message",
+      "send": "Send",
+      "category": {
+        "greeting": "Greeting",
+        "business": "Business",
+        "cars": "Cars",
+        "reactions": "Reactions"
+      },
+      "msg": {
+        "hello": "Hello! 👋",
+        "how_are_you": "How are you doing?",
+        "good_morning": "Good morning! ☀️",
+        "good_evening": "Good evening! 🌙",
+        "good_work": "Good luck with business! 🤝",
+        "business_is_good": "Market is busy today! 💸",
+        "hard_market": "Market is slow, looking for deals.",
+        "sold_car": "Just sold a great car! 🚗",
+        "nice_car": "Your car looks amazing! 🔥",
+        "lets_race": "Wanna race when you're free? 🏎️",
+        "garage_looks_great": "Your garage looks solid! 💪",
+        "dream_car": "That's my dream car... 😍",
+        "congrats": "Congrats!",
+        "wow": "Wow! 🤯",
+        "thanks": "Thanks! 🙏",
+        "good_luck": "Good luck! 🍀",
+        "thumbs_up": "Great! 👍",
+        "fire": "Looking fire! 🔥"
+      }
+    },
+    "interaction": {
+      "respect": "Show Respect",
+      "respect_sent": "Respect sent! 🫡",
+      "already_respected": "Enough respect for today. Come back tomorrow! ⏳",
+      "respect_count": "Respect Points"
+    }
   }
 }

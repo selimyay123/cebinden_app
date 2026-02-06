@@ -47,6 +47,28 @@ class StaffService {
     return true;
   }
 
+  // Personel Durdur/Başlat
+  Future<void> toggleStaffPause(String staffId) async {
+    final staffIndex = _myStaff.indexWhere((s) => s.id == staffId);
+    if (staffIndex == -1) return;
+
+    final staff = _myStaff[staffIndex];
+    staff.isPaused = !staff.isPaused;
+
+    // DB Güncelle
+    await DatabaseHelper().addStaff(staff); // Upsert
+
+    // UI Güncelle
+    _eventController.add('staff_update_${staff.id}');
+
+    // Mesaj hazırla
+    final msg = staff.isPaused
+        ? 'staff.pause_success'.trParams({'name': staff.name})
+        : 'staff.resume_success'.trParams({'name': staff.name});
+
+    _eventController.add(msg);
+  }
+
   // Günlük Maaşları Hesapla
   double calculateDailyWages() {
     double total = 0;
@@ -95,6 +117,10 @@ class StaffService {
     for (var staff in List<Staff>.from(_myStaff)) {
       // List.from ile kopya üzerinde dönüyoruz çünkü işlem sırasında silinebilir
       final now = DateTime.now();
+
+      // Eğer personel duraklatıldıysa işlem yapma (Sadece contract süresi işler)
+      if (staff.isPaused) continue;
+
       final difference = now.difference(staff.lastActionTime).inSeconds;
 
       // Süre dolduysa işlem yap
@@ -166,7 +192,7 @@ class StaffService {
     DatabaseHelper db,
     Map<String, dynamic> userMap,
   ) async {
-    final int currentVehicleCount = await db.getUserStaffVehicleCount(userId);
+    final int currentVehicleCount = await db.getUserVehicleCount(userId);
     final int garageLimit = (userMap['garageLimit'] as num? ?? 10).toInt();
 
     if (currentVehicleCount >= garageLimit) {

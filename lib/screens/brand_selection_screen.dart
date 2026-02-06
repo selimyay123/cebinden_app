@@ -559,7 +559,8 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
           onTap: () async {
             if (remainingUses <= 0) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(duration: const Duration(milliseconds: 1500), 
+                SnackBar(
+                  duration: const Duration(milliseconds: 1500),
                   content: Row(
                     children: [
                       const Icon(Icons.info_outline, color: Colors.white),
@@ -633,7 +634,8 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
               } else {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(duration: const Duration(milliseconds: 1500), 
+                    SnackBar(
+                      duration: const Duration(milliseconds: 1500),
                       content: Row(
                         children: [
                           const Icon(Icons.search_off, color: Colors.white),
@@ -659,7 +661,8 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 ).pop(); // Dialog'u kapat
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(duration: const Duration(milliseconds: 1500), 
+                  SnackBar(
+                    duration: const Duration(milliseconds: 1500),
                     content: Row(
                       children: [
                         const Icon(Icons.error_outline, color: Colors.white),
@@ -710,7 +713,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '$remainingUses/3',
+                    '$remainingUses/${SkillService.skillDefinitions[SkillService.skillQuickBuy]!['dailyLimit']}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

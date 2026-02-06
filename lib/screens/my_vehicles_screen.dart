@@ -121,7 +121,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
     return ValueListenableBuilder<String>(
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
-        if (!_hasStaff) {
+        if (!_hasStaff && _commercialVehicles.isEmpty) {
           return _buildScaffold(
             context: context,
             title: widget.selectedBrand != null
@@ -1385,7 +1385,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
 
     if (remainingUses <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(duration: const Duration(milliseconds: 1500), 
+        SnackBar(
+          duration: const Duration(milliseconds: 1500),
           content: Row(
             children: [
               const Icon(Icons.error_outline, color: Colors.white),
@@ -1537,9 +1538,12 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
         setState(() => _currentUser = updatedUser);
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(duration: const Duration(milliseconds: 1500), content: Text('Hata: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(milliseconds: 1500),
+          content: Text('Hata: $e'),
+        ),
+      );
     } finally {
       setState(() => _isLoading = false);
     }

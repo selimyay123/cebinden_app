@@ -26,7 +26,7 @@ class SkillService {
     skillQuickBuy: {
       'maxLevel': 3,
       'costs': [1, 2, 3], // Seviye 1, 2, 3 maliyetleri
-      'dailyLimit': 3,
+      'dailyLimit': 1,
     },
     skillQuickSell: {
       'maxLevel': 3,
@@ -44,7 +44,7 @@ class SkillService {
     skillExpertiseExpert: {
       'maxLevel': 1,
       'costs': [1],
-      'dailyLimit': 3,
+      'dailyLimit': 1,
     },
     skillTimeMaster: {
       'maxLevel': 1,
@@ -93,7 +93,8 @@ class SkillService {
     if (currentLevel >= maxLevel) return false;
 
     final costs = def['costs'] as List<int>;
-    final cost = costs[currentLevel]; // currentLevel 0 ise index 0 (1. seviye maliyeti)
+    final cost =
+        costs[currentLevel]; // currentLevel 0 ise index 0 (1. seviye maliyeti)
 
     if (user.skillPoints < cost) return false;
 
@@ -120,7 +121,7 @@ class SkillService {
     if (def == null) return false;
 
     final dailyLimit = def['dailyLimit'] as int;
-    
+
     // Gün kontrolü
     if (user.lastSkillUseDay != _gameTime.currentDay) {
       return true; // Farklı gün (yeni veya resetlenmiş), limit sıfırlandı
@@ -183,7 +184,7 @@ class SkillService {
     // MarketRefreshService'den aktif ilanları al
     final marketService = MarketRefreshService();
     final allListings = marketService.getActiveListings();
-    
+
     final candidates = allListings.where((v) {
       // Skor aralığında olsun
       return v.score >= minScore && v.score <= maxScore;
@@ -194,18 +195,18 @@ class SkillService {
     // Rastgele birini seç
     return candidates[Random().nextInt(candidates.length)];
   }
-  
+
   /// Kalan kullanım hakkını getir
   int getRemainingDailyUses(User user, String skillId) {
     final def = skillDefinitions[skillId];
     if (def == null) return 0;
-    
+
     final dailyLimit = def['dailyLimit'] as int;
-    
+
     if (user.lastSkillUseDay != _gameTime.currentDay) {
       return dailyLimit;
     }
-    
+
     final usage = user.dailySkillUses[skillId] ?? 0;
     return (dailyLimit - usage).clamp(0, dailyLimit);
   }
@@ -224,7 +225,7 @@ class SkillService {
     // Şimdilik Vehicle.price (piyasa değeri) üzerinden hesaplayalım, çünkü "Hızlı Sat" genelde piyasa değerine yakın veya üstünde satmak demektir.
     // VEYA: Kullanıcı isteği "kar payı" diyor.
     // Eğer UserVehicle ise purchasePrice var.
-    
+
     // Basitlik için: Piyasa değeri * (1 + margin)
     return (vehicle.price * (1 + margin)).round();
   }

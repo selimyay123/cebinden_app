@@ -47,6 +47,7 @@
     "ok": "Tamam",
     "pleaseWait": "Lütfen bekleyiniz...",
     "cancel": "İptal",
+    "add": "Ekle",
     "confirm": "Onayla",
     "userNotFound": "Kullanıcı bulunamadı",
     "save": "Kaydet",
@@ -77,7 +78,10 @@
     "attention": "Dikkat!",
     "retry": "Tekrar Dene",
     "remaining": "kalan",
-    "free": "BEDAVA"
+    "free": "BEDAVA",
+    "money_suffix_m": "M",
+    "money_suffix_b": "B",
+    "money_prefix_less_than": "<"
   },
   "errors": {
     "balanceUpdateFailed": "Bakiye güncellenemedi",
@@ -145,12 +149,19 @@
     "manage_staff": "Personel Yönetimi",
     "contract_expired": "{name} adlı personelin sözleşmesi bittiği için ayrıldı.",
     "contract_remaining": "Sözleşme: {days} Gün Kaldı",
-    "hire_success": "{name} işe alındı!",
     "empty_title": "Henüz Personeliniz Yok",
     "empty_desc": "İşlerinizi otomatikleştirmek ve gelirinizi artırmak için profesyonel bir ekip kurun.",
     "hire_button": "Personel İşe Al",
     "hire_category_title": "Departman Seç",
-    "hire_category_desc": "Hangi departman için personel arıyorsunuz?",
+    "hire_category_desc": "Yeni personel için departman seçin",
+    "pause_work": "Çalışmayı Durdur",
+    "resume_work": "Devam Ettir",
+    "pause_confirm_title": "Çalışmayı Durdur?",
+    "resume_confirm_title": "Devam Ettir?",
+    "pause_confirm_desc": "{name} isimli personelin işlemlerini durdurmak istiyor musunuz? Sözleşme süresi işlemeye devam eder.",
+    "resume_confirm_desc": "{name} isimli personelin işlemlerini devam ettirmek istiyor musunuz?",
+    "pause_success": "{name} durduruldu.",
+    "resume_success": "{name} devam ediyor.",
     "cat_buyer": "Satın Alımcı",
     "cat_sales": "Satış Temsilcisi",
     "cat_tech": "Teknik",
@@ -834,7 +845,7 @@
     "availablePoints": "Yetenek Puanı",
     "activeSkills": "Aktif Yetenekler",
     "quickBuy": "Hızlı Al",
-    "quickBuyDesc": "Belirli skor aralığındaki araçları anında bulup detaylarını görüntülemenizi sağlar. Seviye arttıkça daha yüksek skorlu araçlar bulabilirsiniz.",
+    "quickBuyDesc": "Belirli skor aralığındaki araçları anında bulup detaylarını görüntülemenizi sağlar. Her oyun gününde 1 kez kullanılabilir. Seviye arttıkça daha yüksek skorlu araçlar bulabilirsiniz.",
     "quickSell": "Hızlı Sat",
     "quickSellDesc": "Sahip olduğunuz araçları anında kar payı ile satmanızı sağlar. Seviye arttıkça kar oranınız artar.",
     "quickSellProfit": "Kar: {percent}",
@@ -845,7 +856,7 @@
     "lowballerDesc": "Araç alırken pazarlık sırasında satıcıların teklifinizi kabul etme ihtimalini artırır.",
     "lowballerBonus": "Kabul Şansı: +{percent}",
     "expertiseExpert": "Ekspertiz Uzmanı",
-    "expertiseExpertDesc": "Her oyun gününde 3 adet ücretsiz ekspertiz yapmanızı sağlar.",
+    "expertiseExpertDesc": "Her oyun gününde 1 adet ücretsiz ekspertiz yapmanızı sağlar.",
     "upgradeConfirmationTitle": "Yükseltme Onayı",
     "upgradeConfirmationMessage": "{skill} yeteneğini {cost} SP karşılığında yükseltmek istediğinize emin misiniz?",
     "watchAd": "Ücretsiz Ekspertiz (Reklam İzle)",
@@ -980,6 +991,7 @@
       "title": "Sosyal",
       "friends": "Arkadaşlar",
       "requests": "İstekler",
+      "addFriendConfirm": "{0} adlı kullanıcıyı arkadaş olarak eklemek istiyor musunuz?",
       "search": "Ara",
       "searchHint": "Kullanıcı adı ara...",
       "noFriends": "Henüz arkadaşın yok",
@@ -2184,5 +2196,44 @@
   },
   "permissions": {
     "tracking_description": "Bu izin, size daha ilgi çekici reklamlar sunabilmemiz için gereklidir."
+  },
+  "social": {
+    "chat": {
+      "title": "Sohbet",
+      "quick_message": "Hızlı Mesaj",
+      "send": "Gönder",
+      "category": {
+        "greeting": "Selamlaşma",
+        "business": "İş & Ticaret",
+        "cars": "Arabalar",
+        "reactions": "Tepkiler"
+      },
+      "msg": {
+        "hello": "Selamun Aleyküm! 👋",
+        "how_are_you": "Nasılsın, her şey yolunda mı?",
+        "good_morning": "Günaydın! ☀️",
+        "good_evening": "İyi akşamlar! 🌙",
+        "good_work": "Hayırlı işler bol kazançlar! 🤝",
+        "business_is_good": "Piyasa bugün hareketli! 💸",
+        "hard_market": "Piyasa durgun, fırsat kovalıyorum.",
+        "sold_car": "Az önce harika bir araç sattım! 🚗",
+        "nice_car": "Araban harika görünüyor! 🔥",
+        "lets_race": "Müsait olduğunda kapışalım mı? 🏎️",
+        "garage_looks_great": "Garajın çok sağlam! 💪",
+        "dream_car": "Bu araç benim hayalim... 😍",
+        "congrats": "Tebrik ederim!",
+        "wow": "Vay be! 🤯",
+        "thanks": "Teşekkürler! 🙏",
+        "good_luck": "Bol şans! 🍀",
+        "thumbs_up": "Harika! 👍",
+        "fire": "Alev aldı buralar! 🔥"
+      }
+    },
+    "interaction": {
+      "respect": "Saygı Göster",
+      "respect_sent": "Saygı gösterildi! 🫡",
+      "already_respected": "Bugünlük bu kadar saygı yeterli. Yarın tekrar gel! ⏳",
+      "respect_count": "Saygı Puanı"
+    }
   }
 }

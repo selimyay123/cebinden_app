@@ -9,6 +9,7 @@ import '../../widgets/modern_alert_dialog.dart';
 import '../../services/localization_service.dart';
 import 'chat_screen.dart';
 import '../../widgets/user_profile_avatar.dart';
+import '../../services/interaction_service.dart';
 
 class FriendsTab extends StatefulWidget {
   const FriendsTab({super.key});
@@ -21,7 +22,8 @@ class _FriendsTabState extends State<FriendsTab> {
   final FriendService _friendService = FriendService();
   final ChatService _chatService = ChatService();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  
+  final InteractionService _interactionService = InteractionService();
+
   User? _currentUser;
 
   @override
@@ -33,9 +35,39 @@ class _FriendsTabState extends State<FriendsTab> {
   Future<void> _loadCurrentUser() async {
     final userMap = await _databaseHelper.getCurrentUser();
     if (userMap != null) {
-      setState(() {
-        _currentUser = User.fromJson(userMap);
-      });
+      if (mounted) {
+        setState(() {
+          _currentUser = User.fromJson(userMap);
+        });
+      }
+    }
+  }
+
+  Future<void> _sendRespect(String toUserId) async {
+    if (_currentUser == null) return;
+
+    final success = await _interactionService.sendRespect(
+      _currentUser!.id,
+      toUserId,
+    );
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('social.interaction.respect_sent'.tr()),
+          backgroundColor: Colors.amber,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('social.interaction.already_respected'.tr()),
+          backgroundColor: Colors.grey,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -66,8 +98,8 @@ class _FriendsTabState extends State<FriendsTab> {
       builder: (context) => ModernAlertDialog(
         title: 'drawer.social.removeFriend'.tr(),
         content: Text(
-          'drawer.social.removeFriendConfirm'.trParams({'0': friendName}), 
-          style: const TextStyle(color: Colors.white70)
+          'drawer.social.removeFriendConfirm'.trParams({'0': friendName}),
+          style: const TextStyle(color: Colors.white70),
         ),
         buttonText: 'common.delete'.tr(),
         onPressed: () => Navigator.pop(context, true),
@@ -87,7 +119,9 @@ class _FriendsTabState extends State<FriendsTab> {
               content: Text('drawer.social.friendRemoved'.tr()),
               backgroundColor: Colors.green.withOpacity(0.8),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               elevation: 8,
             ),
           );
@@ -99,7 +133,9 @@ class _FriendsTabState extends State<FriendsTab> {
               content: Text('Hata: $e'),
               backgroundColor: Colors.red.withOpacity(0.8),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               elevation: 8,
             ),
           );
@@ -111,18 +147,27 @@ class _FriendsTabState extends State<FriendsTab> {
   @override
   Widget build(BuildContext context) {
     if (_currentUser == null) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)));
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFFE5B80B)),
+      );
     }
 
     return StreamBuilder<QuerySnapshot>(
       stream: _friendService.getFriends(_currentUser!.id),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Hata: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+          return Center(
+            child: Text(
+              'Hata: ${snapshot.error}',
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)));
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFFE5B80B)),
+          );
         }
 
         final docs = snapshot.data?.docs ?? [];
@@ -143,7 +188,10 @@ class _FriendsTabState extends State<FriendsTab> {
                     // Switch to Search tab (parent controller)
                     DefaultTabController.of(context).animateTo(2);
                   },
-                  child: Text('drawer.social.findFriends'.tr(), style: const TextStyle(color: Color(0xFFE5B80B))),
+                  child: Text(
+                    'drawer.social.findFriends'.tr(),
+                    style: const TextStyle(color: Color(0xFFE5B80B)),
+                  ),
                 ),
               ],
             ),
@@ -177,14 +225,29 @@ class _FriendsTabState extends State<FriendsTab> {
                 ),
                 title: Text(
                   friendName,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chat_bubble_outline, color: Colors.purpleAccent),
-                      onPressed: () => _openChat(friendId, friendName, friendImage),
+                      icon: const Icon(
+                        Icons.thumb_up_alt_outlined,
+                        color: Colors.amber,
+                      ),
+                      tooltip: 'social.interaction.respect'.tr(),
+                      onPressed: () => _sendRespect(friendId),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.chat_bubble_outline,
+                        color: Colors.purpleAccent,
+                      ),
+                      onPressed: () =>
+                          _openChat(friendId, friendName, friendImage),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: Colors.red),

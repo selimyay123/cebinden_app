@@ -4,6 +4,7 @@ import '../../services/friend_service.dart';
 import '../../services/database_helper.dart';
 import '../../services/localization_service.dart';
 import '../../widgets/user_profile_avatar.dart';
+import '../../services/interaction_service.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -16,7 +17,8 @@ class _SearchTabState extends State<SearchTab> {
   final TextEditingController _searchController = TextEditingController();
   final FriendService _friendService = FriendService();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  
+  final InteractionService _interactionService = InteractionService();
+
   List<SocialUser> _searchResults = [];
   bool _isLoading = false;
   String? _currentUserId;
@@ -54,10 +56,38 @@ class _SearchTabState extends State<SearchTab> {
         _isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hata: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
       }
+    }
+  }
+
+  Future<void> _sendRespect(String toUserId) async {
+    if (_currentUserId == null) return;
+
+    final success = await _interactionService.sendRespect(
+      _currentUserId!,
+      toUserId,
+    );
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('social.interaction.respect_sent'.tr()),
+          backgroundColor: Colors.amber,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('social.interaction.already_respected'.tr()),
+          backgroundColor: Colors.grey,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -71,6 +101,7 @@ class _SearchTabState extends State<SearchTab> {
           SnackBar(
             content: Text('drawer.social.requestSent'.tr()),
             backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -80,6 +111,7 @@ class _SearchTabState extends State<SearchTab> {
           SnackBar(
             content: Text('Hata: $e'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -106,7 +138,10 @@ class _SearchTabState extends State<SearchTab> {
                 borderSide: BorderSide.none,
               ),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.arrow_forward, color: Colors.purpleAccent),
+                icon: const Icon(
+                  Icons.arrow_forward,
+                  color: Colors.purpleAccent,
+                ),
                 onPressed: () => _performSearch(_searchController.text),
               ),
             ),
@@ -115,57 +150,86 @@ class _SearchTabState extends State<SearchTab> {
         ),
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)))
+              ? const Center(
+                  child: CircularProgressIndicator(color: Color(0xFFE5B80B)),
+                )
               : _searchResults.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.person_search, size: 64, color: Colors.grey[800]),
-                          const SizedBox(height: 16),
-                          Text(
-                            'drawer.social.searchHint'.tr(),
-                            style: GoogleFonts.poppins(color: Colors.grey),
-                          ),
-                        ],
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.person_search,
+                        size: 64,
+                        color: Colors.grey[800],
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final user = _searchResults[index];
-                        if (user.id == _currentUserId) return const SizedBox.shrink();
+                      const SizedBox(height: 16),
+                      Text(
+                        'drawer.social.searchHint'.tr(),
+                        style: GoogleFonts.poppins(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _searchResults.length,
+                  itemBuilder: (context, index) {
+                    final user = _searchResults[index];
+                    if (user.id == _currentUserId)
+                      return const SizedBox.shrink();
 
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple.shade900.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(12),
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple.shade900.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        leading: UserProfileAvatar(
+                          imageUrl: user.profileImageUrl,
+                          username: user.username,
+                          radius: 20,
+                          backgroundColor: Colors.grey[800],
+                          textColor: Colors.white,
+                        ),
+                        title: Text(
+                          user.username,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
-                          child: ListTile(
-                            leading: UserProfileAvatar(
-                              imageUrl: user.profileImageUrl,
-                              username: user.username,
-                              radius: 20,
-                              backgroundColor: Colors.grey[800],
-                              textColor: Colors.white,
+                        ),
+                        subtitle: Text(
+                          'Seviye ${user.level}',
+                          style: TextStyle(color: Colors.grey[400]),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.thumb_up_alt_outlined,
+                                color: Colors.amber,
+                              ),
+                              tooltip: 'social.interaction.respect'.tr(),
+                              onPressed: () => _sendRespect(user.id),
                             ),
-                            title: Text(
-                              user.username,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              'Seviye ${user.level}',
-                              style: TextStyle(color: Colors.grey[400]),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.person_add, color: Colors.purpleAccent),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.person_add,
+                                color: Colors.purpleAccent,
+                              ),
                               onPressed: () => _sendRequest(user.id),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
         ),
       ],
     );

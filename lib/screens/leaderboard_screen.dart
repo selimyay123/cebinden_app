@@ -5,11 +5,12 @@ import '../services/friend_service.dart';
 import '../services/database_helper.dart';
 import '../models/user_model.dart';
 import '../services/localization_service.dart';
-import 'package:intl/intl.dart';
+
 import 'package:lottie/lottie.dart';
 import '../services/report_service.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/user_profile_avatar.dart';
+import '../widgets/modern_alert_dialog.dart';
 import '../widgets/social_background.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -22,11 +23,10 @@ class LeaderboardScreen extends StatefulWidget {
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   final LeaderboardService _leaderboardService = LeaderboardService();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  
+
   User? _currentUser;
   List<Map<String, dynamic>> _topPlayers = [];
   bool _isLoading = true;
-  final NumberFormat _currencyFormat = NumberFormat.currency(locale: 'tr_TR', symbol: 'TL', decimalDigits: 0);
 
   @override
   void initState() {
@@ -52,7 +52,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
       // Liderlik tablosunu çek
       final players = await _leaderboardService.getTopPlayers(limit: 50);
-      
+
       if (mounted) {
         setState(() {
           _topPlayers = players;
@@ -74,7 +74,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.deepPurpleAccent.withValues(alpha: 0.5),
         elevation: 0,
         title: Text(
           'drawer.leaderboard'.tr(),
@@ -96,104 +96,132 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       ),
       body: SocialBackground(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)))
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFFE5B80B)),
+              )
             : _topPlayers.isEmpty
-                ? Center(
-                    child: Text(
-                      'Henüz veri yok.',
-                      style: GoogleFonts.poppins(color: Colors.white70),
+            ? Center(
+                child: Text(
+                  'Henüz veri yok.',
+                  style: GoogleFonts.poppins(color: Colors.white70),
+                ),
+              )
+            : Column(
+                children: [
+                  // Bilgilendirme Mesajı
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
                     ),
-                  )
-                : Column(
+                    color: Colors.black.withOpacity(0.3),
+                    child: Row(
                       children: [
-                        // Bilgilendirme Mesajı
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                          color: Colors.black.withOpacity(0.3),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.info_outline, color: Colors.white54, size: 16),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'auth.reportInfo'.tr(),
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
+                        const Icon(
+                          Icons.info_outline,
+                          color: Colors.white54,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'auth.reportInfo'.tr(),
+                            style: GoogleFonts.poppins(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                        Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: _topPlayers.length,
-                            itemBuilder: (context, index) {
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _topPlayers.length,
+                      itemBuilder: (context, index) {
                         final player = _topPlayers[index];
-                        final isCurrentUser = _currentUser?.id == player['userId'];
+                        final isCurrentUser =
+                            _currentUser?.id == player['userId'];
                         final rank = index + 1;
-                        
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
-                            color: isCurrentUser 
-                                ? const Color(0xFFE5B80B).withOpacity(0.15) 
-                                : const Color(0xFF1E1E1E).withOpacity(0.8), // Hafif şeffaflık
+                            color: isCurrentUser
+                                ? const Color(0xFFE5B80B).withOpacity(0.15)
+                                : Colors.deepPurple.shade900.withOpacity(
+                                    0.5,
+                                  ), // Şeffaf koyu mor
+
                             borderRadius: BorderRadius.circular(16),
-                            border: isCurrentUser 
-                                ? Border.all(color: const Color(0xFFE5B80B).withOpacity(0.5))
+                            border: isCurrentUser
+                                ? Border.all(
+                                    color: const Color(
+                                      0xFFE5B80B,
+                                    ).withOpacity(0.5),
+                                  )
                                 : null,
                           ),
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             leading: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 SizedBox(
-                                  width: 50, // Sabit genişlik ile hizalamayı koru
+                                  width:
+                                      50, // Sabit genişlik ile hizalamayı koru
                                   height: 50,
-                                  child: rank == 1 
-                                    ? Lottie.asset('assets/animations/1st.json')
-                                    : Center(
-                                        child: Container(
-                                          width: 30,
-                                          height: 30,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: _getRankColor(rank),
-                                          ),
-                                          child: Text(
-                                            '$rank',
-                                            style: GoogleFonts.poppins(
-                                              color: rank <= 3 ? Colors.black : Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
+                                  child: rank == 1
+                                      ? Lottie.asset(
+                                          'assets/animations/1st.json',
+                                        )
+                                      : Center(
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: _getRankColor(rank),
+                                            ),
+                                            child: Text(
+                                              '$rank',
+                                              style: GoogleFonts.poppins(
+                                                color: rank <= 3
+                                                    ? Colors.black
+                                                    : Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
                                 ),
                                 const SizedBox(width: 12),
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.grey[800]!, width: 1),
-                                    ),
-                                    child: UserProfileAvatar(
-                                      imageUrl: player['profileImageUrl'],
-                                      username: player['username'],
-                                      radius: 19,
-                                      backgroundColor: Colors.grey[800],
-                                      textColor: Colors.white,
-                                      fontSize: 16,
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.grey[800]!,
+                                      width: 1,
                                     ),
                                   ),
+                                  child: UserProfileAvatar(
+                                    imageUrl: player['profileImageUrl'],
+                                    username: player['username'],
+                                    radius: 19,
+                                    backgroundColor: Colors.grey[800],
+                                    textColor: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ],
                             ),
                             title: Text(
@@ -212,18 +240,65 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                 fontSize: 12,
                               ),
                             ),
-                            trailing: Text(
-                              _formatMoney(player['balance']),
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFFE5B80B),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _formatMoney(player['balance']),
+                                  style: GoogleFonts.poppins(
+                                    color: const Color(0xFFE5B80B),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                if (!isCurrentUser) ...[
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.person_add,
+                                      color: Colors.white70,
+                                      size: 20,
+                                    ),
+                                    tooltip: 'drawer.social.addFriend'.tr(),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => ModernAlertDialog(
+                                          title: 'drawer.social.addFriend'.tr(),
+                                          content: Text(
+                                            'drawer.social.addFriendConfirm'
+                                                .trParams({
+                                                  '0': player['username'] ?? '',
+                                                }),
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                          buttonText: 'common.add'.tr(),
+                                          onPressed: () {
+                                            Navigator.pop(
+                                              context,
+                                            ); // Close dialog
+                                            _sendFriendRequest(
+                                              player['userId'],
+                                            );
+                                          },
+                                          secondaryButtonText: 'common.cancel'
+                                              .tr(),
+                                          onSecondaryPressed: () =>
+                                              Navigator.pop(context),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ],
                             ),
                             onTap: () {
                               _showUserDetailDialog(
                                 rank: rank,
-                                username: player['username'] ?? 'Bilinmeyen Oyuncu',
+                                username:
+                                    player['username'] ?? 'Bilinmeyen Oyuncu',
                                 profileImageUrl: player['profileImageUrl'],
                                 balance: player['balance'],
                               );
@@ -232,16 +307,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                               if (!isCurrentUser) {
                                 _showReportDialog(
                                   userId: player['userId'],
-                                  username: player['username'] ?? 'Bilinmeyen Oyuncu',
+                                  username:
+                                      player['username'] ?? 'Bilinmeyen Oyuncu',
                                 );
                               }
                             },
                           ),
                         );
-                            },
-                          ),
-                        ),
-
+                      },
+                    ),
+                  ),
                 ],
               ),
       ),
@@ -267,7 +342,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       await FriendService().sendFriendRequest(_currentUser!.id, toUserId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(duration: const Duration(milliseconds: 1500), 
+          SnackBar(
+            duration: const Duration(milliseconds: 1500),
             content: Text('drawer.social.requestSent'.tr()),
             backgroundColor: Colors.green,
           ),
@@ -276,8 +352,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(duration: const Duration(milliseconds: 1500), 
-            content: Text('Hata: $e'), // "Request already sent" or "Already friends"
+          SnackBar(
+            duration: const Duration(milliseconds: 1500),
+            content: Text(
+              'Hata: $e',
+            ), // "Request already sent" or "Already friends"
             backgroundColor: Colors.orange,
           ),
         );
@@ -286,19 +365,47 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   String _formatMoney(dynamic amount) {
-    if (amount == null) return 'TL0';
-    return _currencyFormat.format(amount);
+    if (amount == null) return '0';
+
+    // Ensure amount is treated as a number
+    double value;
+    if (amount is int) {
+      value = amount.toDouble();
+    } else if (amount is double) {
+      value = amount;
+    } else if (amount is String) {
+      value = double.tryParse(amount) ?? 0;
+    } else {
+      return '0';
+    }
+
+    if (value < 1000000) {
+      return '${'common.money_prefix_less_than'.tr()}1${'common.money_suffix_m'.tr()}';
+    } else if (value < 1000000000) {
+      int millions = (value / 1000000).floor();
+      return '$millions${'common.money_suffix_m'.tr()}';
+    } else {
+      int billions = (value / 1000000000).floor();
+      return '$billions${'common.money_suffix_b'.tr()}';
+    }
   }
 
-  Future<void> _showReportDialog({required String userId, required String username}) async {
+  Future<void> _showReportDialog({
+    required String userId,
+    required String username,
+  }) async {
     if (_currentUser == null) return;
 
     // Önce rapor kontrolü yap
-    final hasReported = await ReportService().hasReported(_currentUser!.id, userId);
+    final hasReported = await ReportService().hasReported(
+      _currentUser!.id,
+      userId,
+    );
     if (hasReported) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(duration: const Duration(milliseconds: 1500), 
+          CustomSnackBar(
+            duration: const Duration(milliseconds: 1500),
             content: Text('report.alreadyReported'.tr()),
             backgroundColor: Colors.orange,
           ),
@@ -311,12 +418,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
     String? selectedReasonKey;
     final TextEditingController otherReasonController = TextEditingController();
-    
+
     // Rapor nedenleri listesi (key'ler)
-    final List<String> reportReasons = [
-      'inappropriateUsername',
-      'other',
-    ];
+    final List<String> reportReasons = ['inappropriateUsername', 'other'];
 
     showDialog(
       context: context,
@@ -357,7 +461,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         },
                       );
                     }).toList(),
-                    
+
                     // "Diğer" seçildiyse açıklama alanı göster
                     if (selectedReasonKey == 'other') ...[
                       const SizedBox(height: 8),
@@ -372,7 +476,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                            borderSide: const BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -386,16 +492,20 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: Text('report.cancel'.tr(), style: const TextStyle(color: Colors.white54)),
+                child: Text(
+                  'report.cancel'.tr(),
+                  style: const TextStyle(color: Colors.white54),
+                ),
               ),
               ElevatedButton(
-                onPressed: selectedReasonKey == null 
+                onPressed: selectedReasonKey == null
                     ? null // Seçim yapılmadıysa buton pasif
                     : () async {
                         if (_currentUser == null) return;
-                        
-                        String finalReason = 'report.reasons.$selectedReasonKey'.tr();
-                        
+
+                        String finalReason = 'report.reasons.$selectedReasonKey'
+                            .tr();
+
                         // "Diğer" seçildiyse ve açıklama girildiyse onu ekle
                         if (selectedReasonKey == 'other') {
                           final otherText = otherReasonController.text.trim();
@@ -417,14 +527,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         if (mounted) {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
+                              CustomSnackBar(
+                                duration: const Duration(milliseconds: 1500),
                                 content: Text('report.success'.tr()),
                                 backgroundColor: Colors.green,
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              CustomSnackBar(duration: const Duration(milliseconds: 1500), 
+                              CustomSnackBar(
+                                duration: const Duration(milliseconds: 1500),
                                 content: Text('report.error'.tr()),
                                 backgroundColor: Colors.red,
                               ),
@@ -479,7 +591,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Profil Resmi
             Container(
               width: 100,
@@ -505,7 +617,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Kullanıcı Adı
             Text(
               username,
@@ -517,7 +629,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            
+
             // Bakiye
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

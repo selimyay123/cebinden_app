@@ -45,6 +45,7 @@
     "ok": "OK",
     "pleaseWait": "Por favor espere...",
     "cancel": "Cancelar",
+    "add": "Añadir",
     "confirm": "Confirmar",
     "userNotFound": "Usuario no encontrado",
     "save": "Guardar",
@@ -75,7 +76,10 @@
     "attention": "¡Atención!",
     "retry": "Reintentar",
     "remaining": "restante",
-    "free": "GRATIS"
+    "free": "GRATIS",
+    "money_suffix_m": "M",
+    "money_suffix_b": "B",
+    "money_prefix_less_than": "<"
   },
   "errors": {
     "balanceUpdateFailed": "No se pudo actualizar el saldo",
@@ -124,7 +128,15 @@
     "empty_desc": "Construye un equipo profesional para automatizar tu negocio y aumentar tus ingresos.",
     "hire_button": "Contratar Personal",
     "hire_category_title": "Seleccionar Departamento",
-    "hire_category_desc": "¿Para qué departamento estás contratando?",
+    "hire_category_desc": "Seleccione el departamento para nuevo personal",
+    "pause_work": "Pausar Trabajo",
+    "resume_work": "Reanudar Trabajo",
+    "pause_confirm_title": "¿Pausar Trabajo?",
+    "resume_confirm_title": "¿Reanudar Trabajo?",
+    "pause_confirm_desc": "¿Quieres pausar las operaciones de {name}? El tiempo del contrato continuará.",
+    "resume_confirm_desc": "¿Quieres reanudar las operaciones de {name}?",
+    "pause_success": "{name} pausado.",
+    "resume_success": "{name} reanudado.",
     "cat_buyer": "Comprador",
     "cat_sales": "Representante de Ventas",
     "cat_tech": "Técnico",
@@ -825,7 +837,7 @@
     "availablePoints": "Punto de Habilidad",
     "activeSkills": "Habilidades Activas",
     "quickBuy": "Compra Rápida",
-    "quickBuyDesc": "Te permite encontrar y ver instantáneamente detalles de vehículos dentro de un rango de puntuación específico. Niveles más altos desbloquean vehículos de mayor puntuación.",
+    "quickBuyDesc": "Te permite encontrar y ver instantáneamente detalles de vehículos dentro de un rango de puntuación específico. Se puede usar 1 vez por día de juego. Niveles más altos desbloquean vehículos de mayor puntuación.",
     "quickSell": "Venta Rápida",
     "quickSellDesc": "Te permite vender instantáneamente tus vehículos con un margen de beneficio. La tasa de beneficio aumenta a medida que aumenta el nivel.",
     "quickSellProfit": "Beneficio: {percent}",
@@ -836,7 +848,7 @@
     "lowballerDesc": "Aumenta la probabilidad de que los vendedores acepten tu oferta durante la negociación al comprar un vehículo.",
     "lowballerBonus": "Probabilidad de Aceptación: +{percent}",
     "expertiseExpert": "Experto en Peritaje",
-    "expertiseExpertDesc": "Te permite realizar 3 peritajes gratuitos cada día del juego.",
+    "expertiseExpertDesc": "Te permite realizar 1 peritaje gratuito cada día del juego.",
     "upgradeConfirmationTitle": "Confirmación de Mejora",
     "upgradeConfirmationMessage": "¿Estás seguro de que quieres mejorar {skill} por {cost} SP?",
     "watchAd": "Peritaje Gratis (Ver Anuncio)",
@@ -975,6 +987,7 @@
       "title": "Social",
       "friends": "Amigos",
       "requests": "Solicitudes",
+      "addFriendConfirm": "¿Quieres añadir al usuario {0} como amigo?",
       "search": "Buscar",
       "searchHint": "Buscar nombre de usuario...",
       "removeFriend": "Eliminar Amigo",
@@ -2186,5 +2199,44 @@
   },
   "permissions": {
     "tracking_description": "Este permiso es necesario para proporcionarte anuncios más interesantes."
+  },
+  "social": {
+    "chat": {
+      "title": "Chat",
+      "quick_message": "Mensaje Rápido",
+      "send": "Enviar",
+      "category": {
+        "greeting": "Saludo",
+        "business": "Negocios",
+        "cars": "Coches",
+        "reactions": "Reacciones"
+      },
+      "msg": {
+        "hello": "¡Hola! 👋",
+        "how_are_you": "¿Cómo estás?",
+        "good_morning": "¡Buenos días! ☀️",
+        "good_evening": "¡Buenas noches! 🌙",
+        "good_work": "¡Buena suerte en los negocios! 🤝",
+        "business_is_good": "¡El mercado está movido hoy! 💸",
+        "hard_market": "El mercado está lento, buscando ofertas.",
+        "sold_car": "¡Acabo de vender un auto genial! 🚗",
+        "nice_car": "¡Tu auto se ve increíble! 🔥",
+        "lets_race": "¿Quieres correr cuando estés libre? 🏎️",
+        "garage_looks_great": "¡Tu garaje se ve sólido! 💪",
+        "dream_car": "Ese es el auto de mis sueños... 😍",
+        "congrats": "¡Felicidades!",
+        "wow": "¡Guau! 🤯",
+        "thanks": "¡Gracias! 🙏",
+        "good_luck": "¡Buena suerte! 🍀",
+        "thumbs_up": "¡Genial! 👍",
+        "fire": "¡Se ve increíble! 🔥"
+      }
+    },
+    "interaction": {
+      "respect": "Mostrar Respeto",
+      "respect_sent": "¡Respeto enviado! 🫡",
+      "already_respected": "Suficiente respeto por hoy. ¡Vuelve mañana! ⏳",
+      "respect_count": "Puntos de Respeto"
+    }
   }
 }

@@ -42,6 +42,7 @@ import 'collection_screen.dart';
 import '../services/market_refresh_service.dart';
 import '../widgets/user_profile_avatar.dart';
 import '../widgets/game_image.dart';
+import 'social/social_hub_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final GlobalKey? marketTabKey;
@@ -83,6 +84,8 @@ class _HomeScreenState extends State<HomeScreen>
   // Bekleyen teklif sayısı
   int _collectedCount = 0;
   int _totalCollectionCount = 0;
+  int _completedCollectionCount =
+      0; // Tamamlanan (ödülü alınmamış) koleksiyon sayısı
   int _vehicleCount = 0;
   List<UserVehicle> _userVehicles = [];
   List<UserVehicle> _userListedVehicles = []; // Satışa çıkarılan araçlar
@@ -247,6 +250,27 @@ class _HomeScreenState extends State<HomeScreen>
       final ownedModelKeys = await _db.getOwnedModelKeys(user.id);
       final collectedCount = ownedModelKeys.length;
 
+      // Tamamlanan ve ödülü alınmamış koleksiyonları hesapla
+      int completedCollectionCount = 0;
+      final collectedBrandRewards = user.collectedBrandRewards;
+
+      allModels.forEach((brand, models) {
+        // Bu markanın ödülü zaten alınmış mı?
+        if (collectedBrandRewards.contains(brand)) return;
+
+        // Bu markaya ait tüm modeller var mı?
+        int ownedInBrand = 0;
+        for (var model in models) {
+          if (ownedModelKeys.contains('${brand}_$model')) {
+            ownedInBrand++;
+          }
+        }
+
+        if (ownedInBrand == models.length) {
+          completedCollectionCount++;
+        }
+      });
+
       if (mounted) {
         setState(() {
           _currentUser = user;
@@ -256,6 +280,7 @@ class _HomeScreenState extends State<HomeScreen>
           _dailyQuests = quests;
           _collectedCount = collectedCount;
           _totalCollectionCount = totalModels;
+          _completedCollectionCount = completedCollectionCount;
           _isLoading = false;
         });
       }
@@ -464,10 +489,9 @@ class _HomeScreenState extends State<HomeScreen>
                   );
                 },
               ),
-              /*
               IconButton(
                 icon: const Icon(Icons.people, color: Colors.blueAccent),
-                tooltip: 'Sosyal',
+                tooltip: 'drawer.social.title'.tr(),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -477,7 +501,6 @@ class _HomeScreenState extends State<HomeScreen>
                   );
                 },
               ),
-              */
               IconButton(
                 icon: const Icon(Icons.leaderboard, color: Colors.amber),
                 tooltip: 'Liderlik Tablosu',
@@ -1593,6 +1616,28 @@ class _HomeScreenState extends State<HomeScreen>
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                // Tamamlanan Koleksiyon Badge'i
+                if (_completedCollectionCount > 0)
+                  PulseBadge(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _completedCollectionCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 12),

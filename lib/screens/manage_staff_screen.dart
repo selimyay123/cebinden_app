@@ -41,9 +41,11 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
     // Olayları dinle
     _eventSubscription = _staffService.eventStream.listen((event) {
       if (mounted) {
-        // Eğer event sadece bir action bildirimi ise (örn: staff_action_123), ignore et veya barı sıfırla
-        if (event.startsWith('staff_action_')) {
-          // Bar otomatik güncelleniyor zaten
+        // Eğer event sadece bir action bildirimi veya update ise ignore et
+        if (event.startsWith('staff_action_') ||
+            event.startsWith('staff_update_')) {
+          // Bu eventler sadece UI yenilemesi içindir (listenin yeniden çizilmesi vb.)
+          // SnackBar göstermeye gerek yok.
         } else if (ModalRoute.of(context)?.isCurrent ?? false) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -70,6 +72,38 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
     setState(() {
       _staff = _staffService.myStaff;
     });
+  }
+
+  void _showPauseConfirmDialog(Staff staff) {
+    final bool isPausing = !staff.isPaused;
+    showDialog(
+      context: context,
+      builder: (dialogContext) => ModernAlertDialog(
+        title: isPausing
+            ? 'staff.pause_confirm_title'.tr()
+            : 'staff.resume_confirm_title'.tr(),
+        icon: isPausing
+            ? Icons.pause_circle_outline_rounded
+            : Icons.play_circle_outline_rounded,
+        content: Text(
+          isPausing
+              ? 'staff.pause_confirm_desc'.trParams({'name': staff.name})
+              : 'staff.resume_confirm_desc'.trParams({'name': staff.name}),
+        ),
+        buttonText: isPausing
+            ? 'staff.pause_work'.tr()
+            : 'staff.resume_work'.tr(),
+        onPressed: () async {
+          await _staffService.toggleStaffPause(staff.id);
+          if (mounted) {
+            Navigator.of(dialogContext).pop();
+            _loadStaff(); // UI güncelle
+          }
+        },
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.of(dialogContext).pop(),
+      ),
+    );
   }
 
   void _showFireConfirmDialog(Staff staff) {
@@ -440,8 +474,41 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
                   ],
                 ),
 
+                SizedBox(height: 12),
+
+                // DURAKLAT / DEVAM ETTİR BUTONU
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showPauseConfirmDialog(staff),
+                    icon: Icon(
+                      staff.isPaused
+                          ? Icons.play_arrow_rounded
+                          : Icons.pause_rounded,
+                      size: 20,
+                    ),
+                    label: Text(
+                      staff.isPaused
+                          ? 'staff.resume_work'.tr()
+                          : 'staff.pause_work'.tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: staff.isPaused
+                          ? Colors.green.withValues(alpha: 0.8)
+                          : Colors.orange.withValues(alpha: 0.8),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
                 // İŞTEN ÇIKAR BUTONU
-                const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -649,7 +716,8 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
     final limit = (role == StaffRole.sales || role == StaffRole.buyer) ? 2 : 5;
     if (roleCount >= limit) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(duration: const Duration(milliseconds: 1500), 
+        SnackBar(
+          duration: const Duration(milliseconds: 1500),
           content: Text(
             'staff.department_full'.trParams({'limit': limit.toString()}),
             style: const TextStyle(color: Colors.white),
