@@ -34,10 +34,10 @@ class ReportService {
 
       return true;
     } catch (e) {
-      print('Error reporting user: $e');
       return false;
     }
   }
+
   /// Kullanıcının daha önce raporlayıp raporlamadığını kontrol et
   Future<bool> hasReported(String reporterId, String reportedUserId) async {
     try {
@@ -50,7 +50,6 @@ class ReportService {
 
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
-      print('Error checking report status: $e');
       return false;
     }
   }

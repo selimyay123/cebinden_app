@@ -16,7 +16,7 @@ class User {
   final String? email; // E-posta adresi (Google Sign-In için)
   final bool isBanned; // Kullanıcı yasaklı mı?
   final bool isTutorialCompleted; // Tutorial tamamlandı mı?
-  
+
   // ========== XP SİSTEMİ ==========
   final int xp; // Toplam deneyim puanı
   final int level; // Kullanıcı seviyesi
@@ -45,12 +45,13 @@ class User {
   final int skillPoints; // Mevcut yetenek puanı
   final Map<String, int> skills; // Yetenek ID -> Seviye
   final Map<String, int> dailySkillUses; // Yetenek ID -> Günlük kullanım sayısı
-  final List<String> purchasedAnimatedPPs; // Satın alınan animasyonlu profil resimleri
+  final List<String>
+  purchasedAnimatedPPs; // Satın alınan animasyonlu profil resimleri
   final String? activeAnimatedPP; // Aktif animasyonlu profil resmi
   final bool hasUnlimitedExpertise; // Sınırsız ekspertiz hakkı var mı?
   final DateTime? xpBoostEndTime; // XP Boost bitiş zamanı
   final int lastSkillUseDay; // Son kullanım günü (sıfırlama için)
-  
+
   final bool hasNoAds; // Reklamları kaldır özelliği var mı?
   final int usernameChangeCount; // Kullanıcı adı değiştirme sayısı
   final DateTime? lastUsernameChangeDate; // Son kullanıcı adı değiştirme tarihi
@@ -113,39 +114,40 @@ class User {
   factory User.create({
     required String username,
     required String password,
+    String?
+    email, // Email opsiyonel olabilir (eski sistem uyumluluğu için) ama yeni kayıtlarda zorunlu olacak
   }) {
     return User(
       id: const Uuid().v4(), // Benzersiz ID üret
       username: username,
       password: password,
+      email: email,
       registeredAt: DateTime.now(),
       usernameChangeCount: 0,
     );
   }
 
-
-
   // ========== XP SİSTEMİ HESAPLAMALARI ==========
-  
+
   /// XP'den seviye hesaplama (Matematiksel formül)
   /// Her seviye için gereken XP: level^2 * 100
   static int calculateLevel(int xp) {
     int level = 1;
     int requiredXp = 100;
     int totalXp = 0;
-    
+
     while (totalXp + requiredXp <= xp) {
       totalXp += requiredXp;
       level++;
       requiredXp = level * level * 100;
     }
-    
+
     // 🆕 Level Cap: Max 100
     if (level > 100) return 100;
-    
+
     return level;
   }
-  
+
   /// Belirli bir seviye için gereken toplam XP
   static int xpForLevel(int level) {
     int totalXp = 0;
@@ -154,21 +156,21 @@ class User {
     }
     return totalXp;
   }
-  
+
   /// Bir sonraki seviye için gereken XP miktarı
   static int xpForNextLevel(int level) {
     return level * level * 100;
   }
-  
+
   /// Mevcut seviyedeki ilerleme yüzdesi (0.0 - 1.0)
   double get levelProgress {
     int currentLevelXp = User.xpForLevel(level);
     int nextLevelXp = User.xpForNextLevel(level);
     int progressXp = xp - currentLevelXp;
-    
+
     return (progressXp / nextLevelXp).clamp(0.0, 1.0);
   }
-  
+
   /// Bir sonraki seviyeye kalan XP
   int get xpToNextLevel {
     int currentLevelXp = User.xpForLevel(level);
@@ -194,7 +196,8 @@ class User {
       registeredAt: DateTime.parse(json['registeredAt'] as String),
       balance: (json['balance'] as num?)?.toDouble() ?? 1000000.0,
       gold: (json['gold'] as num?)?.toDouble() ?? 0.0,
-      profitLossPercentage: (json['profitLossPercentage'] as num?)?.toDouble() ?? 0.0,
+      profitLossPercentage:
+          (json['profitLossPercentage'] as num?)?.toDouble() ?? 0.0,
       profileImageUrl: json['profileImageUrl'] as String?,
       currency: 'TL', // Always force TL
       authProvider: json['authProvider'] as String? ?? 'email',
@@ -202,7 +205,9 @@ class User {
       appleUserId: json['appleUserId'] as String?,
       email: json['email'] as String?,
       isBanned: json['isBanned'] as bool? ?? false,
-      isTutorialCompleted: json['isTutorialCompleted'] as bool? ?? true, // Eski kullanıcılar için varsayılan true
+      isTutorialCompleted:
+          json['isTutorialCompleted'] as bool? ??
+          true, // Eski kullanıcılar için varsayılan true
       // XP Sistemi
       xp: json['xp'] as int? ?? 0,
       level: json['level'] as int? ?? 1,
@@ -212,47 +217,55 @@ class User {
       totalOffersReceived: json['totalOffersReceived'] as int? ?? 0,
       successfulNegotiations: json['successfulNegotiations'] as int? ?? 0,
       consecutiveLoginDays: json['consecutiveLoginDays'] as int? ?? 0,
-      lastLoginDate: json['lastLoginDate'] != null 
+      lastLoginDate: json['lastLoginDate'] != null
           ? DateTime.parse(json['lastLoginDate'] as String)
           : null,
-      lastDailyRewardDate: json['lastDailyRewardDate'] != null 
-          ? DateTime.parse(json['lastDailyRewardDate']) 
+      lastDailyRewardDate: json['lastDailyRewardDate'] != null
+          ? DateTime.parse(json['lastDailyRewardDate'])
           : null,
       garageLimit: json['garageLimit'] as int? ?? 3,
       // Günlük İstatistikler
-      dailyStartingBalance: (json['dailyStartingBalance'] as num?)?.toDouble() ?? (json['balance'] as num?)?.toDouble() ?? 1000000.0,
-      lastDailyResetDate: json['lastDailyResetDate'] != null 
-          ? DateTime.parse(json['lastDailyResetDate']) 
+      dailyStartingBalance:
+          (json['dailyStartingBalance'] as num?)?.toDouble() ??
+          (json['balance'] as num?)?.toDouble() ??
+          1000000.0,
+      lastDailyResetDate: json['lastDailyResetDate'] != null
+          ? DateTime.parse(json['lastDailyResetDate'])
           : null,
       // Galeri Sistemi
       ownsGallery: json['ownsGallery'] as bool? ?? false,
-      galleryPurchaseDate: json['galleryPurchaseDate'] != null 
-          ? DateTime.parse(json['galleryPurchaseDate']) 
+      galleryPurchaseDate: json['galleryPurchaseDate'] != null
+          ? DateTime.parse(json['galleryPurchaseDate'])
           : null,
       totalRentalIncome: (json['totalRentalIncome'] as num?)?.toDouble() ?? 0.0,
-      lastDailyRentalIncome: (json['lastDailyRentalIncome'] as num?)?.toDouble() ?? 0.0,
+      lastDailyRentalIncome:
+          (json['lastDailyRentalIncome'] as num?)?.toDouble() ?? 0.0,
       // Yetenek Sistemi
       skillPoints: json['skillPoints'] as int? ?? 0,
-      skills: (json['skills'] as Map?)?.map(
+      skills:
+          (json['skills'] as Map?)?.map(
             (k, v) => MapEntry(k.toString(), v as int),
           ) ??
           const {},
-      dailySkillUses: (json['dailySkillUses'] as Map?)?.map(
+      dailySkillUses:
+          (json['dailySkillUses'] as Map?)?.map(
             (k, v) => MapEntry(k.toString(), v as int),
           ) ??
           const {},
       lastSkillUseDay: json['lastSkillUseDay'] as int? ?? 0,
-      collectedBrandRewards: (json['collectedBrandRewards'] as List?)?.cast<String>() ?? const [],
-      purchasedAnimatedPPs: (json['purchasedAnimatedPPs'] as List?)?.cast<String>() ?? const [],
+      collectedBrandRewards:
+          (json['collectedBrandRewards'] as List?)?.cast<String>() ?? const [],
+      purchasedAnimatedPPs:
+          (json['purchasedAnimatedPPs'] as List?)?.cast<String>() ?? const [],
       activeAnimatedPP: json['activeAnimatedPP'] as String?,
       hasUnlimitedExpertise: json['hasUnlimitedExpertise'] as bool? ?? false,
       hasNoAds: json['hasNoAds'] as bool? ?? false,
-      xpBoostEndTime: json['xpBoostEndTime'] != null 
-          ? DateTime.parse(json['xpBoostEndTime']) 
+      xpBoostEndTime: json['xpBoostEndTime'] != null
+          ? DateTime.parse(json['xpBoostEndTime'])
           : null,
       usernameChangeCount: json['usernameChangeCount'] as int? ?? 0,
-      lastUsernameChangeDate: json['lastUsernameChangeDate'] != null 
-          ? DateTime.parse(json['lastUsernameChangeDate']) 
+      lastUsernameChangeDate: json['lastUsernameChangeDate'] != null
+          ? DateTime.parse(json['lastUsernameChangeDate'])
           : null,
     );
   }
@@ -378,7 +391,8 @@ class User {
       totalVehiclesSold: totalVehiclesSold ?? this.totalVehiclesSold,
       totalOffersMade: totalOffersMade ?? this.totalOffersMade,
       totalOffersReceived: totalOffersReceived ?? this.totalOffersReceived,
-      successfulNegotiations: successfulNegotiations ?? this.successfulNegotiations,
+      successfulNegotiations:
+          successfulNegotiations ?? this.successfulNegotiations,
       consecutiveLoginDays: consecutiveLoginDays ?? this.consecutiveLoginDays,
       lastLoginDate: lastLoginDate ?? this.lastLoginDate,
       lastDailyRewardDate: lastDailyRewardDate ?? this.lastDailyRewardDate,
@@ -388,15 +402,18 @@ class User {
       ownsGallery: ownsGallery ?? this.ownsGallery,
       galleryPurchaseDate: galleryPurchaseDate ?? this.galleryPurchaseDate,
       totalRentalIncome: totalRentalIncome ?? this.totalRentalIncome,
-      lastDailyRentalIncome: lastDailyRentalIncome ?? this.lastDailyRentalIncome,
+      lastDailyRentalIncome:
+          lastDailyRentalIncome ?? this.lastDailyRentalIncome,
       skillPoints: skillPoints ?? this.skillPoints,
       skills: skills ?? this.skills,
       dailySkillUses: dailySkillUses ?? this.dailySkillUses,
       lastSkillUseDay: lastSkillUseDay ?? this.lastSkillUseDay,
-      collectedBrandRewards: collectedBrandRewards ?? this.collectedBrandRewards,
+      collectedBrandRewards:
+          collectedBrandRewards ?? this.collectedBrandRewards,
       purchasedAnimatedPPs: purchasedAnimatedPPs ?? this.purchasedAnimatedPPs,
       activeAnimatedPP: activeAnimatedPP ?? this.activeAnimatedPP,
-      hasUnlimitedExpertise: hasUnlimitedExpertise ?? this.hasUnlimitedExpertise,
+      hasUnlimitedExpertise:
+          hasUnlimitedExpertise ?? this.hasUnlimitedExpertise,
       hasNoAds: hasNoAds ?? this.hasNoAds,
       xpBoostEndTime: xpBoostEndTime ?? this.xpBoostEndTime,
     );
@@ -416,4 +433,3 @@ class User {
   @override
   int get hashCode => id.hashCode;
 }
-

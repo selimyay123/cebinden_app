@@ -1,13 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import '../services/asset_service.dart';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
-import 'home_screen.dart';
 import 'login_screen.dart';
 import 'main_screen.dart';
-
 
 class ResourceDownloadScreen extends StatefulWidget {
   const ResourceDownloadScreen({super.key});
@@ -18,7 +17,6 @@ class ResourceDownloadScreen extends StatefulWidget {
 
 class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
   final AssetService _assetService = AssetService();
-  String _statusMessage = '';
   double _progress = 0.0;
   String _timeRemaining = '';
   int _totalFiles = 0;
@@ -33,13 +31,6 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
     });
   }
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
-  }
-  
   String _formatDurationShort(Duration duration) {
     if (duration.inMinutes > 0) {
       return '${duration.inMinutes}m ${duration.inSeconds % 60}s';
@@ -49,29 +40,28 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
   }
 
   Future<void> _startDownload() async {
-    setState(() {
-      _statusMessage = LocalizationService().translate('resourceDownload.checking');
-    });
-    
+    setState(() {});
+
     await _assetService.init();
 
     if (!mounted) return;
-    
+
     // 1. Get all file paths first
     List<String> allPaths = [];
     allPaths.addAll(await _assetService.getAllFilePaths('assets/images'));
     allPaths.addAll(await _assetService.getAllFilePaths('assets/car_images'));
-    allPaths.addAll(await _assetService.getAllFilePaths('assets/images/brands'));
-    
+    allPaths.addAll(
+      await _assetService.getAllFilePaths('assets/images/brands'),
+    );
+
     _totalFiles = allPaths.length;
-    
+
     if (_totalFiles == 0) {
-       _finishDownload();
-       return;
+      _finishDownload();
+      return;
     }
 
     setState(() {
-      _statusMessage = LocalizationService().translate('resourceDownload.downloading');
       _startTime = DateTime.now();
     });
 
@@ -82,24 +72,28 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
     // But `isAssetDownloaded` is async.
     // Let's just iterate and download. If it exists, `downloadAsset` might overwrite or we check `isAssetDownloaded` inside loop.
     // `AssetService.syncFolder` checks `isAssetDownloaded`.
-    
+
     // Let's do a smart queue.
     // We can process in chunks of 5.
-    
+
     int chunkSize = 5;
     for (int i = 0; i < allPaths.length; i += chunkSize) {
       if (!mounted) return;
-      
-      int end = (i + chunkSize < allPaths.length) ? i + chunkSize : allPaths.length;
+
+      int end = (i + chunkSize < allPaths.length)
+          ? i + chunkSize
+          : allPaths.length;
       List<String> chunk = allPaths.sublist(i, end);
-      
-      await Future.wait(chunk.map((path) async {
-        bool exists = await _assetService.isAssetDownloaded(path);
-        if (!exists) {
-          await _assetService.downloadAsset(path);
-        }
-        _updateProgress();
-      }));
+
+      await Future.wait(
+        chunk.map((path) async {
+          bool exists = await _assetService.isAssetDownloaded(path);
+          if (!exists) {
+            await _assetService.downloadAsset(path);
+          }
+          _updateProgress();
+        }),
+      );
     }
 
     _finishDownload();
@@ -107,10 +101,10 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
 
   void _updateProgress() {
     if (!mounted) return;
-    
+
     _downloadedFiles++;
     double progress = _downloadedFiles / _totalFiles;
-    
+
     // Calculate time remaining
     if (_startTime != null && _downloadedFiles > 0) {
       final elapsed = DateTime.now().difference(_startTime!);
@@ -118,7 +112,7 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
       final remainingFiles = _totalFiles - _downloadedFiles;
       final remainingMillis = avgTimePerFile * remainingFiles;
       final remainingDuration = Duration(milliseconds: remainingMillis.toInt());
-      
+
       setState(() {
         _progress = progress;
         _timeRemaining = _formatDurationShort(remainingDuration);
@@ -133,7 +127,6 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
   void _finishDownload() {
     if (!mounted) return;
     setState(() {
-      _statusMessage = LocalizationService().translate('resourceDownload.ready');
       _progress = 1.0;
       _timeRemaining = '';
     });
@@ -141,7 +134,9 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    await Future.delayed(const Duration(seconds: 1)); // Show "Ready" for a second
+    await Future.delayed(
+      const Duration(seconds: 1),
+    ); // Show "Ready" for a second
     if (!mounted) return;
 
     final user = await AuthService().getCurrentUser();
@@ -168,7 +163,7 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
             width: double.infinity,
             height: double.infinity,
           ),
-          
+
           // Progress Indicator at Bottom Center
           Align(
             alignment: Alignment.bottomCenter,
@@ -193,7 +188,7 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  
+
                   // Progress Info (Percentage and Time)
                   if (_progress < 1.0 && _progress > 0.0)
                     Padding(
@@ -207,7 +202,9 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
                               color: Colors.white,
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              shadows: [Shadow(blurRadius: 5, color: Colors.black)],
+                              shadows: [
+                                Shadow(blurRadius: 5, color: Colors.black),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 15),
@@ -218,7 +215,9 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
                                 color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                shadows: [Shadow(blurRadius: 5, color: Colors.black)],
+                                shadows: [
+                                  Shadow(blurRadius: 5, color: Colors.black),
+                                ],
                               ),
                             ),
                         ],
@@ -230,10 +229,12 @@ class _ResourceDownloadScreenState extends State<ResourceDownloadScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
-                        value: _progress > 0 ? _progress : null, 
+                        value: _progress > 0 ? _progress : null,
                         minHeight: 10,
                         backgroundColor: Colors.white24,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          Colors.amber,
+                        ),
                       ),
                     ),
                   ),

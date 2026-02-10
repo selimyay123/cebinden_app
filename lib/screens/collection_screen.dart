@@ -7,7 +7,6 @@ import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
 import '../utils/vehicle_utils.dart';
-import '../utils/vehicle_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/game_image.dart';
 
@@ -198,11 +197,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -321,7 +320,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.emoji_events, color: Colors.white, size: 28),
@@ -349,7 +348,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                       }),
                       style: GoogleFonts.poppins(
                         fontSize: 13,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],

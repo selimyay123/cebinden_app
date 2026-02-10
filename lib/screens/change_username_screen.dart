@@ -146,7 +146,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
           ),
           behavior: SnackBarBehavior.floating,
           content: Text('changeUsername.success'.tr()),
-          backgroundColor: Colors.green.withOpacity(0.8),
+          backgroundColor: Colors.green.withValues(alpha: 0.8),
         ),
       );
       Navigator.pop(context, true); // Return true to indicate success
@@ -181,7 +181,7 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                     Icon(
                       Icons.person_outline,
                       size: 80,
-                      color: Colors.deepPurple.withOpacity(0.7),
+                      color: Colors.deepPurple.withValues(alpha: 0.7),
                     ),
                     const SizedBox(height: 20),
 
@@ -202,10 +202,10 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: _statusColor.withOpacity(0.1),
+                          color: _statusColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: _statusColor.withOpacity(0.3),
+                            color: _statusColor.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
@@ -226,10 +226,10 @@ class _ChangeUsernameScreenState extends State<ChangeUsernameScreen> {
                         padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.only(bottom: 16),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.red.withOpacity(0.3),
+                            color: Colors.red.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(

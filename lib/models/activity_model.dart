@@ -9,6 +9,8 @@ enum ActivityType {
   dailyLogin, // Günlük giriş bonusu
   expense, // Genel gider
   income, // Genel gelir
+  staffPurchase, // Personel alım
+  staffSale, // Personel satım
 }
 
 class Activity {
@@ -20,6 +22,12 @@ class Activity {
   final double? amount; // Pozitif: Gelir, Negatif: Gider
   final DateTime date;
 
+  // Localization support
+  final String? titleKey;
+  final Map<String, dynamic>? titleParams;
+  final String? descriptionKey;
+  final Map<String, dynamic>? descriptionParams;
+
   Activity({
     required this.id,
     required this.userId,
@@ -28,6 +36,10 @@ class Activity {
     required this.description,
     this.amount,
     required this.date,
+    this.titleKey,
+    this.titleParams,
+    this.descriptionKey,
+    this.descriptionParams,
   });
 
   factory Activity.create({
@@ -36,6 +48,10 @@ class Activity {
     required String title,
     required String description,
     double? amount,
+    String? titleKey,
+    Map<String, dynamic>? titleParams,
+    String? descriptionKey,
+    Map<String, dynamic>? descriptionParams,
   }) {
     return Activity(
       id: const Uuid().v4(),
@@ -45,6 +61,10 @@ class Activity {
       description: description,
       amount: amount,
       date: DateTime.now(),
+      titleKey: titleKey,
+      titleParams: titleParams,
+      descriptionKey: descriptionKey,
+      descriptionParams: descriptionParams,
     );
   }
 
@@ -55,8 +75,18 @@ class Activity {
       type: ActivityType.values[json['type'] as int],
       title: json['title'] as String,
       description: json['description'] as String,
-      amount: json['amount'] != null ? (json['amount'] as num).toDouble() : null,
+      amount: json['amount'] != null
+          ? (json['amount'] as num).toDouble()
+          : null,
       date: DateTime.parse(json['date'] as String),
+      titleKey: json['titleKey'] as String?,
+      titleParams: json['titleParams'] != null
+          ? Map<String, dynamic>.from(json['titleParams'])
+          : null,
+      descriptionKey: json['descriptionKey'] as String?,
+      descriptionParams: json['descriptionParams'] != null
+          ? Map<String, dynamic>.from(json['descriptionParams'])
+          : null,
     );
   }
 
@@ -69,6 +99,10 @@ class Activity {
       'description': description,
       'amount': amount,
       'date': date.toIso8601String(),
+      'titleKey': titleKey,
+      'titleParams': titleParams,
+      'descriptionKey': descriptionKey,
+      'descriptionParams': descriptionParams,
     };
   }
 }

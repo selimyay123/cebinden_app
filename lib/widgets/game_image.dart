@@ -44,6 +44,7 @@ class GameImage extends StatefulWidget {
 
 class _GameImageState extends State<GameImage> {
   bool _isLoading = false;
+  // ignore: unused_field
   bool _hasError = false;
   File? _localFile;
 
@@ -76,7 +77,7 @@ class _GameImageState extends State<GameImage> {
     } else {
       // Dosya yok, indirmeyi dene
       // Sadece belirli klasörler için otomatik indirme yap
-      if (widget.assetPath.startsWith('assets/car_images') || 
+      if (widget.assetPath.startsWith('assets/car_images') ||
           widget.assetPath.startsWith('assets/images/brands')) {
         _downloadFile();
       } else {
@@ -101,7 +102,7 @@ class _GameImageState extends State<GameImage> {
     }
 
     final success = await AssetService().downloadAsset(widget.assetPath);
-    
+
     if (!mounted) return;
 
     if (success) {
@@ -152,7 +153,7 @@ class _GameImageState extends State<GameImage> {
         filterQuality: widget.filterQuality,
         errorBuilder: (context, error, stackTrace) {
           if (widget.errorBuilder != null) {
-             return widget.errorBuilder!(context, error, stackTrace);
+            return widget.errorBuilder!(context, error, stackTrace);
           }
           // Fallback to asset if file is corrupted
           return Image.asset(
@@ -189,14 +190,16 @@ class _GameImageState extends State<GameImage> {
         gaplessPlayback: widget.gaplessPlayback,
         isAntiAlias: widget.isAntiAlias,
         filterQuality: widget.filterQuality,
-        errorBuilder: widget.errorBuilder ?? (context, error, stackTrace) {
-          return Container(
-            width: widget.width,
-            height: widget.height,
-            color: Colors.grey[300],
-            child: Icon(Icons.image_not_supported, color: Colors.grey[500]),
-          );
-        },
+        errorBuilder:
+            widget.errorBuilder ??
+            (context, error, stackTrace) {
+              return Container(
+                width: widget.width,
+                height: widget.height,
+                color: Colors.grey[300],
+                child: Icon(Icons.image_not_supported, color: Colors.grey[500]),
+              );
+            },
       );
     }
   }
@@ -206,32 +209,19 @@ class _GameImageState extends State<GameImage> {
 class GameDecorationImage extends DecorationImage {
   GameDecorationImage({
     required String assetPath,
-    BoxFit? fit,
-    AlignmentGeometry alignment = Alignment.center,
-    ImageRepeat repeat = ImageRepeat.noRepeat,
-    Rect? centerSlice,
-    bool matchTextDirection = false,
+    super.fit,
+    super.alignment,
+    super.repeat,
+    super.centerSlice,
+    super.matchTextDirection,
     bool gaplessPlayback = false,
-    FilterQuality filterQuality = FilterQuality.low,
-    bool invertColors = false,
-    bool isAntiAlias = false,
-    double scale = 1.0,
-    double opacity = 1.0,
-    ColorFilter? colorFilter,
-  }) : super(
-          image: _getImageProvider(assetPath),
-          fit: fit,
-          alignment: alignment,
-          repeat: repeat,
-          centerSlice: centerSlice,
-          matchTextDirection: matchTextDirection,
-          filterQuality: filterQuality,
-          invertColors: invertColors,
-          isAntiAlias: isAntiAlias,
-          scale: scale,
-          opacity: opacity,
-          colorFilter: colorFilter,
-        );
+    super.filterQuality = FilterQuality.low,
+    super.invertColors,
+    super.isAntiAlias,
+    super.scale,
+    super.opacity,
+    super.colorFilter,
+  }) : super(image: _getImageProvider(assetPath));
 
   static ImageProvider _getImageProvider(String assetPath) {
     final file = AssetService().getLocalFile(assetPath);

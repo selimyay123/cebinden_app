@@ -87,7 +87,7 @@ class LocalizationService {
   Future<void> _loadLanguageFile(String languageCode) async {
     try {
       String jsonString = await rootBundle.loadString(
-        'assets/translations/$languageCode.json',
+        'assets/lang/$languageCode.json',
       );
       _localizedStrings = json.decode(jsonString);
     } catch (e) {

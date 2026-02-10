@@ -1,7 +1,8 @@
+// ignore_for_file: use_build_context_synchronously, empty_catches
+
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'dart:ui';
+
 import 'package:flutter/services.dart'; // 🆕 Input formatters için
 import 'package:intl/intl.dart';
 import '../models/offer_model.dart';
@@ -13,12 +14,8 @@ import '../services/auth_service.dart';
 import '../services/offer_service.dart';
 import '../services/localization_service.dart';
 import '../widgets/modern_alert_dialog.dart';
-import '../services/xp_service.dart';
 import '../utils/brand_colors.dart';
-import '../services/market_refresh_service.dart'; // Araç detayları için
-import '../models/vehicle_model.dart'; // Vehicle modeli için
-import 'dart:math'; // Random için
-import 'main_screen.dart';
+
 import '../utils/vehicle_utils.dart';
 import '../mixins/auto_refresh_mixin.dart';
 
@@ -38,12 +35,12 @@ class MyOffersScreen extends StatefulWidget {
   final bool isIncoming; // true = gelen teklifler, false = gönderilen teklifler
 
   const MyOffersScreen({
-    Key? key,
+    super.key,
     this.initialTab = 0,
     this.selectedBrand,
     this.selectedVehicleId,
     this.isIncoming = true,
-  }) : super(key: key);
+  });
 
   @override
   State<MyOffersScreen> createState() => _MyOffersScreenState();
@@ -54,7 +51,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   final OfferService _offerService = OfferService();
-  final MarketRefreshService _marketService = MarketRefreshService();
+
   final AssetService _assetService = AssetService();
 
   // Gelen teklifler (kullanıcının ilanlarına gelen)
@@ -148,13 +145,13 @@ class _MyOffersScreenState extends State<MyOffersScreen>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         if (Navigator.canPop(context)) {
           Navigator.pop(context, _shouldRefreshParent);
-          return false;
         }
-        return true;
       },
       child: _buildContent(),
     );
@@ -177,7 +174,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       appBar: AppBar(
         title: Text('offers.title'.tr()),
         actions: [],
-        backgroundColor: Colors.deepPurple.withOpacity(0.9),
+        backgroundColor: Colors.deepPurple.withValues(alpha: 0.9),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -316,7 +313,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -354,7 +351,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: brandColor.withOpacity(0.3),
+                            color: brandColor.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -429,7 +426,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
       appBar: AppBar(
         title: Text('${widget.selectedBrand} ${'offers.title'.tr()}'),
         actions: [],
-        backgroundColor: Colors.deepPurple.withOpacity(0.9),
+        backgroundColor: Colors.deepPurple.withValues(alpha: 0.9),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -536,7 +533,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               : 'myVehicles.offers'.tr(),
         ),
         actions: [],
-        backgroundColor: Colors.deepPurple.withOpacity(0.9),
+        backgroundColor: Colors.deepPurple.withValues(alpha: 0.9),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -612,7 +609,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                 // Teklif Listesi
                                 ...vehicleOffers.map((offer) {
                                   return _buildIncomingOfferCard(offer);
-                                }).toList(),
+                                }),
                               ],
                             ),
                           ),
@@ -762,7 +759,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            '${_formatCurrency(firstOffer.listingPrice)}',
+                            _formatCurrency(firstOffer.listingPrice),
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -894,7 +891,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.deepPurple.withOpacity(0.3),
+                          color: Colors.deepPurple.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -934,7 +931,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               // Avatar
               CircleAvatar(
                 radius: 18,
-                backgroundColor: Colors.white.withOpacity(0.2),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
                 child: Text(
                   offer.buyerName[0],
                   style: const TextStyle(
@@ -994,8 +991,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple.withOpacity(
-                          0.6,
+                        color: Colors.deepPurple.withValues(
+                          alpha: 0.6,
                         ), // Mor arka plan
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(4),
@@ -1004,11 +1001,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           bottomRight: Radius.circular(16),
                         ),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -1030,7 +1027,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           const SizedBox(height: 8),
                           Divider(
                             height: 16,
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
 
                           // Teklif Fiyatı
@@ -1038,10 +1035,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'offers.offerPrice'.tr() + ': ',
+                                '${'offers.offerPrice'.tr()}: ',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                 ),
                               ),
                               Text(
@@ -1059,8 +1056,9 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           FutureBuilder<UserVehicle?>(
                             future: _db.getUserVehicleById(offer.vehicleId),
                             builder: (context, snapshot) {
-                              if (!snapshot.hasData || snapshot.data == null)
+                              if (!snapshot.hasData || snapshot.data == null) {
                                 return const SizedBox();
+                              }
 
                               final vehicle = snapshot.data!;
                               final profitLoss =
@@ -1079,10 +1077,10 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: color.withOpacity(0.2),
+                                  color: color.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                    color: color.withOpacity(0.5),
+                                    color: color.withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Row(
@@ -1108,7 +1106,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                                       ' (%${profitLossPercentage.toStringAsFixed(1)})',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        color: color.withOpacity(0.9),
+                                        color: color.withValues(alpha: 0.9),
                                       ),
                                     ),
                                   ],
@@ -1152,7 +1150,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -1172,7 +1170,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                           size: 14,
                           color: _getUserResponseColor(
                             offer,
-                          ).withOpacity(1.0), // Koyu ton
+                          ).withValues(alpha: 1.0), // Koyu ton
                         ),
                       ),
                     ],
@@ -1225,8 +1223,8 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple.shade50.withOpacity(
-                          0.9,
+                        backgroundColor: Colors.deepPurple.shade50.withValues(
+                          alpha: 0.9,
                         ),
                         foregroundColor: Colors.deepPurple,
                         elevation: 0,
@@ -1234,7 +1232,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
-                            color: Colors.deepPurple.withOpacity(0.5),
+                            color: Colors.deepPurple.withValues(alpha: 0.5),
                           ),
                         ),
                         visualDensity: VisualDensity.compact,
@@ -1248,13 +1246,17 @@ class _MyOffersScreenState extends State<MyOffersScreen>
                     child: ElevatedButton(
                       onPressed: () => _handleRejectOffer(offer),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade50.withOpacity(0.9),
+                        backgroundColor: Colors.red.shade50.withValues(
+                          alpha: 0.9,
+                        ),
                         foregroundColor: Colors.red,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.red.withOpacity(0.5)),
+                          side: BorderSide(
+                            color: Colors.red.withValues(alpha: 0.5),
+                          ),
                         ),
                         visualDensity: VisualDensity.compact,
                       ),
@@ -1491,381 +1493,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     );
   }
 
-  Widget _buildOfferTile(Offer offer, {bool compact = false}) {
-    final percentDiff = offer.offerPercentage;
-    final isGoodOffer = percentDiff >= -10; // -%10'dan az düşük ise iyi teklif
-
-    return FutureBuilder<UserVehicle?>(
-      future: _db.getUserVehicleById(offer.vehicleId),
-      builder: (context, snapshot) {
-        final vehicle = snapshot.data;
-        return _buildOfferTileContent(
-          offer,
-          vehicle,
-          percentDiff,
-          isGoodOffer,
-          compact,
-        );
-      },
-    );
-  }
-
-  Widget _buildOfferTileContent(
-    Offer offer,
-    UserVehicle? vehicle,
-    double percentDiff,
-    bool isGoodOffer,
-    bool compact,
-  ) {
-    // Kar/Zarar hesaplama
-    double? profitLoss;
-    double? profitLossPercentage;
-
-    if (vehicle != null) {
-      profitLoss = offer.offerPrice - vehicle.purchasePrice;
-      profitLossPercentage = (profitLoss / vehicle.purchasePrice) * 100;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _getOfferBackgroundColor(offer),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _getOfferBorderColor(offer), width: 1.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Üst Satır: Alıcı ve Fiyat
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Alıcı Bilgisi
-              Expanded(
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.deepPurple.shade100,
-                      child: Text(
-                        offer.buyerName[0],
-                        style: TextStyle(
-                          color: Colors.deepPurple.shade700,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            offer.buyerName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            _getTimeAgo(offer.offerDate),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Fiyat
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${_formatCurrency(offer.offerPrice)} TL',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        percentDiff >= 0
-                            ? Icons.arrow_upward
-                            : Icons.arrow_downward,
-                        size: 14,
-                        color: percentDiff >= 0 ? Colors.green : Colors.red,
-                      ),
-                      Text(
-                        '${percentDiff.toStringAsFixed(1)}%',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: percentDiff >= 0 ? Colors.green : Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          // Kar/Zarar Analizi
-          if (profitLoss != null && !compact) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: profitLoss >= 0
-                    ? Colors.green.shade50
-                    : Colors.red.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: profitLoss >= 0
-                      ? Colors.green.shade300
-                      : Colors.red.shade300,
-                  width: 1.5,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            profitLoss >= 0
-                                ? Icons.trending_up
-                                : Icons.trending_down,
-                            color: profitLoss >= 0
-                                ? Colors.green.shade700
-                                : Colors.red.shade700,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            profitLoss >= 0
-                                ? 'misc.profit'.tr()
-                                : 'misc.loss'.tr(),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: profitLoss >= 0
-                                  ? Colors.green.shade700
-                                  : Colors.red.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        '${profitLoss >= 0 ? '+' : ''}${_formatCurrency(profitLoss)} TL',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: profitLoss >= 0
-                              ? Colors.green.shade700
-                              : Colors.red.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'misc.profitLossRatio'.tr(),
-                        style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-                      ),
-                      Text(
-                        '${profitLossPercentage! >= 0 ? '+' : ''}${profitLossPercentage.toStringAsFixed(1)}%',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: profitLoss >= 0
-                              ? Colors.green.shade700
-                              : Colors.red.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'misc.purchasePrice'.tr(),
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                      Text(
-                        '${_formatCurrency(vehicle!.purchasePrice)} TL',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          // Mesaj
-          if (offer.message != null && !compact) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.message_outlined,
-                    size: 16,
-                    color: Colors.grey[600],
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      offer.message!.tr(),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[700],
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          // Aksiyon Butonları (Sadece bekleyen teklifler için)
-          if (offer.isPending() && !compact) ...[
-            const SizedBox(height: 12),
-            // Kabul Et Butonu
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => _handleAcceptOffer(offer),
-                icon: const Icon(Icons.check_circle, size: 20),
-                label: Text('offers.accept'.tr()),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Karşı Teklif Ver Butonu
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () =>
-                    _showCounterOfferDialogForIncoming(offer, vehicle),
-                icon: const Icon(Icons.local_offer, size: 20),
-                label: Text('offers.sendCounterOffer'.tr()),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.deepPurple,
-                  side: const BorderSide(color: Colors.deepPurple, width: 1.5),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Reddet Butonu
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _handleRejectOffer(offer),
-                icon: const Icon(Icons.cancel, size: 20),
-                label: Text('offers.reject'.tr()),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  side: const BorderSide(color: Colors.red),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-          ],
-
-          // Durum Badge (Kabul/Red edilmiş için)
-          if (!offer.isPending()) ...[
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: offer.status == OfferStatus.accepted
-                    ? Colors.green
-                    : Colors.red,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                offer.status == OfferStatus.accepted
-                    ? 'misc.acceptedStatus'.tr()
-                    : 'misc.rejectedStatus'.tr(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Color _getOfferBackgroundColor(Offer offer) {
-    if (offer.status == OfferStatus.accepted) {
-      return Colors.green.shade50.withValues(alpha: 0.9);
-    } else if (offer.status == OfferStatus.rejected) {
-      return Colors.red.shade50.withValues(alpha: 0.9);
-    } else if (offer.offerPercentage >= -10) {
-      return Colors.deepPurple.shade50.withValues(alpha: 0.9);
-    } else {
-      return Colors.grey.shade50.withValues(alpha: 0.9);
-    }
-  }
-
-  Color _getOfferBorderColor(Offer offer) {
-    if (offer.status == OfferStatus.accepted) {
-      return Colors.green;
-    } else if (offer.status == OfferStatus.rejected) {
-      return Colors.red;
-    } else if (offer.offerPercentage >= -10) {
-      return Colors.deepPurple;
-    } else {
-      return Colors.grey.shade300;
-    }
-  }
-
   String _getTimeAgo(DateTime date) {
     final now = DateTime.now();
     final diff = now.difference(date);
@@ -1888,12 +1515,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]}.',
         );
-  }
-
-  String _formatDate(DateTime date) {
-    final currentLang = LocalizationService().currentLanguage;
-    final locale = currentLang == 'tr' ? 'tr_TR' : 'en_US';
-    return DateFormat('dd MMMM yyyy', locale).format(date);
   }
 
   Future<void> _handleAcceptOffer(Offer offer) async {
@@ -1968,7 +1589,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptSuccess'.tr()),
-              backgroundColor: Colors.green.withOpacity(0.8),
+              backgroundColor: Colors.green.withValues(alpha: 0.8),
             ),
           );
 
@@ -2009,7 +1630,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptError'.tr()),
-              backgroundColor: Colors.red.withOpacity(0.8),
+              backgroundColor: Colors.red.withValues(alpha: 0.8),
             ),
           );
         }
@@ -2114,7 +1735,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('offer.counterOfferAcceptedSuccess'.tr()),
-              backgroundColor: Colors.green.withOpacity(0.8),
+              backgroundColor: Colors.green.withValues(alpha: 0.8),
             ),
           );
           _loadOffers();
@@ -2130,7 +1751,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               content: Text(
                 result['error'] ?? 'purchase.insufficientBalance'.tr(),
               ),
-              backgroundColor: Colors.red.withOpacity(0.8),
+              backgroundColor: Colors.red.withValues(alpha: 0.8),
             ),
           );
         }
@@ -2171,7 +1792,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             ),
             behavior: SnackBarBehavior.floating,
             content: Text('offer.counterOfferRejectedSuccess'.tr()),
-            backgroundColor: Colors.red.withOpacity(0.8),
+            backgroundColor: Colors.red.withValues(alpha: 0.8),
           ),
         );
         _loadOffers();
@@ -2197,7 +1818,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
           ),
           behavior: SnackBarBehavior.floating,
           content: Text('misc.noPendingToReject'.tr()),
-          backgroundColor: Colors.deepPurple.withOpacity(0.8),
+          backgroundColor: Colors.deepPurple.withValues(alpha: 0.8),
         ),
       );
       return;
@@ -2247,7 +1868,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               content: Text(
                 '✅ ${'offers.rejectAllSuccess'.trParams({'count': successCount.toString()})}',
               ),
-              backgroundColor: Colors.green.withOpacity(0.8),
+              backgroundColor: Colors.green.withValues(alpha: 0.8),
             ),
           );
         } else {
@@ -2261,7 +1882,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               content: Text(
                 '⚠️ ${'offers.rejectAllPartialSuccess'.trParams({'count': successCount.toString(), 'total': pendingOffers.length.toString()})}',
               ),
-              backgroundColor: Colors.deepPurple.withOpacity(0.8),
+              backgroundColor: Colors.deepPurple.withValues(alpha: 0.8),
             ),
           );
         }
@@ -2319,7 +1940,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('✅ ${'offer.rejectSuccess'.tr()}'),
-              backgroundColor: Colors.green.withOpacity(0.8),
+              backgroundColor: Colors.green.withValues(alpha: 0.8),
               duration: const Duration(milliseconds: 1500),
             ),
           );
@@ -2351,49 +1972,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('offers.acceptError'.tr()),
-              backgroundColor: Colors.red.withOpacity(0.8),
+              backgroundColor: Colors.red.withValues(alpha: 0.8),
             ),
           );
         }
       }
-    }
-  }
-
-  /// Satın alma animasyonunu oynat
-  Future<void> _playPurchaseAnimation() async {
-    if (!mounted) return;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.85),
-      builder: (context) => PopScope(
-        canPop: false, // Geri tuşunu devre dışı bırak
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Dönen çekiç/tokmak animasyonu
-              Lottie.asset(
-                'assets/animations/satinal.json',
-                width: 300,
-                height: 300,
-                repeat: false, // Sadece 1 kez oynat
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    // Animasyon süresi kadar bekle (~2 saniye)
-    await Future.delayed(const Duration(milliseconds: 2000));
-
-    if (mounted) {
-      Navigator.of(
-        context,
-        rootNavigator: true,
-      ).pop(); // Animasyon overlay'ini kapat
     }
   }
 
@@ -2414,7 +1997,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           // İşlem bittiğinde diyalogu güncellemek için periyodik kontrol
@@ -2483,14 +2066,14 @@ class _MyOffersScreenState extends State<MyOffersScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (context) => PopScope(
         canPop: false,
         child: Center(
           child: Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -2518,193 +2101,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   }
 
   /// Satın alma başarılı dialogunu göster
-  void _showPurchaseSuccessDialog(Offer offer, double newBalance) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Glassmorphism Background
-            ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.5),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(
-                        height: 80,
-                      ), // Space for the floating image
-                      // Congratulations Title
-                      Text(
-                        'purchase.congratulations'.tr(),
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.5,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Vehicle Name
-                      Text(
-                        '${offer.vehicleBrand} ${offer.vehicleModel}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-
-                      // Successfully Purchased Text
-                      Text(
-                        'purchase.successfullyPurchased'.tr(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Success Info Card
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.green.withOpacity(0.2),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.stars,
-                                  color: Colors.amber,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'This vehicle is now yours!',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '${'purchase.newBalance'.tr()}: ${_formatCurrency(newBalance)} TL',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[800],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Modern Gradient Button
-                      Container(
-                        width: double.infinity,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Colors.deepPurple, Color(0xFF8E24AA)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.deepPurple.withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context, rootNavigator: true).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: Text(
-                            'purchase.great'.tr(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Floating Vehicle Image or Icon
-            Positioned(
-              top: 0,
-              child: SizedBox(
-                width: 150,
-                height: 100,
-                child: offer.vehicleImageUrl.isNotEmpty
-                    ? Image.asset(offer.vehicleImageUrl, fit: BoxFit.contain)
-                    : const Icon(
-                        Icons.directions_car,
-                        size: 60,
-                        color: Colors.deepPurple,
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   /// Karşı teklif gönderme dialogunu göster
 
@@ -2715,9 +2111,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
   ) async {
     // Eğer araç bilgisi yoksa (Chat ekranından geliyorsa), veritabanından çek
     UserVehicle? targetVehicle = vehicle;
-    if (targetVehicle == null) {
-      targetVehicle = await _db.getUserVehicleById(offer.vehicleId);
-    }
+    targetVehicle ??= await _db.getUserVehicleById(offer.vehicleId);
 
     if (!mounted) return;
 
@@ -2777,7 +2171,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('offer.counterOfferAcceptedSuccess'.tr()),
-              backgroundColor: Colors.green.withOpacity(0.8),
+              backgroundColor: Colors.green.withValues(alpha: 0.8),
             ),
           );
         }
@@ -2803,7 +2197,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             ),
             behavior: SnackBarBehavior.floating,
             content: Text('offers.counterOfferError'.tr()),
-            backgroundColor: Colors.red.withOpacity(0.8),
+            backgroundColor: Colors.red.withValues(alpha: 0.8),
           ),
         );
       }
@@ -2869,9 +2263,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2896,7 +2292,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.2),
+                color: Colors.blue.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -3017,101 +2413,6 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         ],
       ),
     );
-  }
-
-  /// Karşı teklifi kabul et ve satın alma işlemini yap
-  Future<bool> _acceptCounterOffer(Offer offer, User user) async {
-    try {
-      // 1. Bakiyeyi düş
-      final newBalance = user.balance - offer.counterOfferAmount!;
-      bool balanceUpdated = await _db.updateUser(user.id, {
-        'balance': newBalance,
-      });
-      if (!balanceUpdated) return false;
-
-      // 2. Teklifi kabul edildi olarak işaretle
-      bool offerUpdated = await _db.updateOfferStatus(
-        offer.offerId,
-        OfferStatus.accepted,
-      );
-      if (!offerUpdated) {
-        // Rollback
-        await _db.updateUser(user.id, {'balance': user.balance});
-        return false;
-      }
-
-      // Aracı bulmaya çalış (MarketRefreshService'den)
-      final marketService = MarketRefreshService();
-      final activeListings = marketService.getActiveListings();
-      Vehicle? sourceVehicle;
-
-      try {
-        sourceVehicle = activeListings.firstWhere(
-          (v) => v.id == offer.vehicleId,
-        );
-      } catch (e) {
-        sourceVehicle = null;
-      }
-
-      // Fallback değerler
-      final random = Random();
-      final colors = [
-        'Beyaz',
-        'Siyah',
-        'Gri',
-        'Kırmızı',
-        'Mavi',
-        'Gümüş',
-        'Kahverengi',
-        'Yeşil',
-      ];
-      final fuelTypes = ['Benzin', 'Dizel', 'Hybrid'];
-      final transmissions = ['Manuel', 'Otomatik'];
-      final engineSizes = ['1.0', '1.2', '1.4', '1.6', '2.0'];
-
-      // 3. Aracı kullanıcıya ekle
-      final userVehicle = UserVehicle.purchase(
-        userId: user.id,
-        vehicleId: offer.vehicleId,
-        brand: offer.vehicleBrand,
-        model: offer.vehicleModel,
-        year: offer.vehicleYear,
-        mileage: sourceVehicle?.mileage ?? (10000 + random.nextInt(190000)),
-        purchasePrice: offer.counterOfferAmount!,
-        color: sourceVehicle?.color ?? colors[random.nextInt(colors.length)],
-        fuelType:
-            sourceVehicle?.fuelType ??
-            fuelTypes[random.nextInt(fuelTypes.length)],
-        transmission:
-            sourceVehicle?.transmission ??
-            transmissions[random.nextInt(transmissions.length)],
-        engineSize:
-            sourceVehicle?.engineSize ??
-            engineSizes[random.nextInt(engineSizes.length)],
-        driveType: sourceVehicle?.driveType ?? 'Önden',
-        hasWarranty: sourceVehicle?.hasWarranty ?? false,
-        hasAccidentRecord: sourceVehicle?.hasAccidentRecord ?? false,
-        score: sourceVehicle?.score ?? 75,
-        bodyType: sourceVehicle?.bodyType ?? 'Sedan',
-        horsepower: sourceVehicle?.horsepower ?? 100,
-        imageUrl: offer.vehicleImageUrl,
-      );
-
-      bool vehicleAdded = await _db.addUserVehicle(userVehicle);
-      if (!vehicleAdded) {
-        // Rollback
-        await _db.updateUser(user.id, {'balance': user.balance});
-        await _db.updateOfferStatus(offer.offerId, OfferStatus.pending);
-        return false;
-      }
-
-      // Badge'i güncelle
-      // _db.notifyOfferUpdate(); // DatabaseHelper artık otomatik yapıyor
-
-      return true;
-    } catch (e) {
-      return false;
-    }
   }
 
   ImageProvider _getBackgroundImageProvider(String assetPath) {
@@ -3267,7 +2568,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog>
                 Row(
                   children: [
                     Text(
-                      'vehicles.purchasePrice'.tr() + ': ',
+                      '${'vehicles.purchasePrice'.tr()}: ',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.white70,
@@ -3298,9 +2599,11 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -3391,7 +2694,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog>
                         stops: [0.0, 0.5, 1.0],
                       ),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -3423,7 +2726,7 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog>
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),
@@ -3444,13 +2747,13 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog>
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: isProfit
-                        ? Colors.green.withOpacity(0.2)
-                        : Colors.red.withOpacity(0.2),
+                        ? Colors.green.withValues(alpha: 0.2)
+                        : Colors.red.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isProfit
-                          ? Colors.green.withOpacity(0.5)
-                          : Colors.red.withOpacity(0.5),
+                          ? Colors.green.withValues(alpha: 0.5)
+                          : Colors.red.withValues(alpha: 0.5),
                     ),
                   ),
                   child: Row(
@@ -3503,13 +2806,13 @@ class _CounterOfferDialogState extends State<_CounterOfferDialog>
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(

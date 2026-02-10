@@ -121,11 +121,19 @@
     "passwordMinLength": "Password must be at least 6 characters",
     "ageRestriction": "You must be at least 13 years old",
     "createAccountTitle": "Choose a username to start the game",
-    "reportInfo": "Long press on a user's name to report them"
+    "reportInfo": "Long press on a user's name to report them",
+    "emailOrUsername": "Email or Username",
+    "enterEmailAddress": "Enter your email address",
+    "forgotPasswordQuestion": "Forgot Password?"
   },
   "staff": {
     "title": "Staff Management",
     "manage_staff": "Manage Staff",
+    "contract_remaining": "Contract: {days} Days Left",
+    "daily_limit_warning": "A staff member can perform a maximum of 20 transactions per day.",
+    "contract_expired": "Contract expired for {name}.",
+    "salary_payment_title": "Staff Salary Payment",
+    "salary_payment_desc": "Daily payment for {count} staff members.",
     "empty_title": "No Staff Yet",
     "empty_desc": "Build a professional team to automate your business and increase your income.",
     "hire_button": "Hire Staff",
@@ -168,7 +176,12 @@
     "department_full": "Department is full! (Max: {limit})",
     "no_personnel_in_dept": "No personnel in this department.",
     "market_knowledge": "Market Knowledge",
-    "single_staff_limit_error": "You can only have one employee in this role. Please dismiss the existing one first."
+    "single_staff_limit_error": "You can only have one employee in this role. Please dismiss the existing one first.",
+    "activity_purchase_title": "{name} Purchased",
+    "activity_purchase_desc": "Purchased by {agent} for {price} TL.",
+    "activity_sale_title": "{name} Sold",
+    "activity_sale_desc": "Sold by {agent} for {price} TL.",
+    "profit_rate": "Profit: %{rate}"
   },
   "home": {
     "title": "Dashboard",
@@ -798,6 +811,8 @@
     "offers": "Offer Notifications",
     "system": "System Notifications",
     "appInfo": "Application",
+    "reauthRequired": "For security, please log in again.",
+    "confirmDeleteAfterAuth": "Identity verified. Deleting account...",
     "about": "About",
     "version": "Version",
     "developer": "Developer",
@@ -889,7 +904,15 @@
     "banConfirmMessage": "Are you sure you want to ban {username}? This action cannot be undone.",
     "reportDismissed": "Report dismissed.",
     "userBanned": "User banned.",
-    "error": "An error occurred."
+    "error": "An error occurred.",
+    "reports_tab": "Reports",
+    "gold_tab": "Gold",
+    "username_label": "Username or Email",
+    "username_hint": "Enter username or email",
+    "gold_amount_hint": "Gold Amount",
+    "assign_gold": "Assign Gold",
+    "gold_assigned_success": "{amount} gold assigned to {username}!",
+    "user_not_found": "User not found with this username or email."
   },
   "report": {
     "title": "Report User",
@@ -1010,7 +1033,17 @@
       "alreadyFriends": "Already friends",
       "requestAlreadySent": "Request already sent",
       "sendMessage": "Type a message...",
-      "addFriend": "Add Friend"
+      "addFriend": "Add Friend",
+      "eula": {
+        "title": "Safe Social Environment",
+        "description": "Welcome to the Social Hub! To ensure a safe and positive experience for everyone, please agree to the following rules:",
+        "rule1": "• Be respectful to others.",
+        "rule2": "• Do not spam or harass other users.",
+        "rule3": "• Use the \"Respect\" feature to show appreciation.",
+        "footer": "Violation of these rules may result in restricted access to social features.",
+        "button": "I Agree",
+        "declinedMessage": "You must accept the rules to access Social features."
+      }
     }
   },
   "activity": {
@@ -1024,11 +1057,13 @@
     "rentalTitle": "Rental Income",
     "rentalDesc": "Collected rent from {count} vehicles",
     "levelUpTitle": "Level Up",
-    "levelUpDesc": "Reached Level {level}",
+    "levelUpDesc": "Reached Level {level}\n{sp} SP",
     "taxiTitle": "Taxi Earnings",
     "taxiDesc": "Earned from Taxi mission",
     "dailyLoginTitle": "Daily Bonus",
     "dailyLoginDesc": "Daily login reward",
+    "tab_general": "General",
+    "tab_staff": "Staff",
     "clearAll": "Clear All",
     "clearAllConfirm": "Are you sure you want to clear all activity history?",
     "cleared": "History cleared",
@@ -1079,6 +1114,8 @@
     "listingScore": "Listing Score"
   },
   "quests": {
+    "tab_daily": "Daily",
+    "tab_missions": "Missions",
     "title": "Quests",
     "noQuests": "No quests found for today.",
     "rewardClaimed": "Reward Claimed! +{xp} XP, +{money} TL",
@@ -2232,10 +2269,10 @@
       }
     },
     "interaction": {
-      "respect": "Show Respect",
-      "respect_sent": "Respect sent! 🫡",
-      "already_respected": "Enough respect for today. Come back tomorrow! ⏳",
-      "respect_count": "Respect Points"
+      "respect": "Send Love",
+      "respect_sent": "Love sent! ❤️",
+      "already_respected": "You have already liked this user.",
+      "respect_count": "Hearts"
     }
   }
 }

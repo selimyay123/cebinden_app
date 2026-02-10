@@ -1,10 +1,10 @@
+// ignore_for_file: curly_braces_in_flow_control_structures, equal_keys_in_map, unused_local_variable
+
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import '../models/vehicle_model.dart';
 import 'localization_service.dart';
 import 'game_time_service.dart';
-import 'settings_helper.dart';
 import '../utils/vehicle_utils.dart';
 
 /// Pazar yenileme ve ilan yaşam döngüsü yönetim servisi
@@ -26,7 +26,7 @@ class MarketRefreshService {
   // Market çalkantı durumu
   bool _isMarketShakeActive = false;
   int _marketShakeDaysRemaining = 0;
-  Map<String, double> _marketShakeAdjustments = {};
+  final Map<String, double> _marketShakeAdjustments = {};
 
   // Marka spawn oranları (gerçek piyasa verisi)
   final Map<String, double> _brandSpawnRates = {
@@ -1897,8 +1897,9 @@ class MarketRefreshService {
   /// Model-spesifik vites tipi seç
   String _getSpecificTransmission(Map<String, dynamic> specs, int year) {
     final transList = specs['transmissions'];
-    if (transList == null)
+    if (transList == null) {
       return _transmissions[_random.nextInt(_transmissions.length)];
+    }
 
     final List<String> types = (transList as List).cast<String>();
     return types[_random.nextInt(types.length)];
@@ -1926,8 +1927,9 @@ class MarketRefreshService {
   /// Model-spesifik motor hacmi seç
   String _getSpecificEngineSize(Map<String, dynamic> specs) {
     final engineData = specs['engineSize'] as Map?;
-    if (engineData == null)
+    if (engineData == null) {
       return _engineSizes[_random.nextInt(_engineSizes.length)];
+    }
 
     final double min = (engineData['min'] as num).toDouble();
     final double max = (engineData['max'] as num).toDouble();
@@ -2746,8 +2748,6 @@ class MarketRefreshService {
       }
       // MODEL-SPESİFİK VİTES DEĞERİ (Hanto için - CVT GÜVENİLİRLİĞİ!)
       else if (brand == 'Hanto') {
-        final vehicleAge = 2025 - year;
-
         // AWD kontrolü (CR-V için)
         final bool hasAWD = driveType == '4x4';
 
@@ -2758,7 +2758,7 @@ class MarketRefreshService {
               1.15; // CVT güvenilirlik + Honda markası = YÜ KSEK BONUS
 
           // RS/Turbo performans versiyonu ek bonusu
-          if (horsepower != null && horsepower >= 170) {
+          if (horsepower >= 170) {
             transFactor *= 1.07; // RS/Turbo performans primi (+%7 ekstra)
           }
         } else if (model == 'VHL') {
@@ -2829,7 +2829,7 @@ class MarketRefreshService {
       }
 
       // Sanal Kokpit / Teknoloji paketi (yeni araçlarda %50 ihtimal)
-      if (year != null && year >= 2020 && _random.nextDouble() < 0.50) {
+      if (year >= 2020 && _random.nextDouble() < 0.50) {
         trimFactor *= 1.08; // Teknoloji primi (+%8)
       }
 
@@ -2935,66 +2935,72 @@ class MarketRefreshService {
 
     // Marka-spesifik teknik detaylar (Yakıt, Vites vb.)
     if (brand == 'Renauva') {
-      if (fuelType == 'Dizel')
+      if (fuelType == 'Dizel') {
         extraNotes.add('modelDescriptions.Renauva.diesel'.tr());
-      else if (fuelType == 'Benzin+LPG')
+      } else if (fuelType == 'Benzin+LPG')
         extraNotes.add('modelDescriptions.Renauva.lpg'.tr());
       else if (fuelType == 'Hybrid')
         extraNotes.add('modelDescriptions.Renauva.hybrid'.tr());
 
       if (transmission == 'Otomatik') {
-        if (model == 'Tallion')
+        if (model == 'Tallion') {
           extraNotes.add('modelDescriptions.Renauva.cvt'.tr());
-        else if (model == 'Signa')
+        } else if (model == 'Signa')
           extraNotes.add('modelDescriptions.Renauva.auto'.tr());
         else
           extraNotes.add('modelDescriptions.Renauva.edc'.tr());
       }
     } else if (brand == 'Volkstar') {
-      if (fuelType == 'Dizel')
+      if (fuelType == 'Dizel') {
         extraNotes.add('modelDescriptions.Volkstar.tdi'.tr());
-      if (transmission == 'Otomatik')
+      }
+      if (transmission == 'Otomatik') {
         extraNotes.add('modelDescriptions.Volkstar.dsg'.tr());
+      }
     } else if (brand == 'Fialto') {
-      if (fuelType == 'Dizel')
+      if (fuelType == 'Dizel') {
         extraNotes.add('modelDescriptions.Fialto.multijet'.tr());
-      else if (fuelType == 'Hybrid')
+      } else if (fuelType == 'Hybrid')
         extraNotes.add('modelDescriptions.Fialto.hybrid'.tr());
 
       if (transmission == 'Otomatik') {
-        if (model == 'Lagua' || model == 'Zorno')
+        if (model == 'Lagua' || model == 'Zorno') {
           extraNotes.add('modelDescriptions.Fialto.dualogic'.tr());
-        else
+        } else {
           extraNotes.add('modelDescriptions.Fialto.auto'.tr());
+        }
       }
     } else if (brand == 'Oplon') {
-      if (fuelType == 'Dizel')
+      if (fuelType == 'Dizel') {
         extraNotes.add('modelDescriptions.Oplon.cdti'.tr());
+      }
 
       if (transmission == 'Otomatik') {
-        if (model == 'Lorisa' && year != null && year < 2020)
+        if (model == 'Lorisa' && year != null && year < 2020) {
           extraNotes.add('modelDescriptions.Oplon.easytronic'.tr());
-        else
+        } else {
           extraNotes.add('modelDescriptions.Oplon.auto'.tr());
+        }
       }
     } else if (brand == 'Bavora') {
-      if (fuelType == 'Dizel')
+      if (fuelType == 'Dizel') {
         extraNotes.add('modelDescriptions.Bavora.diesel'.tr());
-      else if (fuelType == 'Hybrid')
+      } else if (fuelType == 'Hybrid')
         extraNotes.add('modelDescriptions.Bavora.hybrid'.tr());
 
       if (transmission == 'Otomatik') {
-        if (model == 'A Serisi' && year != null && year >= 2020)
+        if (model == 'A Serisi' && year != null && year >= 2020) {
           extraNotes.add('modelDescriptions.Bavora.dct'.tr());
-        else
+        } else {
           extraNotes.add('modelDescriptions.Bavora.zf'.tr());
+        }
       }
       extraNotes.add('modelDescriptions.Bavora.rwd'.tr());
     } else if (brand == 'Fortran') {
       if (fuelType == 'Dizel') {
-        if (model == 'Odak' || model == 'Tupa')
+        if (model == 'Odak' || model == 'Tupa') {
           extraNotes.add('modelDescriptions.Fortran.ecoblue'.tr());
-        else if (model == 'Vista')
+        } else if (model == 'Vista')
           extraNotes.add('modelDescriptions.Fortran.tdci'.tr());
         else if (model == 'Avger')
           extraNotes.add('modelDescriptions.Fortran.biturbo'.tr());
@@ -3005,54 +3011,59 @@ class MarketRefreshService {
 
       if (transmission == 'Otomatik') {
         if (year != null && year >= 2018) {
-          if (model == 'Avger')
+          if (model == 'Avger') {
             extraNotes.add('modelDescriptions.Fortran.auto10'.tr());
-          else
+          } else {
             extraNotes.add('modelDescriptions.Fortran.auto8'.tr());
+          }
         } else {
           extraNotes.add('modelDescriptions.Fortran.powershift'.tr());
         }
       }
-      if (model == 'Avger')
+      if (model == 'Avger') {
         extraNotes.add('modelDescriptions.Fortran.4x4'.tr());
+      }
     } else if (brand == 'Mercurion') {
-      if (fuelType == 'Dizel')
+      if (fuelType == 'Dizel') {
         extraNotes.add('modelDescriptions.Mercurion.diesel'.tr());
-      else if (fuelType == 'Hybrid')
+      } else if (fuelType == 'Hybrid')
         extraNotes.add('modelDescriptions.Mercurion.hybrid'.tr());
 
       if (transmission == 'Otomatik') {
-        if (model == '1 Serisi' || model == 'GJE')
+        if (model == '1 Serisi' || model == 'GJE') {
           extraNotes.add('modelDescriptions.Mercurion.dct'.tr());
-        else
+        } else {
           extraNotes.add('modelDescriptions.Mercurion.tronic'.tr());
+        }
       }
-      if (model == '8 Serisi')
+      if (model == '8 Serisi') {
         extraNotes.add('modelDescriptions.Mercurion.4matic'.tr());
-      else
+      } else {
         extraNotes.add('modelDescriptions.Mercurion.rwd'.tr());
+      }
     } else if (brand == 'Hundar') {
-      if (fuelType == 'Dizel')
+      if (fuelType == 'Dizel') {
         extraNotes.add('modelDescriptions.Hundar.crdi'.tr());
-      else if (fuelType == 'Hybrid')
+      } else if (fuelType == 'Hybrid')
         extraNotes.add('modelDescriptions.Hundar.hybrid'.tr());
 
       if (transmission == 'Otomatik') {
-        if (year != null && year >= 2019)
+        if (year != null && year >= 2019) {
           extraNotes.add('modelDescriptions.Hundar.dct'.tr());
-        else
+        } else {
           extraNotes.add('modelDescriptions.Hundar.auto'.tr());
+        }
       }
     } else if (brand == 'Koyoro') {
-      if (fuelType == 'Hybrid')
+      if (fuelType == 'Hybrid') {
         extraNotes.add('modelDescriptions.Koyoro.hybrid'.tr());
-      else if (fuelType == 'Dizel')
+      } else if (fuelType == 'Dizel')
         extraNotes.add('modelDescriptions.Koyoro.diesel'.tr());
 
       if (transmission == 'Otomatik') {
-        if (fuelType == 'Hybrid')
+        if (fuelType == 'Hybrid') {
           extraNotes.add('modelDescriptions.Koyoro.cvt_hybrid'.tr());
-        else if ((fuelType == 'Dizel' || model == 'Karma') &&
+        } else if ((fuelType == 'Dizel' || model == 'Karma') &&
             year != null &&
             year <= 2015)
           extraNotes.add('modelDescriptions.Koyoro.mmt'.tr());
@@ -3061,19 +3072,21 @@ class MarketRefreshService {
       }
     } else if (brand == 'Audira') {
       if (fuelType == 'Dizel') {
-        if (model == 'B6')
+        if (model == 'B6') {
           extraNotes.add('modelDescriptions.Audira.tdi_high'.tr());
-        else
+        } else {
           extraNotes.add('modelDescriptions.Audira.tdi'.tr());
+        }
       }
-      if (driveType == '4x4')
+      if (driveType == '4x4') {
         extraNotes.add('modelDescriptions.Audira.quattro'.tr());
+      }
 
       if (transmission == 'Otomatik' && year != null) {
         final vehicleAge = 2025 - year;
-        if (driveType == '4x4' && vehicleAge >= 5)
+        if (driveType == '4x4' && vehicleAge >= 5) {
           extraNotes.add('modelDescriptions.Audira.tiptronic'.tr());
-        else if (model == 'B4' && vehicleAge >= 8 && vehicleAge <= 12)
+        } else if (model == 'B4' && vehicleAge >= 8 && vehicleAge <= 12)
           extraNotes.add('modelDescriptions.Audira.multitronic'.tr());
         else if (vehicleAge >= 5)
           extraNotes.add('modelDescriptions.Audira.stronic_check'.tr());
@@ -3082,19 +3095,22 @@ class MarketRefreshService {
       }
     } else if (brand == 'Hanto') {
       if (fuelType == 'Hybrid') {
-        if (model == 'VHL')
+        if (model == 'VHL') {
           extraNotes.add('modelDescriptions.Hanto.hybrid_vhl'.tr());
-        else if (model == 'Caz')
+        } else if (model == 'Caz')
           extraNotes.add('modelDescriptions.Hanto.hybrid_caz'.tr());
       } else if (fuelType == 'Benzin+LPG')
         extraNotes.add('modelDescriptions.Hanto.lpg'.tr());
 
-      if (driveType == '4x4')
+      if (driveType == '4x4') {
         extraNotes.add('modelDescriptions.Hanto.awd'.tr());
-      if (transmission == 'Otomatik')
+      }
+      if (transmission == 'Otomatik') {
         extraNotes.add('modelDescriptions.Hanto.cvt'.tr());
-      if (model == 'Vice' && horsepower != null && horsepower >= 170)
+      }
+      if (model == 'Vice' && horsepower != null && horsepower >= 170) {
         extraNotes.add('modelDescriptions.Hanto.rs'.tr());
+      }
     }
 
     // Ana açıklama + ek notlar

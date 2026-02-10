@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches, unused_local_variable
+
 import 'dart:async';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -88,9 +90,7 @@ class DatabaseHelper {
         await LeaderboardService().updateUserScore(userObj);
         // 🆕 Cloud Save Sync
         await CloudService().saveUser(userObj);
-      } catch (e) {
-        print('Firestore sync error: $e');
-      }
+      } catch (e) {}
 
       _userUpdateController.add(null);
       return 1;
@@ -192,18 +192,14 @@ class DatabaseHelper {
           final userObj = User.fromJson(updatedUser.cast<String, dynamic>());
           // Arka planda güncelle, kullanıcıyı bekletme
           LeaderboardService().updateUserScore(userObj);
-        } catch (e) {
-          print('Firestore sync error: $e');
-        }
+        } catch (e) {}
       }
 
       // 🆕 Cloud Save Sync (Her güncellemede)
       try {
         final userObj = User.fromJson(updatedUser.cast<String, dynamic>());
         CloudService().saveUser(userObj);
-      } catch (e) {
-        print('Cloud save error: $e');
-      }
+      } catch (e) {}
 
       _userUpdateController.add(null);
       return true;
@@ -281,10 +277,19 @@ class DatabaseHelper {
         await _dailyQuestsBox.delete(userId);
       }
 
-      // 6. Son olarak kullanıcıyı sil
+      // 6. Personeli sil
+      final staffList = _staffBox.values
+          .where((s) => s['userId'] == userId)
+          .toList();
+      for (var staff in staffList) {
+        final staffId = staff['id'] as String;
+        await _staffBox.delete(staffId);
+      }
+      await _staffBox.flush();
+
+      // 7. Son olarak kullanıcıyı sil
       return await deleteUser(userId);
     } catch (e) {
-      print('Error deleting user data: $e');
       return false;
     }
   }
@@ -341,9 +346,7 @@ class DatabaseHelper {
       // 🆕 Cloud Save Sync
       try {
         await CloudService().saveVehicle(vehicle);
-      } catch (e) {
-        print('Cloud save vehicle error: $e');
-      }
+      } catch (e) {}
 
       return true;
     } catch (e) {
@@ -387,7 +390,6 @@ class DatabaseHelper {
 
       return userVehicle;
     } catch (e) {
-      print('Error buying vehicle for user: $e');
       return null;
     }
   }
@@ -430,9 +432,7 @@ class DatabaseHelper {
       final key = '${userId}_$missionId';
       await _missionsBox.put(key, missionData);
       await _missionsBox.flush();
-    } catch (e) {
-      print('Error adding mission: $e');
-    }
+    } catch (e) {}
   }
 
   Future<void> updateMissionProgress(
@@ -454,9 +454,7 @@ class DatabaseHelper {
         await _missionsBox.put(key, updated);
         await _missionsBox.flush();
       }
-    } catch (e) {
-      print('Error updating mission: $e');
-    }
+    } catch (e) {}
   }
 
   // Kullanıcının tüm araçlarını getir
@@ -612,9 +610,7 @@ class DatabaseHelper {
           Map<String, dynamic>.from(vehicleMap),
         );
         await CloudService().saveVehicle(updatedVehicleObj);
-      } catch (e) {
-        print('Cloud update vehicle error: $e');
-      }
+      } catch (e) {}
 
       return true;
     } catch (e) {
@@ -668,9 +664,7 @@ class DatabaseHelper {
       if (userId != null) {
         try {
           await CloudService().deleteVehicle(userId, vehicleId);
-        } catch (e) {
-          print('Cloud delete vehicle error: $e');
-        }
+        } catch (e) {}
       }
 
       return true;
@@ -1061,9 +1055,7 @@ class DatabaseHelper {
         await _notificationsBox.delete(notifId);
       }
       await _notificationsBox.flush();
-    } catch (e) {
-      print('Error deleting vehicle notifications: $e');
-    }
+    } catch (e) {}
   }
 
   // ============================================================================
@@ -1183,18 +1175,44 @@ class DatabaseHelper {
       await _activitiesBox.put(activity.id, activityMap);
       await _activitiesBox.flush();
 
-      // Limit kontrolü (En fazla 50 aktivite)
-      final userActivities = await getUserActivities(activity.userId);
-      if (userActivities.length > 50) {
-        // getUserActivities zaten tarihe göre sıralı (yeni en üstte)
-        // 50. indexten sonrasını sil (en eskiler)
-        final activitiesToDelete = userActivities.sublist(50);
+      // Limit kontrolü (Ayrı ayrı 50'şer limit)
+      final allActivities = await getUserActivities(activity.userId);
+
+      // Staff aktivitelerini ve genel aktiviteleri ayır
+      final staffActivities = allActivities
+          .where(
+            (a) =>
+                a.type == ActivityType.staffPurchase ||
+                a.type == ActivityType.staffSale,
+          )
+          .toList();
+
+      final generalActivities = allActivities
+          .where(
+            (a) =>
+                a.type != ActivityType.staffPurchase &&
+                a.type != ActivityType.staffSale,
+          )
+          .toList();
+
+      // Staff limiti kontrolü
+      if (staffActivities.length > 50) {
+        // En eskileri sil (list zaten tarihe göre yeni->eski sıralı olduğu için sonuncular en eskidir)
+        final activitiesToDelete = staffActivities.sublist(50);
         for (var act in activitiesToDelete) {
           await _activitiesBox.delete(act.id);
         }
-        await _activitiesBox.flush();
       }
 
+      // Genel limit kontrolü
+      if (generalActivities.length > 50) {
+        final activitiesToDelete = generalActivities.sublist(50);
+        for (var act in activitiesToDelete) {
+          await _activitiesBox.delete(act.id);
+        }
+      }
+
+      await _activitiesBox.flush();
       return true;
     } catch (e) {
       return false;
@@ -1279,19 +1297,23 @@ class DatabaseHelper {
     }
   }
 
-  // Tüm personelleri getir
-  Future<List<Staff>> getAllStaff() async {
+  // Kullanıcının personellerini getir
+  Future<List<Staff>> getAllStaff(String userId) async {
     try {
       final allStaff = _staffBox.values;
       final staffList = <Staff>[];
 
       for (var staffMap in allStaff) {
         final map = Map<String, dynamic>.from(staffMap);
-        // Role göre doğru sınıfı oluştur
-        if (map['role'] == StaffRole.buyer.toString()) {
-          staffList.add(BuyerAgent.fromJson(map));
-        } else if (map['role'] == StaffRole.sales.toString()) {
-          staffList.add(SalesAgent.fromJson(map));
+
+        // userId eşleşiyor mu?
+        if (map['userId'] == userId) {
+          // Role göre doğru sınıfı oluştur
+          if (map['role'] == StaffRole.buyer.toString()) {
+            staffList.add(BuyerAgent.fromJson(map));
+          } else if (map['role'] == StaffRole.sales.toString()) {
+            staffList.add(SalesAgent.fromJson(map));
+          }
         }
       }
 

@@ -17,7 +17,7 @@ class RequestsTab extends StatefulWidget {
 class _RequestsTabState extends State<RequestsTab> {
   final FriendService _friendService = FriendService();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  
+
   User? _currentUser;
 
   @override
@@ -41,21 +41,24 @@ class _RequestsTabState extends State<RequestsTab> {
     try {
       // Gönderen kişinin bilgilerini al (Leaderboard'dan veya Users'dan)
       final fromUser = await _friendService.getSocialUser(fromUserId);
-      
+
       if (fromUser != null) {
         await _friendService.acceptFriendRequest(
-          requestId, 
-          fromUserId, 
+          requestId,
+          fromUserId,
           _currentUser!.id,
           _currentUser!.username,
           _currentUser!.profileImageUrl,
           fromUser.username,
           fromUser.profileImageUrl,
         );
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('drawer.social.requestAccepted'.tr()), backgroundColor: Colors.green),
+            SnackBar(
+              content: Text('drawer.social.requestAccepted'.tr()),
+              backgroundColor: Colors.green,
+            ),
           );
         }
       } else {
@@ -87,21 +90,50 @@ class _RequestsTabState extends State<RequestsTab> {
     }
   }
 
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: color, size: 20),
+        onPressed: onPressed,
+        constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_currentUser == null) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)));
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFFE5B80B)),
+      );
     }
 
     return StreamBuilder<QuerySnapshot>(
       stream: _friendService.getIncomingRequests(_currentUser!.id),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Hata: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+          return Center(
+            child: Text(
+              'Hata: ${snapshot.error}',
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Color(0xFFE5B80B)));
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFFE5B80B)),
+          );
         }
 
         final docs = snapshot.data?.docs ?? [];
@@ -111,11 +143,11 @@ class _RequestsTabState extends State<RequestsTab> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.mark_email_read, size: 64, color: Colors.grey[800]),
+                Icon(Icons.mark_email_read, size: 90, color: Colors.white),
                 const SizedBox(height: 16),
                 Text(
                   'drawer.social.noRequests'.tr(),
-                  style: GoogleFonts.poppins(color: Colors.grey),
+                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 18),
                 ),
               ],
             ),
@@ -129,7 +161,7 @@ class _RequestsTabState extends State<RequestsTab> {
             final doc = docs[index];
             final data = doc.data() as Map<String, dynamic>;
             final fromUserId = data['fromId'] as String;
-            
+
             return FutureBuilder<SocialUser?>(
               future: _friendService.getSocialUser(fromUserId),
               builder: (context, userSnapshot) {
@@ -140,36 +172,73 @@ class _RequestsTabState extends State<RequestsTab> {
                 final user = userSnapshot.data!;
 
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.shade900.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.deepPurple.shade800,
+                        Colors.deepPurple.shade500,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: ListTile(
-                    leading: UserProfileAvatar(
-                      imageUrl: user.profileImageUrl,
-                      username: user.username,
-                      radius: 20,
-                      backgroundColor: Colors.grey[800],
-                      textColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    leading: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white24, width: 2),
+                      ),
+                      child: UserProfileAvatar(
+                        imageUrl: user.profileImageUrl,
+                        username: user.username,
+                        radius: 22,
+                        backgroundColor: Colors.grey[900],
+                        textColor: Colors.white,
+                      ),
                     ),
                     title: Text(
                       user.username,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     subtitle: Text(
                       'Seviye ${user.level}',
-                      style: TextStyle(color: Colors.grey[400]),
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.check_circle, color: Colors.green),
+                        _buildActionButton(
+                          icon: Icons.check_circle_rounded,
+                          color: Colors.greenAccent,
                           onPressed: () => _acceptRequest(doc.id, fromUserId),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.cancel, color: Colors.red),
+                        _buildActionButton(
+                          icon: Icons.cancel_rounded,
+                          color: Colors.redAccent,
                           onPressed: () => _rejectRequest(doc.id),
                         ),
                       ],

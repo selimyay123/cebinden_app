@@ -17,19 +17,21 @@ class SellerProfile {
   final double minAcceptableRatio; // İlan fiyatının minimum %kaçını kabul eder
   final double counterOfferThreshold; // Karşı teklif için eşik (%olarak)
   final double counterOfferIncrease; // Karşı teklif artış oranı
-  
+
   // 🆕 ZONE SYSTEM - 3 Bölge tanımı
   final double insultZoneThreshold; // Hakaret bölgesi eşiği (örn: %70)
   final double negotiationZoneThreshold; // Müzakere bölgesi eşiği (örn: %90)
-  
+
   // 🆕 FUZZY LOGIC - Karar noktalarında sapma
-  final double fuzzyLogicVariance; // Karar noktalarındaki sapma oranı (örn: %2-3)
-  
+  final double
+  fuzzyLogicVariance; // Karar noktalarındaki sapma oranı (örn: %2-3)
+
   // 🆕 PATIENCE METER - Sabır/Tansiyon sistemi
   final int maxPatience; // Maksimum pazarlık turu (2-5 arası)
-  
+
   // 🆕 RESERVE PRICE - Görünmeyen minimum fiyat
-  final double reservePriceRatio; // İlan fiyatının %kaçına inmek ister (örn: 0.85 = %85'ine kadar iner)
+  final double
+  reservePriceRatio; // İlan fiyatının %kaçına inmek ister (örn: 0.85 = %85'ine kadar iner)
 
   SellerProfile({
     required this.sellerType,
@@ -46,7 +48,7 @@ class SellerProfile {
   /// Random satıcı profili oluştur
   factory SellerProfile.generateRandom({int? seed}) {
     final random = seed != null ? Random(seed) : Random();
-    
+
     // Tip seç (ağırlıklı random)
     SellerType type;
     double typeRoll = random.nextDouble();
@@ -70,7 +72,8 @@ class SellerProfile {
         // Sert (Tok Satıcı/Binici): En az %98-100 kabul eder (YÜKSEK!)
         minRatio = 0.98 + random.nextDouble() * 0.02;
         counterThreshold = 0.88; // %88 altı için direkt red
-        counterIncrease = 0.15 + random.nextDouble() * 0.08; // %15-23 artır (AGRESIF)
+        counterIncrease =
+            0.15 + random.nextDouble() * 0.08; // %15-23 artır (AGRESIF)
         // 🆕 Zone System
         insultZone = 0.82; // %82 altı hakaret (YÜKSEK!)
         negotiationZone = 0.97; // %97 altı müzakere (ÇOK YÜKSEK!)
@@ -78,7 +81,8 @@ class SellerProfile {
         // 🆕 Patience
         patience = 2 + random.nextInt(2); // 2-3 tur (çabuk sıkılır)
         // 🆕 Reserve Price
-        reserveRatio = 0.95 + random.nextDouble() * 0.04; // %95-99 (neredeyse inmez!)
+        reserveRatio =
+            0.95 + random.nextDouble() * 0.04; // %95-99 (neredeyse inmez!)
         break;
       case SellerType.moderate:
         // Ilımlı (Galerici): En az %94-98 kabul eder (YÜKSEK!)
@@ -106,7 +110,8 @@ class SellerProfile {
         // 🆕 Patience
         patience = 4 + random.nextInt(2); // 4-5 tur (sabırlı)
         // 🆕 Reserve Price
-        reserveRatio = 0.85 + random.nextDouble() * 0.07; // %85-92 (esnek ama yine yüksek)
+        reserveRatio =
+            0.85 + random.nextDouble() * 0.07; // %85-92 (esnek ama yine yüksek)
         break;
       case SellerType.desperate:
         // Aceleci (Acil Satıcı): En az %82-88 kabul eder (ORTA)
@@ -120,7 +125,9 @@ class SellerProfile {
         // 🆕 Patience
         patience = 5 + random.nextInt(2); // 5-6 tur (çok sabırlı)
         // 🆕 Reserve Price
-        reserveRatio = 0.78 + random.nextDouble() * 0.08; // %78-86 (esnek ama yine de yüksek)
+        reserveRatio =
+            0.78 +
+            random.nextDouble() * 0.08; // %78-86 (esnek ama yine de yüksek)
         break;
     }
 
@@ -147,25 +154,30 @@ class SellerProfile {
     double negotiationPowerBonus = 0.0;
     if (buyerUser != null && buyerUser is User) {
       final skillService = SkillService();
-      final level = skillService.getSkillLevel(buyerUser, SkillService.skillLowballer);
+      final level = skillService.getSkillLevel(
+        buyerUser,
+        SkillService.skillLowballer,
+      );
       negotiationPowerBonus = SkillService.lowballerBonuses[level] ?? 0.0;
     }
-    
+
     // 🆕 RESERVE PRICE: Satıcının kafasındaki gerçek minimum fiyat
     final reservePrice = listingPrice * reservePriceRatio;
-    
+
     // 🆕 PRICE BAND ADJUSTMENT
     final priceBandMultiplier = _calculatePriceBandMultiplier(listingPrice);
     final priceBandBonus = _calculatePriceBandBonus(listingPrice);
-    
+
     // Oran hesapla (fuzzy logic olmadan, saf oran)
     final ratio = offerPrice / reservePrice;
-    
+
     // Eşikler
     final adjustedInsultZone = insultZoneThreshold * priceBandMultiplier;
-    final adjustedNegotiationZone = negotiationZoneThreshold + (1.0 - priceBandMultiplier) * 0.05;
-    final adjustedMinAcceptable = (minAcceptableRatio + priceBandBonus) - negotiationPowerBonus;
-    
+    final adjustedNegotiationZone =
+        negotiationZoneThreshold + (1.0 - priceBandMultiplier) * 0.05;
+    final adjustedMinAcceptable =
+        (minAcceptableRatio + priceBandBonus) - negotiationPowerBonus;
+
     // Olasılık Hesabı
     if (ratio < adjustedInsultZone) {
       return 0.0; // Hakaret bölgesi -> %0 şans
@@ -186,7 +198,7 @@ class SellerProfile {
       // Eğer adjustedMinAcceptable'ın %5 üzerindeyse kesin kabul (%100)
       final upperLimit = adjustedMinAcceptable * 1.05;
       if (ratio >= upperLimit) return 1.0;
-      
+
       final range = upperLimit - adjustedMinAcceptable;
       final progress = (ratio - adjustedMinAcceptable) / range;
       return 0.70 + (progress * 0.30); // %70 - %100 arası
@@ -201,45 +213,52 @@ class SellerProfile {
     dynamic buyerUser, // 🆕 Alıcı kullanıcı (skill kontrolü için)
   }) {
     final random = Random();
-    
+
     // 🆕 SKILL CHECK: Ölücü yeteneği var mı?
     double negotiationPowerBonus = 0.0;
     if (buyerUser != null && buyerUser is User) {
       final skillService = SkillService();
-      final level = skillService.getSkillLevel(buyerUser, SkillService.skillLowballer);
+      final level = skillService.getSkillLevel(
+        buyerUser,
+        SkillService.skillLowballer,
+      );
       negotiationPowerBonus = SkillService.lowballerBonuses[level] ?? 0.0;
     }
-    
-    
+
     // 🆕 RESERVE PRICE: Satıcının kafasındaki gerçek minimum fiyat
     // Kullanıcı ilan fiyatını görür ama bot reserve price'a göre karar verir!
     final reservePrice = listingPrice * reservePriceRatio;
-    
+
     // 🆕 PRICE BAND ADJUSTMENT: Araç fiyatına göre eşikleri ayarla
     // Yüksek fiyatlı araçlarda daha katı ol
     final priceBandMultiplier = _calculatePriceBandMultiplier(listingPrice);
-    final priceBandBonus = _calculatePriceBandBonus(listingPrice); // 🆕 Yüksek fiyat = yüksek eşik
-    
+    final priceBandBonus = _calculatePriceBandBonus(
+      listingPrice,
+    ); // 🆕 Yüksek fiyat = yüksek eşik
+
     // 🆕 FUZZY LOGIC: Küçük bir rastgele sapma ekle (%2-3)
     // Bu, aynı teklifin her seferinde farklı sonuç verebilmesini sağlar
-    final fuzzyFactor = 1.0 + (random.nextDouble() * 2 - 1) * fuzzyLogicVariance;
-    
+    final fuzzyFactor =
+        1.0 + (random.nextDouble() * 2 - 1) * fuzzyLogicVariance;
+
     // 🆕 KRİTİK: Artık teklifin RESERVE PRICE'a olan oranını kullanıyoruz!
     // Böylece aynı fiyatlı araçlar farklı reserve'lere sahipse farklı davranırlar
     final adjustedRatio = (offerPrice / reservePrice) * fuzzyFactor;
-    
+
     // Fiyat bandına göre ayarlanmış eşikler
     final adjustedInsultZone = insultZoneThreshold * priceBandMultiplier;
-    final adjustedNegotiationZone = negotiationZoneThreshold + (1.0 - priceBandMultiplier) * 0.05;
-    
+    final adjustedNegotiationZone =
+        negotiationZoneThreshold + (1.0 - priceBandMultiplier) * 0.05;
+
     // 🆕 KRİTİK: Kabul eşiğini fiyat bandına göre YÜKSELT!
     // Pahalı araçlarda daha yüksek oran gerekli
     // 🆕 SKILL BONUS: Pazarlık Gücü varsa eşiği düşür (alıcı lehine)
-    final adjustedMinAcceptable = (minAcceptableRatio + priceBandBonus) - negotiationPowerBonus;
-    
+    final adjustedMinAcceptable =
+        (minAcceptableRatio + priceBandBonus) - negotiationPowerBonus;
+
     // 🆕 PATIENCE CHECK: Sabır tükendi mi?
     final isPatienceExhausted = currentRounds >= maxPatience;
-    
+
     if (isPatienceExhausted) {
       // Sabır tükendi! Artık karşı teklif yok, nihai karar zamanı
       // Eğer teklif minimum kabul edilebilir oranın üstündeyse kabul et, değilse reddet
@@ -260,9 +279,9 @@ class SellerProfile {
         };
       }
     }
-    
+
     // 🆕 ZONE SYSTEM: 3 Bölge Kontrolü (Fiyat Bandına Göre Ayarlanmış)
-    
+
     // 🔴 BÖLGE 1: HAKARET BÖLGESÖ (Insult Zone)
     // Çok düşük teklif - Satıcı hakaret olarak algılar
     if (adjustedRatio < adjustedInsultZone) {
@@ -272,7 +291,6 @@ class SellerProfile {
         'zone': 'insult', // Debug için
       };
     }
-    
     // 🟡 BÖLGE 2: MÜZAKERE BÖLGESÖ (Negotiation Zone)
     // Düşük ama pazarlık yapılabilir teklif
     else if (adjustedRatio < adjustedNegotiationZone) {
@@ -285,7 +303,7 @@ class SellerProfile {
         sellerBias: counterOfferIncrease,
         random: random,
       );
-      
+
       return {
         'decision': 'counter',
         'counterAmount': counterOffer,
@@ -293,14 +311,15 @@ class SellerProfile {
         'zone': 'negotiation', // Debug için
       };
     }
-    
     // 🟢 BÖLGE 3: KABUL BÖLGESÖ (Acceptance Zone)
     // Yüksek teklif - Kabul edilebilir veya son nazlanma
     else {
       // 🆕 Fiyat bandına göre ayarlanmış kabul eşiğini kontrol et
       if (adjustedRatio >= adjustedMinAcceptable) {
         // Fuzzy logic: Bazen yüksek teklifi bile nazlanarak kabul et
-        if (adjustedRatio >= 0.95 && adjustedRatio < 0.98 && random.nextDouble() < 0.15) {
+        if (adjustedRatio >= 0.95 &&
+            adjustedRatio < 0.98 &&
+            random.nextDouble() < 0.15) {
           // %15 ihtimalle "biraz daha artsanız?" diye nazlan
           final finalOffer = offerPrice * 1.02; // %2 daha fazla iste
           return {
@@ -310,7 +329,7 @@ class SellerProfile {
             'zone': 'final_bargain',
           };
         }
-        
+
         return {
           'decision': 'accept',
           'response': _getAcceptMessage(),
@@ -325,7 +344,7 @@ class SellerProfile {
           sellerBias: counterOfferIncrease,
           random: random,
         );
-        
+
         return {
           'decision': 'counter',
           'counterAmount': counterOffer,
@@ -346,18 +365,6 @@ class SellerProfile {
       'negotiation.insult.5'.tr(),
       'negotiation.insult.6'.tr(),
       'negotiation.insult.7'.tr(),
-    ];
-    return messages[Random().nextInt(messages.length)];
-  }
-  
-  // Eski normal red mesajları (artık kullanılmıyor ama bırakıyorum)
-  String _getRejectMessage() {
-    final messages = [
-      'negotiation.reject.1'.tr(),
-      'negotiation.reject.2'.tr(),
-      'negotiation.reject.3'.tr(),
-      'negotiation.reject.4'.tr(),
-      'negotiation.reject.5'.tr(),
     ];
     return messages[Random().nextInt(messages.length)];
   }
@@ -383,19 +390,29 @@ class SellerProfile {
     ];
     return messages[Random().nextInt(messages.length)];
   }
-  
+
   // 🆕 SON NAZLANMA MESAJLARI (İyi teklif ama biraz daha istiyor)
   String _getFinalBargainMessage(double finalAmount) {
     final messages = [
-      'negotiation.finalBargain.1'.trParams({'amount': _formatCurrency(finalAmount)}),
-      'negotiation.finalBargain.2'.trParams({'amount': _formatCurrency(finalAmount)}),
-      'negotiation.finalBargain.3'.trParams({'amount': _formatCurrency(finalAmount)}),
-      'negotiation.finalBargain.4'.trParams({'amount': _formatCurrency(finalAmount)}),
-      'negotiation.finalBargain.5'.trParams({'amount': _formatCurrency(finalAmount)}),
+      'negotiation.finalBargain.1'.trParams({
+        'amount': _formatCurrency(finalAmount),
+      }),
+      'negotiation.finalBargain.2'.trParams({
+        'amount': _formatCurrency(finalAmount),
+      }),
+      'negotiation.finalBargain.3'.trParams({
+        'amount': _formatCurrency(finalAmount),
+      }),
+      'negotiation.finalBargain.4'.trParams({
+        'amount': _formatCurrency(finalAmount),
+      }),
+      'negotiation.finalBargain.5'.trParams({
+        'amount': _formatCurrency(finalAmount),
+      }),
     ];
     return messages[Random().nextInt(messages.length)];
   }
-  
+
   // 🆕 SABIR TÜKENDİ - KABUL MESAJLARI
   String _getPatienceExhaustedAcceptMessage() {
     final messages = [
@@ -407,7 +424,7 @@ class SellerProfile {
     ];
     return messages[Random().nextInt(messages.length)];
   }
-  
+
   // 🆕 SABIR TÜKENDİ - RED MESAJLARI
   String _getPatienceExhaustedRejectMessage() {
     final messages = [
@@ -422,12 +439,14 @@ class SellerProfile {
   }
 
   String _formatCurrency(double value) {
-    return value.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return value
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
-  
+
   // 🆕 PRICE BAND MULTIPLIER: Araç fiyatına göre eşik çarpanı
   // Yüksek fiyatlı araçlarda daha katı eşikler (zone thresholds için)
   double _calculatePriceBandMultiplier(double listingPrice) {
@@ -441,7 +460,7 @@ class SellerProfile {
       return 0.85; // 3M+: %15 daha sıkı
     }
   }
-  
+
   // 🆕 PRICE BAND BONUS: Araç fiyatı arttıkça kabul eşiğini YÜKSELTir
   // Pahalı araçlarda daha yüksek teklif oranı gerekli
   double _calculatePriceBandBonus(double listingPrice) {
@@ -459,7 +478,7 @@ class SellerProfile {
       return 0.05; // 5M+: +%5 daha yüksek (ÇOK KATİ!)
     }
   }
-  
+
   // 🆕 SMART COUNTER OFFER: Mantıklı karşı teklif hesapla
   // 🔥 KRİTİK: Karşı teklifler İLAN FİYATINA YAKIN olmalı, orta nokta değil!
   // Gerçek hayatta galericiler çok az iner
@@ -473,46 +492,48 @@ class SellerProfile {
     // 1. 🔥 YENİ MANTIK: İlan fiyatından başla, satıcı bias'ına göre az iner
     // Eski: Orta noktayı bul → ÇOK YUMUŞAK ❌
     // Yeni: İlan fiyatından küçük bir indirim yap → GERÇEKÇÖ ✅
-    
+
     // 2. Kullanıcı teklifini dikkate al (çok düşükse biraz daha iner)
     // Ama yine de ilan fiyatına yakın kalır
     final userOfferRatio = offerPrice / listingPrice;
-    
+
     double adjustedCounter;
     if (userOfferRatio < 0.85) {
       // Çok düşük teklif, biraz daha aşağı in ama yine de yüksek kal
-      adjustedCounter = listingPrice * (0.93 + random.nextDouble() * 0.04); // %93-97
+      adjustedCounter =
+          listingPrice * (0.93 + random.nextDouble() * 0.04); // %93-97
     } else if (userOfferRatio < 0.92) {
       // Orta teklif, ilan fiyatına yakın dur
-      adjustedCounter = listingPrice * (0.95 + random.nextDouble() * 0.03); // %95-98
+      adjustedCounter =
+          listingPrice * (0.95 + random.nextDouble() * 0.03); // %95-98
     } else {
       // İyi teklif, çok az in
-      adjustedCounter = listingPrice * (0.97 + random.nextDouble() * 0.02); // %97-99
+      adjustedCounter =
+          listingPrice * (0.97 + random.nextDouble() * 0.02); // %97-99
     }
-    
+
     // 4. Reserve price'ın altına inme (mantık kontrolü)
     double lowerBound1 = reservePrice * 1.02;
     final upperBound = listingPrice * 0.99;
-    
+
     // Lower bound upper bound'dan büyük olamaz
     if (lowerBound1 > upperBound) {
       lowerBound1 = upperBound;
     }
-    
+
     adjustedCounter = adjustedCounter.clamp(lowerBound1, upperBound);
-    
+
     // 5. Kullanıcı teklifinden mutlaka yüksek ol
     double lowerBound2 = offerPrice * 1.05;
-    
+
     // Lower bound upper bound'dan büyük olamaz
     if (lowerBound2 > upperBound) {
       lowerBound2 = upperBound;
     }
-    
+
     adjustedCounter = adjustedCounter.clamp(lowerBound2, upperBound);
-    
+
     // 6. 1000'e yuvarla (daha gerçekçi görünsün)
     return (adjustedCounter / 1000).round() * 1000.0;
   }
 }
-

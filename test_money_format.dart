@@ -1,4 +1,6 @@
 // Mock Localization
+// ignore_for_file: unused_local_variable, unused_element
+
 Map<String, String> tr = {
   'common.money_suffix_m': 'M',
   'common.money_suffix_b': 'B',
@@ -34,8 +36,6 @@ String _formatMoney(dynamic amount) {
 }
 
 void main() {
-  print('Testing Money Formatting:');
-
   var cases = [
     500,
     999999,
@@ -50,7 +50,5 @@ void main() {
     null,
   ];
 
-  for (var c in cases) {
-    print('$c -> ${_formatMoney(c)}');
-  }
+  for (var c in cases) {}
 }

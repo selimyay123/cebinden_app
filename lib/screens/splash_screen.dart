@@ -1,7 +1,8 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
-import '../services/localization_service.dart';
 import 'main_screen.dart';
 import 'login_screen.dart';
 
@@ -29,17 +30,12 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
 
       // Aktif kullanıcı var mı kontrol et
-      
+
       final userExists = await _authService.checkUserExists();
-      
+
       if (userExists) {
         final currentUser = await _authService.getCurrentUser();
-        
-        
-      } else {
-        
-        
-      }
+      } else {}
 
       if (!mounted) return;
 
@@ -57,8 +53,6 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     } catch (e) {
-      
-      
       // Hata durumunda güvenli olarak login'e yönlendir
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
@@ -72,15 +66,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Intro resmi ile uyumlu olması için siyah yapıldı, gerekirse değiştirilebilir
+      backgroundColor: Colors
+          .black, // Intro resmi ile uyumlu olması için siyah yapıldı, gerekirse değiştirilebilir
       body: Stack(
         children: [
           Image.asset(
-              'assets/images/splash_screen.jpeg',
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-            ),
+            'assets/images/splash_screen.jpeg',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
           const Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -101,4 +96,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

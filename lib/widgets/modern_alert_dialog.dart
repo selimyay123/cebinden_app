@@ -72,7 +72,7 @@ class _ModernAlertDialogState extends State<ModernAlertDialog>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -94,7 +94,7 @@ class _ModernAlertDialogState extends State<ModernAlertDialog>
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -142,7 +142,7 @@ class _ModernAlertDialogState extends State<ModernAlertDialog>
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: Colors.white.withOpacity(0.3)),
+                              side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                             ),
                           ),
                           child: Text(

@@ -119,11 +119,16 @@
     "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
     "ageRestriction": "Debes tener al menos 13 años",
     "createAccountTitle": "Elige un nombre de usuario para empezar el juego",
-    "reportInfo": "Mantén presionado el nombre de un usuario para reportarlo"
+    "reportInfo": "Mantén presionado el nombre de un usuario para reportarlo",
+    "emailOrUsername": "Correo electrónico o Nombre de usuario",
+    "enterEmailAddress": "Ingresa tu correo electrónico",
+    "forgotPasswordQuestion": "¿Olvidaste tu contraseña?"
   },
   "staff": {
     "title": "Gestión de Personal",
     "manage_staff": "Gestión de Personal",
+    "contract_remaining": "Contrato: {days} Días Restantes",
+    "daily_limit_warning": "Un miembro del personal puede realizar un máximo de 20 transacciones por día.",
     "empty_title": "Aún no tienes personal",
     "empty_desc": "Construye un equipo profesional para automatizar tu negocio y aumentar tus ingresos.",
     "hire_button": "Contratar Personal",
@@ -162,10 +167,19 @@
     "staff_resigned": "¡Todo su personal ha dimitido por falta de saldo!",
     "hire_success": "¡{name} se unió al equipo!",
     "fire_success": "Caminos separados con {name}.",
+    "contract_expired": "Contrato expirado para {name}.",
+    "salary_payment_title": "Pago de Salario del Personal",
+    "salary_payment_desc": "Pago diario para {count} miembros del personal.",
+    "salary_paid_success": "Salarios del personal pagados.",
     "department_full": "¡Departamento lleno! (Máx: {limit})",
     "no_personnel_in_dept": "No hay personal en este departamento.",
     "market_knowledge": "Conocimiento del Mercado",
-    "single_staff_limit_error": "Solo puede tener un empleado en este puesto. Por favor, despida al empleado actual primero."
+    "single_staff_limit_error": "Solo puede tener un empleado en este puesto. Por favor, despida al empleado actual primero.",
+    "activity_purchase_title": "{name} Comprado",
+    "activity_purchase_desc": "Comprado por {agent} por {price} TL.",
+    "activity_sale_title": "{name} Vendido",
+    "activity_sale_desc": "Vendido por {agent} por {price} TL.",
+    "profit_rate": "Beneficio: %{rate}"
   },
   "home": {
     "title": "Panel de Control",
@@ -795,6 +809,8 @@
     "offers": "Notificaciones de Oferta",
     "system": "Notificaciones del Sistema",
     "appInfo": "Aplicación",
+    "reauthRequired": "Por seguridad, por favor inicia sesión de nuevo.",
+    "confirmDeleteAfterAuth": "Identidad verificada. Eliminando cuenta...",
     "about": "Acerca de",
     "version": "Versión",
     "developer": "Desarrollador",
@@ -886,7 +902,15 @@
     "banConfirmMessage": "¿Estás seguro de que quieres banear a {username}? Esta acción no se puede deshacer.",
     "reportDismissed": "Reporte descartado.",
     "userBanned": "Usuario baneado.",
-    "error": "Ocurrió un error."
+    "error": "Ocurrió un error.",
+    "reports_tab": "Reportes",
+    "gold_tab": "Oro",
+    "username_label": "Usuario o Email",
+    "username_hint": "Ingresa usuario o email",
+    "gold_amount_hint": "Cantidad de Oro",
+    "assign_gold": "Asignar Oro",
+    "gold_assigned_success": "¡{amount} oro asignado a {username}!",
+    "user_not_found": "No se encontró usuario con este nombre o email."
   },
   "report": {
     "title": "Reportar Usuario",
@@ -1007,7 +1031,17 @@
       "alreadyFriends": "Ya son amigos",
       "requestAlreadySent": "Solicitud ya enviada",
       "sendMessage": "Escribe un mensaje...",
-      "addFriend": "Añadir Amigo"
+      "addFriend": "Añadir Amigo",
+      "eula": {
+        "title": "Entorno Social Seguro",
+        "description": "¡Bienvenido al Centro Social! Para garantizar una experiencia segura y positiva para todos, acepta las siguientes reglas:",
+        "rule1": "• Sé respetuoso con los demás.",
+        "rule2": "• No envíes spam ni acoses a otros usuarios.",
+        "rule3": "• Usa la función \"Respeto\" para mostrar aprecio.",
+        "footer": "La violación de estas reglas puede resultar en el acceso restringido a las funciones sociales.",
+        "button": "Estoy de Acuerdo",
+        "declinedMessage": "Debes aceptar las reglas para acceder a las funciones sociales."
+      }
     }
   },
   "activity": {
@@ -1021,11 +1055,13 @@
     "rentalTitle": "Ingreso de Alquiler",
     "rentalDesc": "Cobró alquiler de {count} vehículos",
     "levelUpTitle": "Subida de Nivel",
-    "levelUpDesc": "Alcanzó el Nivel {level}",
+    "levelUpDesc": "Alcanzó el Nivel {level}\n{sp} SP",
     "taxiTitle": "Ganancias de Taxi",
     "taxiDesc": "Ganado de misión de Taxi",
     "dailyLoginTitle": "Bono Diario",
     "dailyLoginDesc": "Recompensa diaria de inicio de sesión",
+    "tab_general": "General",
+    "tab_staff": "Personal",
     "clearAll": "Limpiar Todo",
     "clearAllConfirm": "¿Estás seguro de que quieres limpiar todo el historial de actividad?",
     "cleared": "Historial limpiado",
@@ -1076,6 +1112,8 @@
     "listingScore": "Puntuación del Anuncio"
   },
   "quests": {
+    "tab_daily": "Diario",
+    "tab_missions": "Misiones",
     "title": "Misiones",
     "noQuests": "No se encontraron misiones para hoy.",
     "rewardClaimed": "¡Recompensa Reclamada! +{xp} XP, +{money} TL",
@@ -2233,10 +2271,10 @@
       }
     },
     "interaction": {
-      "respect": "Mostrar Respeto",
-      "respect_sent": "¡Respeto enviado! 🫡",
-      "already_respected": "Suficiente respeto por hoy. ¡Vuelve mañana! ⏳",
-      "respect_count": "Puntos de Respeto"
+      "respect": "Me gusta",
+      "respect_sent": "¡Me gusta enviado! ❤️",
+      "already_respected": "¡Ya diste me gusta hoy! ¡Vuelve mañana! ⏳",
+      "respect_count": "Corazones"
     }
   }
 }

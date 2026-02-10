@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,8 +9,6 @@ import 'requests_tab.dart';
 import 'search_tab.dart';
 import '../../widgets/modern_alert_dialog.dart';
 
-import 'dart:io';
-import '../../services/asset_service.dart';
 import '../../widgets/social_background.dart';
 
 class SocialHubScreen extends StatefulWidget {
@@ -32,52 +32,73 @@ class _SocialHubScreenState extends State<SocialHubScreen> {
     final accepted = prefs.getBool('social_eula_accepted') ?? false;
 
     if (!accepted && mounted) {
-      showDialog(
+      final result = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
-        builder: (context) => ModernAlertDialog(
-          title: 'Safe Social Environment',
+        builder: (dialogContext) => ModernAlertDialog(
+          title: 'drawer.social.eula.title'.tr(),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Welcome to the Social Hub! To ensure a safe and positive experience for everyone, please agree to the following rules:',
+                'drawer.social.eula.description'.tr(),
                 style: const TextStyle(color: Colors.white70),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              _buildRuleItem('• Be respectful to others.'),
-              _buildRuleItem('• Do not spam or harass other users.'),
-              _buildRuleItem(
-                '• Use the "Respect" feature to show appreciation.',
-              ),
+              _buildRuleItem('drawer.social.eula.rule1'.tr()),
+              _buildRuleItem('drawer.social.eula.rule2'.tr()),
+              _buildRuleItem('drawer.social.eula.rule3'.tr()),
               const SizedBox(height: 12),
               Text(
-                'Violation of these rules may result in restricted access to social features.',
+                'drawer.social.eula.footer'.tr(),
                 style: const TextStyle(color: Colors.white60, fontSize: 12),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
-          buttonText: 'I Agree',
-          onPressed: () async {
-            await prefs.setBool('social_eula_accepted', true);
-            if (mounted) Navigator.pop(context);
+          buttonText: 'drawer.social.eula.button'.tr(),
+          onPressed: () {
+            Navigator.of(dialogContext).pop(true); // Return true
           },
-          secondaryButtonText: 'Cancel',
-          onSecondaryPressed: () => Navigator.of(context)
-            ..pop()
-            ..pop(), // Pop dialog then screen
+          secondaryButtonText: 'common.cancel'.tr(),
+          onSecondaryPressed: () {
+            Navigator.of(dialogContext).pop(false); // Return false
+          },
           icon: Icons.safety_check,
           iconColor: Colors.blueAccent,
         ),
       );
+
+      // Handle result after dialog is closed using the screen's context
+      if (result == true) {
+        await prefs.setBool('social_eula_accepted', true);
+      } else {
+        // User cancelled or dismissed
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('drawer.social.eula.declinedMessage'.tr()),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          Navigator.of(context).pop(); // Go back to Home
+        }
+      }
     }
   }
 
   Widget _buildRuleItem(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
-      child: Text(text, style: const TextStyle(color: Colors.white)),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 

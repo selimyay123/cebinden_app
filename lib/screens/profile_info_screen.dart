@@ -3,15 +3,11 @@ import 'package:lottie/lottie.dart';
 import '../models/user_model.dart';
 import '../services/localization_service.dart';
 import 'package:intl/intl.dart';
-import 'main_screen.dart';
 
 class ProfileInfoScreen extends StatelessWidget {
   final User user;
 
-  const ProfileInfoScreen({
-    super.key,
-    required this.user,
-  });
+  const ProfileInfoScreen({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +15,7 @@ class ProfileInfoScreen extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('profile.title'.tr()),
-        actions: [
-
-        ],
+        actions: [],
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -38,7 +32,7 @@ class ProfileInfoScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -51,7 +45,7 @@ class ProfileInfoScreen extends StatelessWidget {
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.deepPurple.withOpacity(0.1),
+                      color: Colors.deepPurple.withValues(alpha: 0.1),
                     ),
                     child: ClipOval(
                       child: _buildProfileImage(user.profileImageUrl),
@@ -76,9 +70,7 @@ class ProfileInfoScreen extends StatelessWidget {
             _buildInfoCard(
               title: 'profile.personalInfo'.tr(),
               icon: Icons.person_outline,
-              children: [
-                _buildInfoRow('profile.username'.tr(), user.username),
-              ],
+              children: [_buildInfoRow('profile.username'.tr(), user.username)],
             ),
 
             const SizedBox(height: 12),
@@ -88,8 +80,14 @@ class ProfileInfoScreen extends StatelessWidget {
               title: 'profile.registrationInfo'.tr(),
               icon: Icons.calendar_today_outlined,
               children: [
-                _buildInfoRow('profile.registrationDate'.tr(), _formatDate(user.registeredAt)),
-                _buildInfoRow('profile.membershipDuration'.tr(), _getMembershipDuration()),
+                _buildInfoRow(
+                  'profile.registrationDate'.tr(),
+                  _formatDate(user.registeredAt),
+                ),
+                _buildInfoRow(
+                  'profile.membershipDuration'.tr(),
+                  _getMembershipDuration(),
+                ),
               ],
             ),
           ],
@@ -100,11 +98,7 @@ class ProfileInfoScreen extends StatelessWidget {
 
   Widget _buildProfileImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
-      return const Icon(
-        Icons.person,
-        size: 50,
-        color: Colors.deepPurple,
-      );
+      return const Icon(Icons.person, size: 50, color: Colors.deepPurple);
     }
 
     if (imageUrl.endsWith('.json')) {
@@ -148,7 +142,7 @@ class ProfileInfoScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -184,13 +178,7 @@ class ProfileInfoScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
           Text(
             value,
             style: TextStyle(
@@ -201,13 +189,6 @@ class ProfileInfoScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
     );
   }
 
@@ -226,4 +207,3 @@ class ProfileInfoScreen extends StatelessWidget {
     }
   }
 }
-

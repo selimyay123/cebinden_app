@@ -7,6 +7,8 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../services/notification_service.dart';
 import '../services/ad_service.dart';
+import '../services/admin_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../services/game_time_service.dart';
 import '../models/user_model.dart';
@@ -86,9 +88,9 @@ class _HomeScreenState extends State<HomeScreen>
   int _totalCollectionCount = 0;
   int _completedCollectionCount =
       0; // Tamamlanan (ödülü alınmamış) koleksiyon sayısı
-  int _vehicleCount = 0;
+
   List<UserVehicle> _userVehicles = [];
-  List<UserVehicle> _userListedVehicles = []; // Satışa çıkarılan araçlar
+  // Satışa çıkarılan araçlar
   List<DailyQuest> _dailyQuests = []; // Günlük görevler
 
   // Tutorial için GlobalKey'ler
@@ -105,7 +107,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Fire animasyonu için
   // Fire animasyonu için
-  bool _showFireAnimation = false;
 
   // Tutorial aktif mi? (scroll'u engellemek için)
   bool _isTutorialActive = false;
@@ -116,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen>
   final ScrollController _scrollController = ScrollController();
   StreamSubscription? _userUpdateSubscription;
   StreamSubscription? _staffEventSubscription;
+  StreamSubscription<DocumentSnapshot>? _firestoreUserSubscription;
 
   @override
   int? get tabIndex => 3; // MainScreen'deki index
@@ -128,17 +130,21 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _initData();
+    // Kullanıcı güncellemelerini dinle (Skill unlock, bakiye değişimi vb.)
+    _userUpdateSubscription = _db.onUserUpdate.listen((_) {
+      if (mounted) _loadCurrentUser();
+    });
+
+    // Real-time Firestore dinleyicisi (Altın atamaları için)
+    _setupFirestoreListener();
+
     // İlk reklam yükleme
     _adService.loadRewardedAd();
 
     // Gün değişimini dinle
     _gameTime.addDayChangeListener(_onGameDayChanged);
 
-    // Kullanıcı güncellemelerini dinle (Skill unlock, bakiye değişimi vb.)
-    _userUpdateSubscription = _db.onUserUpdate.listen((_) {
-      if (mounted) _loadCurrentUser();
-    });
+    _initData();
 
     // Personel Simülasyon Dinleyicisi (Global Bildirim)
     final staffService = StaffService();
@@ -148,8 +154,14 @@ class _HomeScreenState extends State<HomeScreen>
     // Olayları dinle
     _staffEventSubscription = staffService.eventStream.listen((event) {
       if (mounted) {
+        // Her durumda bakiyeyi güncelle
+        _loadCurrentUser();
+
         // İlgisiz eventleri (progress güncellemeleri) yoksay
-        if (event.startsWith('staff_action_')) return;
+        if (event.startsWith('staff_action_') ||
+            event.startsWith('staff_update_')) {
+          return;
+        }
 
         if (ModalRoute.of(context)?.isCurrent ?? false) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -161,8 +173,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           );
         }
-        // Bakiyeyi güncelle
-        _loadCurrentUser();
       }
     });
   }
@@ -171,6 +181,51 @@ class _HomeScreenState extends State<HomeScreen>
     await _loadCurrentUser();
     if (mounted) {
       _checkDailyStreak();
+      await _claimPendingGold();
+    }
+  }
+
+  /// Firestore'u gerçek zamanlı dinleyerek bekleyen altınları yakala
+  Future<void> _setupFirestoreListener() async {
+    final user = await AuthService().getCurrentUser();
+    if (user == null) return;
+
+    _firestoreUserSubscription?.cancel();
+    _firestoreUserSubscription = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.id)
+        .snapshots()
+        .listen((snapshot) {
+          if (snapshot.exists && snapshot.data() != null) {
+            final data = snapshot.data() as Map<String, dynamic>;
+            final pending = (data['pendingGold'] as num?)?.toDouble() ?? 0;
+            if (pending > 0) {
+              debugPrint(
+                '🔥 Firestore Listener: $pending bekleyen altın yakalandı!',
+              );
+              _claimPendingGold(); // Zaten içinden claim yapacak
+            }
+          }
+        });
+  }
+
+  /// Admin panelinden atanan bekleyen altını talep et
+  Future<void> _claimPendingGold() async {
+    // Mevcut yerel veriyi al
+    final user = await AuthService().getCurrentUser();
+    if (user == null) return;
+
+    // Firestore'dan bekleyen altını al VE sıfırla (claimPendingGold içinde)
+    final pending = await AdminService().claimPendingGold(user.id);
+    if (pending > 0) {
+      debugPrint('💰 Bekleyen $pending altın tanımlanıyor...');
+      final newGold = user.gold + pending;
+
+      // Yerel DB'yi güncelle (updateUser içinde CloudService.saveUser çağrılır)
+      await DatabaseHelper().updateUser(user.id, {'gold': newGold});
+
+      // UI'yı güncelle
+      await _loadCurrentUser();
     }
   }
 
@@ -180,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen>
     _adService.dispose();
     _userUpdateSubscription?.cancel();
     _staffEventSubscription?.cancel();
+    _firestoreUserSubscription?.cancel();
     super.dispose();
   }
 
@@ -188,17 +244,10 @@ class _HomeScreenState extends State<HomeScreen>
     if (!mounted) return;
 
     // Fire animasyonunu tetikle (Teklifler yenileniyor)
-    setState(() {
-      _showFireAnimation = true;
-    });
 
     // 3 saniye sonra animasyonu gizle
     Timer(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _showFireAnimation = false;
-        });
-      }
+      if (mounted) {}
     });
 
     // Galeri sahibiyse kiralama geliri işle
@@ -226,10 +275,8 @@ class _HomeScreenState extends State<HomeScreen>
       _notificationService.checkAndResetDailyNotifications(user.id);
 
       final vehicles = await _db.getUserActiveVehicles(user.id);
-      final vehicleCount = vehicles.length;
 
       // Kullanıcının satışa çıkardığı araçları yükle
-      final listedVehicles = await _db.getUserListedVehicles(user.id);
 
       // Bekleyen teklifleri yükle
 
@@ -275,8 +322,6 @@ class _HomeScreenState extends State<HomeScreen>
         setState(() {
           _currentUser = user;
           _userVehicles = vehicles;
-          _userListedVehicles = listedVehicles;
-          _vehicleCount = vehicleCount;
           _dailyQuests = quests;
           _collectedCount = collectedCount;
           _totalCollectionCount = totalModels;
@@ -285,9 +330,7 @@ class _HomeScreenState extends State<HomeScreen>
         });
       }
 
-      User updatedUser = user;
-
-      // Eğer son sıfırlama tarihi bugün değilse (veya null ise), sıfırla
+      // Eğer son sıfırlama tarihi bugün değilse (veya null ise), sadece o alanları güncelle
       if (user.lastDailyResetDate == null ||
           DateTime(
                 user.lastDailyResetDate!.year,
@@ -295,30 +338,16 @@ class _HomeScreenState extends State<HomeScreen>
                 user.lastDailyResetDate!.day,
               ) !=
               today) {
-        updatedUser = user.copyWith(
-          dailyStartingBalance: user.balance,
-          lastDailyResetDate: now,
-        );
-
-        await _db.updateUser(user.id, updatedUser.toJson());
+        debugPrint('🆕 Günlük bakiye sıfırlanıyor...');
+        await _db.updateUser(user.id, {
+          'dailyStartingBalance': user.balance,
+          'lastDailyResetDate': now.toIso8601String(),
+        });
+        // Listener üzerinden tekrar yüklenecek
       }
 
-      setState(() {
-        _currentUser = updatedUser;
-        _userVehicles = vehicles;
-        _vehicleCount = vehicleCount;
-        _userListedVehicles = listedVehicles;
-        _isLoading = false;
-      });
-
-      // Günlük giriş bonusunu (Streak) kontrol et
-      // _checkDailyStreak(); // ARTIK BURADA ÇAĞIRMIYORUZ (Sonsuz döngü/çift dialog hatası için)
-
-      // Günlük görevleri kontrol et/oluştur
-      _questService.checkAndGenerateQuests(user.id);
-
       // Liderlik tablosu için verileri senkronize et (Arka planda)
-      LeaderboardService().updateUserScore(updatedUser);
+      LeaderboardService().updateUserScore(user);
 
       // Kullanıcı yüklendikten sonra tutorial'ı kontrol et
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -350,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen>
             showDialog(
               context: context,
               builder: (context) => ModernAlertDialog(
-                title: '${'ads.rewardReceived'.tr()}',
+                title: 'ads.rewardReceived'.tr(),
                 icon: Icons.attach_money,
                 iconColor: Colors.greenAccent,
                 content: Column(
@@ -1318,7 +1347,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildWatchAdCard() {
-    return Container(
+    return SizedBox(
       height: 90, // Sayaç ile tam uyum için hafifçe artırıldı
       child: Stack(
         clipBehavior: Clip.none,
@@ -2421,10 +2450,7 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (context) => ModernAlertDialog(
         title: 'home.buyGallery'.tr(),
         content: Text(
-          'home.galleryPrice'.tr() +
-              ': ${_formatCurrency(galleryPrice)} TL\n\n' +
-              'common.continue'.tr() +
-              '?',
+          '${'home.galleryPrice'.tr()}: ${_formatCurrency(galleryPrice)} TL\n\n${'common.continue'.tr()}?',
           style: const TextStyle(fontSize: 16, color: Colors.white),
         ),
         buttonText: 'common.continue'.tr(),
@@ -2707,7 +2733,7 @@ class _HomeScreenState extends State<HomeScreen>
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: rentedVehicles.length,
-          itemBuilder: (context, index) {
+          itemBuilder: (itemContext, index) {
             final vehicle = rentedVehicles[index];
             final dailyIncome =
                 vehicle.purchasePrice * RentalService.dailyRentalRate;
@@ -2887,6 +2913,7 @@ class _HomeScreenState extends State<HomeScreen>
           content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: rentableVehicles.length,
               itemBuilder: (context, index) {
@@ -3305,7 +3332,7 @@ class _HomeScreenState extends State<HomeScreen>
                   //   title: 'Araç Kirala',
                   //   onTap: () {
                   //     Navigator.pop(context);
-                  //     // TODO: Araç kiralama sayfasına git
+                  //
                   //     ScaffoldMessenger.of(context).showSnackBar(
                   //       const SnackBar(
                   //         content: Text('Araç kiralama sayfası yakında...'),
@@ -3320,7 +3347,7 @@ class _HomeScreenState extends State<HomeScreen>
                   //   title: 'drawer.tasks'.tr(),
                   //   onTap: () {
                   //     Navigator.pop(context);
-                  //     // TODO: Görevler sayfasına git
+                  //
                   //     ScaffoldMessenger.of(context).showSnackBar(
                   //       SnackBar(
                   //         content: Text('drawer.tasksComingSoon'.tr()),
@@ -3452,7 +3479,7 @@ class _HomeScreenState extends State<HomeScreen>
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('tutorial_completed', true);
     } catch (e) {
-      print('Error updating tutorial status: $e');
+      // Tutorial status update failed
     }
   }
 
@@ -3892,7 +3919,7 @@ class _HomeScreenState extends State<HomeScreen>
 class WiggleBadge extends StatefulWidget {
   final Widget child;
 
-  const WiggleBadge({Key? key, required this.child}) : super(key: key);
+  const WiggleBadge({super.key, required this.child});
 
   @override
   State<WiggleBadge> createState() => _WiggleBadgeState();
@@ -3950,7 +3977,7 @@ class _WiggleBadgeState extends State<WiggleBadge>
 
 class PulseBadge extends StatefulWidget {
   final Widget child;
-  const PulseBadge({Key? key, required this.child}) : super(key: key);
+  const PulseBadge({super.key, required this.child});
 
   @override
   State<PulseBadge> createState() => _PulseBadgeState();

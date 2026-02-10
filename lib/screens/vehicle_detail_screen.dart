@@ -21,16 +21,13 @@ import '../services/market_refresh_service.dart'; // Market Servisi (Fiyat hesap
 import '../services/screen_refresh_service.dart';
 import '../widgets/vehicle_top_view.dart';
 import '../widgets/level_up_dialog.dart';
-import 'my_offers_screen.dart';
 import '../services/skill_service.dart';
 import '../models/seller_profile_model.dart';
-import '../services/screen_refresh_service.dart';
 import '../widgets/modern_alert_dialog.dart';
 
 import '../widgets/vehicle_image.dart';
 import '../widgets/game_image.dart';
 import 'package:intl/intl.dart';
-import 'main_screen.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
   final Vehicle vehicle;
@@ -118,7 +115,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('favorites.removedFromFavorites'.tr()),
-              backgroundColor: Colors.orange.withOpacity(0.8),
+              backgroundColor: Colors.orange.withValues(alpha: 0.8),
               duration: const Duration(milliseconds: 1500),
             ),
           );
@@ -143,7 +140,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               ),
               behavior: SnackBarBehavior.floating,
               content: Text('favorites.addedToFavorites'.tr()),
-              backgroundColor: Colors.green.withOpacity(0.8),
+              backgroundColor: Colors.green.withValues(alpha: 0.8),
               duration: const Duration(milliseconds: 1500),
             ),
           );
@@ -221,7 +218,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      Colors.black.withOpacity(0.7),
+                                      Colors.black.withValues(alpha: 0.7),
                                       Colors.transparent,
                                     ],
                                   ),
@@ -413,7 +410,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             // Loading Indicator
             if (_isLoading)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 child: const Center(
                   child: CircularProgressIndicator(color: Colors.deepOrange),
                 ),
@@ -441,16 +438,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final bool priceDropped =
         _vehicle.isExpertiseDone && _vehicle.price < _vehicle.declaredPrice;
 
-    // Yetenek indirimi
-    // Yetenek indirimi
-    final multiplier = 1.0;
-    final discountedPrice = _vehicle.price;
-    final hasSkillDiscount = false;
-
-    // Piyasa Kurdu yeteneği kontrolü
-    final hasMarketInsider = false;
-
-    if (!priceDropped && !hasSkillDiscount) {
+    if (!priceDropped) {
       // Hiçbir indirim yok
       return Text(
         '${_formatCurrency(_vehicle.price)} TL',
@@ -465,53 +453,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (hasMarketInsider) ...[
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blueGrey.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.analytics_outlined,
-                      color: Colors.blueGrey,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'skills.marketInsider'.tr(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('vehicle.marketValue'.tr()),
-                    Text(
-                      '${_formatCurrency(_vehicle.price * 0.9)} - ${_formatCurrency(_vehicle.price * 1.1)} TL',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
         // 1. İlan Fiyatı (Ekspertiz düşüşü varsa)
         if (priceDropped) ...[
           Text(
@@ -533,73 +474,25 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         ],
 
         // 2. Ara Fiyat (Ekspertiz sonrası, yetenek indirimi öncesi)
-        if (hasSkillDiscount) ...[
-          if (priceDropped)
-            Text(
-              'expertise.value'.tr(),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.green[700],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+
+        // Sadece ekspertiz indirimi var
+        if (priceDropped)
           Text(
-            '${_formatCurrency(_vehicle.price)} TL',
+            'expertise.value'.tr(),
             style: TextStyle(
-              fontSize: priceDropped ? 16 : 18,
-              decoration: TextDecoration.lineThrough,
-              color: Colors.grey[600],
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '-%${((1 - multiplier) * 100).toStringAsFixed(0)}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${_formatCurrency(discountedPrice)} TL',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-              ),
-            ],
-          ),
-        ] else ...[
-          // Sadece ekspertiz indirimi var
-          if (priceDropped)
-            Text(
-              'expertise.value'.tr(),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.green[700],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          Text(
-            '${_formatCurrency(_vehicle.price)} TL',
-            style: TextStyle(
-              fontSize: 24,
+              fontSize: 12,
+              color: Colors.green[700],
               fontWeight: FontWeight.bold,
-              color: priceDropped ? Colors.green : Colors.deepPurple,
             ),
           ),
-        ],
+        Text(
+          '${_formatCurrency(_vehicle.price)} TL',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: priceDropped ? Colors.green : Colors.deepPurple,
+          ),
+        ),
       ],
     );
   }
@@ -1080,13 +973,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                 );
 
                             if (!rewardEarned) {
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('common.adFailed'.tr()),
-                                  ),
-                                );
-                              }
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('common.adFailed'.tr())),
+                              );
                             }
                           },
                           icon: const Icon(Icons.ondemand_video),
@@ -1297,8 +1187,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.8),
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false,
+      builder: (context) => PopScope(
+        canPop: false,
         child: Center(
           child: Lottie.asset(
             'assets/animations/satinal.json',
@@ -1361,7 +1251,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             ),
             behavior: SnackBarBehavior.floating,
             content: Text('expertise.issuesFoundMessage'.tr()),
-            backgroundColor: Colors.red.withOpacity(0.8),
+            backgroundColor: Colors.red.withValues(alpha: 0.8),
             duration: const Duration(milliseconds: 1500),
           ),
         );
@@ -1376,7 +1266,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             ),
             behavior: SnackBarBehavior.floating,
             content: Text('expertise.cleanMessage'.tr()),
-            backgroundColor: Colors.green.withOpacity(0.8),
+            backgroundColor: Colors.green.withValues(alpha: 0.8),
           ),
         );
       }
@@ -1668,9 +1558,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     final TextEditingController offerController = TextEditingController();
 
     // 🆕 Initialize SellerProfile with deterministic seed
-    final sellerProfile = SellerProfile.generateRandom(
-      seed: _vehicle.id.hashCode,
-    );
     double acceptanceChance = 0.0;
 
     // Önceden reddedilmiş teklif var mı kontrol et
@@ -1755,7 +1642,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         ),
                       ),
                       filled: true,
-                      fillColor: Colors.white.withOpacity(0.1),
+                      fillColor: Colors.white.withValues(alpha: 0.1),
                       prefixIcon: const Icon(
                         Icons.attach_money,
                         color: Colors.white70,
@@ -1824,7 +1711,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             stops: [0.0, 0.5, 1.0],
                           ),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -1856,7 +1743,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.2,
+                                      ),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -1884,7 +1773,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     ),
                     behavior: SnackBarBehavior.floating,
                     content: Text('offer.enterAmountError'.tr()),
-                    backgroundColor: Colors.red.withOpacity(0.8),
+                    backgroundColor: Colors.red.withValues(alpha: 0.8),
                   ),
                 );
                 return;
@@ -1902,7 +1791,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     ),
                     behavior: SnackBarBehavior.floating,
                     content: Text('offer.invalidAmountError'.tr()),
-                    backgroundColor: Colors.red.withOpacity(0.8),
+                    backgroundColor: Colors.red.withValues(alpha: 0.8),
                   ),
                 );
                 return;
@@ -1917,7 +1806,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                     ),
                     behavior: SnackBarBehavior.floating,
                     content: Text('offer.offerTooHighError'.tr()),
-                    backgroundColor: Colors.red.withOpacity(0.8),
+                    backgroundColor: Colors.red.withValues(alpha: 0.8),
                   ),
                 );
                 return;
@@ -1953,9 +1842,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2190,8 +2079,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false, // Geri tuşu ile kapatmayı engelle
+      builder: (context) => PopScope(
+        canPop: false, // Geri tuşu ile kapatmayı engelle
         child: AlertDialog(
           title: Row(
             children: [
@@ -2440,8 +2329,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black.withValues(alpha: 0.85),
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false, // Geri tuşunu devre dışı bırak
+      builder: (context) => PopScope(
+        canPop: false, // Geri tuşunu devre dışı bırak
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -2488,15 +2377,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                 child: Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(28),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -2549,10 +2438,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Colors.green.withOpacity(0.2),
+                            color: Colors.green.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Column(
@@ -2567,7 +2456,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '${'purchase.successMessage'.tr()}',
+                                  'purchase.successMessage'.tr(),
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -2604,7 +2493,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.deepPurple.withOpacity(0.3),
+                              color: Colors.deepPurple.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -2715,7 +2604,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.deepPurple.withOpacity(0.3),
+                            color: Colors.deepPurple.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),

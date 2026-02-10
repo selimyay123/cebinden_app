@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/vehicle_model.dart';
 import 'market_refresh_service.dart';
@@ -29,7 +31,6 @@ class FavoriteService {
       await _favoritesBox.flush();
       return true;
     } catch (e) {
-
       return false;
     }
   }
@@ -42,7 +43,6 @@ class FavoriteService {
       await _favoritesBox.flush();
       return true;
     } catch (e) {
-
       return false;
     }
   }
@@ -53,7 +53,6 @@ class FavoriteService {
       final key = '${userId}_$vehicleId';
       return _favoritesBox.containsKey(key);
     } catch (e) {
-
       return false;
     }
   }
@@ -62,7 +61,7 @@ class FavoriteService {
   Future<List<Vehicle>> getUserFavorites(String userId) async {
     try {
       final List<Vehicle> favorites = [];
-      
+
       // Kullanıcıya ait tüm favorileri bul
       for (var entry in _favoritesBox.toMap().entries) {
         final String key = entry.key.toString();
@@ -70,29 +69,28 @@ class FavoriteService {
           try {
             final vehicleMap = Map<String, dynamic>.from(entry.value);
             final storedVehicle = Vehicle.fromJson(vehicleMap);
-            
+
             // Market servisinden güncel veriyi kontrol et
             // Eğer araç hala markette ise, güncel halini (ekspertiz yapılmış vs.) al
-            final marketVehicle = MarketRefreshService().getVehicleById(storedVehicle.id);
-            
+            final marketVehicle = MarketRefreshService().getVehicleById(
+              storedVehicle.id,
+            );
+
             if (marketVehicle != null) {
               favorites.add(marketVehicle);
             } else {
               // Araç markette yoksa (satılmış veya süresi dolmuş), favorilerden de temizle
               await _favoritesBox.delete(key);
             }
-          } catch (e) {
-
-          }
+          } catch (e) {}
         }
       }
-      
+
       // Tarihe göre sırala (en yeniler önce)
       favorites.sort((a, b) => b.listedAt.compareTo(a.listedAt));
-      
+
       return favorites;
     } catch (e) {
-
       return [];
     }
   }
@@ -108,7 +106,6 @@ class FavoriteService {
       }
       return count;
     } catch (e) {
-
       return 0;
     }
   }
@@ -118,45 +115,39 @@ class FavoriteService {
   Future<void> removeVehicleFromAllFavorites(String vehicleId) async {
     try {
       final List<String> keysToRemove = [];
-      
+
       // İlana ait tüm favori kayıtlarını bul
       for (var key in _favoritesBox.keys) {
         if (key.toString().endsWith('_$vehicleId')) {
           keysToRemove.add(key.toString());
         }
       }
-      
+
       // Toplu silme
       for (var key in keysToRemove) {
         await _favoritesBox.delete(key);
       }
-      
+
       await _favoritesBox.flush();
-
-    } catch (e) {
-
-    }
+    } catch (e) {}
   }
 
   /// Kullanıcının tüm favorilerini temizle
   Future<void> clearUserFavorites(String userId) async {
     try {
       final List<String> keysToRemove = [];
-      
+
       for (var key in _favoritesBox.keys) {
         if (key.toString().startsWith('${userId}_')) {
           keysToRemove.add(key.toString());
         }
       }
-      
+
       for (var key in keysToRemove) {
         await _favoritesBox.delete(key);
       }
-      
-      await _favoritesBox.flush();
-    } catch (e) {
 
-    }
+      await _favoritesBox.flush();
+    } catch (e) {}
   }
 }
-

@@ -46,7 +46,7 @@ class CitySkylinePainter extends CustomPainter {
     
     // Pencereler (Işıklar)
     final windowPaint = Paint()
-      ..color = Colors.yellow.withOpacity(0.3)
+      ..color = Colors.yellow.withValues(alpha: 0.3)
       ..style = PaintingStyle.fill;
       
     // Tekrar başa dön ve pencereleri çiz

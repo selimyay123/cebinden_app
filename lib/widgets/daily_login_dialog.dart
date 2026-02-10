@@ -1,4 +1,5 @@
-import 'dart:ui';
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../services/daily_login_service.dart';
@@ -38,9 +39,11 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.grey[800]!.withOpacity(0.8),
+              backgroundColor: Colors.grey[800]!.withValues(alpha: 0.8),
               content: const Text('Reklam yüklenemedi, normal ödül alınıyor.'),
             ),
           );
@@ -50,18 +53,23 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
       }
     }
 
-    final success = await _loginService.claimReward(widget.userId, isDouble: doubleReward);
+    final success = await _loginService.claimReward(
+      widget.userId,
+      isDouble: doubleReward,
+    );
 
     if (mounted) {
       setState(() => _isClaiming = false);
       if (success) {
         Navigator.pop(context); // Dialogu kapat
         widget.onClaim(); // Callback'i çağır (örn: konfeti patlat)
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: const Color(0xFF4CAF50),
             content: Row(
@@ -70,7 +78,10 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                 const SizedBox(width: 12),
                 Text(
                   'xp.source.dailyRewardClaimed'.tr(),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -80,9 +91,11 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.red.withOpacity(0.8),
+            backgroundColor: Colors.red.withValues(alpha: 0.8),
             content: Text('xp.dailyRewardError'.tr()),
           ),
         );
@@ -102,13 +115,16 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
         children: [
           // Main Card Content
           Container(
-            margin: const EdgeInsets.only(top: 0, bottom: 80), // Space for buttons bottom
+            margin: const EdgeInsets.only(
+              top: 0,
+              bottom: 80,
+            ), // Space for buttons bottom
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -132,7 +148,7 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                     ),
                   ),
                 ),
-                
+
                 // Content Body
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
@@ -142,14 +158,17 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                       Container(
                         margin: const EdgeInsets.only(top: 24),
                         transform: Matrix4.translationValues(0, -45, 0),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFD4982F),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: Colors.white, width: 2),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -170,29 +189,36 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          childAspectRatio: 0.85,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              childAspectRatio: 0.85,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
                         itemCount: 6,
                         itemBuilder: (context, index) {
                           final day = index + 1;
                           final isCurrent = day == widget.currentStreak;
                           final isPast = day < widget.currentStreak;
-                          
+
                           return Container(
                             decoration: BoxDecoration(
-                              color: isCurrent ? const Color(0xFF4CAF50) : const Color(0xFFF0F0F0),
+                              color: isCurrent
+                                  ? const Color(0xFF4CAF50)
+                                  : const Color(0xFFF0F0F0),
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: isCurrent ? [
-                                BoxShadow(
-                                  color: Colors.green.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                )
-                              ] : null,
+                              boxShadow: isCurrent
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.green.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ]
+                                  : null,
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -202,14 +228,18 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: isCurrent ? Colors.white : Colors.grey[600],
+                                    color: isCurrent
+                                        ? Colors.white
+                                        : Colors.grey[600],
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(isCurrent ? 0.2 : 0.5),
+                                    color: Colors.white.withValues(
+                                      alpha: isCurrent ? 0.2 : 0.5,
+                                    ),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Lottie.asset(
@@ -225,7 +255,9 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: isCurrent ? Colors.white : Colors.grey[800],
+                                    color: isCurrent
+                                        ? Colors.white
+                                        : Colors.grey[800],
                                   ),
                                 ),
                               ],
@@ -233,9 +265,9 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                           );
                         },
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Day 7 (Large Card)
                       Container(
                         width: double.infinity,
@@ -276,13 +308,20 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
                                       fontWeight: FontWeight.w900,
                                       color: Colors.white,
                                       shadows: [
-                                        Shadow(blurRadius: 2, color: Colors.black26, offset: Offset(1, 1))
+                                        Shadow(
+                                          blurRadius: 2,
+                                          color: Colors.black26,
+                                          offset: Offset(1, 1),
+                                        ),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.black26,
                                       borderRadius: BorderRadius.circular(12),
@@ -308,8 +347,6 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
             ),
           ),
 
-
-
           // Close Button (Top Right)
           Positioned(
             top: 40,
@@ -333,17 +370,24 @@ class _DailyLoginDialogState extends State<DailyLoginDialog> {
             left: 0,
             right: 0,
             child: ElevatedButton(
-              onPressed: _isClaiming ? null : () => _handleClaim(doubleReward: false),
+              onPressed: _isClaiming
+                  ? null
+                  : () => _handleClaim(doubleReward: false),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4CAF50),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 elevation: 4,
               ),
               child: Text(
                 'AL',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

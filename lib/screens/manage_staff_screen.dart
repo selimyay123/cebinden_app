@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import '../services/staff_service.dart';
@@ -211,7 +213,42 @@ class _ManageStaffScreenState extends State<ManageStaffScreen>
             ),
       body: Container(
         color: Colors.black,
-        child: _staff.isEmpty ? _buildEmptyState() : _buildTabBarView(),
+        child: _staff.isEmpty
+            ? _buildEmptyState()
+            : Column(
+                children: [
+                  // SARI UYARI MESAJI
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    color: Colors.amber.withValues(alpha: 0.2),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline,
+                          color: Colors.amber,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'staff.daily_limit_warning'.tr(),
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: _buildTabBarView()),
+                ],
+              ),
       ),
     );
   }

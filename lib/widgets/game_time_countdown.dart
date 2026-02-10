@@ -1,12 +1,11 @@
-import 'dart:io';
+// ignore_for_file: unused_local_variable
+
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import '../services/localization_service.dart'; // Custom localization service
 import '../services/game_time_service.dart';
-import '../screens/settings_screen.dart';
 import '../screens/skill_tree_screen.dart';
 
 import '../models/user_model.dart';
@@ -15,12 +14,8 @@ import '../services/skill_service.dart';
 class GameTimeCountdown extends StatefulWidget {
   final EdgeInsetsGeometry? margin;
   final User? currentUser;
-  
-  const GameTimeCountdown({
-    Key? key, 
-    this.margin,
-    this.currentUser,
-  }) : super(key: key);
+
+  const GameTimeCountdown({super.key, this.margin, this.currentUser});
 
   @override
   State<GameTimeCountdown> createState() => _GameTimeCountdownState();
@@ -52,7 +47,7 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
     if (mounted) {
       setState(() {
         final newTime = _gameTime.getTimeUntilNextDay();
-        
+
         // Sadece zaman geriye doğru büyük bir atlama yaparsa animasyon uygula (Hızlı sarma)
         // Gün döngüsünde (0 -> 60) zaman artacağı için bu koşul sağlanmaz ve animasyon çalışmaz
         if (_remainingTime.inSeconds - newTime.inSeconds > 5) {
@@ -60,7 +55,7 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
         } else {
           _animationDuration = Duration.zero;
         }
-        
+
         _remainingTime = newTime;
         _currentHour = _gameTime.getCurrentHour();
         _totalDurationMinutes = _gameTime.getGameDayDuration();
@@ -79,7 +74,7 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
   Widget build(BuildContext context) {
     // Gündüz/Gece kontrolü (06:00 - 18:00 arası gündüz)
     final isDay = _currentHour >= 6 && _currentHour < 18;
-    
+
     // İlerleme oranı (0.0 - 1.0)
     final totalSeconds = _totalDurationMinutes * 60;
     final remainingSeconds = _remainingTime.inSeconds;
@@ -87,23 +82,38 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
 
     // Renkler ve Gradientler
     final List<Color> gradientColors = isDay
-        ? [const Color(0xFF4FC3F7), const Color(0xFFFFB74D)] // Gündüz: Mavi -> Turuncu
-        : [const Color(0xFF311B92), const Color(0xFF1A237E)]; // Gece: Koyu Mor -> Lacivert
+        ? [
+            const Color(0xFF4FC3F7),
+            const Color(0xFFFFB74D),
+          ] // Gündüz: Mavi -> Turuncu
+        : [
+            const Color(0xFF311B92),
+            const Color(0xFF1A237E),
+          ]; // Gece: Koyu Mor -> Lacivert
 
     final Color textColor = Colors.white;
-    final Color progressColor = isDay ? Colors.orangeAccent : Colors.purpleAccent;
+    final Color progressColor = isDay
+        ? Colors.orangeAccent
+        : Colors.purpleAccent;
 
     return GestureDetector(
       onLongPress: () {
         // Yetenek kontrolü
         if (widget.currentUser == null) return;
-        
-        final hasSkill = SkillService().getSkillLevel(widget.currentUser!, SkillService.skillTimeMaster) > 0;
-        
+
+        final hasSkill =
+            SkillService().getSkillLevel(
+              widget.currentUser!,
+              SkillService.skillTimeMaster,
+            ) >
+            0;
+
         if (!hasSkill) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('skills.timeMasterDesc'.tr()), // "Unlock ability..." message
+              content: Text(
+                'skills.timeMasterDesc'.tr(),
+              ), // "Unlock ability..." message
               duration: const Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
               action: SnackBarAction(
@@ -111,7 +121,9 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SkillTreeScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const SkillTreeScreen(),
+                    ),
                   );
                 },
               ),
@@ -122,10 +134,10 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
 
         // Haptic feedback
         HapticFeedback.heavyImpact();
-        
+
         // Hızlı sar
         _gameTime.fastForwardToNextDay(secondsRemaining: 3);
-        
+
         // UI güncellemesi için
         _updateTime();
       },
@@ -141,7 +153,7 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: gradientColors.last.withOpacity(0.4),
+              color: gradientColors.last.withValues(alpha: 0.4),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -163,9 +175,14 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                 ),
               ),
             ),
-            
+
             Padding(
-              padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+              padding: const EdgeInsets.only(
+                top: 16,
+                left: 16,
+                right: 16,
+                bottom: 16,
+              ),
               child: Row(
                 children: [
                   // Animasyon
@@ -175,9 +192,9 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                     height: 50,
                     fit: BoxFit.cover,
                   ),
-                  
+
                   const SizedBox(width: 6),
-                  
+
                   // Metinler
                   Expanded(
                     child: Column(
@@ -185,7 +202,10 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TweenAnimationBuilder<int>(
-                          tween: IntTween(begin: _remainingTime.inSeconds, end: _remainingTime.inSeconds),
+                          tween: IntTween(
+                            begin: _remainingTime.inSeconds,
+                            end: _remainingTime.inSeconds,
+                          ),
                           duration: _animationDuration,
                           builder: (context, value, child) {
                             return Text(
@@ -197,7 +217,7 @@ class _GameTimeCountdownState extends State<GameTimeCountdown> {
                                 letterSpacing: 1.2,
                                 shadows: [
                                   Shadow(
-                                    color: Colors.black.withOpacity(0.3),
+                                    color: Colors.black.withValues(alpha: 0.3),
                                     blurRadius: 4,
                                     offset: const Offset(0, 2),
                                   ),

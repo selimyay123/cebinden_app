@@ -1,7 +1,10 @@
+import 'dart:math';
+
 enum StaffRole { buyer, sales, technical, accountant }
 
 abstract class Staff {
   final String id;
+  final String userId; // Hangi kullanıcıya ait
   final String name;
   final StaffRole role;
 
@@ -14,8 +17,13 @@ abstract class Staff {
   int actionIntervalSeconds; // Kaç saniyede bir işlem yapacağı
   bool isPaused; // Çalışmayı durdurdu mu?
 
+  // Günlük Limit Takibi
+  int dailyActionCount;
+  DateTime? lastDailyActionDate;
+
   Staff({
     required this.id,
+    required this.userId,
     required this.name,
     required this.role,
     required this.salary,
@@ -25,6 +33,8 @@ abstract class Staff {
     DateTime? lastActionTime,
     this.actionIntervalSeconds = 60,
     this.isPaused = false,
+    this.dailyActionCount = 0,
+    this.lastDailyActionDate,
   }) : lastActionTime = lastActionTime ?? DateTime.now();
 
   // Her personel çalışır ama farklı iş yapar
@@ -42,29 +52,23 @@ class BuyerAgent extends Staff {
   double speed; // Hız Çarpanı (Eski: speed)
 
   BuyerAgent({
-    required String id,
-    required String name,
-    required double salary,
-    int efficiency = 50,
-    int morale = 100,
-    required DateTime hiredDate,
+    required super.id,
+    required super.userId,
+    required super.name,
+    required super.salary,
+    super.efficiency,
+    super.morale,
+    required super.hiredDate,
     this.targetBrands = const [],
     this.maxBudgetPerVehicle = 500000,
     this.skill = 0.5,
     this.speed = 1.0,
-    DateTime? lastActionTime,
-    int actionIntervalSeconds = 60,
-  }) : super(
-         id: id,
-         name: name,
-         role: StaffRole.buyer,
-         salary: salary,
-         efficiency: efficiency,
-         morale: morale,
-         hiredDate: hiredDate,
-         lastActionTime: lastActionTime,
-         actionIntervalSeconds: actionIntervalSeconds,
-       );
+    super.lastActionTime,
+    super.actionIntervalSeconds,
+    super.isPaused,
+    super.dailyActionCount,
+    super.lastDailyActionDate,
+  }) : super(role: StaffRole.buyer);
 
   @override
   Map<String, dynamic> work() {
@@ -80,6 +84,7 @@ class BuyerAgent extends Staff {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
       'name': name,
       'role': role.toString(),
       'salary': salary,
@@ -92,12 +97,16 @@ class BuyerAgent extends Staff {
       'speed': speed,
       'lastActionTime': lastActionTime.toIso8601String(),
       'actionIntervalSeconds': actionIntervalSeconds,
+      'isPaused': isPaused,
+      'dailyActionCount': dailyActionCount,
+      'lastDailyActionDate': lastDailyActionDate?.toIso8601String(),
     };
   }
 
   factory BuyerAgent.fromJson(Map<String, dynamic> json) {
     return BuyerAgent(
       id: json['id'],
+      userId: json['userId'] ?? 'unknown',
       name: json['name'],
       salary: (json['salary'] as num).toDouble(),
       efficiency: json['efficiency'],
@@ -107,13 +116,17 @@ class BuyerAgent extends Staff {
       maxBudgetPerVehicle: (json['maxBudgetPerVehicle'] as num).toDouble(),
       skill: (json['skill'] != null)
           ? (json['skill'] as num).toDouble()
-          : (json['marketKnowledge'] as num?)?.toDouble() ??
-                0.5, // Eski veri uyumu
+          : (json['marketKnowledge'] as num?)?.toDouble() ?? 0.5,
       speed: (json['speed'] as num?)?.toDouble() ?? 1.0,
       lastActionTime: json['lastActionTime'] != null
           ? DateTime.parse(json['lastActionTime'])
           : null,
       actionIntervalSeconds: json['actionIntervalSeconds'] as int? ?? 60,
+      isPaused: json['isPaused'] ?? false,
+      dailyActionCount: json['dailyActionCount'] ?? 0,
+      lastDailyActionDate: json['lastDailyActionDate'] != null
+          ? DateTime.parse(json['lastDailyActionDate'])
+          : null,
     );
   }
 }
@@ -123,34 +136,32 @@ class SalesAgent extends Staff {
   double speed; // Hız çarpanı
 
   SalesAgent({
-    required String id,
-    required String name,
-    required double salary,
-    int efficiency = 50,
-    int morale = 100,
-    required DateTime hiredDate,
+    required super.id,
+    required super.userId,
+    required super.name,
+    required super.salary,
+    super.efficiency,
+    super.morale,
+    required super.hiredDate,
     this.skill = 0.5,
     this.speed = 1.0,
-    DateTime? lastActionTime,
-    int actionIntervalSeconds = 60,
-  }) : super(
-         id: id,
-         name: name,
-         role: StaffRole.sales,
-         salary: salary,
-         efficiency: efficiency,
-         morale: morale,
-         hiredDate: hiredDate,
-         lastActionTime: lastActionTime,
-         actionIntervalSeconds: actionIntervalSeconds,
-       );
+    super.lastActionTime,
+    super.actionIntervalSeconds,
+    super.isPaused,
+    super.dailyActionCount,
+    super.lastDailyActionDate,
+  }) : super(role: StaffRole.sales);
 
   @override
   Map<String, dynamic> work() {
+    final random = Random();
+    double maxPotentialBonus = skill * 0.25;
+    double luckFactor = 0.5 + random.nextDouble();
+
     return {
       'action': 'negotiate_sale',
-      'success_chance': skill, // Skill doğrudan şans
-      'bonus_margin': skill * 0.1, // Skill %10'a kadar bonus kâr sağlar
+      'success_chance': skill,
+      'bonus_margin': maxPotentialBonus * luckFactor,
       'duration_factor': 1.0 / speed,
     };
   }
@@ -159,6 +170,7 @@ class SalesAgent extends Staff {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
       'name': name,
       'role': role.toString(),
       'salary': salary,
@@ -169,12 +181,16 @@ class SalesAgent extends Staff {
       'speed': speed,
       'lastActionTime': lastActionTime.toIso8601String(),
       'actionIntervalSeconds': actionIntervalSeconds,
+      'isPaused': isPaused,
+      'dailyActionCount': dailyActionCount,
+      'lastDailyActionDate': lastDailyActionDate?.toIso8601String(),
     };
   }
 
   factory SalesAgent.fromJson(Map<String, dynamic> json) {
     return SalesAgent(
       id: json['id'],
+      userId: json['userId'] ?? 'unknown',
       name: json['name'],
       salary: (json['salary'] as num).toDouble(),
       efficiency: json['efficiency'],
@@ -182,12 +198,17 @@ class SalesAgent extends Staff {
       hiredDate: DateTime.parse(json['hiredDate']),
       skill: (json['skill'] != null)
           ? (json['skill'] as num).toDouble()
-          : (json['persuasion'] as num?)?.toDouble() ?? 0.5, // Eski veri uyumu
+          : (json['persuasion'] as num?)?.toDouble() ?? 0.5,
       speed: (json['speed'] as num?)?.toDouble() ?? 1.0,
       lastActionTime: json['lastActionTime'] != null
           ? DateTime.parse(json['lastActionTime'])
           : null,
       actionIntervalSeconds: json['actionIntervalSeconds'] as int? ?? 60,
+      isPaused: json['isPaused'] ?? false,
+      dailyActionCount: json['dailyActionCount'] ?? 0,
+      lastDailyActionDate: json['lastDailyActionDate'] != null
+          ? DateTime.parse(json['lastDailyActionDate'])
+          : null,
     );
   }
 }

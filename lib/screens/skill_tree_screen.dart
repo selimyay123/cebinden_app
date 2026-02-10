@@ -119,7 +119,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.deepPurple.withOpacity(0.8), Colors.transparent],
+              colors: [Colors.deepPurple.withValues(alpha: 0.8), Colors.transparent],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -226,11 +226,11 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.deepPurpleAccent.withOpacity(0.7),
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -243,7 +243,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.2),
+                color: Colors.amber.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -314,7 +314,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                       ? const SizedBox()
                       : Container(
                           width: 4,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
                 ),
                 // Node Dot
@@ -327,7 +327,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                     border: Border.all(color: Colors.white, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(0.6),
+                        color: color.withValues(alpha: 0.6),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),
@@ -340,7 +340,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                       ? const SizedBox()
                       : Container(
                           width: 4,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
                 ),
               ],
@@ -383,11 +383,11 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -423,9 +423,9 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: color.withOpacity(0.3)),
+                          border: Border.all(color: color.withValues(alpha: 0.3)),
                         ),
                         child: Icon(icon, color: color.shade700, size: 28),
                       ),
@@ -503,7 +503,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                             borderRadius: BorderRadius.circular(6),
                             boxShadow: [
                               BoxShadow(
-                                color: color.withOpacity(0.4),
+                                color: color.withValues(alpha: 0.4),
                                 blurRadius: 6,
                                 offset: const Offset(0, 2),
                               ),
@@ -529,7 +529,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> with SingleTickerProv
                         : [color.shade400, color.shade700],
                     height: 48,
                     // Disable button visually if not enough points or max level
-                    textColor: Colors.white.withOpacity(canUpgrade || isMaxLevel ? 1.0 : 0.5),
+                    textColor: Colors.white.withValues(alpha: canUpgrade || isMaxLevel ? 1.0 : 0.5),
                   ),
                 ],
               ),

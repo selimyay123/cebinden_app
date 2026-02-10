@@ -158,7 +158,7 @@ class FriendService {
     final snapshot = await _firestore
         .collection('leaderboard')
         .where('username', isGreaterThanOrEqualTo: query)
-        .where('username', isLessThan: query + 'z')
+        .where('username', isLessThan: '${query}z')
         .limit(20)
         .get();
 

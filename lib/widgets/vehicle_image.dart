@@ -56,7 +56,7 @@ class VehicleImage extends StatelessWidget {
               child: ColorFiltered(
                 // 2. Adım: Maskeyi istenen renge boya
                 colorFilter: ColorFilter.mode(
-                  color.withOpacity(0.85), 
+                  color.withValues(alpha: 0.85), 
                   BlendMode.srcIn,
                 ),
                 child: ColorFiltered(

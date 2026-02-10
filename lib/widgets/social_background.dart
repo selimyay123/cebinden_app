@@ -14,8 +14,8 @@ class SocialBackground extends StatelessWidget {
           image: const AssetImage('assets/images/social_bg_abstract.png'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withOpacity(
-              0.2,
+            Colors.black.withValues(
+              alpha: 0.2,
             ), // Slight darkening for text readability
             BlendMode.darken,
           ),

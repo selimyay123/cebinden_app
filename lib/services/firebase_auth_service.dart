@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -12,16 +14,14 @@ class FirebaseAuthService {
   factory FirebaseAuthService() => _instance;
   FirebaseAuthService._internal();
 
-  final firebase_auth.FirebaseAuth _firebaseAuth = firebase_auth.FirebaseAuth.instance;
+  final firebase_auth.FirebaseAuth _firebaseAuth =
+      firebase_auth.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     // iOS için CLIENT_ID manuel olarak belirtilmeli, Android'de google-services.json'dan otomatik alınır
-    clientId: Platform.isIOS 
+    clientId: Platform.isIOS
         ? '585097479960-jd9clpbd09ttok1lgienfbaaedqofv9c.apps.googleusercontent.com'
         : null,
-    scopes: [
-      'email',
-      'profile',
-    ],
+    scopes: ['email', 'profile'],
   );
 
   /// Google ile giriş yap
@@ -30,61 +30,63 @@ class FirebaseAuthService {
     try {
       // 1. Google Sign-In akışını başlat
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
+
       if (googleUser == null) {
         // Kullanıcı giriş işlemini iptal etti
         return null;
       }
 
       // 2. Google kimlik doğrulama detaylarını al
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       // 3. Firebase credential oluştur
-      final firebase_auth.AuthCredential credential = firebase_auth.GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      final firebase_auth.AuthCredential credential =
+          firebase_auth.GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
 
       // 4. Firebase'e giriş yap
-      final firebase_auth.UserCredential userCredential = 
-          await _firebaseAuth.signInWithCredential(credential);
-      
+      final firebase_auth.UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
+
       final firebase_auth.User? firebaseUser = userCredential.user;
-      
+
       if (firebaseUser == null) {
         return null;
       }
 
       // 5. Kullanıcıyı local database'de kontrol et veya oluştur
       final existingUser = await _findUserByGoogleId(firebaseUser.uid);
-      
+
       if (existingUser != null) {
         // Mevcut kullanıcı - giriş yap
         return existingUser;
       } else {
         // 🆕 Cloud Save Check (Bulutta var mı?)
-        final cloudUser = await CloudService().getUserByGoogleId(firebaseUser.uid);
-        
+        final cloudUser = await CloudService().getUserByGoogleId(
+          firebaseUser.uid,
+        );
+
         if (cloudUser != null) {
           // Bulutta bulundu! Restore et
           await DatabaseHelper().insertUser(cloudUser.toJson());
-          
+
           // Araçları da restore et
           final vehicles = await CloudService().getUserVehicles(cloudUser.id);
           for (var vehicle in vehicles) {
             await DatabaseHelper().addUserVehicle(vehicle);
           }
-          
+
           return cloudUser;
         }
-        
+
         // Yeni kullanıcı - kayıt oluştur
         final newUser = await _createGoogleUser(firebaseUser);
         return newUser;
       }
-      
     } catch (e) {
-      print("GOOGLE SIGN IN ERROR: $e");
       return null;
     }
   }
@@ -93,16 +95,15 @@ class FirebaseAuthService {
   Future<User?> _findUserByGoogleId(String googleUserId) async {
     try {
       final usersMapList = await DatabaseHelper().getAllUsers();
-      
+
       for (var userMap in usersMapList) {
         if (userMap['googleUserId'] == googleUserId) {
           return User.fromJson(userMap);
         }
       }
-      
+
       return null;
     } catch (e) {
-      
       return null;
     }
   }
@@ -113,7 +114,10 @@ class FirebaseAuthService {
       // Google'dan gelen bilgilerle kullanıcı oluştur
       final newUser = User(
         id: const Uuid().v4(),
-        username: firebaseUser.displayName ?? firebaseUser.email?.split('@')[0] ?? 'GoogleUser',
+        username:
+            firebaseUser.displayName ??
+            firebaseUser.email?.split('@')[0] ??
+            'GoogleUser',
         password: '', // Google ile giriş için şifre gerekmez
         registeredAt: DateTime.now(),
         balance: 1000000.0, // Başlangıç parası
@@ -127,12 +131,9 @@ class FirebaseAuthService {
 
       // Local database'e kaydet
       await DatabaseHelper().insertUser(newUser.toJson());
-      
-      
+
       return newUser;
-      
     } catch (e) {
-      
       rethrow;
     }
   }
@@ -142,10 +143,7 @@ class FirebaseAuthService {
     try {
       await _googleSignIn.signOut();
       await _firebaseAuth.signOut();
-      
-    } catch (e) {
-      
-    }
+    } catch (e) {}
   }
 
   /// Mevcut Firebase kullanıcısını al
@@ -157,6 +155,7 @@ class FirebaseAuthService {
   bool isSignedIn() {
     return _firebaseAuth.currentUser != null;
   }
+
   /// Apple ile giriş yap
   Future<User?> signInWithApple() async {
     try {
@@ -169,17 +168,18 @@ class FirebaseAuthService {
       );
 
       // 2. OAuthCredential oluştur
-      final firebase_auth.OAuthCredential credential = firebase_auth.OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
+      final firebase_auth.OAuthCredential credential =
+          firebase_auth.OAuthProvider('apple.com').credential(
+            idToken: appleCredential.identityToken,
+            accessToken: appleCredential.authorizationCode,
+          );
 
       // 3. Firebase'e giriş yap
-      final firebase_auth.UserCredential userCredential = 
-          await _firebaseAuth.signInWithCredential(credential);
-      
+      final firebase_auth.UserCredential userCredential = await _firebaseAuth
+          .signInWithCredential(credential);
+
       final firebase_auth.User? firebaseUser = userCredential.user;
-      
+
       if (firebaseUser == null) {
         return null;
       }
@@ -187,23 +187,25 @@ class FirebaseAuthService {
       // 4. Kullanıcıyı local database'de kontrol et veya oluştur
       // Apple ID'ye göre ara
       final existingUser = await _findUserByAppleId(firebaseUser.uid);
-      
+
       if (existingUser != null) {
         return existingUser;
       } else {
         // 🆕 Cloud Save Check (Bulutta var mı?)
-        final cloudUser = await CloudService().getUserByAppleId(firebaseUser.uid);
-        
+        final cloudUser = await CloudService().getUserByAppleId(
+          firebaseUser.uid,
+        );
+
         if (cloudUser != null) {
           // Bulutta bulundu! Restore et
           await DatabaseHelper().insertUser(cloudUser.toJson());
-          
+
           // Araçları da restore et
           final vehicles = await CloudService().getUserVehicles(cloudUser.id);
           for (var vehicle in vehicles) {
             await DatabaseHelper().addUserVehicle(vehicle);
           }
-          
+
           return cloudUser;
         }
 
@@ -212,7 +214,6 @@ class FirebaseAuthService {
         return newUser;
       }
     } catch (e) {
-      print("Apple Sign In Error: $e");
       return null;
     }
   }
@@ -221,13 +222,13 @@ class FirebaseAuthService {
   Future<User?> _findUserByAppleId(String appleUserId) async {
     try {
       final usersMapList = await DatabaseHelper().getAllUsers();
-      
+
       for (var userMap in usersMapList) {
         if (userMap['appleUserId'] == appleUserId) {
           return User.fromJson(userMap);
         }
       }
-      
+
       return null;
     } catch (e) {
       return null;
@@ -236,17 +237,23 @@ class FirebaseAuthService {
 
   /// Apple bilgilerinden yeni kullanıcı oluştur
   Future<User> _createAppleUser(
-      firebase_auth.User firebaseUser, AuthorizationCredentialAppleID appleCredential) async {
+    firebase_auth.User firebaseUser,
+    AuthorizationCredentialAppleID appleCredential,
+  ) async {
     try {
       String displayName = '';
-      if (appleCredential.givenName != null && appleCredential.familyName != null) {
-        displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
-      } else if (firebaseUser.displayName != null && firebaseUser.displayName!.isNotEmpty) {
+      if (appleCredential.givenName != null &&
+          appleCredential.familyName != null) {
+        displayName =
+            '${appleCredential.givenName} ${appleCredential.familyName}';
+      } else if (firebaseUser.displayName != null &&
+          firebaseUser.displayName!.isNotEmpty) {
         displayName = firebaseUser.displayName!;
       }
-      
+
       // Eğer isim hala boşsa veya "Apple User" ise ve email varsa, email'in baş kısmını kullan
-      if ((displayName.isEmpty || displayName == 'Apple User') && firebaseUser.email != null) {
+      if ((displayName.isEmpty || displayName == 'Apple User') &&
+          firebaseUser.email != null) {
         // Private relay email kontrolü
         if (firebaseUser.email!.contains('privaterelay.appleid.com')) {
           displayName = 'Apple User';
@@ -271,10 +278,164 @@ class FirebaseAuthService {
         email: firebaseUser.email,
       );
 
-      await DatabaseHelper().insertUser(newUser.toJson()); // Assuming DatabaseHelper().insertUser still takes a map
+      await DatabaseHelper().insertUser(
+        newUser.toJson(),
+      ); // Assuming DatabaseHelper().insertUser still takes a map
       return newUser;
     } catch (e) {
       rethrow;
+    }
+  }
+
+  /// E-posta ve şifre ile giriş yap
+  Future<firebase_auth.User?> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } catch (e) {
+      // Debug Log
+      return null;
+    }
+  }
+
+  /// E-posta ve şifre ile kayıt ol (Firebase Auth)
+  Future<firebase_auth.User?> registerWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Şifre sıfırlama e-postası gönder
+  Future<bool> sendPasswordResetEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      // Debug Log
+      return false;
+    }
+  }
+
+  /// Doğrulama e-postası gönder
+  Future<void> sendEmailVerification() async {
+    final user = _firebaseAuth.currentUser;
+    if (user != null && !user.emailVerified) {
+      await user.sendEmailVerification();
+    }
+  }
+
+  /// E-posta doğrulanmış mı?
+  bool get isEmailVerified {
+    return _firebaseAuth.currentUser?.emailVerified ?? false;
+  }
+
+  /// Kullanıcı verilerini yenile (Örn: Doğrulama sonrası)
+  Future<void> reloadUser() async {
+    await _firebaseAuth.currentUser?.reload();
+  }
+
+  /// Kullanıcı hesabını tamamen sil (Firebase Auth)
+  Future<bool> deleteUser() async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user != null) {
+        await user.delete();
+        return true;
+      } else {
+        // Kullanıcı giriş yapmamış (veya session yok)
+        throw firebase_auth.FirebaseAuthException(
+          code: 'requires-recent-login',
+          message: 'No user signed in. Re-login required.',
+        );
+      }
+    } catch (e) {
+      // Debug için log
+
+      // String kontrolü ile hatayı yakala (Type check bazen çalışmayabilir)
+      if (e.toString().contains('requires-recent-login') ||
+          (e is firebase_auth.FirebaseAuthException &&
+              e.code == 'requires-recent-login')) {
+        throw firebase_auth.FirebaseAuthException(
+          code: 'requires-recent-login',
+          message: 'Re-login required',
+        );
+      }
+      return false;
+    }
+  }
+
+  /// E-posta/Şifre ile yeniden doğrulama (Hassas işlemler için)
+  Future<bool> reauthenticateWithPassword(String password) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user?.email == null) return false;
+
+      final credential = firebase_auth.EmailAuthProvider.credential(
+        email: user!.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Google ile yeniden doğrulama
+  Future<bool> reauthenticateWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return false;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = firebase_auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await _firebaseAuth.currentUser?.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Apple ile yeniden doğrulama
+  Future<bool> reauthenticateWithApple() async {
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final credential = firebase_auth.OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      await _firebaseAuth.currentUser?.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import '../models/mission_model.dart';
 import '../models/user_model.dart';
 import 'database_helper.dart';
@@ -191,9 +193,17 @@ class MissionService {
 
     // Zincirleme görev tanımları
     final Map<String, List<String>> missionChains = {
-      'balance': ['mission_balance_1m', 'mission_balance_5m', 'mission_balance_10m'],
+      'balance': [
+        'mission_balance_1m',
+        'mission_balance_5m',
+        'mission_balance_10m',
+      ],
       'level': ['mission_level_5', 'mission_level_10', 'mission_level_20'],
-      'negotiation': ['mission_negotiation_10', 'mission_negotiation_20', 'mission_negotiation_50'],
+      'negotiation': [
+        'mission_negotiation_10',
+        'mission_negotiation_20',
+        'mission_negotiation_50',
+      ],
       'fleet': ['mission_fleet_10', 'mission_fleet_20', 'mission_fleet_50'],
     };
 
@@ -203,12 +213,12 @@ class MissionService {
     // 1. Zincirleri kontrol et
     missionChains.forEach((key, chain) {
       bool foundActive = false;
-      
+
       for (int i = 0; i < chain.length; i++) {
         final missionId = chain[i];
         final mission = _allMissions.firstWhere((m) => m.id == missionId);
         processedMissions.add(missionId);
-        
+
         bool isCompleted = false;
         bool isClaimed = false;
 
@@ -229,23 +239,32 @@ class MissionService {
               _db.updateMissionProgress(userId, mission.id, true, false);
             }
           }
-          
-          result.add(mission.copyWith(
-            isCompleted: isCompleted,
-            isClaimed: isClaimed,
-            currentValue: _calculateCurrentValue(user, userVehicles.length, mission),
-          ));
+
+          result.add(
+            mission.copyWith(
+              isCompleted: isCompleted,
+              isClaimed: isClaimed,
+              currentValue: _calculateCurrentValue(
+                user,
+                userVehicles.length,
+                mission,
+              ),
+            ),
+          );
           foundActive = true;
           break; // Zincirin sonraki halkalarını gösterme
         }
-        
+
         // Eğer son halka ise ve alınmışsa, yine de göster (tamamlandı olarak)
         if (i == chain.length - 1 && isClaimed) {
-           result.add(mission.copyWith(
-            isCompleted: true,
-            isClaimed: true,
-            currentValue: mission.targetValue, // Tamamlandığı için hedef değere eşit
-          ));
+          result.add(
+            mission.copyWith(
+              isCompleted: true,
+              isClaimed: true,
+              currentValue:
+                  mission.targetValue, // Tamamlandığı için hedef değere eşit
+            ),
+          );
         }
       }
     });
@@ -272,11 +291,15 @@ class MissionService {
         }
       }
 
-      result.add(mission.copyWith(
-        isCompleted: isCompleted,
-        isClaimed: isClaimed,
-        currentValue: isCompleted ? mission.targetValue : _calculateCurrentValue(user, userVehicles.length, mission),
-      ));
+      result.add(
+        mission.copyWith(
+          isCompleted: isCompleted,
+          isClaimed: isClaimed,
+          currentValue: isCompleted
+              ? mission.targetValue
+              : _calculateCurrentValue(user, userVehicles.length, mission),
+        ),
+      );
     }
 
     return result;
@@ -307,8 +330,6 @@ class MissionService {
         // Tüm markaların koleksiyonu tamamlandı mı?
         // Toplam 10 marka var: Renauva, Volkstar, Fialto, Oplon, Bavora, Fortran, Mercurion, Koyoro, Audira, Hanto
         return user.collectedBrandRewards.length >= mission.targetValue;
-      default:
-        return false;
     }
   }
 
@@ -335,21 +356,26 @@ class MissionService {
         return user.ownsGallery ? 1.0 : 0.0;
       case MissionType.collection:
         return user.collectedBrandRewards.length.toDouble();
-      default:
-        return 0.0;
     }
   }
 
   /// Ödül talep et
   Future<XPGainResult?> claimReward(String userId, String missionId) async {
     final missions = await getUserMissions(userId);
-    final mission = missions.firstWhere((m) => m.id == missionId, orElse: () => throw Exception('Mission not found'));
+    final mission = missions.firstWhere(
+      (m) => m.id == missionId,
+      orElse: () => throw Exception('Mission not found'),
+    );
 
     if (!mission.isCompleted || mission.isClaimed) return null;
 
     // Ödülleri ver
-    final xpResult = await _xpService.addXP(userId, mission.rewardXP, XPSource.achievement); // XPSource.achievement eklenmeli
-    
+    final xpResult = await _xpService.addXP(
+      userId,
+      mission.rewardXP,
+      XPSource.achievement,
+    ); // XPSource.achievement eklenmeli
+
     final userMap = await _db.getUserById(userId);
     if (userMap != null) {
       final user = User.fromJson(userMap);
@@ -360,19 +386,21 @@ class MissionService {
 
     // DB'yi güncelle
     await _db.updateMissionProgress(userId, missionId, true, true);
-    
+
     // Aktivite Geçmişine Ekle
-    await _db.addActivity(Activity.create(
-      userId: userId,
-      type: ActivityType.income,
-      title: 'activity.oneTimeQuestTitle'.tr(),
-      description: 'activity.rewardDesc'.trParams({
-        'money': mission.rewardMoney.toStringAsFixed(0),
-        'xp': mission.rewardXP.toString(),
-      }),
-      amount: mission.rewardMoney,
-    ));
-    
+    await _db.addActivity(
+      Activity.create(
+        userId: userId,
+        type: ActivityType.income,
+        title: 'activity.oneTimeQuestTitle'.tr(),
+        description: 'activity.rewardDesc'.trParams({
+          'money': mission.rewardMoney.toStringAsFixed(0),
+          'xp': mission.rewardXP.toString(),
+        }),
+        amount: mission.rewardMoney,
+      ),
+    );
+
     return xpResult;
   }
 }

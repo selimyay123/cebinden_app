@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../services/localization_service.dart';
 import '../services/auth_service.dart';
 import '../services/game_time_service.dart';
@@ -10,7 +9,6 @@ import 'home_screen.dart';
 import 'brand_selection_screen.dart';
 import 'my_vehicles_screen.dart';
 import 'my_offers_screen.dart';
-import 'settings_screen.dart';
 import 'sell_vehicle_screen.dart';
 import 'my_listings_screen.dart';
 import 'store_screen.dart';
@@ -106,7 +104,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     // Sayfaları burada tanımlıyoruz
-    final List<Widget> _screens = [
+    final List<Widget> screens = [
       TabNavigator(
         navigatorKey: _navigatorKeys[0],
         child: BrandSelectionScreen(
@@ -198,13 +196,13 @@ class _MainScreenState extends State<MainScreen> {
         key: _mainScaffoldKey,
         body: IndexedStack(
           index: _currentIndex,
-          children: _screens,
+          children: screens,
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -226,9 +224,9 @@ class _MainScreenState extends State<MainScreen> {
               ScreenRefreshService().notifyTabChanged(index);
               _checkPendingOffers();
             },
-            backgroundColor: Colors.white.withOpacity(0.2),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
             elevation: 8,
-            indicatorColor: Colors.deepPurple.withOpacity(0.2),
+            indicatorColor: Colors.deepPurple.withValues(alpha: 0.2),
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
             destinations: [
               // Market

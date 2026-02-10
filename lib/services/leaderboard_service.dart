@@ -25,9 +25,11 @@ class LeaderboardService {
       };
 
       // Kullanıcı ID'sini belge ID'si olarak kullanıyoruz, böylece her kullanıcının tek bir kaydı olur
-      await _firestore.collection(collectionName).doc(user.id).set(userData, SetOptions(merge: true));
+      await _firestore
+          .collection(collectionName)
+          .doc(user.id)
+          .set(userData, SetOptions(merge: true));
     } catch (e) {
-      print('Error updating leaderboard score: $e');
       // Hata durumunda sessizce devam et, kullanıcı deneyimini bozma
     }
   }
@@ -36,13 +38,12 @@ class LeaderboardService {
   Future<void> deleteUserScore(String userId) async {
     try {
       await _firestore.collection(collectionName).doc(userId).delete();
-    } catch (e) {
-      print('Error deleting leaderboard score: $e');
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   /// En zengin ilk N kullanıcıyı getirir
-  Future<List<Map<String, dynamic>>> getTopPlayers({int limit = 50}) async {
+  Future<List<Map<String, dynamic>>> getTopPlayers({int limit = 100}) async {
     try {
       final querySnapshot = await _firestore
           .collection(collectionName)
@@ -52,11 +53,14 @@ class LeaderboardService {
 
       return querySnapshot.docs
           .map((doc) => doc.data())
-          .where((data) => data['email'] != 'selimyay123@gmail.com') // Test hesabını gizle
+          .where(
+            (data) =>
+                data['email'] != 'selimyay123@gmail.com' &&
+                data['email'] != 'caneryokusm@gmail.com',
+          ) // Test hesabını gizle
           .take(limit)
           .toList();
     } catch (e) {
-      print('Error fetching leaderboard: $e');
       return [];
     }
   }
@@ -69,21 +73,23 @@ class LeaderboardService {
       // Bu basit yöntem çok sayıda kullanıcıda performans sorunu yaratabilir
       // Ancak MVP için yeterli olacaktır.
       // Daha iyi bir yöntem: Kullanıcının balance'ından yüksek olanların sayısını (count) almak.
-      
-      final userDoc = await _firestore.collection(collectionName).doc(userId).get();
+
+      final userDoc = await _firestore
+          .collection(collectionName)
+          .doc(userId)
+          .get();
       if (!userDoc.exists) return null;
-      
+
       final userBalance = userDoc.data()?['balance'] as double? ?? 0;
-      
+
       final countQuery = await _firestore
           .collection(collectionName)
           .where('balance', isGreaterThan: userBalance)
           .count()
           .get();
-          
+
       return (countQuery.count ?? 0) + 1;
     } catch (e) {
-      print('Error fetching user rank: $e');
       return null;
     }
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
@@ -160,6 +162,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                 _buildGarageContent(
                   _commercialVehicles,
                   _commercialByBrand,
+                  isInteractive: false,
                   limitCount: _commercialVehicles.length,
                   emptyMessage:
                       'Personeliniz henüz ticari amaçlı araç satın almadı. Satın Alımcı işe alarak otomatik araç toplayabilirsiniz.',
@@ -190,19 +193,19 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
     PreferredSizeWidget? bottom,
     int? limitCount,
   }) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         if (Navigator.canPop(context)) {
           Navigator.pop(context);
-          return false;
         }
-        return true;
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           title: Text(title),
-          backgroundColor: Colors.deepPurple.withOpacity(0.9),
+          backgroundColor: Colors.deepPurple.withValues(alpha: 0.9),
           foregroundColor: Colors.white,
           elevation: 0,
           bottom: bottom,
@@ -246,7 +249,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -258,8 +261,8 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: isFull
-                  ? Colors.red.withOpacity(0.1)
-                  : Colors.deepPurple.withOpacity(0.1),
+                  ? Colors.red.withValues(alpha: 0.1)
+                  : Colors.deepPurple.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -314,7 +317,10 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
   }
 
   // Marka listesi (1. seviye)
-  Widget _buildBrandList(Map<String, List<UserVehicle>> vehiclesByBrand) {
+  Widget _buildBrandList(
+    Map<String, List<UserVehicle>> vehiclesByBrand, {
+    bool isInteractive = true,
+  }) {
     return RefreshIndicator(
       onRefresh: _loadMyVehicles,
       child: GridView.builder(
@@ -329,7 +335,11 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
         itemBuilder: (context, index) {
           final brand = vehiclesByBrand.keys.elementAt(index);
           final vehicles = vehiclesByBrand[brand]!;
-          return _buildBrandCard(brand, vehicles.length);
+          return _buildBrandCard(
+            brand,
+            vehicles.length,
+            isInteractive: isInteractive,
+          );
         },
       ),
     );
@@ -357,6 +367,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
   Widget _buildGarageContent(
     List<UserVehicle> vehicles,
     Map<String, List<UserVehicle>> vehiclesByBrand, {
+    bool isInteractive = true,
     int? limitCount,
     String? emptyMessage,
   }) {
@@ -404,7 +415,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
       }
     } else {
       // Marka seçili değil, marka listesi göster
-      content = _buildBrandList(vehiclesByBrand);
+      content = _buildBrandList(vehiclesByBrand, isInteractive: isInteractive);
     }
 
     if (limitCount != null) {
@@ -489,28 +500,34 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
     );
   }
 
-  Widget _buildBrandCard(String brand, int vehicleCount) {
+  Widget _buildBrandCard(
+    String brand,
+    int vehicleCount, {
+    bool isInteractive = true,
+  }) {
     final brandColor = BrandColors.getColor(
       brand,
       defaultColor: Colors.deepPurple,
     );
 
     return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyVehiclesScreen(selectedBrand: brand),
-          ),
-        );
-      },
+      onTap: !isInteractive
+          ? null
+          : () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyVehiclesScreen(selectedBrand: brand),
+                ),
+              );
+            },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -554,7 +571,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: brandColor.withOpacity(0.3),
+                            color: brandColor.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -609,7 +626,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -628,7 +645,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withOpacity(0.1),
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Builder(
@@ -752,7 +769,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.1),
+                                color: Colors.orange.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Row(
@@ -781,7 +798,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.1),
+                              color: Colors.blue.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -799,7 +816,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.1),
+                              color: Colors.orange.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -878,7 +895,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.1),
+                        color: Colors.green.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -1046,7 +1063,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                           Text(
                             '${vehicle.year} • ${vehicle.brand}',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               fontSize: 14,
                             ),
                           ),
@@ -1074,10 +1091,10 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
+                            color: Colors.red.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: Colors.red.withOpacity(0.3),
+                              color: Colors.red.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Row(
@@ -1248,22 +1265,6 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
     );
   }
 
-  Widget _buildSimpleDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSectionTitle(String title) {
     return Row(
       children: [
@@ -1296,7 +1297,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
         border: Border.all(color: Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1322,7 +1323,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, size: 20, color: color),
@@ -1353,7 +1354,7 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
     await showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -1430,9 +1431,9 @@ class _MyVehiclesScreenState extends State<MyVehiclesScreen>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.2),
+                color: Colors.green.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.withOpacity(0.5)),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.5)),
               ),
               child: Row(
                 children: [

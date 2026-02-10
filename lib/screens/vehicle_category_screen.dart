@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 import 'vehicle_list_screen.dart';
 import 'brand_selection_screen.dart';
-import 'main_screen.dart';
 
 class VehicleCategoryScreen extends StatelessWidget {
   const VehicleCategoryScreen({super.key});
@@ -97,7 +96,7 @@ class VehicleCategoryScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withValues(alpha: 0.1),
         child: InkWell(
           onTap: () async {
             // isi için marka seçimi, diğerleri için direkt liste
@@ -145,7 +144,7 @@ class VehicleCategoryScreen extends StatelessWidget {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(

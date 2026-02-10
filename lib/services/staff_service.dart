@@ -1,13 +1,17 @@
+// ignore_for_file: constant_identifier_names
+
 import '../models/staff_model.dart';
+import '../models/activity_model.dart';
 import 'dart:async';
 import 'database_helper.dart';
 import 'localization_service.dart';
 // import '../services/game_time_service.dart';
 import 'activity_service.dart';
 import 'market_refresh_service.dart';
-import '../models/user_vehicle_model.dart';
 
-class StaffService {
+import 'package:flutter/widgets.dart'; // For WidgetsBindingObserver
+
+class StaffService with WidgetsBindingObserver {
   static final StaffService _instance = StaffService._internal();
   factory StaffService() => _instance;
   StaffService._internal();
@@ -21,7 +25,33 @@ class StaffService {
   List<Staff> get myStaff => _myStaff;
 
   Future<void> init() async {
-    _myStaff = await DatabaseHelper().getAllStaff();
+    final userMap = await DatabaseHelper().getCurrentUser();
+    if (userMap != null) {
+      _myStaff = await DatabaseHelper().getAllStaff(userMap['id']);
+    } else {
+      _myStaff = [];
+    }
+
+    // Lifecycle observer ekle (Sadece bir kez)
+    try {
+      WidgetsBinding.instance.removeObserver(this);
+      WidgetsBinding.instance.addObserver(this);
+    } catch (_) {}
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      stopRealTimeLoop();
+    } else if (state == AppLifecycleState.resumed) {
+      startRealTimeLoop();
+    }
+  }
+
+  // Staff listesini temizle (Logout/Delete durumunda)
+  void clearStaff() {
+    stopRealTimeLoop();
+    _myStaff.clear();
   }
 
   // Personel İşe Al
@@ -34,9 +64,49 @@ class StaffService {
       }
     }
 
-    // TODO: Bakiye kontrolü ve DB işlemi
-    _myStaff.add(staff);
-    await DatabaseHelper().addStaff(staff);
+    // Staff userId güncelle (Hiring sırasında)
+    final currentUser = await DatabaseHelper().getCurrentUser();
+    if (currentUser == null) return false;
+
+    // Yeni bir instance oluştur (copyWith olmadığı için yeniden oluşturuyoruz veya modelde copyWith olmalı)
+    // Şimdilik modelde copyWith yok, o yüzden manuel ID set etme şansımız yok çünkü final.
+    // Bu yüzden Staff modelini baştan oluşturacağız.
+
+    Staff newStaff;
+    if (staff is SalesAgent) {
+      newStaff = SalesAgent(
+        id: staff.id,
+        userId: currentUser['id'],
+        name: staff.name,
+        salary: staff.salary,
+        efficiency: staff.efficiency,
+        morale: staff.morale,
+        hiredDate: DateTime.now(), // İşe alım tarihi şimdi
+        skill: staff.skill,
+        speed: staff.speed,
+        actionIntervalSeconds: staff.actionIntervalSeconds,
+      );
+    } else if (staff is BuyerAgent) {
+      newStaff = BuyerAgent(
+        id: staff.id,
+        userId: currentUser['id'],
+        name: staff.name,
+        salary: staff.salary,
+        efficiency: staff.efficiency,
+        morale: staff.morale,
+        hiredDate: DateTime.now(),
+        targetBrands: staff.targetBrands,
+        maxBudgetPerVehicle: staff.maxBudgetPerVehicle,
+        skill: staff.skill,
+        speed: staff.speed,
+        actionIntervalSeconds: staff.actionIntervalSeconds,
+      );
+    } else {
+      return false;
+    }
+
+    _myStaff.add(newStaff);
+    await DatabaseHelper().addStaff(newStaff);
     return true;
   }
 
@@ -73,9 +143,48 @@ class StaffService {
   double calculateDailyWages() {
     double total = 0;
     for (var staff in _myStaff) {
+      // Sadece aktif personel maaş alır (Pause olsa bile sözleşme devam ettiği için maaş işler)
       total += staff.salary;
     }
     return total;
+  }
+
+  // Günlük Maaşları Öde
+  Future<void> processDailySalaries() async {
+    if (_myStaff.isEmpty) return;
+
+    final totalWages = calculateDailyWages();
+    if (totalWages <= 0) return;
+
+    final db = DatabaseHelper();
+    final userMap = await db.getCurrentUser();
+    if (userMap == null) return;
+
+    final String userId = userMap['id'];
+    final double currentBalance = (userMap['balance'] as num).toDouble();
+
+    // Bakiye kontrolü yapmaksızın düş, eksiye düşebilir (Borç)
+    final newBalance = currentBalance - totalWages;
+    await db.updateUser(userId, {'balance': newBalance});
+
+    // Gider olarak kaydet
+    await ActivityService().logActivity(
+      userId: userId,
+      type: ActivityType.expense,
+      title: 'staff.salary_payment_title'.tr(), // "Personel Maaş Ödemesi"
+      description: 'staff.salary_payment_desc'.trParams({
+        'count': _myStaff.length.toString(),
+      }), // "{count} personel için günlük ödeme"
+      amount: -totalWages,
+      titleKey: 'staff.salary_payment_title',
+      descriptionKey: 'staff.salary_payment_desc',
+      descriptionParams: {'count': _myStaff.length.toString()},
+    );
+
+    // UI Güncelle
+    _eventController.add(
+      'staff_action_salary_paid',
+    ); // ActivityScreen yenilenmesi için
   }
 
   // Günlük Satış Özeti için Stream
@@ -88,7 +197,6 @@ class StaffService {
   void startRealTimeLoop() {
     if (_simulatorTimer != null && _simulatorTimer!.isActive) return;
 
-    print("Staff Real-Time Simulation Started.");
     // Her saniye kontrol et
     _simulatorTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _checkStaffActivity();
@@ -98,8 +206,9 @@ class StaffService {
   void stopRealTimeLoop() {
     _simulatorTimer?.cancel();
     _simulatorTimer = null;
-    print("Staff Real-Time Simulation Stopped.");
   }
+
+  static const int DAILY_TRANSACTION_LIMIT = 20;
 
   // Periyodik Kontrol
   void _checkStaffActivity() async {
@@ -121,18 +230,47 @@ class StaffService {
       // Eğer personel duraklatıldıysa işlem yapma (Sadece contract süresi işler)
       if (staff.isPaused) continue;
 
+      // Günlük Limit Kontrolü ve Sıfırlama
+      if (staff.lastDailyActionDate == null ||
+          staff.lastDailyActionDate!.day != now.day ||
+          staff.lastDailyActionDate!.month != now.month ||
+          staff.lastDailyActionDate!.year != now.year) {
+        // Yeni bir gün, limiti sıfırla
+        staff.dailyActionCount = 0;
+        staff.lastDailyActionDate = now;
+        // DB güncelle (Sadece tarih değiştiğinde kaydetmek iyi olur)
+        await db.addStaff(staff);
+      }
+
+      // Limit dolduysa işlem yapma
+      if (staff.dailyActionCount >= DAILY_TRANSACTION_LIMIT) continue;
+
       final difference = now.difference(staff.lastActionTime).inSeconds;
 
       // Süre dolduysa işlem yap
       if (difference >= staff.actionIntervalSeconds) {
+        bool success = false;
         if (staff.role == StaffRole.buyer) {
-          await _processBuyerAgent(staff as BuyerAgent, userId, db, userMap);
+          success = await _processBuyerAgent(
+            staff as BuyerAgent,
+            userId,
+            db,
+            userMap,
+          );
         } else if (staff.role == StaffRole.sales) {
-          await _processSalesAgent(staff as SalesAgent, userId, db);
+          success = await _processSalesAgent(staff as SalesAgent, userId, db);
         }
 
         // İşlem zamanını güncelle
         staff.lastActionTime = now;
+
+        // İşlem başarılıysa sayacı artır
+        if (success) {
+          staff.dailyActionCount++;
+          staff.lastDailyActionDate = now;
+          await db.addStaff(staff); // Sayacı kaydet
+        }
+
         // UI güncellemesi için stream'e bilgi at (Progress bar reset için)
         _eventController.add('staff_action_${staff.id}');
       }
@@ -157,7 +295,7 @@ class StaffService {
     }
   }
 
-  Future<void> _processSalesAgent(
+  Future<bool> _processSalesAgent(
     SalesAgent agent,
     String userId,
     DatabaseHelper db,
@@ -169,7 +307,7 @@ class StaffService {
       return !v.isListedForSale && !v.isSold && (v.isStaffPurchased == true);
     }).toList();
 
-    if (availableVehicles.isEmpty) return; // Satacak araç yok
+    if (availableVehicles.isEmpty) return false; // Satacak araç yok
 
     final result = agent.work();
     final success = await _handleSalesAgentWork(
@@ -180,27 +318,19 @@ class StaffService {
     );
 
     if (success) {
-      _eventController.add(
-        'staff.daily_sales_success'.trParams({'count': '1'}),
-      );
+      // Snackbar kaldırıldı
+      _eventController.add('staff_action_${agent.id}'); // Sadece UI update için
     }
+    return success;
   }
 
-  Future<void> _processBuyerAgent(
+  Future<bool> _processBuyerAgent(
     BuyerAgent agent,
     String userId,
     DatabaseHelper db,
     Map<String, dynamic> userMap,
   ) async {
-    final int currentVehicleCount = await db.getUserVehicleCount(userId);
-    final int garageLimit = (userMap['garageLimit'] as num? ?? 10).toInt();
-
-    if (currentVehicleCount >= garageLimit) {
-      // Yer yok
-      return;
-    }
-
-    final double currentBalance = (userMap['balance'] as num).toDouble();
+    final currentBalance = (userMap['balance'] as num).toDouble();
     final result = agent.work();
 
     final success = await _handleBuyerAgentWork(
@@ -211,10 +341,9 @@ class StaffService {
     );
 
     if (success) {
-      _eventController.add(
-        'staff.daily_purchase_success'.trParams({'count': '1'}),
-      );
+      _eventController.add('staff_action_${agent.id}');
     }
+    return success;
   }
 
   // Aday Listesi Oluştur (GÜNCEL)
@@ -242,6 +371,7 @@ class StaffService {
         candidates.add(
           SalesAgent(
             id: id,
+            userId: 'candidate', // Geçici ID, işe alınınca değişecek
             name: name,
             salary: baseSalary.roundToDouble(),
             hiredDate: DateTime.now(),
@@ -257,6 +387,7 @@ class StaffService {
         candidates.add(
           BuyerAgent(
             id: id,
+            userId: 'candidate', // Geçici ID
             name: name,
             salary: baseSalary.roundToDouble(),
             hiredDate: DateTime.now(),
@@ -299,7 +430,7 @@ class StaffService {
 
       if (allVehicles.isEmpty) {
         // allVehicles.isEmpty olmalı
-        print("Buyer ${agent.name}: Market is empty.");
+
         return false;
       }
 
@@ -315,9 +446,6 @@ class StaffService {
           .toList();
 
       if (affordableVehicles.isEmpty) {
-        print(
-          "Buyer ${agent.name}: No affordable vehicles found (Budget: ${budgetLimit.toStringAsFixed(0)}).",
-        );
         return false;
       }
 
@@ -353,22 +481,26 @@ class StaffService {
           marketService.removeOpportunityListing(vehicle.id);
 
           // Aktivite Kaydı
-          await ActivityService().logVehiclePurchase(userId, purchasedVehicle);
+          // GÜNCELLEME: staffPurchase tipi kullanılıyor
+          await ActivityService().logActivity(
+            userId: userId,
+            type: ActivityType.staffPurchase,
+            title: 'staff.activity_purchase_title'.trParams({
+              'name': '${vehicle.brand} ${vehicle.model}',
+            }),
+            description: '', // Açıklama gizlendi
+            amount: -finalPrice, // Gider olduğu için negatif
+            titleKey: 'staff.activity_purchase_title',
+            titleParams: {'name': '${vehicle.brand} ${vehicle.model}'},
+            descriptionKey: '',
+          );
 
-          String logMsg =
-              "🚙 ${agent.name} bir araç satın aldı!\nAraç: ${vehicle.brand} ${vehicle.model}\nFiyat: -${finalPrice.toStringAsFixed(0)} TL (Piyasa: ${basePrice.toStringAsFixed(0)})";
-          print(logMsg);
           return true;
         }
       } else {
         // Bakiye yetmedi (Pazarlığa rağmen)
-        print("Buyer ${agent.name} found car but insufficient funds.");
       }
-    } else {
-      print(
-        "Buyer ${agent.name}: Search failed (Roll: $randomRoll > Chance: $adjustedChance)",
-      );
-    }
+    } else {}
     return false;
   }
 
@@ -401,7 +533,6 @@ class StaffService {
       double negotiationBonus = result['bonus_margin'] ?? 0.0;
       // Minimum satış fiyatı alış fiyatı olsun, üzerine kar eklensin
       double finalPrice = basePrice * (1.05 + negotiationBonus); // %5 taban kar
-      double profit = finalPrice - basePrice;
 
       // Veritabanı İşlemleri
       final db = DatabaseHelper();
@@ -418,15 +549,34 @@ class StaffService {
         await db.updateUser(userId, {'balance': newBalance});
 
         // 3. Aktivite geçmişine kaydet
-        await ActivityService().logVehicleSale(
-          userId,
-          vehicleToSell as UserVehicle,
-          finalPrice,
+        // GÜNCELLEME: staffSale tipi kullanılıyor
+        // Kar oranını hesapla
+        final double basePriceForCalc = vehicleToSell.purchasePrice > 0
+            ? vehicleToSell.purchasePrice
+            : 1.0;
+        final double profit = finalPrice - basePriceForCalc;
+        final double profitRate = (profit / basePriceForCalc) * 100;
+
+        await ActivityService().logActivity(
+          userId: userId,
+          type: ActivityType.staffSale,
+          title: 'staff.activity_sale_title'.trParams({
+            // ignore: prefer_interpolation_to_compose_strings
+            'name': vehicleToSell.brand + ' ' + vehicleToSell.model,
+          }),
+          description: 'staff.profit_rate'.trParams({
+            'rate': profitRate.toStringAsFixed(0),
+          }),
+          amount: finalPrice,
+          titleKey: 'staff.activity_sale_title',
+          titleParams: {
+            // ignore: prefer_interpolation_to_compose_strings
+            'name': vehicleToSell.brand + ' ' + vehicleToSell.model,
+          },
+          descriptionKey: 'staff.profit_rate',
+          descriptionParams: {'rate': profitRate.toStringAsFixed(0)},
         );
 
-        String logMsg =
-            "🚗 ${agent.name} bir araç sattı!\nAraç: ${vehicleToSell.brand} ${vehicleToSell.model}\nBakiye: +${finalPrice.toStringAsFixed(0)} TL (Kâr: ${profit.toStringAsFixed(0)} TL)";
-        print(logMsg);
         return true;
       }
     }

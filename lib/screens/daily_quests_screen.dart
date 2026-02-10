@@ -115,7 +115,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                 'money': quest.rewardMoney.toStringAsFixed(0),
               }),
             ),
-            backgroundColor: Colors.green.withOpacity(0.8),
+            backgroundColor: Colors.green.withValues(alpha: 0.8),
           ),
         );
 
@@ -138,7 +138,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.red.withOpacity(0.8),
+            backgroundColor: Colors.red.withValues(alpha: 0.8),
             content: Text('quests.claimFailed'.tr()),
           ),
         );
@@ -168,7 +168,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                 'money': mission.rewardMoney.toStringAsFixed(0),
               }),
             ),
-            backgroundColor: Colors.green.withOpacity(0.8),
+            backgroundColor: Colors.green.withValues(alpha: 0.8),
           ),
         );
 
@@ -191,7 +191,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white.withOpacity(0.5),
+          backgroundColor: Colors.white.withValues(alpha: 0.5),
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
@@ -206,7 +206,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Günlük'), // TODO: Çeviri eklenebilir
+                    Text('quests.tab_daily'.tr()),
                     if (_getUnclaimedDailyQuestsCount() > 0) ...[
                       const SizedBox(width: 8),
                       _buildBlinkingBadge(_getUnclaimedDailyQuestsCount()),
@@ -218,7 +218,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Görevler'),
+                    Text('quests.tab_missions'.tr()),
                     if (_getUnclaimedMissionsCount() > 0) ...[
                       const SizedBox(width: 8),
                       _buildBlinkingBadge(_getUnclaimedMissionsCount()),
@@ -298,12 +298,12 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
     final progress = quest.progress;
 
     return Card(
-      color: Colors.deepPurpleAccent.withOpacity(0.9),
+      color: Colors.deepPurpleAccent.withValues(alpha: 0.9),
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -360,7 +360,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '${quest.rewardMoney.toStringAsFixed(0)} TL',
+                      '${quest.rewardMoney.toStringAsFixed(0)} ${"common.currency".tr()}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
@@ -377,7 +377,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                 child: ElevatedButton(
                   onPressed: () => _claimReward(quest),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.withOpacity(0.8),
+                    backgroundColor: Colors.green.withValues(alpha: 0.8),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -406,12 +406,12 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
     );
 
     return Card(
-      color: Colors.deepPurpleAccent.withOpacity(0.9),
+      color: Colors.deepPurpleAccent.withValues(alpha: 0.9),
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -481,7 +481,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '${mission.rewardMoney.toStringAsFixed(0)} TL',
+                      '${mission.rewardMoney.toStringAsFixed(0)} ${"common.currency".tr()}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
@@ -498,7 +498,7 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
                 child: ElevatedButton(
                   onPressed: () => _claimMissionReward(mission),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.withOpacity(0.8),
+                    backgroundColor: Colors.green.withValues(alpha: 0.8),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -516,11 +516,6 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
         ),
       ),
     );
-  }
-
-  String _formatNumber(int number) {
-    final formatter = NumberFormat('#,###', 'tr_TR');
-    return formatter.format(number);
   }
 
   String _getLocalizedDescription(DailyQuest quest) {

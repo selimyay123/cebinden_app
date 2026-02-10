@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +13,7 @@ class AssetService {
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final Dio _dio = Dio();
-  
+
   String? _localPath;
 
   Future<void> init() async {
@@ -37,12 +39,15 @@ class AssetService {
 
   /// Downloads a file from Firebase Storage to local storage
   /// Returns true if successful
-  Future<bool> downloadAsset(String assetPath, {Function(double)? onProgress}) async {
+  Future<bool> downloadAsset(
+    String assetPath, {
+    Function(double)? onProgress,
+  }) async {
     try {
       final ref = _storage.ref().child(assetPath);
       final downloadUrl = await ref.getDownloadURL();
       final file = getLocalFile(assetPath);
-      
+
       // Ensure directory exists
       await file.parent.create(recursive: true);
 
@@ -67,17 +72,17 @@ class AssetService {
     try {
       final result = await _storage.ref().child(folderPath).listAll();
       List<String> paths = [];
-      
+
       for (var item in result.items) {
         paths.add(item.fullPath);
       }
-      
+
       for (var prefix in result.prefixes) {
         // Recursively list subfolders if needed, or just return folders
         // For now, let's just add the folder logic in the main downloader
-        // paths.addAll(await listAssets(prefix.fullPath)); 
+        // paths.addAll(await listAssets(prefix.fullPath));
       }
-      
+
       return paths;
     } catch (e) {
       debugPrint('Error listing assets in $folderPath: $e');
@@ -99,7 +104,7 @@ class AssetService {
       for (var prefix in result.prefixes) {
         paths.addAll(await getAllFilePaths(prefix.fullPath));
       }
-      
+
       return paths;
     } catch (e) {
       debugPrint('Error listing assets in $folderPath: $e');
@@ -108,7 +113,10 @@ class AssetService {
   }
 
   /// Recursively downloads all assets in a folder
-  Future<void> syncFolder(String folderPath, {Function(String, double)? onProgress}) async {
+  Future<void> syncFolder(
+    String folderPath, {
+    Function(String, double)? onProgress,
+  }) async {
     try {
       final ref = _storage.ref().child(folderPath);
       final result = await ref.listAll();
@@ -118,14 +126,17 @@ class AssetService {
       // we will refactor _startDownload in the screen, so I'll leave this as is for now
       // unless I want to make it cleaner.
       // Actually, let's just add the new method and leave syncFolder as is for now.
-      
+
       for (var item in result.items) {
         final path = item.fullPath;
         if (!await isAssetDownloaded(path)) {
           if (onProgress != null) onProgress(path, 0.0);
-          await downloadAsset(path, onProgress: (p) {
-             if (onProgress != null) onProgress(path, p);
-          });
+          await downloadAsset(
+            path,
+            onProgress: (p) {
+              if (onProgress != null) onProgress(path, p);
+            },
+          );
         }
       }
 

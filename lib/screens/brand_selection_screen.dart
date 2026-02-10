@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
@@ -85,13 +87,13 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
     return ValueListenableBuilder<String>(
       valueListenable: LocalizationService().languageNotifier,
       builder: (context, currentLanguage, child) {
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
             if (Navigator.canPop(context)) {
               Navigator.pop(context);
-              return false;
             }
-            return true;
           },
           child: Builder(
             builder: (context) {
@@ -215,7 +217,9 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
-                              color: widget.categoryColor.withOpacity(0.1),
+                              color: widget.categoryColor.withValues(
+                                alpha: 0.1,
+                              ),
                               child: Row(
                                 children: [
                                   Icon(
@@ -301,10 +305,10 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: Colors.purpleAccent.withOpacity(0.2),
+        color: Colors.purpleAccent.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
-        shadowColor: Colors.purple.withOpacity(0.3),
+        shadowColor: Colors.purple.withValues(alpha: 0.3),
         child: InkWell(
           onTap: () async {
             // Rastgele bir marka seç
@@ -362,10 +366,10 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: Colors.deepPurpleAccent.withOpacity(0.7),
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
-        shadowColor: widget.categoryColor.withOpacity(0.3),
+        shadowColor: widget.categoryColor.withValues(alpha: 0.3),
         child: InkWell(
           onTap: () async {
             await Navigator.push(
@@ -427,10 +431,10 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 1,
-        shadowColor: Colors.black.withOpacity(0.05),
+        shadowColor: Colors.black.withValues(alpha: 0.05),
         child: InkWell(
           onTap: () async {
             // Seçilen markaya göre MODEL SEÇİM sayfasına git
@@ -458,7 +462,7 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
+                        color: Colors.grey.withValues(alpha: 0.3),
                         blurRadius: 8,
                         spreadRadius: 2,
                         offset: const Offset(0, 2),
@@ -551,10 +555,10 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: Colors.orange.shade800.withOpacity(0.6),
+        color: Colors.orange.shade800.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
-        shadowColor: Colors.orange.withOpacity(0.3),
+        shadowColor: Colors.orange.withValues(alpha: 0.3),
         child: InkWell(
           onTap: () async {
             if (remainingUses <= 0) {
@@ -607,11 +611,12 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 _currentUser!,
               );
 
-              if (mounted)
+              if (mounted) {
                 Navigator.of(
                   context,
                   rootNavigator: true,
                 ).pop(); // Dialog'u kapat
+              }
 
               if (vehicle != null) {
                 // Kullanım hakkını düş
@@ -654,11 +659,12 @@ class _BrandSelectionScreenState extends State<BrandSelectionScreen> {
                 }
               }
             } catch (e) {
-              if (mounted)
+              if (mounted) {
                 Navigator.of(
                   context,
                   rootNavigator: true,
                 ).pop(); // Dialog'u kapat
+              }
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

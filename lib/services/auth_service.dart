@@ -5,7 +5,10 @@ import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'firebase_auth_service.dart';
 import 'cloud_service.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+
 import 'leaderboard_service.dart';
+import 'staff_service.dart'; // Import StaffService
 
 class AuthService {
   // Singleton pattern
@@ -15,12 +18,41 @@ class AuthService {
   final FirebaseAuthService _firebaseAuth = FirebaseAuthService();
   final ProfanityFilter _profanityFilter;
 
-  AuthService._internal() : _profanityFilter = ProfanityFilter.filterAdditionally([
-      'amk', 'aq', 'sik', 'yarrak', 'oç', 'pic', 'piç', 'yavşak', 'göt', 'meme', 
-      'sokuk', 'siktir', 'sikiş', 'kaşar', 'orospu', 'orosbu', 'kahpe', 'ibne', 
-      'ipne', 'puşt', 'pezevenk', 'sikik', 'yarak', 'amcık', 'ananı', 'bacını',
-      'sikerim', 'sokayım', 'kaltak', 'dalyarak', 'taşşak', 'tassak'
-    ]);
+  AuthService._internal()
+    : _profanityFilter = ProfanityFilter.filterAdditionally([
+        'amk',
+        'aq',
+        'sik',
+        'yarrak',
+        'oç',
+        'pic',
+        'piç',
+        'yavşak',
+        'göt',
+        'meme',
+        'sokuk',
+        'siktir',
+        'sikiş',
+        'kaşar',
+        'orospu',
+        'orosbu',
+        'kahpe',
+        'ibne',
+        'ipne',
+        'puşt',
+        'pezevenk',
+        'sikik',
+        'yarak',
+        'amcık',
+        'ananı',
+        'bacını',
+        'sikerim',
+        'sokayım',
+        'kaltak',
+        'dalyarak',
+        'taşşak',
+        'tassak',
+      ]);
 
   // Küfür kontrolü
   bool hasProfanity(String text) {
@@ -29,16 +61,17 @@ class AuthService {
 
   // Admin kontrolü
   bool get isAdmin {
-    // Şu anki kullanıcıyı alıp kontrol etmek yerine, 
+    // Şu anki kullanıcıyı alıp kontrol etmek yerine,
     // giriş yapan kullanıcının email'ini kontrol edeceğiz.
     // Ancak burada doğrudan kullanıcı objesine erişimimiz yok.
     // Bu yüzden bu kontrolü UI tarafında veya user objesi üzerinden yapacağız.
-    return false; 
+    return false;
   }
 
   // Kullanıcı admin mi? (User objesi üzerinden)
   bool isUserAdmin(User user) {
-    return user.email == 'selimyay123@gmail.com';
+    return user.email == 'selimyay123@gmail.com' ||
+        user.email == 'caneryokusm@gmail.com';
   }
 
   // Şifreyi hashle
@@ -57,15 +90,15 @@ class AuthService {
   // Aktif kullanıcıyı getir
   Future<User?> getCurrentUser() async {
     final userMap = await _db.getCurrentUser();
-    
+
     if (userMap == null) {
       return null;
     }
-    
+
     try {
       return User.fromJson(userMap);
     } catch (e) {
-            return null;
+      return null;
     }
   }
 
@@ -74,26 +107,102 @@ class AuthService {
     required String username,
     required String password,
   }) async {
-        final hashedPassword = _hashPassword(password);
-        
-    // Kullanıcıyı database'den bul
-    final userMap = await _db.getUserByUsername(username);
-    
-    if (userMap == null) {
-            return null; // Kullanıcı bulunamadı
+    final hashedPassword = _hashPassword(password);
+
+    // 1. Önce kullanıcıyı database'den bul (YEREL KONTROL)
+    var userMap = await _db.getUserByUsername(username);
+    User? user;
+
+    if (userMap != null) {
+      // Yerelde bulundu, şifre kontrolü yap
+      if (userMap['password'] != hashedPassword) {
+        // Şifre yanlış (yerel hash ile uyuşmuyor).
+        // ANCAK: Kullanıcı şifresini "Şifremi Unuttum" ile Firebase üzerinden değiştirmiş olabilir.
+        // Bu durumda Firebase'e bu şifreyle girmeyi deneyelim.
+        final email = userMap['email'] as String?;
+        if (email != null && email.isNotEmpty) {
+          try {
+            await _firebaseAuth.signInWithEmailAndPassword(email, password);
+            // Eğer hata almazsak, Firebase şifresi bu demektir!
+            // Yerel şifreyi güncelle.
+            userMap['password'] = hashedPassword;
+            await _db.updateUser(userMap['id'], {'password': hashedPassword});
+            // Cloud'u da güncellemek iyi olur
+            try {
+              final userObj = User.fromJson(userMap);
+              await CloudService().saveUser(
+                userObj.copyWith(password: hashedPassword),
+              );
+            } catch (_) {}
+
+            // Devam et...
+            user = User.fromJson(userMap);
+          } catch (e) {
+            return null; // Hem yerel hem Firebase yanlış
+          }
+        } else {
+          return null; // Email yok, kurtaramayız
+        }
+      } else {
+        user = User.fromJson(userMap);
+      }
     }
-    
-            
-    // Şifreyi kontrol et
-    if (userMap['password'] != hashedPassword) {
-            return null; // Şifre yanlış
+
+    // 2. Yerelde yoksa veya yukarıdaki akışta bulunamadıysa Buluta bak (CLOUD FALLBACK)
+    if (user == null) {
+      try {
+        final cloudUser = await CloudService().getUserByUsername(username);
+
+        if (cloudUser != null) {
+          // Bulutta bulundu, şifre kontrolü yap
+          if (cloudUser.password == hashedPassword) {
+            // Şifre doğru! Kullanıcıyı ve araçlarını yerel DB'ye restore et
+
+            // Kullanıcıyı kaydet
+            await _db.insertUser(cloudUser.toJson());
+
+            // Araçları çek ve kaydet
+            final vehicles = await CloudService().getUserVehicles(cloudUser.id);
+            for (var vehicle in vehicles) {
+              await _db.addUserVehicle(vehicle);
+            }
+
+            user = cloudUser;
+          } else {
+            // Yerelde yok, Bulutta var ama şifre yanlış.
+            // Burada da Firebase Recovery denenebilir ama şimdilik pas geçiyorum.
+            return null;
+          }
+        } else {
+          return null; // Ne yerelde ne bulutta var
+        }
+      } catch (e) {
+        return null; // Bağlantı hatası vb.
+      }
     }
-    
-        
+
+    // Kullanıcı bulundu ve şifre (hash) doğru.
+    // ŞİMDİ FIREBASE AUTH GİRİŞİ YAPMALIYIZ (Eğer email varsa)
+    if (user.email != null && user.email!.isNotEmpty) {
+      try {
+        final credential = await _firebaseAuth.signInWithEmailAndPassword(
+          user.email!,
+          password,
+        );
+        if (credential != null) {
+        } else {}
+      } catch (e) {
+        // Firebase girişi başarısız olsa bile (örn: internet yok, veya firebase hesabı silinmiş ama DB'de var),
+        // Yerel giriş devam etmeli mi?
+        // "Hesap Silme" gibi kritik işlemler için Firebase Auth şart.
+        // Ancak "Offline Oyun" için yerel giriş yeterli olabilir.
+        // Şimdilik sadece logluyoruz, girişi engellemiyor.
+        // Kullanıcı hesap silmeye çalışırsa "Giriş yapmalısınız" hatası alacak, bu da doğru davranış.
+      }
+    }
+
     // Aktif kullanıcıyı ayarla
-    await _db.setCurrentUser(userMap['id'] as String);
-    
-    final user = User.fromJson(userMap);
+    await _db.setCurrentUser(user.id);
 
     // Yasaklı mı kontrol et
     if (user.isBanned) {
@@ -101,15 +210,19 @@ class AuthService {
       return null;
     }
 
+    // Staff servisini başlat (Kullanıcıya özel personelleri yükle)
+    await StaffService().init();
+
     return user;
   }
 
   // Yeni kullanıcı kaydı oluştur
   Future<bool> registerUser({
     required String username,
+    required String email,
     required String password,
   }) async {
-    if (username.trim().isEmpty || password.isEmpty) {
+    if (username.trim().isEmpty || email.trim().isEmpty || password.isEmpty) {
       return false;
     }
 
@@ -118,39 +231,61 @@ class AuthService {
       return false; // Uygunsuz kullanıcı adı
     }
 
-    // Kullanıcı adı kontrolü
-    final existingUser = await _db.getUserByUsername(username);
-    if (existingUser != null) {
+    // Kullanıcı adı kontrolü (Global)
+    final cloudUser = await CloudService().getUserByUsername(username);
+    if (cloudUser != null) {
       return false; // Kullanıcı adı zaten var
     }
-    
-    // Yeni kullanıcı oluştur
-    final newUser = User.create(
-      username: username.trim(),
-      password: _hashPassword(password),
-    );
 
-    // Database'e ekle
-    final result = await _db.insertUser({
-      'id': newUser.id,
-      'username': newUser.username,
-      'password': newUser.password,
-      'registeredAt': newUser.registeredAt.toIso8601String(),
-      'balance': newUser.balance,
-      'profitLossPercentage': newUser.profitLossPercentage,
-      'profileImageUrl': newUser.profileImageUrl,
-      'currency': newUser.currency,
-      'isTutorialCompleted': false, // Yeni kullanıcılar için tutorial gösterilmeli
-    });
+    try {
+      // 1. Firebase Auth ile kullanıcı oluştur
+      firebase_auth.User? firebaseUser;
+      try {
+        firebaseUser = await _firebaseAuth.registerWithEmailAndPassword(
+          email,
+          password,
+        );
+      } catch (e) {
+        return false;
+      }
 
-    if (result == -1) {
-      return false; // Hata oluştu
+      if (firebaseUser == null) {
+        return false;
+      }
+
+      // 2. Yeni kullanıcı modelini oluştur
+      final newUser = User(
+        id: firebaseUser.uid,
+        username: username.trim(),
+        email: email.trim(),
+        password: _hashPassword(password),
+        registeredAt: DateTime.now(),
+        balance: 1000000.0,
+        authProvider: 'email',
+      );
+
+      // 3. Database'e ekle
+      final result = await _db.insertUser(newUser.toJson());
+
+      if (result == -1) {
+        return false;
+      }
+
+      // Aktif kullanıcıyı ayarla
+      await _db.setCurrentUser(newUser.id);
+
+      // Staff servisini başlat (Yeni kullanıcı için boş liste yükler)
+      await StaffService().init();
+
+      return true;
+    } catch (e) {
+      return false;
     }
-    
-    // Aktif kullanıcıyı ayarla
-    await _db.setCurrentUser(newUser.id);
-    
-    return true;
+  }
+
+  // Şifre sıfırlama e-postası gönder
+  Future<bool> sendPasswordResetEmail(String email) async {
+    return await _firebaseAuth.sendPasswordResetEmail(email);
   }
 
   // Google ile giriş yap
@@ -158,23 +293,25 @@ class AuthService {
     try {
       // Firebase üzerinden Google Sign-In
       final user = await _firebaseAuth.signInWithGoogle();
-      
+
       if (user == null) {
         return null; // Kullanıcı giriş iptal etti veya hata oluştu
       }
-      
+
       // Aktif kullanıcıyı ayarla
       await _db.setCurrentUser(user.id);
-      
+
       // Yasaklı mı kontrol et
       if (user.isBanned) {
         await logout();
         return null;
       }
 
+      // Staff servisini başlat
+      await StaffService().init();
+
       return user;
     } catch (e) {
-      
       return null;
     }
   }
@@ -184,19 +321,22 @@ class AuthService {
     try {
       // Firebase üzerinden Apple Sign-In
       final user = await _firebaseAuth.signInWithApple();
-      
+
       if (user == null) {
         return null; // Kullanıcı giriş iptal etti veya hata oluştu
       }
-      
+
       // Aktif kullanıcıyı ayarla
       await _db.setCurrentUser(user.id);
-      
+
       // Yasaklı mı kontrol et
       if (user.isBanned) {
         await logout();
         return null;
       }
+
+      // Staff servisini başlat
+      await StaffService().init();
 
       return user;
     } catch (e) {
@@ -208,6 +348,9 @@ class AuthService {
   Future<void> logout() async {
     await _db.clearCurrentUser();
     await _firebaseAuth.signOut(); // Google'dan da çıkış yap
+
+    // Staff servisini temizle (Önceki kullanıcının personellerini sil)
+    StaffService().clearStaff();
   }
 
   // Şifre değiştir
@@ -234,7 +377,6 @@ class AuthService {
       final newPasswordHash = _hashPassword(newPassword);
       return await _db.updatePassword(userId, newPasswordHash);
     } catch (e) {
-      
       return false;
     }
   }
@@ -261,7 +403,9 @@ class AuthService {
     // Süre kontrolü
     if (user.usernameChangeCount > 0) {
       if (user.lastUsernameChangeDate != null) {
-        final daysSinceLastChange = DateTime.now().difference(user.lastUsernameChangeDate!).inDays;
+        final daysSinceLastChange = DateTime.now()
+            .difference(user.lastUsernameChangeDate!)
+            .inDays;
         if (daysSinceLastChange < 7) {
           return false; // 7 gün geçmedi
         }
@@ -271,6 +415,11 @@ class AuthService {
     // Kullanıcı adı zaten alınmış mı kontrol et
     final existingUser = await _db.getUserByUsername(newUsername.trim());
     if (existingUser != null) return false;
+
+    final cloudExistingUser = await CloudService().getUserByUsername(
+      newUsername.trim(),
+    );
+    if (cloudExistingUser != null) return false;
 
     // Kullanıcı adını güncelle
     return await _db.updateUser(userId, {
@@ -295,44 +444,80 @@ class AuthService {
 
       return await _db.updateUser(userId, updates);
     } catch (e) {
-      
       return false;
     }
   }
 
   // Hesabı sil
-  Future<bool> deleteAccount(String userId) async {
+  Future<bool> deleteAccount(String userId, {bool force = false}) async {
     try {
-      // 1. Cloud'dan sil (Firestore)
-      // CloudService singleton olduğu için direkt instance alabiliriz veya yukarıda tanımlı _firebaseAuth gibi tanımlayabiliriz.
-      // Ancak CloudService henüz AuthService içinde tanımlı değil, import var ama field yok.
-      // Singleton olduğu için CloudService() diyerek erişebiliriz.
-      await CloudService().deleteUser(userId);
-      
-      // 1.5 Leaderboard'dan sil
-      await LeaderboardService().deleteUserScore(userId);
+      // 0. Önce Firebase Auth'dan sil (En kritiği bu)
+      // Eğer bu başarısız olursa (örn: requires-recent-login), işlem durmalı
+      bool authDeleted = false;
+      try {
+        authDeleted = await _firebaseAuth.deleteUser();
+      } catch (e) {
+        if (!force) rethrow; // Force değilse hatayı fırlat
+      }
 
-      // 2. Local verileri sil (Hive) - deleteUser yerine deleteUserData kullanıyoruz
-      return await _db.deleteUserData(userId);
+      if (!authDeleted && !force) {
+        // Auth silinemedi ve force değil, işlemi durdur
+        return false;
+      }
+
+      // 1. Cloud'dan sil (Firestore)
+      try {
+        await CloudService().deleteUser(userId);
+      } catch (e) {
+        if (!force) rethrow;
+      }
+
+      // 1.5 Leaderboard'dan sil
+      try {
+        await LeaderboardService().deleteUserScore(userId);
+        // ignore: empty_catches
+      } catch (e) {}
+
+      // 2. Local verileri sil (Hive)
+      await _db.deleteUserData(userId);
+
+      // 3. Oturumu kapat
+      await logout();
+
+      return true;
     } catch (e) {
-      print('Error deleting account: $e');
-      return false;
+      // Debug Log
+
+      // Eğer hata 'requires-recent-login' ise yukarıya fırlat ki UI bilsin
+      // Type check bazen başarısız olabiliyor, string kontrolü ekliyoruz
+      if (e.toString().contains('requires-recent-login')) {
+        throw firebase_auth.FirebaseAuthException(
+          code: 'requires-recent-login',
+          message: 'Re-login required',
+        );
+      } else if (e is firebase_auth.FirebaseAuthException &&
+          e.code == 'requires-recent-login') {
+        rethrow;
+      } else {
+        // Diğer hataları da fırlat ki UI görebilsin
+        rethrow;
+      }
     }
   }
 
   // Tüm kullanıcıları getir (debug için)
   Future<List<User>> getAllUsers() async {
     final usersMapList = await _db.getAllUsers();
-    
+
     final List<User> users = [];
     for (final userMap in usersMapList) {
       try {
         users.add(User.fromJson(userMap));
       } catch (e) {
-                continue;
+        continue;
       }
     }
-    
+
     return users;
   }
 
@@ -340,14 +525,41 @@ class AuthService {
   Future<int> getUserCount() async {
     return await _db.getUserCount();
   }
+
   // Kullanıcıyı yasakla
   Future<bool> banUser(String userId) async {
     try {
       return await _db.updateUser(userId, {'isBanned': true});
     } catch (e) {
-      print('Error banning user: $e');
       return false;
     }
   }
-}
 
+  // E-posta doğrulama gönder
+  Future<void> sendEmailVerification() async {
+    await _firebaseAuth.sendEmailVerification();
+  }
+
+  // E-posta doğrulanmış mı kontrol et
+  bool get isEmailVerified {
+    return _firebaseAuth.isEmailVerified;
+  }
+
+  // Kullanıcı verilerini yenile
+  Future<void> reloadUser() async {
+    await _firebaseAuth.reloadUser();
+  }
+
+  // Re-authentication Methods
+  Future<bool> reauthenticateWithPassword(String password) async {
+    return await _firebaseAuth.reauthenticateWithPassword(password);
+  }
+
+  Future<bool> reauthenticateWithGoogle() async {
+    return await _firebaseAuth.reauthenticateWithGoogle();
+  }
+
+  Future<bool> reauthenticateWithApple() async {
+    return await _firebaseAuth.reauthenticateWithApple();
+  }
+}

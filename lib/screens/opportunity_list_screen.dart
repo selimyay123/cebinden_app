@@ -1,5 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import '../services/market_refresh_service.dart';
 import '../services/localization_service.dart';
 import '../widgets/modern_alert_dialog.dart';
@@ -8,7 +9,6 @@ import '../models/vehicle_model.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/auth_service.dart';
-import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/vehicle_image.dart';
 import '../widgets/custom_snackbar.dart';
@@ -24,7 +24,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
   final MarketRefreshService _marketService = MarketRefreshService();
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
-  
+
   List<OpportunityListing> _listings = [];
   bool _isLoading = true;
   User? _currentUser;
@@ -37,15 +37,19 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     _currentUser = await _authService.getCurrentUser();
     _listings = _marketService.getOpportunityListings();
-    
+
     setState(() => _isLoading = false);
   }
 
   String _formatCurrency(double amount) {
-    final formatter = NumberFormat.currency(locale: 'tr_TR', symbol: '', decimalDigits: 0);
+    final formatter = NumberFormat.currency(
+      locale: 'tr_TR',
+      symbol: '',
+      decimalDigits: 0,
+    );
     return formatter.format(amount).trim();
   }
 
@@ -72,17 +76,17 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _listings.isEmpty
-                ? _buildEmptyState()
-                : RefreshIndicator(
-                    onRefresh: _loadData,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _listings.length,
-                      itemBuilder: (context, index) {
-                        return _buildOpportunityCard(_listings[index]);
-                      },
-                    ),
-                  ),
+            ? _buildEmptyState()
+            : RefreshIndicator(
+                onRefresh: _loadData,
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _listings.length,
+                  itemBuilder: (context, index) {
+                    return _buildOpportunityCard(_listings[index]);
+                  },
+                ),
+              ),
       ),
     );
   }
@@ -112,20 +116,23 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
 
   Widget _buildOpportunityCard(OpportunityListing listing) {
     final vehicle = listing.vehicle;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.redAccent.withOpacity(0.5), width: 1.5), // Fırsat vurgusu
+        border: Border.all(
+          color: Colors.redAccent.withValues(alpha: 0.5),
+          width: 1.5,
+        ), // Fırsat vurgusu
       ),
       child: InkWell(
         onTap: () => _navigateToDetail(listing),
@@ -154,10 +161,14 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
                               fit: BoxFit.contain,
                             ),
                           )
-                        : const Icon(Icons.directions_car, size: 40, color: Colors.grey),
+                        : const Icon(
+                            Icons.directions_car,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
                   ),
                   const SizedBox(width: 12),
-                  
+
                   // Bilgiler
                   Expanded(
                     child: Column(
@@ -179,7 +190,10 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
                             ),
                             // Fırsat Etiketi
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.red,
                                 borderRadius: BorderRadius.circular(8),
@@ -198,7 +212,10 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
                         const SizedBox(height: 4),
                         Text(
                           '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
-                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 13,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -216,7 +233,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
                 ],
               ),
             ),
-            
+
             // Alt Kısım: Fiyat ve Satın Al
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -284,7 +301,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
     // Satın alma işlemini burada yapmak daha mantıklı olabilir.
     // Ancak VehicleDetailScreen çok detaylı, onu kullanmak daha iyi.
     // VehicleDetailScreen'i güncellememiz gerekebilir.
-    
+
     // Şimdilik direkt satın alma dialogu açalım bu ekranda
     _showPurchaseDialog(listing);
   }
@@ -305,7 +322,7 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
               '${'vehicles.price'.tr()}: ${_formatCurrency(vehicle.price)} TL',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-             Text(
+            Text(
               'Normal Fiyat: ${_formatCurrency(listing.originalPrice)} TL',
               style: TextStyle(
                 color: Colors.grey[500],
@@ -332,14 +349,15 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
 
   Future<void> _processPurchase(Vehicle vehicle) async {
     if (_currentUser == null) return;
-    
+
     // Close dialog immediately to prevent stuck state
     Navigator.of(context, rootNavigator: true).pop();
 
     // Bakiye kontrolü
     if (_currentUser!.balance < vehicle.price) {
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(duration: const Duration(milliseconds: 1500), 
+        CustomSnackBar(
+          duration: const Duration(milliseconds: 1500),
           content: Text('purchase.insufficientBalance'.tr()),
           backgroundColor: Colors.red,
         ),
@@ -351,7 +369,8 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
     final activeVehicles = await _db.getUserActiveVehicles(_currentUser!.id);
     if (activeVehicles.length >= _currentUser!.garageLimit) {
       ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar(duration: const Duration(milliseconds: 1500), 
+        CustomSnackBar(
+          duration: const Duration(milliseconds: 1500),
           content: Text('errors.garageFull'.tr()),
           backgroundColor: Colors.red,
         ),
@@ -371,8 +390,8 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       // 2. Aracı kullanıcıya ekle
       // UserVehicle oluştur
       final userVehicle = UserVehicle.fromVehicle(
-        vehicle, 
-        _currentUser!.id, 
+        vehicle,
+        _currentUser!.id,
         purchasePrice: vehicle.price,
       );
       await _db.addUserVehicle(userVehicle);
@@ -383,7 +402,8 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       // 4. Başarı mesajı ve yenileme
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(duration: const Duration(milliseconds: 1500), 
+          CustomSnackBar(
+            duration: const Duration(milliseconds: 1500),
             content: Text('purchase.purchaseSuccess'.tr()),
             backgroundColor: Colors.green,
           ),
@@ -394,7 +414,8 @@ class _OpportunityListScreenState extends State<OpportunityListScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnackBar(duration: const Duration(milliseconds: 1500), 
+          CustomSnackBar(
+            duration: const Duration(milliseconds: 1500),
             content: Text('Hata oluştu: $e'),
             backgroundColor: Colors.red,
           ),

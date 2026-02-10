@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/user_vehicle_model.dart';
@@ -86,9 +88,12 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
     } catch (e) {
       debugPrint('Error loading user vehicles: $e');
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(duration: const Duration(milliseconds: 1500), content: Text('Error loading vehicles: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(milliseconds: 1500),
+            content: Text('Error loading vehicles: $e'),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -101,13 +106,13 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         if (Navigator.canPop(context)) {
           Navigator.pop(context);
-          return false;
         }
-        return true;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -191,7 +196,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
                   width: 70,
                   height: 70,
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.withOpacity(0.1),
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Builder(
@@ -445,7 +450,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
     await showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -477,7 +482,8 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
 
     if (remainingUses <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(duration: const Duration(milliseconds: 1500), 
+        SnackBar(
+          duration: const Duration(milliseconds: 1500),
           content: Row(
             children: [
               const Icon(Icons.error_outline, color: Colors.white),
@@ -520,7 +526,7 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -607,9 +613,12 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
         setState(() => _currentUser = updatedUser);
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(duration: const Duration(milliseconds: 1500), content: Text('Hata: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(milliseconds: 1500),
+          content: Text('Hata: $e'),
+        ),
+      );
     } finally {
       setState(() => _isLoading = false);
     }

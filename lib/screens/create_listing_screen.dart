@@ -5,7 +5,7 @@ import 'package:lottie/lottie.dart';
 import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
-import '../models/user_model.dart';
+
 import '../utils/currency_input_formatter.dart';
 import '../utils/vehicle_utils.dart';
 import '../widgets/game_image.dart';
@@ -24,9 +24,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
   final DatabaseHelper _db = DatabaseHelper();
   final _formKey = GlobalKey<FormState>();
   final _priceController = TextEditingController();
-  final _descriptionController = TextEditingController();
+
   bool _isLoading = false;
-  User? _currentUser;
 
   @override
   void initState() {
@@ -35,22 +34,12 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     // Yetenek çarpanını sonradan yükleyeceğiz
     final suggestedPrice = widget.vehicle.purchasePrice * 1.1;
     _priceController.text = CurrencyInputFormatter.format(suggestedPrice);
-
-    _loadUserAndCalculateBonus();
-  }
-
-  Future<void> _loadUserAndCalculateBonus() async {
-    final userMap = await _db.getCurrentUser();
-    if (userMap != null) {
-      final user = User.fromJson(userMap);
-      setState(() => _currentUser = user);
-    }
   }
 
   @override
   void dispose() {
     _priceController.dispose();
-    _descriptionController.dispose();
+
     super.dispose();
   }
 
@@ -61,7 +50,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withValues(alpha: 0.85),
       builder: (context) => PopScope(
         canPop: false, // Geri tuşunu devre dışı bırak
         child: Center(
@@ -102,7 +91,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
     try {
       final listingPrice = CurrencyInputFormatter.parse(_priceController.text);
-      // final listingDescription = _descriptionController.text.trim();
       final listingDescription = ''; // Description hidden
 
       final success = await _db.listVehicleForSale(
@@ -117,6 +105,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         // 🎬 Satışa koyma animasyonunu oynat
         await _playListForSaleAnimation();
 
+        if (!mounted) return;
+
         // Başarı mesajı
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -126,7 +116,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             ),
             behavior: SnackBarBehavior.floating,
             content: Text('sell.listingSuccess'.tr()),
-            backgroundColor: Colors.green.withOpacity(0.8),
+            backgroundColor: Colors.green.withValues(alpha: 0.8),
             duration: const Duration(milliseconds: 1500),
           ),
         );
@@ -140,7 +130,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             ),
             behavior: SnackBarBehavior.floating,
             content: Text('sell.listingError'.tr()),
-            backgroundColor: Colors.red.withOpacity(0.8),
+            backgroundColor: Colors.red.withValues(alpha: 0.8),
           ),
         );
       }
@@ -154,7 +144,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           ),
           behavior: SnackBarBehavior.floating,
           content: Text('${'sell.listingErrorWithMessage'.tr()}: $e'),
-          backgroundColor: Colors.red.withOpacity(0.8),
+          backgroundColor: Colors.red.withValues(alpha: 0.8),
         ),
       );
     } finally {
@@ -197,8 +187,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               const SizedBox(height: 16),
 
               // Açıklama Girişi
-              // _buildDescriptionInput(),
-              // const SizedBox(height: 16),
 
               // Satışa Çıkar Butonu
               SizedBox(
@@ -237,7 +225,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.deepPurple.withOpacity(0.1),
+                color: Colors.deepPurple.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Builder(
@@ -365,7 +353,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.green),
                 ),
@@ -455,13 +443,13 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: isProfit
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.red.withOpacity(0.1),
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isProfit
-                        ? Colors.green.withOpacity(0.3)
-                        : Colors.red.withOpacity(0.3),
+                        ? Colors.green.withValues(alpha: 0.3)
+                        : Colors.red.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -509,30 +497,6 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
           ),
         ],
         const SizedBox(height: 8),
-      ],
-    );
-  }
-
-  Widget _buildDescriptionInput() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'sell.descriptionLabel'.tr(),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _descriptionController,
-          maxLines: 3,
-          maxLength: 500,
-          decoration: InputDecoration(
-            hintText: 'sell.descriptionHint'.tr(),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            filled: true,
-            fillColor: Colors.grey[100],
-          ),
-        ),
       ],
     );
   }

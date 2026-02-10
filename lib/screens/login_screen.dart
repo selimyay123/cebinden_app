@@ -1,7 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import '../services/auth_service.dart';
+import '../services/firebase_auth_service.dart';
 import '../services/localization_service.dart';
+import '../services/database_helper.dart';
+import '../services/cloud_service.dart';
+import '../models/user_model.dart';
 import 'main_screen.dart';
 import 'register_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -26,6 +32,88 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _showForgotPasswordDialog(BuildContext context) async {
+    final emailController = TextEditingController();
+
+    return showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Şifre Sıfırlama'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'E-posta adresinizi girin, size şifre sıfırlama bağlantısı gönderelim.',
+                style: TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'E-posta',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final email = emailController.text.trim();
+                if (email.isEmpty) return;
+
+                // Dialog'u kapat
+                Navigator.of(dialogContext).pop();
+
+                // Loading göster
+                setState(() => _isLoading = true);
+
+                final success = await FirebaseAuthService()
+                    .sendPasswordResetEmail(email);
+
+                setState(() => _isLoading = false);
+
+                if (!mounted) return;
+
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Sıfırlama bağlantısı e-posta adresinize gönderildi.',
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'E-posta gönderilemedi. Lütfen adresi kontrol edin.',
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Gönder'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _login() async {
@@ -53,16 +141,68 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
       return;
     }
 
-    final user = await _authService.login(
-      username: username,
-      password: password,
-    );
+    // Giriş mantığı:
+    // 1. Önce E-posta ile giriş yapmayı dene (Firebase Auth)
+    // 2. Başarısız olursa, eski yöntemle (Kullanıcı Adı) dene (Legacy support)
+
+    User? user;
+
+    // E-posta formatındaysa direkt Firebase deniyoruz
+    final isEmail = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    ).hasMatch(username);
+
+    if (isEmail) {
+      try {
+        final firebaseUser = await FirebaseAuthService()
+            .signInWithEmailAndPassword(username, password);
+        if (firebaseUser != null) {
+          // Firebase girişi başarılı, şimdi veritabanından kullanıcı verisini çekelim
+          // ID change: Firebase UID is used as User ID in our DB
+
+          // Önce local DB'ye bak
+          final localUserMap = await DatabaseHelper().getUserById(
+            firebaseUser.uid,
+          );
+          if (localUserMap != null) {
+            user = User.fromJson(localUserMap);
+          } else {
+            // Localde yoksa Cloud'dan çek (Yeni cihaz senaryosu)
+            final cloudUser = await CloudService().getUserById(
+              firebaseUser.uid,
+            );
+            if (cloudUser != null) {
+              user = cloudUser;
+              // Local'e kaydet
+              await DatabaseHelper().insertUser(user.toJson());
+
+              // Araçları çek ve kaydet
+              final vehicles = await CloudService().getUserVehicles(user.id);
+              for (var vehicle in vehicles) {
+                await DatabaseHelper().addUserVehicle(vehicle);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // E-posta girişi başarısız, belki kullanıcı adı olarak girilmiştir veya hata vardır.
+        // Devam et...
+      }
+    }
+
+    // Eğer E-posta ile giriş yapılamadıysa veya format e-posta değilse, eski usul dene
+    user ??= await _authService.login(username: username, password: password);
 
     if (!mounted) return;
 
     if (user != null) {
       // Başarılı giriş - Tüm route geçmişini temizle
-      
+      await DatabaseHelper().setCurrentUser(
+        user.id,
+      ); // 🟢 FIX: Aktif kullanıcıyı kaydet!
+
+      if (!mounted) return;
+
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainScreen()),
         (route) => false, // Tüm önceki ekranları temizle
@@ -88,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
 
       if (user != null) {
         // Başarılı Google girişi
-        
+
         Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
@@ -121,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
 
       if (user != null) {
         // Başarılı Apple girişi
-        
+
         Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
@@ -179,10 +319,7 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                   Text(
                     'app.subtitle'.tr(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
 
@@ -201,10 +338,10 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                   TextField(
                     controller: _usernameController,
                     enabled: !_isLoading,
-                    maxLength: 10,
+                    maxLength: 100,
                     decoration: InputDecoration(
-                      labelText: 'auth.username'.tr(),
-                      hintText: 'auth.enterUsername'.tr(),
+                      labelText: 'auth.emailOrUsername'.tr(),
+                      hintText: 'auth.enterEmailAddress'.tr(),
                       prefixIcon: const Icon(Icons.person),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -266,6 +403,22 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                   ),
                   const SizedBox(height: 8),
 
+                  // Şifremi Unuttum
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        _showForgotPasswordDialog(context);
+                      },
+                      child: Text(
+                        'auth.forgotPasswordQuestion'.tr(),
+                        style: TextStyle(
+                          color: Colors.deepPurple[400],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+
                   // Hata mesajı
                   if (_errorMessage != null)
                     Container(
@@ -280,8 +433,11 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.error_outline,
-                              color: Colors.red[700], size: 20),
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.red[700],
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -316,8 +472,9 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
                               width: 24,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                           : Text(
@@ -453,4 +610,3 @@ class _LoginScreenState extends State<LoginScreen> with LocalizationMixin {
     );
   }
 }
-

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, empty_catches
+
 import 'package:flutter/material.dart';
 import '../models/notification_model.dart';
 import '../models/user_model.dart';
@@ -6,7 +8,6 @@ import '../services/database_helper.dart';
 import '../services/localization_service.dart';
 import '../widgets/modern_alert_dialog.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'main_screen.dart';
 import 'my_offers_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -19,7 +20,7 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   final NotificationService _notificationService = NotificationService();
   final DatabaseHelper _db = DatabaseHelper();
-  
+
   User? _currentUser;
   List<AppNotification> _notifications = [];
   bool _isLoading = true;
@@ -28,24 +29,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void initState() {
     super.initState();
     _loadData();
-    
+
     // Türkçe timeago mesajlarını ekle
     timeago.setLocaleMessages('tr', timeago.TrMessages());
   }
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     try {
       final userMap = await _db.getCurrentUser();
       if (userMap != null) {
         _currentUser = User.fromJson(userMap);
-        _notifications = await _notificationService.getUserNotifications(_currentUser!.id);
+        _notifications = await _notificationService.getUserNotifications(
+          _currentUser!.id,
+        );
       }
-    } catch (e) {
-      
-    }
-    
+    } catch (e) {}
+
     setState(() => _isLoading = false);
   }
 
@@ -74,7 +75,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       context: context,
       builder: (context) => ModernAlertDialog(
         title: 'notifications.deleteAll'.tr(),
-        content: Text('notifications.deleteAllConfirm'.tr(), style: const TextStyle(color: Colors.white70)),
+        content: Text(
+          'notifications.deleteAllConfirm'.tr(),
+          style: const TextStyle(color: Colors.white70),
+        ),
         buttonText: 'common.delete'.tr(),
         onPressed: () => Navigator.pop(context, true),
         secondaryButtonText: 'common.cancel'.tr(),
@@ -100,7 +104,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         elevation: 0,
         foregroundColor: Colors.black,
         actions: [
-
           if (_notifications.isNotEmpty) ...[
             IconButton(
               icon: const Icon(Icons.done_all),
@@ -126,8 +129,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _notifications.isEmpty
-                  ? _buildEmptyState()
-                  : _buildNotificationsList(),
+              ? _buildEmptyState()
+              : _buildNotificationsList(),
         ),
       ),
     );
@@ -157,10 +160,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 48),
             child: Text(
               'notifications.noNotificationsDesc'.tr(),
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ),
@@ -182,8 +182,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildNotificationCard(AppNotification notification) {
-    final locale = LocalizationService().currentLanguage;
-
     // final String title = notification.title; // Title removed as per request
     final String message = notification.message;
 
@@ -203,47 +201,46 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: InkWell(
         onTap: () async {
           await _markAsRead(notification);
-          
+
           if (notification.data != null) {
-            if (notification.data!.containsKey('vehicleId') && notification.data!.containsKey('brand')) {
-               final vehicleId = notification.data!['vehicleId'];
-               final brand = notification.data!['brand'];
-               
-               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyOffersScreen(
-                      selectedBrand: brand,
-                      selectedVehicleId: vehicleId,
-                      isIncoming: true,
-                    ),
+            if (notification.data!.containsKey('vehicleId') &&
+                notification.data!.containsKey('brand')) {
+              final vehicleId = notification.data!['vehicleId'];
+              final brand = notification.data!['brand'];
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyOffersScreen(
+                    selectedBrand: brand,
+                    selectedVehicleId: vehicleId,
+                    isIncoming: true,
                   ),
-                );
-            }
-            else if (notification.data!.containsKey('offerId') && notification.data!.containsKey('vehicleId')) {
-               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyOffersScreen(
-                      isIncoming: true,
-                      initialTab: 0,
-                    ),
-                  ),
-                );
+                ),
+              );
+            } else if (notification.data!.containsKey('offerId') &&
+                notification.data!.containsKey('vehicleId')) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const MyOffersScreen(isIncoming: true, initialTab: 0),
+                ),
+              );
             }
           }
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.deepPurple.withOpacity(0.85), // Purple background
+            color: Colors.deepPurple.withValues(
+              alpha: 0.85,
+            ), // Purple background
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -262,7 +259,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     child: Text(
                       message,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.95), // White message
+                        color: Colors.white.withValues(
+                          alpha: 0.95,
+                        ), // White message
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -284,9 +283,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                timeago.format(notification.createdAt, locale: LocalizationService().currentLanguage),
+                timeago.format(
+                  notification.createdAt,
+                  locale: LocalizationService().currentLanguage,
+                ),
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6), // Dim white time
+                  color: Colors.white.withValues(alpha: 0.6), // Dim white time
                   fontSize: 12,
                 ),
               ),
@@ -296,7 +298,4 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
     );
   }
-
-
 }
-

@@ -80,7 +80,7 @@ class ModernButton extends StatelessWidget {
         boxShadow: [
           // Glow effect
           BoxShadow(
-            color: color.withOpacity(0.4),
+            color: color.withValues(alpha: 0.4),
             blurRadius: 12,
             offset: const Offset(0, 4),
             spreadRadius: 0,

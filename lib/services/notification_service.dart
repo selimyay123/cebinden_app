@@ -39,7 +39,7 @@ class NotificationService {
 
     // 2. Yerel Bildirim Ayarları
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
@@ -94,7 +94,7 @@ class NotificationService {
             android: AndroidNotificationDetails(
               'high_importance_channel',
               'High Importance Notifications',
-              icon: '@mipmap/ic_launcher',
+              icon: '@mipmap/launcher_icon',
             ),
           ),
         );

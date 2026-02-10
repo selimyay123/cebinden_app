@@ -1,17 +1,19 @@
+// ignore_for_file: constant_identifier_names
+
 import '../models/user_model.dart';
 import 'database_helper.dart';
 import 'activity_service.dart';
 
 /// XP kazanım kaynakları
 enum XPSource {
-  vehiclePurchase,      // Araç satın alma
-  vehicleSale,          // Araç satışı
-  offerMade,            // Teklif gönderme
-  offerAccepted,        // Teklif kabul edilmesi
-  counterOfferSuccess,  // Başarılı karşı teklif
-  dailyLogin,           // Günlük giriş bonusu
-  profitBonus,          // Kâr bonusu
-  achievement,          // Başarım/Görev tamamlam
+  vehiclePurchase, // Araç satın alma
+  vehicleSale, // Araç satışı
+  offerMade, // Teklif gönderme
+  offerAccepted, // Teklif kabul edilmesi
+  counterOfferSuccess, // Başarılı karşı teklif
+  dailyLogin, // Günlük giriş bonusu
+  profitBonus, // Kâr bonusu
+  achievement, // Başarım/Görev tamamlam
 }
 
 /// XP Kazanım Sonucu
@@ -21,7 +23,7 @@ class XPGainResult {
   final int newLevel;
   final bool leveledUp;
   final LevelUpReward? rewards;
-  
+
   XPGainResult({
     required this.xpGained,
     required this.oldLevel,
@@ -29,14 +31,10 @@ class XPGainResult {
     required this.leveledUp,
     this.rewards,
   });
-  
-  factory XPGainResult.empty() => XPGainResult(
-    xpGained: 0,
-    oldLevel: 0,
-    newLevel: 0,
-    leveledUp: false,
-  );
-  
+
+  factory XPGainResult.empty() =>
+      XPGainResult(xpGained: 0, oldLevel: 0, newLevel: 0, leveledUp: false);
+
   bool get hasGain => xpGained > 0;
 }
 
@@ -46,7 +44,7 @@ class LevelUpReward {
   final double cashBonus;
   final double goldBonus;
   final List<String> unlocks;
-  
+
   LevelUpReward({
     required this.level,
     required this.cashBonus,
@@ -61,7 +59,7 @@ class LevelUpReward {
 /// XP Yönetim Servisi
 class XPService {
   final DatabaseHelper _db = DatabaseHelper();
-  
+
   // XP Kazanma Miktarları (Ayarlanabilir)
   static const int XP_VEHICLE_PURCHASE = 50;
   static const int XP_VEHICLE_SALE = 100;
@@ -70,7 +68,7 @@ class XPService {
   static const int XP_COUNTER_OFFER_SUCCESS = 50;
   static const int XP_DAILY_LOGIN_BASE = 25;
   static const int XP_CONSECUTIVE_LOGIN_BONUS = 10; // Her ardışık gün için +10
-  
+
   /// Kâr bazlı bonus XP hesapla
   /// Her 100,000 TL kâr için +10 XP (maksimum 200 XP)
   static int calculateProfitBonusXP(double profit) {
@@ -79,7 +77,7 @@ class XPService {
     }
     return 0;
   }
-  
+
   /// XP Ekle ve seviye kontrolü yap
   Future<XPGainResult> addXP(
     String userId,
@@ -90,41 +88,38 @@ class XPService {
     final userMap = await _db.getUserById(userId);
     if (userMap == null) return XPGainResult.empty();
     final user = User.fromJson(userMap);
-    
+
     // Yetenek Kontrolü: Hızlı Öğrenen
     // %25 daha fazla XP kazanımı
     int finalXP = xpAmount;
-    
+
     // XP Boost Kontrolü
     if (user.isXpBoostActive) {
       finalXP *= 2;
     }
-    
+
     final oldLevel = user.level;
     final newXP = user.xp + finalXP;
     final newLevel = User.calculateLevel(newXP);
     final leveledUp = newLevel > oldLevel;
-    
+
     // Güncellenecek alanlar
-    final updates = <String, dynamic>{
-      'xp': newXP,
-      'level': newLevel,
-    };
-    
+    final updates = <String, dynamic>{'xp': newXP, 'level': newLevel};
+
     // İstatistik güncellemeleri
     if (additionalStats != null) {
       updates.addAll(additionalStats);
     }
-    
+
     // User'ı güncelle
     await _db.updateUser(userId, updates);
-    
+
     // Seviye atlandıysa ödülleri hesapla ve ver
     LevelUpReward? rewards;
     if (leveledUp) {
       rewards = await _processLevelUpRewards(userId, newLevel);
     }
-    
+
     return XPGainResult(
       xpGained: finalXP,
       oldLevel: oldLevel,
@@ -133,21 +128,30 @@ class XPService {
       rewards: rewards,
     );
   }
-  
+
   /// Seviye atlama ödüllerini işle ve kullanıcıya ver
-  Future<LevelUpReward> _processLevelUpRewards(String userId, int newLevel) async {
+  Future<LevelUpReward> _processLevelUpRewards(
+    String userId,
+    int newLevel,
+  ) async {
     final userMap = await _db.getUserById(userId);
     if (userMap == null) {
-    if (userMap == null) {
-      return LevelUpReward(level: newLevel, cashBonus: 0, goldBonus: 0, unlocks: [], skillPoints: 0);
-    }
+      if (userMap == null) {
+        return LevelUpReward(
+          level: newLevel,
+          cashBonus: 0,
+          goldBonus: 0,
+          unlocks: [],
+          skillPoints: 0,
+        );
+      }
     }
     final user = User.fromJson(userMap);
-    
+
     // Ödül miktarlarını hesapla
     final cashReward = newLevel * 50000.0; // Level 2 → 100k, Level 3 → 150k
     final goldReward = newLevel >= 5 ? (newLevel / 5).floor() * 0.05 : 0.0;
-    
+
     // Ödülleri kullanıcıya ekle
     final newBalance = user.balance + cashReward;
     final newGold = user.gold + goldReward;
@@ -158,13 +162,13 @@ class XPService {
       'gold': newGold,
       'skillPoints': newSkillPoints,
     });
-    
+
     // Kilitleri aç
     final unlocks = _getUnlocksForLevel(newLevel);
 
     // Aktivite kaydı
     await ActivityService().logLevelUp(userId, newLevel, cashReward, 1);
-    
+
     return LevelUpReward(
       level: newLevel,
       cashBonus: cashReward,
@@ -173,12 +177,12 @@ class XPService {
       skillPoints: 1,
     );
   }
-  
+
   /// Seviye bazlı kilit açma özellikleri
   /// Seviye bazlı kilit açma özellikleri
   List<String> _getUnlocksForLevel(int level) {
     final unlocks = <String>[];
-    
+
     // Kullanıcı isteği üzerine kilit açma yazıları gizlendi
     /*
     if (level == 5) unlocks.add('xp.unlock.premiumVehicles');
@@ -187,74 +191,66 @@ class XPService {
     if (level == 25) unlocks.add('xp.unlock.vipStatus');
     if (level == 50) unlocks.add('xp.unlock.specialBadges');
     */
-    
+
     return unlocks;
   }
-  
 
-  
   /// Araç satın alma XP'si ver
   Future<XPGainResult> onVehiclePurchase(String userId) async {
     final userMap = await _db.getUserById(userId);
     if (userMap == null) return XPGainResult.empty();
     final user = User.fromJson(userMap);
-    
+
     return await addXP(
       userId,
       XP_VEHICLE_PURCHASE,
       XPSource.vehiclePurchase,
-      additionalStats: {
-        'totalVehiclesBought': user.totalVehiclesBought + 1,
-      },
+      additionalStats: {'totalVehiclesBought': user.totalVehiclesBought + 1},
     );
   }
-  
+
   /// Araç satışı XP'si ver (kâr bonusu dahil)
   Future<XPGainResult> onVehicleSale(String userId, double profit) async {
     final userMap = await _db.getUserById(userId);
     if (userMap == null) return XPGainResult.empty();
     final user = User.fromJson(userMap);
-    
+
     final profitBonus = calculateProfitBonusXP(profit);
     final totalXP = XP_VEHICLE_SALE + profitBonus;
-    
+
     return await addXP(
       userId,
       totalXP,
       XPSource.vehicleSale,
-      additionalStats: {
-        'totalVehiclesSold': user.totalVehiclesSold + 1,
-      },
+      additionalStats: {'totalVehiclesSold': user.totalVehiclesSold + 1},
     );
   }
-  
+
   /// Teklif gönderme XP'si ver
   Future<XPGainResult> onOfferMade(String userId) async {
     final userMap = await _db.getUserById(userId);
     if (userMap == null) return XPGainResult.empty();
     final user = User.fromJson(userMap);
-    
+
     return await addXP(
       userId,
       XP_OFFER_MADE,
       XPSource.offerMade,
-      additionalStats: {
-        'totalOffersMade': user.totalOffersMade + 1,
-      },
+      additionalStats: {'totalOffersMade': user.totalOffersMade + 1},
     );
   }
-  
+
   /// Teklif kabul edilmesi XP'si ver
   Future<XPGainResult> onOfferAccepted(String userId) async {
     return await addXP(userId, XP_OFFER_ACCEPTED, XPSource.offerAccepted);
   }
-  
+
   /// Başarılı karşı teklif XP'si ver
   Future<XPGainResult> onCounterOfferSuccess(String userId) async {
     final userMap = await _db.getUserById(userId);
     if (userMap == null) return XPGainResult.empty();
     final user = User.fromJson(userMap);
-    
+
     return await addXP(
       userId,
       XP_COUNTER_OFFER_SUCCESS,
@@ -265,4 +261,3 @@ class XPService {
     );
   }
 }
-

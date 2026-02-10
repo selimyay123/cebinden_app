@@ -9,14 +9,14 @@ class UserProfileAvatar extends StatelessWidget {
   final Color? textColor;
   final double? fontSize;
   const UserProfileAvatar({
-    Key? key,
+    super.key,
     this.imageUrl,
     this.radius = 20,
     this.username,
     this.backgroundColor,
     this.textColor,
     this.fontSize,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

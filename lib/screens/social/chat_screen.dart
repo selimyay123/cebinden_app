@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import '../../models/user_model.dart';
 import '../../widgets/modern_alert_dialog.dart';
 import '../../services/chat_service.dart';
 import '../../services/localization_service.dart';
 import '../../widgets/social_background.dart';
-import '../../utils/quick_chat_data.dart';
+// import '../../utils/quick_chat_data.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -32,8 +31,9 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final ChatService _chatService = ChatService();
   final ScrollController _scrollController = ScrollController();
-  DateTime? _lastMessageTime;
+  // DateTime? _lastMessageTime;
 
+  /*
   void _sendMessage(String messageKey) {
     // Basic flood protection: prevent sending more than one message every 2 seconds
     if (_lastMessageTime != null &&
@@ -71,6 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
       );
     }
   }
+*/
 
   Future<void> _deleteMessage(String messageId) async {
     final confirm = await showDialog<bool>(
@@ -123,7 +124,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('drawer.social.chatCleared'.tr()),
-            backgroundColor: Colors.green.withOpacity(0.8),
+            backgroundColor: Colors.green.withValues(alpha: 0.8),
             action: SnackBarAction(
               label: 'OK',
               textColor: Colors.white,
@@ -140,6 +141,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  /*
   void _showQuickChatSheet() {
     showModalBottomSheet(
       context: context,
@@ -245,6 +247,7 @@ class _ChatScreenState extends State<ChatScreen> {
       },
     );
   }
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -393,8 +396,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               decoration: BoxDecoration(
                                 color: isMe
                                     ? Colors.purpleAccent
-                                    : Colors.deepPurple.shade900.withOpacity(
-                                        0.8,
+                                    : Colors.deepPurple.shade900.withValues(
+                                        alpha: 0.8,
                                       ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: const Radius.circular(16),
@@ -440,6 +443,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
+            /*
             SafeArea(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -447,7 +451,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   color: Colors.deepPurple.shade900,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, -2),
                     ),
@@ -481,6 +485,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
+            */
           ],
         ),
       ),

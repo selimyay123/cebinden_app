@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -6,7 +8,6 @@ import '../services/database_helper.dart';
 import '../models/user_model.dart';
 import '../services/localization_service.dart';
 import '../services/ad_service.dart';
-import '../services/activity_service.dart';
 import '../services/activity_service.dart';
 
 enum ObstacleType { car, pedestrian }
@@ -18,10 +19,11 @@ class TaxiGameScreen extends StatefulWidget {
   State<TaxiGameScreen> createState() => _TaxiGameScreenState();
 }
 
-class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProviderStateMixin {
+class _TaxiGameScreenState extends State<TaxiGameScreen>
+    with SingleTickerProviderStateMixin {
   final DatabaseHelper _db = DatabaseHelper();
   final AdService _adService = AdService();
-  
+
   // Oyun Ayarları
   static const int laneCount = 3;
   static const double laneWidth = 80.0;
@@ -29,7 +31,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
   static const double obstacleHeight = 70.0;
   static const double coinSize = 40.0;
   static const int rewardPerCoin = 25;
-  
+
   // Oyun Durumu
   bool _isPlaying = false;
   bool _isGameOver = false;
@@ -42,11 +44,11 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
   double _gameSpeed = 400.0; // 🆕 Başlangıç hızı düşürüldü (500 -> 400)
   late Ticker _ticker;
   Duration? _lastElapsed;
-  
+
   // Objeler
   final List<Obstacle> _obstacles = [];
   final List<Coin> _coins = [];
-  
+
   // Yol Animasyonu
   double _distanceTraveled = 0;
   double _nextSpawnDistance = 200;
@@ -105,20 +107,23 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
     // Hızlandırma (Her 1000px'de bir %5 hızlan)
     // 🆕 Daha dengeli hızlanma: Her 1000px'de bir %2 hızlan
     if (_distanceTraveled % 1000 < (_gameSpeed * dt)) {
-       _gameSpeed *= 1.02; 
-       if (_gameSpeed > 1000) _gameSpeed = 1000; // Max hız düşürüldü
+      _gameSpeed *= 1.02;
+      if (_gameSpeed > 1000) _gameSpeed = 1000; // Max hız düşürüldü
     }
-    
+
     final moveAmount = _gameSpeed * dt;
     _distanceTraveled += moveAmount;
-    
+
     // Yol animasyonu
     _roadOffset = (_roadOffset + moveAmount) % 100;
 
     // Engel ve Coin Oluşturma
     if (_distanceTraveled >= _nextSpawnDistance) {
       _spawnObjects();
-      _nextSpawnDistance = _distanceTraveled + 300 + Random().nextInt(200); // 🆕 Mesafe kısaltıldı
+      _nextSpawnDistance =
+          _distanceTraveled +
+          300 +
+          Random().nextInt(200); // 🆕 Mesafe kısaltıldı
     }
 
     // Engelleri Hareket Ettir
@@ -128,7 +133,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
       if (_obstacles[i].y > MediaQuery.of(context).size.height) {
         _obstacles.removeAt(i);
         _score++;
-        
+
         // 🆕 XP Ödülü: Her 5 engel geçişinde 1 XP
         if (_score % 5 == 0) {
           _xpEarned++;
@@ -136,7 +141,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
       } else {
         // Çarpışma Kontrolü
         final playerY = MediaQuery.of(context).size.height - 180;
-        
+
         if (_obstacles[i].lane == _playerLane &&
             _obstacles[i].y + obstacleHeight > playerY + 10 &&
             _obstacles[i].y < playerY + playerHeight - 10) {
@@ -154,18 +159,17 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
       } else {
         // Toplama Kontrolü
         final playerY = MediaQuery.of(context).size.height - 180;
-        
+
         if (_coins[i].lane == _playerLane &&
             _coins[i].y + coinSize > playerY &&
             _coins[i].y < playerY + playerHeight) {
-          
           // 🆕 Altın Coin Kontrolü
           if (_coins[i].isGold) {
             _goldEarned += 0.1;
           } else {
             _moneyEarned += rewardPerCoin;
           }
-          
+
           _coinsCollected++;
           _coins.removeAt(i);
         }
@@ -176,22 +180,24 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
   void _spawnObjects() {
     final random = Random();
     int obstacleLane = random.nextInt(laneCount);
-    
+
     // 🆕 Engel Tipi Seçimi (%20 yaya, %80 araba)
-    ObstacleType type = random.nextDouble() < 0.2 ? ObstacleType.pedestrian : ObstacleType.car;
-    
+    ObstacleType type = random.nextDouble() < 0.2
+        ? ObstacleType.pedestrian
+        : ObstacleType.car;
+
     _obstacles.add(Obstacle(lane: obstacleLane, y: -100, type: type));
-    
+
     // %40 şansla coin ekle
     if (random.nextDouble() < 0.4) {
       int coinLane;
       do {
         coinLane = random.nextInt(laneCount);
       } while (coinLane == obstacleLane);
-      
+
       // 🆕 %1 şansla Altın Coin (Daha nadir)
       bool isGold = random.nextDouble() < 0.01;
-      
+
       _coins.add(Coin(lane: coinLane, y: -100, isGold: isGold));
     }
   }
@@ -221,7 +227,7 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
     final userMap = await _db.getCurrentUser();
     if (userMap != null) {
       final user = User.fromJson(userMap);
-      
+
       await _db.updateUser(user.id, {
         'balance': user.balance + _moneyEarned,
         'xp': user.xp + _xpEarned, // 🆕 XP ekle
@@ -230,7 +236,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
 
       // Aktivite kaydı
       if (_moneyEarned > 0) {
-        await ActivityService().logTaxiEarnings(user.id, _moneyEarned.toDouble());
+        await ActivityService().logTaxiEarnings(
+          user.id,
+          _moneyEarned.toDouble(),
+        );
       }
     }
 
@@ -247,8 +256,10 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
     return StatefulBuilder(
       builder: (context, setDialogState) {
         return AlertDialog(
-          backgroundColor: Colors.white.withOpacity(0.9),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Colors.white.withValues(alpha: 0.9),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Row(
             children: [
               const Icon(Icons.flag, color: Colors.deepPurple),
@@ -286,13 +297,33 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                       if (_xpEarned > 0) ...[
                         const Icon(Icons.star, color: Colors.blue, size: 16),
                         const SizedBox(width: 4),
-                        Text('taxiGame.earnedXP'.trParams({'amount': '$_xpEarned'}), style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                        Text(
+                          'taxiGame.earnedXP'.trParams({
+                            'amount': '$_xpEarned',
+                          }),
+                          style: const TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(width: 12),
                       ],
                       if (_goldEarned > 0) ...[
-                        const Icon(Icons.monetization_on, color: Colors.amber, size: 16),
+                        const Icon(
+                          Icons.monetization_on,
+                          color: Colors.amber,
+                          size: 16,
+                        ),
                         const SizedBox(width: 4),
-                        Text('taxiGame.earnedGold'.trParams({'amount': _goldEarned.toStringAsFixed(1)}), style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                        Text(
+                          'taxiGame.earnedGold'.trParams({
+                            'amount': _goldEarned.toStringAsFixed(1),
+                          }),
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ],
                   ),
@@ -311,7 +342,9 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'taxiGame.stackCount'.trParams({'count': '$_coinsCollected'}),
+                        'taxiGame.stackCount'.trParams({
+                          'count': '$_coinsCollected',
+                        }),
                         style: const TextStyle(fontSize: 16),
                         textAlign: TextAlign.center,
                       ),
@@ -323,31 +356,41 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                        onPressed: () async {
+                      onPressed: () async {
                         await _adService.showRewardedAd(
                           onRewarded: (reward) async {
                             final userMap = await _db.getCurrentUser();
                             if (userMap != null) {
                               final user = User.fromJson(userMap);
-                              
+
                               final finalReward = _moneyEarned;
-                              
+
                               await _db.updateUser(user.id, {
-                                'balance': user.balance + finalReward, // Ekstra kazanç (zaten ilk kazanç eklendi)
+                                'balance':
+                                    user.balance +
+                                    finalReward, // Ekstra kazanç (zaten ilk kazanç eklendi)
                               });
 
                               // Aktivite kaydı (Ekstra kazanç)
-                              await ActivityService().logTaxiEarnings(user.id, finalReward.toDouble());
+                              await ActivityService().logTaxiEarnings(
+                                user.id,
+                                finalReward.toDouble(),
+                              );
                             }
-                            
+
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(duration: const Duration(milliseconds: 1500), 
+                                SnackBar(
+                                  duration: const Duration(milliseconds: 1500),
                                   elevation: 8,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                   behavior: SnackBarBehavior.floating,
                                   content: Text('taxiGame.rewardDoubled'.tr()),
-                                  backgroundColor: Colors.green.withOpacity(0.8),
+                                  backgroundColor: Colors.green.withValues(
+                                    alpha: 0.8,
+                                  ),
                                 ),
                               );
                               Navigator.pop(context);
@@ -356,12 +399,17 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                           },
                           onAdNotReady: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(duration: const Duration(milliseconds: 1500), 
+                              SnackBar(
+                                duration: const Duration(milliseconds: 1500),
                                 elevation: 8,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                                 behavior: SnackBarBehavior.floating,
                                 content: Text('taxiGame.adNotReady'.tr()),
-                                backgroundColor: Colors.grey.withOpacity(0.8),
+                                backgroundColor: Colors.grey.withValues(
+                                  alpha: 0.8,
+                                ),
                               ),
                             );
                             _adService.loadRewardedAd();
@@ -470,15 +518,22 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                       children: [
                         // Para Göstergesi
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.8),
+                            color: Colors.black.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(color: Colors.green, width: 2),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.local_atm, color: Colors.green, size: 20),
+                              const Icon(
+                                Icons.local_atm,
+                                color: Colors.green,
+                                size: 20,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 '$_moneyEarned',
@@ -493,15 +548,22 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                         ),
                         // Skor (Araç)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.8),
+                            color: Colors.black.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(color: Colors.amber, width: 2),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.speed, color: Colors.amber, size: 20),
+                              const Icon(
+                                Icons.speed,
+                                color: Colors.amber,
+                                size: 20,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 '$_score',
@@ -524,12 +586,16 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
             // Başlatma Ekranı
             if (!_isPlaying && !_isGameOver)
               Container(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.local_taxi, size: 80, color: Colors.amber),
+                      const Icon(
+                        Icons.local_taxi,
+                        size: 80,
+                        color: Colors.amber,
+                      ),
                       const SizedBox(height: 20),
                       Text(
                         'taxiGame.title'.tr(),
@@ -543,11 +609,18 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                       const SizedBox(height: 10),
                       Text(
                         'taxiGame.collectMoney'.tr(),
-                        style: const TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.greenAccent,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         'taxiGame.swipeToMove'.tr(),
-                        style: const TextStyle(color: Colors.white70, fontSize: 16),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
                       ),
                       const SizedBox(height: 40),
                       ElevatedButton(
@@ -555,14 +628,20 @@ class _TaxiGameScreenState extends State<TaxiGameScreen> with SingleTickerProvid
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.amber,
                           foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 16,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
                         child: Text(
                           'taxiGame.start'.tr(),
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -640,7 +719,7 @@ class GamePainter extends CustomPainter {
     final roadPaint = Paint()
       ..color = Colors.grey[900]!
       ..style = PaintingStyle.fill;
-    
+
     // Yol kenar çizgileri
     final borderPaint = Paint()
       ..color = Colors.white
@@ -648,27 +727,25 @@ class GamePainter extends CustomPainter {
       ..strokeWidth = 4;
 
     final roadRect = Rect.fromLTWH(roadX, 0, roadWidth, size.height);
-    
+
     // Gölge
     final shadowPath = Path()..addRect(roadRect);
     canvas.drawShadow(shadowPath, Colors.black, 10, true);
-    
+
     canvas.drawRect(roadRect, roadPaint);
     canvas.drawRect(roadRect, borderPaint);
 
     // 3. Şerit Çizgileri
     final lanePaint = Paint()
-      ..color = Colors.white.withOpacity(0.5)
+      ..color = Colors.white.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill;
 
-    for (int i = 1; i < 3; i++) { // 3 şerit için 2 çizgi
+    for (int i = 1; i < 3; i++) {
+      // 3 şerit için 2 çizgi
       double laneX = roadX + (i * laneWidth);
       for (int j = -1; j < 15; j++) {
         double lineY = (j * 100) + roadOffset - 50; // 100px aralık
-        canvas.drawRect(
-          Rect.fromLTWH(laneX - 2, lineY, 4, 60),
-          lanePaint,
-        );
+        canvas.drawRect(Rect.fromLTWH(laneX - 2, lineY, 4, 60), lanePaint);
       }
     }
 
@@ -679,40 +756,51 @@ class GamePainter extends CustomPainter {
       ..color = Colors.green[300]!
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
-    
+
     for (var coin in coins) {
-      double coinX = roadX + (coin.lane * laneWidth) + (laneWidth - coinSize) / 2;
+      double coinX =
+          roadX + (coin.lane * laneWidth) + (laneWidth - coinSize) / 2;
       final coinRect = Rect.fromLTWH(coinX, coin.y, coinSize, coinSize);
-      
+
       // Gölge
       canvas.drawRect(
-        coinRect.shift(const Offset(0, 2)), 
-        Paint()..color = Colors.black.withOpacity(0.3)
+        coinRect.shift(const Offset(0, 2)),
+        Paint()..color = Colors.black.withValues(alpha: 0.3),
       );
 
       canvas.drawRect(coinRect, coin.isGold ? goldCoinPaint : coinPaint);
       canvas.drawRect(coinRect, coinBorderPaint);
-      
+
       // İçine dolar işareti ($) veya G
-      _drawText(canvas, coin.isGold ? 'G' : '\$', coinX + coinSize/2, coin.y + coinSize/2, 
-        color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold);
+      _drawText(
+        canvas,
+        coin.isGold ? 'G' : '\$',
+        coinX + coinSize / 2,
+        coin.y + coinSize / 2,
+        color: Colors.white,
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      );
     }
 
     // 5. Engeller (Arabalar ve Yayalar)
     final carPaint = Paint()..color = Colors.red[700]!;
     final pedestrianPaint = Paint()..color = Colors.blue[700]!; // 🆕 Yaya Rengi
-    
+
     for (var obstacle in obstacles) {
       double obsX = roadX + (obstacle.lane * laneWidth) + (laneWidth - 50) / 2;
-      
+
       if (obstacle.type == ObstacleType.car) {
         // ARABA ÇİZİMİ
         final obsRect = Rect.fromLTWH(obsX, obstacle.y, 50, obstacleHeight);
-        
+
         // Gölge
         canvas.drawRRect(
-          RRect.fromRectAndRadius(obsRect.shift(const Offset(0, 4)), const Radius.circular(12)),
-          Paint()..color = Colors.black.withOpacity(0.4)
+          RRect.fromRectAndRadius(
+            obsRect.shift(const Offset(0, 4)),
+            const Radius.circular(12),
+          ),
+          Paint()..color = Colors.black.withValues(alpha: 0.4),
         );
 
         // Araba Gövdesi
@@ -720,29 +808,45 @@ class GamePainter extends CustomPainter {
           RRect.fromRectAndRadius(obsRect, const Radius.circular(12)),
           carPaint,
         );
-        
+
         // Stop lambaları
         final lightPaint = Paint()..color = Colors.redAccent;
-        canvas.drawRect(Rect.fromLTWH(obsX + 8, obstacle.y + obstacleHeight - 11, 6, 3), lightPaint);
-        canvas.drawRect(Rect.fromLTWH(obsX + 50 - 14, obstacle.y + obstacleHeight - 11, 6, 3), lightPaint);
-        
+        canvas.drawRect(
+          Rect.fromLTWH(obsX + 8, obstacle.y + obstacleHeight - 11, 6, 3),
+          lightPaint,
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(obsX + 50 - 14, obstacle.y + obstacleHeight - 11, 6, 3),
+          lightPaint,
+        );
+
         // Cam
-        final windowPaint = Paint()..color = Colors.black.withOpacity(0.3);
-        canvas.drawRect(Rect.fromLTWH(obsX + 5, obstacle.y + 15, 40, 20), windowPaint);
-        
+        final windowPaint = Paint()
+          ..color = Colors.black.withValues(alpha: 0.3);
+        canvas.drawRect(
+          Rect.fromLTWH(obsX + 5, obstacle.y + 15, 40, 20),
+          windowPaint,
+        );
       } else {
         // 🆕 YAYA ÇİZİMİ (Basit)
         double pedWidth = 30;
         double pedHeight = 30;
         double pedX = obsX + (50 - pedWidth) / 2;
         double pedY = obstacle.y + (obstacleHeight - pedHeight) / 2;
-        
+
         // Kafa
-        canvas.drawCircle(Offset(pedX + pedWidth/2, pedY), 8, pedestrianPaint);
-        
+        canvas.drawCircle(
+          Offset(pedX + pedWidth / 2, pedY),
+          8,
+          pedestrianPaint,
+        );
+
         // Gövde
-        canvas.drawRect(Rect.fromLTWH(pedX, pedY + 8, pedWidth, 20), pedestrianPaint);
-        
+        canvas.drawRect(
+          Rect.fromLTWH(pedX, pedY + 8, pedWidth, 20),
+          pedestrianPaint,
+        );
+
         // Kollar (Basit çizgi)
         // canvas.drawLine(...)
       }
@@ -750,13 +854,16 @@ class GamePainter extends CustomPainter {
 
     // 6. Oyuncu (Taksi)
     double playerX = roadX + (playerLane * laneWidth) + (laneWidth - 50) / 2;
-    
+
     final playerRect = Rect.fromLTWH(playerX, playerY, 50, playerHeight);
-    
+
     // Gölge
     canvas.drawRRect(
-      RRect.fromRectAndRadius(playerRect.shift(const Offset(0, 4)), const Radius.circular(12)),
-      Paint()..color = Colors.black.withOpacity(0.4)
+      RRect.fromRectAndRadius(
+        playerRect.shift(const Offset(0, 4)),
+        const Radius.circular(12),
+      ),
+      Paint()..color = Colors.black.withValues(alpha: 0.4),
     );
 
     // Taksi Gövdesi
@@ -765,7 +872,7 @@ class GamePainter extends CustomPainter {
       RRect.fromRectAndRadius(playerRect, const Radius.circular(12)),
       taxiPaint,
     );
-    
+
     // Taksi detayları
     final taxiBorderPaint = Paint()
       ..color = Colors.black
@@ -779,29 +886,43 @@ class GamePainter extends CustomPainter {
     // Tavan Işığı
     canvas.drawRect(
       Rect.fromLTWH(playerX + 15, playerY + 10, 20, 6),
-      Paint()..color = Colors.black
+      Paint()..color = Colors.black,
     );
-    
+
     // Cam
     canvas.drawRect(
       Rect.fromLTWH(playerX + 5, playerY + 20, 40, 15),
-      Paint()..color = Colors.black.withOpacity(0.2)
+      Paint()..color = Colors.black.withValues(alpha: 0.2),
     );
-    
+
     // Damalı şerit (Basit)
     final checkPaint = Paint()..color = Colors.black;
-    for(int k=0; k<5; k++) {
-       if(k%2==0) {
-         canvas.drawRect(Rect.fromLTWH(playerX + (k*10), playerY + 40, 10, 5), checkPaint);
-       }
+    for (int k = 0; k < 5; k++) {
+      if (k % 2 == 0) {
+        canvas.drawRect(
+          Rect.fromLTWH(playerX + (k * 10), playerY + 40, 10, 5),
+          checkPaint,
+        );
+      }
     }
   }
 
-  void _drawText(Canvas canvas, String text, double x, double y, 
-      {Color color = Colors.white, double fontSize = 14, FontWeight fontWeight = FontWeight.normal}) {
+  void _drawText(
+    Canvas canvas,
+    String text,
+    double x,
+    double y, {
+    Color color = Colors.white,
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.normal,
+  }) {
     final textSpan = TextSpan(
       text: text,
-      style: TextStyle(color: color, fontSize: fontSize, fontWeight: fontWeight),
+      style: TextStyle(
+        color: color,
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+      ),
     );
     final textPainter = TextPainter(
       text: textSpan,
@@ -809,7 +930,10 @@ class GamePainter extends CustomPainter {
       textAlign: TextAlign.center,
     );
     textPainter.layout();
-    textPainter.paint(canvas, Offset(x - textPainter.width / 2, y - textPainter.height / 2));
+    textPainter.paint(
+      canvas,
+      Offset(x - textPainter.width / 2, y - textPainter.height / 2),
+    );
   }
 
   @override

@@ -1,7 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 import '../models/user_vehicle_model.dart';
 import '../models/vehicle_model.dart';
 import '../services/database_helper.dart';
@@ -13,25 +14,22 @@ import '../widgets/modern_alert_dialog.dart';
 import '../utils/brand_colors.dart';
 import 'vehicle_detail_screen.dart';
 import 'package:intl/intl.dart';
-import 'main_screen.dart';
 import '../utils/vehicle_utils.dart';
 import '../mixins/auto_refresh_mixin.dart';
 
 class MyListingsScreen extends StatefulWidget {
-  final String? selectedBrand; // null = marka listesi göster, brand = o markanın ilanlarını göster
+  final String?
+  selectedBrand; // null = marka listesi göster, brand = o markanın ilanlarını göster
   final int initialTab; // 0 = İlanlarım, 1 = Favori İlanlarım
 
-  const MyListingsScreen({
-    super.key,
-    this.selectedBrand,
-    this.initialTab = 0,
-  });
+  const MyListingsScreen({super.key, this.selectedBrand, this.initialTab = 0});
 
   @override
   State<MyListingsScreen> createState() => _MyListingsScreenState();
 }
 
-class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerProviderStateMixin, RouteAware, AutoRefreshMixin {
+class _MyListingsScreenState extends State<MyListingsScreen>
+    with SingleTickerProviderStateMixin, RouteAware, AutoRefreshMixin {
   final DatabaseHelper _db = DatabaseHelper();
   final AuthService _authService = AuthService();
   final FavoriteService _favoriteService = FavoriteService();
@@ -40,13 +38,12 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   List<Vehicle> _favoriteListings = [];
   bool _isLoading = true;
   late TabController _tabController;
-  
+
   // Marka bazında gruplandırılmış ilanlar
   Map<String, List<UserVehicle>> _listingsByBrand = {};
   StreamSubscription? _vehicleUpdateSubscription;
 
   @override
-
   @override
   int? get tabIndex => 4; // MainScreen'deki index
 
@@ -60,10 +57,14 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   void initState() {
     super.initState();
     _assetService.init();
-    _tabController = TabController(length: 2, vsync: this, initialIndex: widget.initialTab);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTab,
+    );
     _loadUserListedVehicles();
     _loadFavoriteListings();
-    
+
     // Araç güncellemelerini dinle
     _vehicleUpdateSubscription = _db.onVehicleUpdate.listen((_) {
       _loadUserListedVehicles();
@@ -84,7 +85,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
     final currentUser = await _authService.getCurrentUser();
     if (currentUser != null) {
       final listedVehicles = await _db.getUserListedVehicles(currentUser.id);
-      
+
       // İlanları markaya göre gruplandır
       final Map<String, List<UserVehicle>> grouped = {};
       for (var vehicle in listedVehicles) {
@@ -93,7 +94,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
         }
         grouped[vehicle.brand]!.add(vehicle);
       }
-      
+
       setState(() {
         _userListedVehicles = listedVehicles;
         _listingsByBrand = grouped;
@@ -125,21 +126,19 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
       builder: (context, currentLanguage, child) {
         // Eğer belirli bir marka seçilmişse, eski davranışı koru
         if (widget.selectedBrand != null) {
-            return WillPopScope(
-              onWillPop: () async {
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                  return false;
-                }
-                return true;
-              },
-              child: Scaffold(
+          return PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, result) {
+              if (didPop) return;
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            },
+            child: Scaffold(
               // backgroundColor: Colors.grey[100],
               appBar: AppBar(
                 title: Text(widget.selectedBrand!),
-                actions: [
-
-                ],
+                actions: [],
                 elevation: 0,
                 backgroundColor: Colors.deepPurple,
                 foregroundColor: Colors.white,
@@ -147,7 +146,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               body: Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: _getBackgroundImageProvider('assets/images/general_bg.png'),
+                    image: _getBackgroundImageProvider(
+                      'assets/images/general_bg.png',
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -155,72 +156,70 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     ? const Center(child: CircularProgressIndicator())
                     : _buildListingList(),
               ),
-              ),
-            );
+            ),
+          );
         }
-        
+
         // Yeni TabBar'lı görünüm
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
             if (Navigator.canPop(context)) {
               Navigator.pop(context);
-              return false;
             }
-            return true;
           },
           child: Scaffold(
-          // backgroundColor: Colors.grey[100],
-          appBar: AppBar(
-            title: Text('listings.title'.tr()),
-            actions: [
-
-            ],
-            elevation: 0,
-            backgroundColor: Colors.deepPurple,
-            foregroundColor: Colors.white,
-            bottom: TabBar(
-              controller: _tabController,
-              indicatorColor: Colors.white,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
-              tabs: [
-                Tab(text: 'listings.myListings'.tr()),
-                Tab(text: 'favorites.myFavorites'.tr()),
-              ],
-            ),
-          ),
-          body: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/general_bg.png'),
-                fit: BoxFit.cover,
+            // backgroundColor: Colors.grey[100],
+            appBar: AppBar(
+              title: Text('listings.title'.tr()),
+              actions: [],
+              elevation: 0,
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+              bottom: TabBar(
+                controller: _tabController,
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                tabs: [
+                  Tab(text: 'listings.myListings'.tr()),
+                  Tab(text: 'favorites.myFavorites'.tr()),
+                ],
               ),
             ),
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // Tab 1: İlanlarım
-                _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : _userListedVehicles.isEmpty
-                        ? _buildEmptyState()
-                        : _buildBrandList(),
-                
-                // Tab 2: Favori İlanlarım
-                _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : _favoriteListings.isEmpty
-                        ? _buildEmptyFavoritesState()
-                        : _buildFavoritesList(),
-              ],
+            body: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/general_bg.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Tab 1: İlanlarım
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _userListedVehicles.isEmpty
+                      ? _buildEmptyState()
+                      : _buildBrandList(),
+
+                  // Tab 2: Favori İlanlarım
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _favoriteListings.isEmpty
+                      ? _buildEmptyFavoritesState()
+                      : _buildFavoritesList(),
+                ],
+              ),
             ),
           ),
-        ),
         );
       },
     );
   }
-  
+
   // Marka listesi (1. seviye)
   Widget _buildBrandList() {
     return RefreshIndicator(
@@ -242,11 +241,11 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
       ),
     );
   }
-  
+
   // Belirli bir markanın ilan listesi (2. seviye)
   Widget _buildListingList() {
     final brandListings = _listingsByBrand[widget.selectedBrand] ?? [];
-    
+
     return RefreshIndicator(
       onRefresh: _loadUserListedVehicles,
       child: ListView.builder(
@@ -262,8 +261,11 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
 
   // Marka kartı widget'ı
   Widget _buildBrandCard(String brand, int listingCount) {
-    final brandColor = BrandColors.getColor(brand, defaultColor: Colors.deepPurple);
-    
+    final brandColor = BrandColors.getColor(
+      brand,
+      defaultColor: Colors.deepPurple,
+    );
+
     return InkWell(
       onTap: () async {
         await Navigator.push(
@@ -281,7 +283,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -298,7 +300,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 child: _buildBrandLogo(brand, 120, 120, brandColor),
               ),
             ),
-            
+
             // İçerik
             Padding(
               padding: const EdgeInsets.all(16),
@@ -319,7 +321,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: brandColor.withOpacity(0.3),
+                            color: brandColor.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -335,7 +337,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                       ),
                     ),
                   ),
-                  
+
                   // Marka İsmi
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,13 +352,10 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        listingCount == 1 
-                          ? '1 ${'misc.listing'.tr()}' 
-                          : '$listingCount ${'misc.listings'.tr()}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                        ),
+                        listingCount == 1
+                            ? '1 ${'misc.listing'.tr()}'
+                            : '$listingCount ${'misc.listings'.tr()}',
+                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -376,11 +375,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.store_outlined,
-              size: 80,
-              color: Colors.black,
-            ),
+            Icon(Icons.store_outlined, size: 80, color: Colors.black),
             const SizedBox(height: 24),
             Text(
               'listings.noListings'.tr(),
@@ -394,10 +389,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             const SizedBox(height: 12),
             Text(
               'listings.noListingsDesc'.tr(),
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ],
@@ -413,11 +405,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.favorite_border,
-              size: 80,
-              color: Colors.black,
-            ),
+            Icon(Icons.favorite_border, size: 80, color: Colors.black),
             const SizedBox(height: 24),
             Text(
               'favorites.noFavorites'.tr(),
@@ -431,10 +419,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             const SizedBox(height: 12),
             Text(
               'favorites.noFavoritesDesc'.tr(),
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ],
@@ -460,14 +445,15 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   }
 
   Widget _buildFavoriteVehicleCard(Vehicle vehicle) {
-    final brandColor = BrandColors.getColor(vehicle.brand, defaultColor: Colors.deepPurple);
-    
+    final brandColor = BrandColors.getColor(
+      vehicle.brand,
+      defaultColor: Colors.deepPurple,
+    );
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () async {
           // Araç detay sayfasına git
@@ -493,15 +479,17 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     width: 70,
                     height: 70,
                     decoration: BoxDecoration(
-                      color: brandColor.withOpacity(0.1),
+                      color: brandColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Builder(
                       builder: (context) {
-                        final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
+                        final imageUrl =
+                            (vehicle.imageUrl != null &&
+                                vehicle.imageUrl!.isNotEmpty)
                             ? vehicle.imageUrl!
                             : '';
-                        
+
                         return ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: _buildVehicleImage(
@@ -513,7 +501,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                             vehicleId: vehicle.id,
                           ),
                         );
-                      }
+                      },
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -539,7 +527,11 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(Icons.location_on, size: 14, color: Colors.grey[500]),
+                            Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color: Colors.grey[500],
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               vehicle.location,
@@ -559,16 +551,26 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     onPressed: () async {
                       final currentUser = await _authService.getCurrentUser();
                       if (currentUser != null) {
-                        await _favoriteService.removeFavorite(currentUser.id, vehicle.id);
+                        await _favoriteService.removeFavorite(
+                          currentUser.id,
+                          vehicle.id,
+                        );
                         await _loadFavoriteListings();
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(duration: const Duration(milliseconds: 1500), 
+                            SnackBar(
+                              duration: const Duration(milliseconds: 1500),
                               elevation: 8,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                               behavior: SnackBarBehavior.floating,
-                              content: Text('favorites.removedFromFavorites'.tr()),
-                              backgroundColor: Colors.orange.withOpacity(0.8),
+                              content: Text(
+                                'favorites.removedFromFavorites'.tr(),
+                              ),
+                              backgroundColor: Colors.orange.withValues(
+                                alpha: 0.8,
+                              ),
                             ),
                           );
                         }
@@ -579,7 +581,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 ],
               ),
               const Divider(height: 24),
-              
+
               // Fiyat ve Teknik Bilgiler
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -589,10 +591,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     children: [
                       Text(
                         'vehicles.price'.tr(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -630,9 +629,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -645,15 +642,17 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                   width: 70,
                   height: 70,
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Builder(
                     builder: (context) {
-                      final imageUrl = (vehicle.imageUrl != null && vehicle.imageUrl!.isNotEmpty)
+                      final imageUrl =
+                          (vehicle.imageUrl != null &&
+                              vehicle.imageUrl!.isNotEmpty)
                           ? vehicle.imageUrl!
                           : '';
-                      
+
                       return ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: _buildVehicleImage(
@@ -665,7 +664,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                           vehicleId: vehicle.id,
                         ),
                       );
-                    }
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -683,10 +682,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                       const SizedBox(height: 4),
                       Text(
                         '${vehicle.year} • ${_formatNumber(vehicle.mileage)} km',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 4),
                       Container(
@@ -695,7 +691,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.1),
+                          color: Colors.orange.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -713,7 +709,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               ],
             ),
             const Divider(height: 24),
-            
+
             // Fiyat Bilgileri
             Row(
               children: [
@@ -723,10 +719,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                     children: [
                       Text(
                         'vehicles.listingPrice'.tr(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -745,10 +738,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                   children: [
                     Text(
                       'vehicles.purchasePrice'.tr(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -763,14 +753,14 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Kar/Zarar Göstergesi
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _getProfitColor(vehicle).withOpacity(0.1),
+                color: _getProfitColor(vehicle).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -792,9 +782,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // İlan Açıklaması
             if (vehicle.listingDescription != null) ...[
               Text(
@@ -818,7 +808,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
               ),
               const SizedBox(height: 16),
             ],
-            
+
             // İlan İstatistikleri
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -833,9 +823,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Butonlar
             Row(
               children: [
@@ -859,7 +849,6 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // TODO: İlanı kaldır
                       _showRemoveListingDialog(vehicle);
                     },
                     icon: const Icon(Icons.close),
@@ -893,10 +882,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
         children: [
           Icon(icon, size: 16, color: Colors.grey[700]),
           const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-          ),
+          Text(text, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
         ],
       ),
     );
@@ -923,16 +909,16 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
       context: context,
       builder: (context) => _EditListingDialog(
         vehicle: vehicle,
-        onSave: (double price, String description) async {
+        onSave: (double price) async {
           // İlanı güncelle
           final success = await _db.updateUserVehicle(vehicle.id, {
             'listingPrice': price,
-            'listingDescription': description,
           });
-          
+
           if (success && mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(duration: const Duration(milliseconds: 1500), 
+              SnackBar(
+                duration: const Duration(milliseconds: 1500),
                 content: Text('sell.listingUpdated'.tr()),
                 backgroundColor: Colors.green,
               ),
@@ -940,7 +926,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             _loadUserListedVehicles(); // Listeyi yenile
           } else if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(duration: const Duration(milliseconds: 1500), 
+              SnackBar(
+                duration: const Duration(milliseconds: 1500),
                 content: Text('sell.listingUpdateFailed'.tr()),
                 backgroundColor: Colors.red,
               ),
@@ -969,14 +956,15 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
             'listingDescription': null,
             'listedDate': null,
           });
-          
+
           if (success) {
             // 🆕 İlana ait tüm teklifleri sil
             await _db.deleteOffersForVehicle(vehicle.id);
 
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(duration: const Duration(milliseconds: 1500), 
+                SnackBar(
+                  duration: const Duration(milliseconds: 1500),
                   content: Text('sell.listingRemoved'.tr()),
                   backgroundColor: Colors.green,
                 ),
@@ -994,10 +982,12 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   }
 
   String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return amount
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 
   String _formatDate(DateTime date) {
@@ -1021,42 +1011,55 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
     } catch (e) {
       debugPrint('Error checking local asset: $e');
     }
-    
+
     // 2. Yoksa varsayılan (açık tema) görseli kullan (Fallback)
     // Eğer koyu tema görseli assets içinde yoksa, açık tema görselini kullan
     // Bu sayede uygulama çökmez.
     if (assetPath.contains('general_bg_dark.png')) {
-       // Koyu tema görseli bulunamadıysa açık tema görselini dene
-       return const AssetImage('assets/images/general_bg.png');
+      // Koyu tema görseli bulunamadıysa açık tema görselini dene
+      return const AssetImage('assets/images/general_bg.png');
     }
-    
+
     return AssetImage(assetPath);
   }
 
-  Widget _buildVehicleImage(String imageUrl, double width, double height, {String? brand, String? model, String? vehicleId}) {
+  Widget _buildVehicleImage(
+    String imageUrl,
+    double width,
+    double height, {
+    String? brand,
+    String? model,
+    String? vehicleId,
+  }) {
     // 1. URL boşsa veya null ise fallback dene
     if (imageUrl.isEmpty) {
       if (brand != null && model != null) {
-        final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+        final fallbackPath = VehicleUtils.getVehicleImage(
+          brand,
+          model,
+          vehicleId: vehicleId,
+        );
         if (fallbackPath != null) {
           // Fallback path de indirilmiş olabilir mi?
           final file = _assetService.getLocalFile(fallbackPath);
           if (file.existsSync()) {
-             return Image.file(
-               file,
-               width: width,
-               height: height,
-               fit: BoxFit.contain,
-               errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
-             );
+            return Image.file(
+              file,
+              width: width,
+              height: height,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  _buildGenericCarIcon(width, height),
+            );
           }
-          
+
           return Image.asset(
             fallbackPath,
             width: width,
             height: height,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+            errorBuilder: (context, error, stackTrace) =>
+                _buildGenericCarIcon(width, height),
           );
         }
       }
@@ -1072,26 +1075,32 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
           if (brand != null && model != null) {
-            final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+            final fallbackPath = VehicleUtils.getVehicleImage(
+              brand,
+              model,
+              vehicleId: vehicleId,
+            );
             if (fallbackPath != null) {
-               // Fallback path de indirilmiş olabilir mi?
-               final file = _assetService.getLocalFile(fallbackPath);
-               if (file.existsSync()) {
-                  return Image.file(
-                    file,
-                    width: width,
-                    height: height,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
-                  );
-               }
-              
+              // Fallback path de indirilmiş olabilir mi?
+              final file = _assetService.getLocalFile(fallbackPath);
+              if (file.existsSync()) {
+                return Image.file(
+                  file,
+                  width: width,
+                  height: height,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildGenericCarIcon(width, height),
+                );
+              }
+
               return Image.asset(
                 fallbackPath,
                 width: width,
                 height: height,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildGenericCarIcon(width, height),
               );
             }
           }
@@ -1099,7 +1108,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
         },
       );
     }
-    
+
     // 3. Local Asset veya İndirilmiş Dosya
     // Önce indirilmiş dosya var mı bak
     try {
@@ -1110,7 +1119,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
           width: width,
           height: height,
           fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildGenericCarIcon(width, height),
         );
       }
     } catch (e) {
@@ -1125,27 +1135,33 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
       fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) {
         if (brand != null && model != null) {
-          final fallbackPath = VehicleUtils.getVehicleImage(brand, model, vehicleId: vehicleId);
+          final fallbackPath = VehicleUtils.getVehicleImage(
+            brand,
+            model,
+            vehicleId: vehicleId,
+          );
           // Eğer fallback path farklıysa onu dene
           if (fallbackPath != null && fallbackPath != imageUrl) {
-             // Fallback path de indirilmiş olabilir mi?
-             final file = _assetService.getLocalFile(fallbackPath);
-             if (file.existsSync()) {
-                return Image.file(
-                  file,
-                  width: width,
-                  height: height,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
-                );
-             }
-            
+            // Fallback path de indirilmiş olabilir mi?
+            final file = _assetService.getLocalFile(fallbackPath);
+            if (file.existsSync()) {
+              return Image.file(
+                file,
+                width: width,
+                height: height,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildGenericCarIcon(width, height),
+              );
+            }
+
             return Image.asset(
               fallbackPath,
               width: width,
               height: height,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => _buildGenericCarIcon(width, height),
+              errorBuilder: (context, error, stackTrace) =>
+                  _buildGenericCarIcon(width, height),
             );
           }
         }
@@ -1154,9 +1170,14 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildBrandLogo(String brand, double width, double height, Color brandColor) {
+  Widget _buildBrandLogo(
+    String brand,
+    double width,
+    double height,
+    Color brandColor,
+  ) {
     final assetPath = 'assets/images/brands/${brand.toLowerCase()}.png';
-    
+
     // 1. Önce indirilmiş dosyalara bak
     try {
       final file = _assetService.getLocalFile(assetPath);
@@ -1169,7 +1190,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
           errorBuilder: (context, error, stackTrace) => Icon(
             Icons.store,
             size: width * 0.8,
-            color: brandColor.withOpacity(0.1),
+            color: brandColor.withValues(alpha: 0.1),
           ),
         );
       }
@@ -1187,7 +1208,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
         return Icon(
           Icons.store,
           size: width * 0.8,
-          color: brandColor.withOpacity(0.1),
+          color: brandColor.withValues(alpha: 0.1),
         );
       },
     );
@@ -1210,15 +1231,11 @@ class _MyListingsScreenState extends State<MyListingsScreen> with SingleTickerPr
   }
 }
 
-
 class _EditListingDialog extends StatefulWidget {
   final UserVehicle vehicle;
-  final Function(double price, String description) onSave;
+  final Function(double price) onSave;
 
-  const _EditListingDialog({
-    required this.vehicle,
-    required this.onSave,
-  });
+  const _EditListingDialog({required this.vehicle, required this.onSave});
 
   @override
   State<_EditListingDialog> createState() => _EditListingDialogState();
@@ -1226,32 +1243,31 @@ class _EditListingDialog extends StatefulWidget {
 
 class _EditListingDialogState extends State<_EditListingDialog> {
   late TextEditingController _priceController;
-  late TextEditingController _descriptionController;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     _priceController = TextEditingController(
-      text: _formatCurrency((widget.vehicle.listingPrice ?? 0)).replaceAll('.', ''),
-    );
-    _descriptionController = TextEditingController(
-      text: widget.vehicle.listingDescription ?? '',
+      text: _formatCurrency(
+        (widget.vehicle.listingPrice ?? 0),
+      ).replaceAll('.', ''),
     );
   }
 
   @override
   void dispose() {
     _priceController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
   String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return amount
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 
   String _formatNumber(int number) {
@@ -1270,11 +1286,11 @@ class _EditListingDialogState extends State<_EditListingDialog> {
     } catch (e) {
       currentPrice = 0;
     }
-    
+
     final profit = currentPrice - widget.vehicle.purchasePrice;
     final isProfit = profit >= 0;
-    final profitPercent = widget.vehicle.purchasePrice > 0 
-        ? (profit / widget.vehicle.purchasePrice) * 100 
+    final profitPercent = widget.vehicle.purchasePrice > 0
+        ? (profit / widget.vehicle.purchasePrice) * 100
         : 0;
 
     final maxPrice = widget.vehicle.purchasePrice * 1.15;
@@ -1292,9 +1308,11 @@ class _EditListingDialogState extends State<_EditListingDialog> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1319,7 +1337,11 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                     // Alış Fiyatı Gösterimi
                     Row(
                       children: [
-                        const Icon(Icons.shopping_cart, size: 14, color: Colors.white70),
+                        const Icon(
+                          Icons.shopping_cart,
+                          size: 14,
+                          color: Colors.white70,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${'vehicles.purchasePrice'.tr()}: ',
@@ -1342,7 +1364,7 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Fiyat Girişi
               Text(
                 'vehicles.listingPrice'.tr(),
@@ -1371,22 +1393,29 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   suffixStyle: const TextStyle(color: Colors.white70),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                    borderSide: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.3),
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                    borderSide: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.3),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: const BorderSide(color: Colors.white),
                   ),
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.1),
+                  fillColor: Colors.white.withValues(alpha: 0.1),
                   helperText: 'myListings.maxPriceHint'.trParams({
                     'price': _formatCurrency(maxPrice),
                   }),
-                  helperStyle: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold),
+                  helperStyle: const TextStyle(
+                    color: Colors.orangeAccent,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -1403,17 +1432,21 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   return null;
                 },
               ),
-              
+
               // Dinamik Kar/Zarar Göstergesi
               if (_priceController.text.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isProfit ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                    color: isProfit
+                        ? Colors.green.withValues(alpha: 0.2)
+                        : Colors.red.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isProfit ? Colors.green.withOpacity(0.5) : Colors.red.withOpacity(0.5),
+                      color: isProfit
+                          ? Colors.green.withValues(alpha: 0.5)
+                          : Colors.red.withValues(alpha: 0.5),
                     ),
                   ),
                   child: Row(
@@ -1427,12 +1460,16 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                       Expanded(
                         child: Text(
                           'myListings.profitLossStatus'.trParams({
-                            'status': isProfit ? 'myListings.profit'.tr() : 'myListings.loss'.tr(),
+                            'status': isProfit
+                                ? 'myListings.profit'.tr()
+                                : 'myListings.loss'.tr(),
                             'amount': _formatCurrency(profit.abs()),
                             'percent': profitPercent.abs().toStringAsFixed(1),
                           }),
                           style: TextStyle(
-                            color: isProfit ? Colors.greenAccent : Colors.redAccent,
+                            color: isProfit
+                                ? Colors.greenAccent
+                                : Colors.redAccent,
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                           ),
@@ -1442,44 +1479,6 @@ class _EditListingDialogState extends State<_EditListingDialog> {
                   ),
                 ),
               ],
-
-              const SizedBox(height: 16),
-              
-              // Açıklama Girişi
-              Text(
-                'myListings.description'.tr(),
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _descriptionController,
-                maxLines: 4,
-                maxLength: 500,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.white),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.1),
-                  hintText: 'vehicles.descriptionHint'.tr(),
-                  hintStyle: const TextStyle(color: Colors.white38),
-                  counterStyle: const TextStyle(color: Colors.white54),
-                ),
-              ),
             ],
           ),
         ),
@@ -1488,11 +1487,12 @@ class _EditListingDialogState extends State<_EditListingDialog> {
       onPressed: () {
         if (_formKey.currentState!.validate()) {
           Navigator.pop(context);
-          
-          final newPrice = double.parse(_priceController.text.replaceAll('.', ''));
-          final newDescription = _descriptionController.text.trim();
-          
-          widget.onSave(newPrice, newDescription);
+
+          final newPrice = double.parse(
+            _priceController.text.replaceAll('.', ''),
+          );
+
+          widget.onSave(newPrice);
         }
       },
       secondaryButtonText: 'common.cancel'.tr(),
@@ -1503,7 +1503,6 @@ class _EditListingDialogState extends State<_EditListingDialog> {
       iconColor: Colors.white,
     );
   }
-
 }
 
 class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
@@ -1520,7 +1519,7 @@ class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
 
     // Sadece sayıları al
     final numericValue = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     if (numericValue.isEmpty) {
       return newValue.copyWith(text: '');
     }
@@ -1536,4 +1535,3 @@ class _ThousandsSeparatorInputFormatter extends TextInputFormatter {
     );
   }
 }
-

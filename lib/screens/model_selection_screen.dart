@@ -3,7 +3,6 @@ import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
 import '../utils/vehicle_utils.dart';
 import 'vehicle_list_screen.dart';
-import 'main_screen.dart';
 import '../widgets/game_image.dart';
 
 class ModelSelectionScreen extends StatelessWidget {
@@ -32,7 +31,7 @@ class ModelSelectionScreen extends StatelessWidget {
           extendBodyBehindAppBar: true,
           appBar: AppBar(
             title: Text('vehicles.selectModel'.tr()),
-            backgroundColor: categoryColor.withOpacity(0.9),
+            backgroundColor: categoryColor.withValues(alpha: 0.9),
             foregroundColor: Colors.white,
             elevation: 0,
           ),
@@ -50,7 +49,7 @@ class ModelSelectionScreen extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
-                    color: categoryColor.withOpacity(0.1),
+                    color: categoryColor.withValues(alpha: 0.1),
                     child: Row(
                       children: [
                         Icon(
@@ -112,10 +111,10 @@ class ModelSelectionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: Colors.purpleAccent.withOpacity(0.2),
+        color: Colors.purpleAccent.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
-        shadowColor: Colors.purple.withOpacity(0.3),
+        shadowColor: Colors.purple.withValues(alpha: 0.3),
         child: InkWell(
           onTap: () async {
             // Rastgele bir model seç
@@ -178,10 +177,10 @@ class ModelSelectionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
-        color: Colors.deepPurpleAccent.withOpacity(0.7),
+        color: Colors.deepPurpleAccent.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 3,
-        shadowColor: categoryColor.withOpacity(0.3),
+        shadowColor: categoryColor.withValues(alpha: 0.3),
         child: InkWell(
           onTap: () async {
             await Navigator.push(
@@ -253,10 +252,10 @@ class ModelSelectionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         elevation: 1,
-        shadowColor: Colors.black.withOpacity(0.05),
+        shadowColor: Colors.black.withValues(alpha: 0.05),
         child: InkWell(
           onTap: () async {
             // Seçilen modele göre araç listesi sayfasına git
@@ -285,7 +284,7 @@ class ModelSelectionScreen extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: categoryColor.withOpacity(0.3),
+                      color: categoryColor.withValues(alpha: 0.3),
                       width: 1, // Daha ince çerçeve
                     ),
                     image: modelImage != null ? GameDecorationImage(

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
@@ -21,7 +23,7 @@ class RentalService {
     try {
       // Kullanıcının aktif (satılmamış) araçlarını al
       final vehicles = await _db.getUserActiveVehicles(userId);
-      
+
       if (vehicles.isEmpty) {
         return 0.0;
       }
@@ -32,16 +34,13 @@ class RentalService {
         // Sadece kirada olan araçlardan gelir elde edilir
         if (vehicle.isRented) {
           double rentalIncome = vehicle.purchasePrice * dailyRentalRate;
-          
 
-          
           totalRental += rentalIncome;
         }
       }
 
       return totalRental;
     } catch (e) {
-
       return 0.0;
     }
   }
@@ -53,7 +52,7 @@ class RentalService {
       // Kullanıcıyı al
       final userJson = await _db.getUserById(userId);
       if (userJson == null) return 0.0;
-      
+
       final user = User.fromJson(userJson);
 
       // Galeri sahibi değilse kiralama yok
@@ -61,20 +60,20 @@ class RentalService {
 
       // Kullanıcının aktif araçlarını al
       final vehicles = await _db.getUserActiveVehicles(userId);
-      
+
       double totalNewPending = 0.0;
-      
+
       for (var vehicle in vehicles) {
         // Sadece kirada olan ve henüz toplanmamış geliri olmayan araçlar yeni gelir üretir
         if (vehicle.isRented && !vehicle.canCollectRentalIncome) {
           double rentalIncome = vehicle.purchasePrice * dailyRentalRate;
-          
+
           // Aracı güncelle: Gelir beklemede ve toplanabilir
           final updatedVehicle = vehicle.copyWith(
             pendingRentalIncome: rentalIncome,
             canCollectRentalIncome: true,
           );
-          
+
           await _db.updateUserVehicle(vehicle.id, updatedVehicle.toJson());
           totalNewPending += rentalIncome;
         }
@@ -138,7 +137,7 @@ class RentalService {
           'projectedDaily': 0.0,
         };
       }
-      
+
       final user = User.fromJson(userJson);
       if (!user.ownsGallery) {
         return {
@@ -159,7 +158,6 @@ class RentalService {
         'projectedDaily': projectedDaily,
       };
     } catch (e) {
-
       return {
         'vehicleCount': 0,
         'lastDailyIncome': 0.0,
@@ -168,7 +166,6 @@ class RentalService {
       };
     }
   }
-
 
   /// Aracı kiraya ver
   Future<bool> rentVehicle(String vehicleId) async {

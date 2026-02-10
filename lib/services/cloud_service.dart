@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import '../models/user_vehicle_model.dart';
@@ -18,9 +20,11 @@ class CloudService {
   /// Kullanıcıyı Firestore'a kaydet (Full Sync)
   Future<void> saveUser(User user) async {
     try {
-      await _firestore.collection(usersCollection).doc(user.id).set(user.toJson());
+      await _firestore
+          .collection(usersCollection)
+          .doc(user.id)
+          .set(user.toJson(), SetOptions(merge: true));
     } catch (e) {
-      print('Cloud Save Error (User): $e');
       // Hata fırlatma, sessizce devam et (Offline olabilir)
     }
   }
@@ -37,21 +41,35 @@ class CloudService {
 
       // Batch write ile toplu silme yapalım (Daha verimli)
       final batch = _firestore.batch();
-      
+
       for (final doc in vehiclesSnapshot.docs) {
         batch.delete(doc.reference);
       }
-      
+
       // 2. Kullanıcı dokümanını sil
       final userRef = _firestore.collection(usersCollection).doc(userId);
       batch.delete(userRef);
-      
+
       // İşlemi uygula
       await batch.commit();
-      
     } catch (e) {
-      print('Cloud Delete Error (User Full): $e');
       // Hata olsa bile devam etmeye çalışabiliriz veya loglayabiliriz
+    }
+  }
+
+  /// ID'ye göre kullanıcı bul
+  Future<User?> getUserById(String userId) async {
+    try {
+      final doc = await _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .get();
+      if (doc.exists && doc.data() != null) {
+        return User.fromJson(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
   }
 
@@ -69,7 +87,6 @@ class CloudService {
       }
       return null;
     } catch (e) {
-      print('Cloud Fetch Error (Google): $e');
       return null;
     }
   }
@@ -88,7 +105,24 @@ class CloudService {
       }
       return null;
     } catch (e) {
-      print('Cloud Fetch Error (Apple): $e');
+      return null;
+    }
+  }
+
+  /// Kullanıcı adına göre kullanıcı bul (Şifreli giriş kurtarma için)
+  Future<User?> getUserByUsername(String username) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection(usersCollection)
+          .where('username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return User.fromJson(querySnapshot.docs.first.data());
+      }
+      return null;
+    } catch (e) {
       return null;
     }
   }
@@ -107,9 +141,7 @@ class CloudService {
           .collection(vehiclesCollection)
           .doc(vehicle.id)
           .set(vehicle.toJson());
-    } catch (e) {
-      print('Cloud Save Error (Vehicle): $e');
-    }
+    } catch (e) {}
   }
 
   /// Aracı Firestore'dan sil
@@ -121,9 +153,7 @@ class CloudService {
           .collection(vehiclesCollection)
           .doc(vehicleId)
           .delete();
-    } catch (e) {
-      print('Cloud Delete Error (Vehicle): $e');
-    }
+    } catch (e) {}
   }
 
   /// Kullanıcının tüm araçlarını getir
@@ -139,7 +169,6 @@ class CloudService {
           .map((doc) => UserVehicle.fromJson(doc.data()))
           .toList();
     } catch (e) {
-      print('Cloud Fetch Error (Vehicles): $e');
       return [];
     }
   }

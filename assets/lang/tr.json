@@ -138,7 +138,10 @@
     "passwordMinLength": "Şifre en az 6 karakter olmalıdır",
     "ageRestriction": "En az 13 yaşında olmalısınız",
     "createAccountTitle": "Oyuna başlamak için bir kullanıcı adı seçin",
-    "reportInfo": "Bir kullanıcıyı raporlamak için isminin üzerine basılı tutun"
+    "reportInfo": "Bir kullanıcıyı raporlamak için isminin üzerine basılı tutun",
+    "emailOrUsername": "E-posta veya Kullanıcı Adı",
+    "enterEmailAddress": "E-posta adresinizi giriniz",
+    "forgotPasswordQuestion": "Şifremi Unuttum?"
   },
   "gender": {
     "male": "Erkek",
@@ -148,7 +151,10 @@
     "title": "Personel Yönetimi",
     "manage_staff": "Personel Yönetimi",
     "contract_expired": "{name} adlı personelin sözleşmesi bittiği için ayrıldı.",
+    "salary_payment_title": "Personel Maaş Ödemesi",
+    "salary_payment_desc": "{count} personel için günlük ödeme yapıldı.",
     "contract_remaining": "Sözleşme: {days} Gün Kaldı",
+    "daily_limit_warning": "Bir personel bir gün içinde en fazla 20 işlem yapabilir.",
     "empty_title": "Henüz Personeliniz Yok",
     "empty_desc": "İşlerinizi otomatikleştirmek ve gelirinizi artırmak için profesyonel bir ekip kurun.",
     "hire_button": "Personel İşe Al",
@@ -191,7 +197,12 @@
     "department_full": "Departman dolu! (Maks: {limit})",
     "no_personnel_in_dept": "Bu departmanda personel yok.",
     "market_knowledge": "Piyasa Bilgisi",
-    "single_staff_limit_error": "Bu pozisyonda sadece tek bir çalışanınız olabilir. Lütfen önce mevcut çalışanı işten çıkarın."
+    "single_staff_limit_error": "Bu pozisyonda sadece tek bir çalışanınız olabilir. Lütfen önce mevcut çalışanı işten çıkarın.",
+    "activity_purchase_title": "{name} Satın Alındı",
+    "activity_purchase_desc": "{agent} tarafından {price} TL karşılığında alındı.",
+    "activity_sale_title": "{name} Satıldı",
+    "activity_sale_desc": "{agent} tarafından {price} TL karşılığında satıldı.",
+    "profit_rate": "%{rate} Kar"
   },
   "home": {
     "title": "Dashboard",
@@ -797,6 +808,9 @@
     "languageFull": "Dil / Language",
     "currency": "Para Birimi",
     "currencyUpdated": "Para birimi güncellendi",
+    "deleteAccountError": "Hesap silinirken bir hata oluştu. Lütfen tekrar deneyin.",
+    "reauthRequired": "Güvenlik gereği tekrar giriş yapmalısınız.",
+    "confirmDeleteAfterAuth": "Kimlik doğrulandı. Hesap siliniyor...",
     "notifications": "Bildirimler",
     "newListings": "Yeni İlan Bildirimleri",
     "priceDrops": "Fiyat Düşüş Bildirimleri",
@@ -894,7 +908,15 @@
     "banConfirmMessage": "{username} kullanıcısını yasaklamak istediğinize emin misiniz? Bu işlem geri alınamaz.",
     "reportDismissed": "Rapor yoksayıldı.",
     "userBanned": "Kullanıcı yasaklandı.",
-    "error": "Hata oluştu."
+    "error": "Hata oluştu.",
+    "reports_tab": "Raporlar",
+    "gold_tab": "Altın",
+    "username_label": "Kullanıcı Adı veya E-posta",
+    "username_hint": "Kullanıcı adı veya e-posta girin",
+    "gold_amount_hint": "Altın Miktarı",
+    "assign_gold": "Altın Ata",
+    "gold_assigned_success": "{username} kullanıcısına {amount} altın atandı!",
+    "user_not_found": "Bu kullanıcı adı veya e-posta ile kullanıcı bulunamadı."
   },
   "report": {
     "title": "Kullanıcıyı Raporla",
@@ -1011,7 +1033,17 @@
       "alreadyFriends": "Zaten arkadaşsınız",
       "requestAlreadySent": "İstek zaten gönderilmiş",
       "sendMessage": "Mesaj yaz...",
-      "addFriend": "Arkadaş Ekle"
+      "addFriend": "Arkadaş Ekle",
+      "eula": {
+        "title": "Güvenli Sosyal Ortam",
+        "description": "Sosyal Merkeze Hoş Geldiniz! Herkes için güvenli ve olumlu bir deneyim sağlamak için lütfen aşağıdaki kuralları kabul edin:",
+        "rule1": "• Diğerlerine saygılı olun.",
+        "rule2": "• Diğer kullanıcıları taciz etmeyin veya spam yapmayın.",
+        "rule3": "• Takdirinizi göstermek için \"Saygı\" özelliğini kullanın.",
+        "footer": "Bu kuralların ihlali sosyal özelliklere erişiminizin kısıtlanmasına neden olabilir.",
+        "button": "Kabul Ediyorum",
+        "declinedMessage": "Sosyal özelliklere erişmek için kuralları kabul etmelisiniz."
+      }
     }
   },
   "activity": {
@@ -1025,11 +1057,13 @@
     "rentalTitle": "Kira Geliri",
     "rentalDesc": "{count} araçtan kira geliri toplandı",
     "levelUpTitle": "Seviye Atlama",
-    "levelUpDesc": "Seviye {level}'e ulaşıldı",
+    "levelUpDesc": "Seviye {level}'e ulaşıldı\n{sp} SP",
     "taxiTitle": "Taksi Kazancı",
     "taxiDesc": "Taksi görevinden kazanıldı",
     "dailyLoginTitle": "Günlük Bonus",
     "dailyLoginDesc": "Günlük giriş ödülü",
+    "tab_general": "Genel",
+    "tab_staff": "Personel",
     "clearAll": "Tümünü Temizle",
     "clearAllConfirm": "Tüm aktivite geçmişini silmek istediğinize emin misiniz?",
     "cleared": "Geçmiş temizlendi",
@@ -1085,6 +1119,8 @@
     "listingScore": "İlan Skoru"
   },
   "quests": {
+    "tab_daily": "Günlük",
+    "tab_missions": "Görevler",
     "title": "Görevler",
     "noQuests": "Bugün için görev bulunamadı.",
     "rewardClaimed": "Ödül Alındı! +{xp} XP, +{money} TL",
@@ -2230,10 +2266,10 @@
       }
     },
     "interaction": {
-      "respect": "Saygı Göster",
-      "respect_sent": "Saygı gösterildi! 🫡",
-      "already_respected": "Bugünlük bu kadar saygı yeterli. Yarın tekrar gel! ⏳",
-      "respect_count": "Saygı Puanı"
+      "respect": "Beğen",
+      "respect_sent": "Beğenildi! ❤️",
+      "already_respected": "Bu kullanıcıyı zaten beğendin.",
+      "respect_count": "Kalpler"
     }
   }
 }
