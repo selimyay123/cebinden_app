@@ -8,9 +8,9 @@ class SocialUser {
   final bool isVip;
 
   SocialUser({
-    required this.id, 
-    required this.username, 
-    this.profileImageUrl, 
+    required this.id,
+    required this.username,
+    this.profileImageUrl,
     required this.level,
     this.isVip = false,
   });
@@ -64,7 +64,15 @@ class FriendService {
   }
 
   // Accept Friend Request
-  Future<void> acceptFriendRequest(String requestId, String fromUserId, String currentUserId, String currentUsername, String? currentUserImage, String fromUsername, String? fromUserImage) async {
+  Future<void> acceptFriendRequest(
+    String requestId,
+    String fromUserId,
+    String currentUserId,
+    String currentUsername,
+    String? currentUserImage,
+    String fromUsername,
+    String? fromUserImage,
+  ) async {
     final batch = _firestore.batch();
 
     // 1. Update request status
@@ -77,7 +85,7 @@ class FriendService {
         .doc(currentUserId)
         .collection('friends')
         .doc(fromUserId);
-    
+
     batch.set(currentUserFriendRef, {
       'username': fromUsername,
       'profileImageUrl': fromUserImage,
@@ -102,7 +110,9 @@ class FriendService {
 
   // Reject Friend Request
   Future<void> rejectFriendRequest(String requestId) async {
-    await _firestore.collection('friend_requests').doc(requestId).update({'status': 'rejected'});
+    await _firestore.collection('friend_requests').doc(requestId).update({
+      'status': 'rejected',
+    });
   }
 
   // Remove Friend
@@ -115,7 +125,7 @@ class FriendService {
         .doc(currentUserId)
         .collection('friends')
         .doc(friendId);
-    
+
     batch.delete(currentUserFriendRef);
 
     // 2. Remove from friend's friends
@@ -151,7 +161,10 @@ class FriendService {
   }
 
   // Search Users
-  Future<List<SocialUser>> searchUsers(String query) async {
+  Future<List<SocialUser>> searchUsers(
+    String query, {
+    String? currentUserId,
+  }) async {
     if (query.isEmpty) return [];
 
     // Search in leaderboard collection
@@ -162,11 +175,29 @@ class FriendService {
         .limit(20)
         .get();
 
-    return snapshot.docs.map((doc) {
-        return SocialUser.fromMap(doc.data(), doc.id);
+    final users = snapshot.docs.map((doc) {
+      return SocialUser.fromMap(doc.data(), doc.id);
     }).toList();
+
+    if (currentUserId != null) {
+      // Filter blocked users
+      final blockedDocs = await _firestore
+          .collection('users')
+          .doc(currentUserId)
+          .collection('blocked')
+          .get();
+
+      final blockedIds = blockedDocs.docs.map((d) => d.id).toSet();
+
+      // Also filter users who blocked me (if possible, but usually we can't see that without a lookup)
+      // For now, just filter users I blocked
+
+      return users.where((user) => !blockedIds.contains(user.id)).toList();
+    }
+
+    return users;
   }
-  
+
   // Get User Details (for request display)
   Future<SocialUser?> getSocialUser(String userId) async {
     final doc = await _firestore.collection('leaderboard').doc(userId).get();

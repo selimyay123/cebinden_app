@@ -529,7 +529,13 @@ class AuthService {
   // Kullanıcıyı yasakla
   Future<bool> banUser(String userId) async {
     try {
-      return await _db.updateUser(userId, {'isBanned': true});
+      // 1. Yerel güncelleme
+      await _db.updateUser(userId, {'isBanned': true});
+
+      // 2. Cloud güncelleme
+      await CloudService().updateUserFields(userId, {'isBanned': true});
+
+      return true;
     } catch (e) {
       return false;
     }

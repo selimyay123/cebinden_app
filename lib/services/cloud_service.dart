@@ -29,6 +29,19 @@ class CloudService {
     }
   }
 
+  /// Kullanıcı verilerini kısmi güncelle (Partial Update)
+  Future<bool> updateUserFields(
+    String userId,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      await _firestore.collection(usersCollection).doc(userId).update(data);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// Kullanıcıyı ve tüm verilerini sil (Hesap Silme)
   Future<void> deleteUser(String userId) async {
     try {

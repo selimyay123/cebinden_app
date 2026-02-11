@@ -55,7 +55,7 @@ class _FriendsTabState extends State<FriendsTab> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('social.interaction.respect_sent'.tr()),
+          content: Text('social_interaction.respect_sent'.tr()),
           backgroundColor: Colors.amber,
           behavior: SnackBarBehavior.floating,
         ),
@@ -63,7 +63,7 @@ class _FriendsTabState extends State<FriendsTab> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('social.interaction.already_respected'.tr()),
+          content: Text('social_interaction.already_respected'.tr()),
           backgroundColor: Colors.grey,
           behavior: SnackBarBehavior.floating,
         ),
@@ -141,6 +141,119 @@ class _FriendsTabState extends State<FriendsTab> {
               elevation: 8,
             ),
           );
+        }
+      }
+    }
+  }
+
+  Future<void> _confirmBlockUser(String userId, String username) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'social_interaction.blockConfirmTitle'.tr(),
+        content: Text(
+          'social_interaction.blockConfirmDesc'.trParams({'name': username}),
+          style: const TextStyle(color: Colors.white70),
+        ),
+        buttonText: 'social_interaction.block'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.block,
+        iconColor: Colors.redAccent,
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _interactionService.blockUser(_currentUser!.id, userId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('social_interaction.blockedEffect'.tr()),
+              backgroundColor: Colors.black87,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${'common.error'.tr()}: $e')));
+        }
+      }
+    }
+  }
+
+  Future<void> _showReportDialog(String userId, String username) async {
+    final reasonController = TextEditingController();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'social_interaction.reportTitle'.tr(),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'social_interaction.reportDesc'.tr(),
+              style: const TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonController,
+              decoration: InputDecoration(
+                hintText: 'social_interaction.reportReason'.tr(),
+                hintStyle: const TextStyle(color: Colors.white30),
+                filled: true,
+                fillColor: Colors.black26,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              maxLines: 3,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        buttonText: 'social_interaction.report'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.flag,
+        iconColor: Colors.orangeAccent,
+      ),
+    );
+
+    if (result == true) {
+      try {
+        await _interactionService.reportUser(
+          _currentUser!.id,
+          userId,
+          'User Report',
+          reasonController.text,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('social_interaction.reportSent'.tr()),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${'common.error'.tr()}: $e')));
         }
       }
     }
@@ -292,21 +405,89 @@ class _FriendsTabState extends State<FriendsTab> {
                     _buildActionButton(
                       icon: Icons.favorite_rounded,
                       color: Colors.pinkAccent,
-                      tooltip: 'social.interaction.respect'.tr(),
+                      tooltip: 'social_interaction.respect'.tr(),
                       onPressed: () => _sendRespect(friendId),
                     ),
-                    /*
-                    _buildActionButton(
-                      icon: Icons.chat_bubble_rounded,
-                      color: Colors.blueAccent,
-                      onPressed: () =>
-                          _openChat(friendId, friendName, friendImage),
-                    ),
-                    */
-                    _buildActionButton(
-                      icon: Icons.delete_rounded,
-                      color: Colors.redAccent,
-                      onPressed: () => _removeFriend(friendId, friendName),
+                    PopupMenuButton<String>(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.more_vert,
+                          color: Colors.white70,
+                          size: 20,
+                        ),
+                      ),
+                      color: const Color(0xFF1E1E2C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      onSelected: (value) {
+                        if (value == 'remove') {
+                          _removeFriend(friendId, friendName);
+                        } else if (value == 'block') {
+                          _confirmBlockUser(friendId, friendName);
+                        } else if (value == 'report') {
+                          _showReportDialog(friendId, friendName);
+                        }
+                      },
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                            PopupMenuItem<String>(
+                              value: 'remove',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.person_remove,
+                                    color: Colors.orangeAccent,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'drawer.social.removeFriend'.tr(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'report',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.flag,
+                                    color: Colors.white70,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'social_interaction.report'.tr(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem<String>(
+                              value: 'block',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.block,
+                                    color: Colors.redAccent,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'social_interaction.block'.tr(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                     ),
                   ],
                 ),

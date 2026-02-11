@@ -64,4 +64,120 @@ class InteractionService {
         .get();
     return doc.exists;
   }
+
+  // Block a user
+  Future<void> blockUser(String currentUserId, String blockedUserId) async {
+    final batch = _firestore.batch();
+
+    // 1. Add to blocked collection
+    final blockedRef = _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('blocked')
+        .doc(blockedUserId);
+    batch.set(blockedRef, {'blockedAt': FieldValue.serverTimestamp()});
+
+    // 2. Remove from friends (both sides)
+    final myFriendRef = _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('friends')
+        .doc(blockedUserId);
+    batch.delete(myFriendRef);
+
+    final theirFriendRef = _firestore
+        .collection('users')
+        .doc(blockedUserId)
+        .collection('friends')
+        .doc(currentUserId);
+    batch.delete(theirFriendRef);
+
+    // 3. Remove any pending friend requests (both directions)
+    // We can't easily query inside a batch for delete without reading first.
+    // For now, we'll do separate deletes for requests or query first.
+    // Given the requirement for "Auto remove", the friend removal is invalidating the friend list.
+    // Let's execute the batch for block+friend remove first.
+
+    await batch.commit();
+
+    // 4. Clean up requests (asynchronous, doesn't need to block UI)
+    _removeFriendRequests(currentUserId, blockedUserId);
+  }
+
+  Future<void> _removeFriendRequests(String userId1, String userId2) async {
+    // Delete requests where userId1 -> userId2
+    final query1 = await _firestore
+        .collection('friend_requests')
+        .where('fromId', isEqualTo: userId1)
+        .where('toId', isEqualTo: userId2)
+        .get();
+
+    // Delete requests where userId2 -> userId1
+    final query2 = await _firestore
+        .collection('friend_requests')
+        .where('fromId', isEqualTo: userId2)
+        .where('toId', isEqualTo: userId1)
+        .get();
+
+    final batch = _firestore.batch();
+    for (var doc in query1.docs) {
+      batch.delete(doc.reference);
+    }
+    for (var doc in query2.docs) {
+      batch.delete(doc.reference);
+    }
+
+    if (query1.docs.isNotEmpty || query2.docs.isNotEmpty) {
+      await batch.commit();
+    }
+  }
+
+  // Unblock a user
+  Future<void> unblockUser(String currentUserId, String blockedUserId) async {
+    await _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('blocked')
+        .doc(blockedUserId)
+        .delete();
+  }
+
+  // Check if specific user is blocked
+  Future<bool> isBlocked(String currentUserId, String targetUserId) async {
+    final doc = await _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('blocked')
+        .doc(targetUserId)
+        .get();
+    return doc.exists;
+  }
+
+  // Get list of blocked user IDs
+  Future<List<String>> getBlockedUserIds(String currentUserId) async {
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('blocked')
+        .get();
+
+    return snapshot.docs.map((doc) => doc.id).toList();
+  }
+
+  // Report a user
+  Future<void> reportUser(
+    String reporterId,
+    String reportedId,
+    String reason,
+    String description,
+  ) async {
+    await _firestore.collection('reports').add({
+      'reporterId': reporterId,
+      'reportedId': reportedId,
+      'reason': reason,
+      'description': description,
+      'status': 'pending',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

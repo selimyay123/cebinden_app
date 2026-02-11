@@ -1009,6 +1009,30 @@
     "vehicle": "vehicle",
     "vehicles": "vehicles",
     "leaderboard": "Leaderboard",
+    "admin": {
+      "title": "Admin Panel",
+      "reports_tab": "Reports",
+      "gold_tab": "Distribute Gold",
+      "error": "An error occurred",
+      "noReports": "No pending reports",
+      "reported": "Reported: {username}",
+      "reason": "Reason: {reason}",
+      "description": "Description: {description}",
+      "dismiss": "Dismiss",
+      "ban": "Ban User",
+      "gold_amount_hint": "Gold Amount",
+      "username_label": "Username or Email",
+      "username_hint": "Enter username",
+      "assign_gold": "Send Gold",
+      "gold_assigned_success": "Successfully sent {amount} Gold to {username}.",
+      "user_not_found": "User not found",
+      "dismissConfirmTitle": "Dismiss Report",
+      "dismissConfirmMessage": "Are you sure you want to dismiss this report?",
+      "banConfirmTitle": "Ban User",
+      "banConfirmMessage": "Are you sure you want to ban {username}? This action cannot be undone.",
+      "reportDismissed": "Report dismissed",
+      "userBanned": "User banned and report resolved"
+    },
     "social": {
       "title": "Social",
       "friends": "Friends",
@@ -1043,8 +1067,61 @@
         "footer": "Violation of these rules may result in restricted access to social features.",
         "button": "I Agree",
         "declinedMessage": "You must accept the rules to access Social features."
+      },
+      "accept": "Accept",
+      "reject": "Reject",
+      "accepted": "accepted request",
+      "rejected": "rejected request",
+      "chat": {
+        "title": "Chat",
+        "quick_message": "Quick Message",
+        "send": "Send",
+        "category": {
+          "greeting": "Greeting",
+          "business": "Business",
+          "cars": "Cars",
+          "reactions": "Reactions"
+        },
+        "msg": {
+          "hello": "Hello! 👋",
+          "how_are_you": "How are you doing?",
+          "good_morning": "Good morning! ☀️",
+          "good_evening": "Good evening! 🌙",
+          "good_work": "Good luck with business! 🤝",
+          "business_is_good": "Market is busy today! 💸",
+          "hard_market": "Market is slow, looking for deals.",
+          "sold_car": "Just sold a great car! 🚗",
+          "nice_car": "Your car looks amazing! 🔥",
+          "lets_race": "Wanna race when you're free? 🏎️",
+          "garage_looks_great": "Your garage looks solid! 💪",
+          "dream_car": "That's my dream car... 😍",
+          "congrats": "Congrats!",
+          "wow": "Wow! 🤯",
+          "thanks": "Thanks! 🙏",
+          "good_luck": "Good luck! 🍀",
+          "thumbs_up": "Great! 👍",
+          "fire": "Looking fire! 🔥"
+        }
       }
     }
+  },
+  "social_interaction": {
+    "respect": "Send Love",
+    "respect_sent": "Love sent! ❤️",
+    "already_respected": "You have already liked this user.",
+    "respect_count": "Hearts",
+    "block": "Block User",
+    "report": "Report User",
+    "unblock": "Unblock User",
+    "blockConfirmTitle": "Block User",
+    "blockConfirmDesc": "Are you sure you want to block {name}? You will no longer see their content.",
+    "unblockConfirmDesc": "Are you sure you want to unblock {name}?",
+    "reportTitle": "Report User",
+    "reportDesc": "Why are you reporting this user?",
+    "reportReason": "Reason",
+    "reportSent": "Report sent. Thank you for making our community safer.",
+    "blockedEffect": "User blocked.",
+    "unblockedEffect": "User unblocked."
   },
   "activity": {
     "title": "Activity Log",
@@ -2235,44 +2312,5 @@
   },
   "permissions": {
     "tracking_description": "This permission is required to provide you with more interesting ads."
-  },
-  "social": {
-    "chat": {
-      "title": "Chat",
-      "quick_message": "Quick Message",
-      "send": "Send",
-      "category": {
-        "greeting": "Greeting",
-        "business": "Business",
-        "cars": "Cars",
-        "reactions": "Reactions"
-      },
-      "msg": {
-        "hello": "Hello! 👋",
-        "how_are_you": "How are you doing?",
-        "good_morning": "Good morning! ☀️",
-        "good_evening": "Good evening! 🌙",
-        "good_work": "Good luck with business! 🤝",
-        "business_is_good": "Market is busy today! 💸",
-        "hard_market": "Market is slow, looking for deals.",
-        "sold_car": "Just sold a great car! 🚗",
-        "nice_car": "Your car looks amazing! 🔥",
-        "lets_race": "Wanna race when you're free? 🏎️",
-        "garage_looks_great": "Your garage looks solid! 💪",
-        "dream_car": "That's my dream car... 😍",
-        "congrats": "Congrats!",
-        "wow": "Wow! 🤯",
-        "thanks": "Thanks! 🙏",
-        "good_luck": "Good luck! 🍀",
-        "thumbs_up": "Great! 👍",
-        "fire": "Looking fire! 🔥"
-      }
-    },
-    "interaction": {
-      "respect": "Send Love",
-      "respect_sent": "Love sent! ❤️",
-      "already_respected": "You have already liked this user.",
-      "respect_count": "Hearts"
-    }
   }
 }

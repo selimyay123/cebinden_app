@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/friend_service.dart';
+import '../../services/interaction_service.dart';
 import '../../services/database_helper.dart';
 import '../../services/localization_service.dart';
 import '../../widgets/user_profile_avatar.dart';
+import '../../widgets/modern_alert_dialog.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -15,11 +17,13 @@ class SearchTab extends StatefulWidget {
 class _SearchTabState extends State<SearchTab> {
   final TextEditingController _searchController = TextEditingController();
   final FriendService _friendService = FriendService();
+  final InteractionService _interactionService = InteractionService();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
   List<SocialUser> _searchResults = [];
   bool _isLoading = false;
   String? _currentUserId;
+  Set<String> _blockedUserIds = {};
 
   @override
   void initState() {
@@ -33,6 +37,23 @@ class _SearchTabState extends State<SearchTab> {
       setState(() {
         _currentUserId = user['id'];
       });
+      _fetchBlockedUsers();
+    }
+  }
+
+  Future<void> _fetchBlockedUsers() async {
+    if (_currentUserId == null) return;
+    try {
+      final blockedIds = await _interactionService.getBlockedUserIds(
+        _currentUserId!,
+      );
+      if (mounted) {
+        setState(() {
+          _blockedUserIds = Set.from(blockedIds);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching blocked users: $e');
     }
   }
 
@@ -49,6 +70,8 @@ class _SearchTabState extends State<SearchTab> {
         _searchResults = results;
         _isLoading = false;
       });
+      // Refresh blocked list to ensure UI is up to date
+      _fetchBlockedUsers();
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -84,6 +107,167 @@ class _SearchTabState extends State<SearchTab> {
             behavior: SnackBarBehavior.floating,
           ),
         );
+      }
+    }
+  }
+
+  Future<void> _confirmBlockUser(String userId, String username) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'social_interaction.blockConfirmTitle'.tr(),
+        content: Text(
+          'social_interaction.blockConfirmDesc'.trParams({'name': username}),
+          style: const TextStyle(color: Colors.white70),
+        ),
+        buttonText: 'social_interaction.block'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.block,
+        iconColor: Colors.redAccent,
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _interactionService.blockUser(_currentUserId!, userId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('social_interaction.blockedEffect'.tr()),
+              backgroundColor: Colors.black87,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+          // Refresh search results to remove blocked user
+          _performSearch(_searchController.text);
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${'common.error'.tr()}: $e')));
+        }
+      }
+    }
+  }
+
+  Future<void> _confirmUnblockUser(String userId, String username) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'social_interaction.unblock'.tr(),
+        content: Text(
+          'social_interaction.unblockConfirmDesc'.trParams({'name': username}),
+          style: const TextStyle(color: Colors.white70),
+        ),
+        buttonText: 'social_interaction.unblock'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.check_circle,
+        iconColor: Colors.greenAccent,
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _interactionService.unblockUser(_currentUserId!, userId);
+        if (mounted) {
+          setState(() {
+            _blockedUserIds.remove(userId);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('social_interaction.unblockedEffect'.tr()),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${'common.error'.tr()}: $e')));
+        }
+      }
+    }
+  }
+
+  Future<void> _showReportDialog(String userId, String username) async {
+    final reasonController = TextEditingController();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => ModernAlertDialog(
+        title: 'social_interaction.reportTitle'.tr(),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'social_interaction.reportDesc'.tr(),
+              style: const TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonController,
+              decoration: InputDecoration(
+                hintText: 'social_interaction.reportReason'.tr(),
+                hintStyle: const TextStyle(color: Colors.white30),
+                filled: true,
+                fillColor: Colors.black26,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              maxLines: 3,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        buttonText: 'social_interaction.report'.tr(),
+        onPressed: () => Navigator.pop(context, true),
+        secondaryButtonText: 'common.cancel'.tr(),
+        onSecondaryPressed: () => Navigator.pop(context, false),
+        icon: Icons.flag,
+        iconColor: Colors.orangeAccent,
+      ),
+    );
+
+    if (result == true) {
+      try {
+        await _interactionService.reportUser(
+          _currentUserId!,
+          userId,
+          'User Report',
+          reasonController.text,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('social_interaction.reportSent'.tr()),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${'common.error'.tr()}: $e')));
+        }
       }
     }
   }
@@ -238,6 +422,95 @@ class _SearchTabState extends State<SearchTab> {
                               icon: Icons.person_add_rounded,
                               color: Colors.purpleAccent,
                               onPressed: () => _sendRequest(user.id),
+                            ),
+                            PopupMenuButton<String>(
+                              icon: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.more_vert,
+                                  color: Colors.white70,
+                                  size: 20,
+                                ),
+                              ),
+                              color: const Color(0xFF1E1E2C),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onSelected: (value) {
+                                if (value == 'block') {
+                                  _confirmBlockUser(user.id, user.username);
+                                } else if (value == 'unblock') {
+                                  _confirmUnblockUser(user.id, user.username);
+                                } else if (value == 'report') {
+                                  _showReportDialog(user.id, user.username);
+                                }
+                              },
+                              itemBuilder: (BuildContext context) =>
+                                  <PopupMenuEntry<String>>[
+                                    PopupMenuItem<String>(
+                                      value: 'report',
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.flag,
+                                            color: Colors.white70,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'social_interaction.report'.tr(),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (_blockedUserIds.contains(user.id))
+                                      PopupMenuItem<String>(
+                                        value: 'unblock',
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.check_circle,
+                                              color: Colors.greenAccent,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'social_interaction.unblock'.tr(),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    else
+                                      PopupMenuItem<String>(
+                                        value: 'block',
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.block,
+                                              color: Colors.redAccent,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'social_interaction.block'.tr(),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
                             ),
                           ],
                         ),

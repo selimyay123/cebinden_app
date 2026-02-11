@@ -1009,6 +1009,30 @@
     "vehicle": "araç",
     "vehicles": "araç",
     "leaderboard": "Liderlik Tablosu",
+    "admin": {
+      "title": "Yönetici Paneli",
+      "reports_tab": "Raporlar",
+      "gold_tab": "Altın Dağıt",
+      "error": "Bir hata oluştu",
+      "noReports": "Bekleyen rapor yok",
+      "reported": "Raporlanan: {username}",
+      "reason": "Sebep: {reason}",
+      "description": "Açıklama: {description}",
+      "dismiss": "Reddet",
+      "ban": "Yasakla",
+      "gold_amount_hint": "Altın Miktarı",
+      "username_label": "Kullanıcı Adı veya E-posta",
+      "username_hint": "Kullanıcı adı girin",
+      "assign_gold": "Altın Gönder",
+      "gold_assigned_success": "{amount} Altın başarıyla {username} kullanıcısına gönderildi.",
+      "user_not_found": "Kullanıcı bulunamadı",
+      "dismissConfirmTitle": "Raporu Reddet",
+      "dismissConfirmMessage": "Bu raporu silmek istediğinize emin misiniz?",
+      "banConfirmTitle": "Kullanıcıyı Yasakla",
+      "banConfirmMessage": "{username} adlı kullanıcıyı yasaklamak istediğinize emin misiniz? Bu işlem geri alınamaz.",
+      "reportDismissed": "Rapor reddedildi",
+      "userBanned": "Kullanıcı yasaklandı ve rapor kapatıldı"
+    },
     "social": {
       "title": "Sosyal",
       "friends": "Arkadaşlar",
@@ -1043,8 +1067,57 @@
         "footer": "Bu kuralların ihlali sosyal özelliklere erişiminizin kısıtlanmasına neden olabilir.",
         "button": "Kabul Ediyorum",
         "declinedMessage": "Sosyal özelliklere erişmek için kuralları kabul etmelisiniz."
+      },
+      "chat": {
+        "title": "Sohbet",
+        "quick_message": "Hızlı Mesaj",
+        "send": "Gönder",
+        "category": {
+          "greeting": "Selamlaşma",
+          "business": "İş & Ticaret",
+          "cars": "Arabalar",
+          "reactions": "Tepkiler"
+        },
+        "msg": {
+          "hello": "Selamun Aleyküm! 👋",
+          "how_are_you": "Nasılsın, her şey yolunda mı?",
+          "good_morning": "Günaydın! ☀️",
+          "good_evening": "İyi akşamlar! 🌙",
+          "good_work": "Hayırlı işler bol kazançlar! 🤝",
+          "business_is_good": "Piyasa bugün hareketli! 💸",
+          "hard_market": "Piyasa durgun, fırsat kovalıyorum.",
+          "sold_car": "Az önce harika bir araç sattım! 🚗",
+          "nice_car": "Araban harika görünüyor! 🔥",
+          "lets_race": "Müsait olduğunda kapışalım mı? 🏎️",
+          "garage_looks_great": "Garajın çok sağlam! 💪",
+          "dream_car": "Bu araç benim hayalim... 😍",
+          "congrats": "Tebrik ederim!",
+          "wow": "Vay be! 🤯",
+          "thanks": "Teşekkürler! 🙏",
+          "good_luck": "Bol şans! 🍀",
+          "thumbs_up": "Harika! 👍",
+          "fire": "Alev aldı buralar! 🔥"
+        }
       }
     }
+  },
+  "social_interaction": {
+    "respect": "Kalp Bırak",
+    "respect_sent": "Kalp gönderildi! ❤️",
+    "already_respected": "Bu kullanıcıya zaten kalp gönderdiniz.",
+    "respect_count": "Kalp",
+    "block": "Engelle",
+    "report": "Şikayet Et",
+    "unblock": "Engeli Kaldır",
+    "blockConfirmTitle": "Kullanıcıyı Engelle",
+    "blockConfirmDesc": "{name} isimli kullanıcıyı engellemek istediğinize emin misiniz? Artık birbirinizi göremeyeceksiniz.",
+    "unblockConfirmDesc": "{name} isimli kullanıcının engelini kaldırmak istediğinize emin misiniz?",
+    "reportTitle": "Kullanıcıyı Şikayet Et",
+    "reportDesc": "Bu kullanıcıyı neden şikayet ediyorsunuz?",
+    "reportReason": "Sebep",
+    "reportSent": "Şikayetiniz alındı. Topluluğumuzu güvenli tuttuğunuz için teşekkürler.",
+    "blockedEffect": "Kullanıcı engellendi.",
+    "unblockedEffect": "Kullanıcı engeli kaldırıldı."
   },
   "activity": {
     "title": "Aktivite Geçmişi",
@@ -2232,44 +2305,5 @@
   },
   "permissions": {
     "tracking_description": "Bu izin, size daha ilgi çekici reklamlar sunabilmemiz için gereklidir."
-  },
-  "social": {
-    "chat": {
-      "title": "Sohbet",
-      "quick_message": "Hızlı Mesaj",
-      "send": "Gönder",
-      "category": {
-        "greeting": "Selamlaşma",
-        "business": "İş & Ticaret",
-        "cars": "Arabalar",
-        "reactions": "Tepkiler"
-      },
-      "msg": {
-        "hello": "Selamun Aleyküm! 👋",
-        "how_are_you": "Nasılsın, her şey yolunda mı?",
-        "good_morning": "Günaydın! ☀️",
-        "good_evening": "İyi akşamlar! 🌙",
-        "good_work": "Hayırlı işler bol kazançlar! 🤝",
-        "business_is_good": "Piyasa bugün hareketli! 💸",
-        "hard_market": "Piyasa durgun, fırsat kovalıyorum.",
-        "sold_car": "Az önce harika bir araç sattım! 🚗",
-        "nice_car": "Araban harika görünüyor! 🔥",
-        "lets_race": "Müsait olduğunda kapışalım mı? 🏎️",
-        "garage_looks_great": "Garajın çok sağlam! 💪",
-        "dream_car": "Bu araç benim hayalim... 😍",
-        "congrats": "Tebrik ederim!",
-        "wow": "Vay be! 🤯",
-        "thanks": "Teşekkürler! 🙏",
-        "good_luck": "Bol şans! 🍀",
-        "thumbs_up": "Harika! 👍",
-        "fire": "Alev aldı buralar! 🔥"
-      }
-    },
-    "interaction": {
-      "respect": "Beğen",
-      "respect_sent": "Beğenildi! ❤️",
-      "already_respected": "Bu kullanıcıyı zaten beğendin.",
-      "respect_count": "Kalpler"
-    }
   }
 }
