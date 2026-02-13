@@ -5,6 +5,7 @@ import '../services/localization_service.dart';
 import '../services/market_refresh_service.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
+import '../services/ad_service.dart';
 import '../models/user_model.dart';
 import '../utils/vehicle_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,7 +46,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
   void initState() {
     super.initState();
     _loadData();
-    
+
     // Araç değişikliklerini dinle
     _vehicleSubscription = _db.onVehicleUpdate.listen((_) {
       _loadData();
@@ -60,7 +61,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-    
+
     final user = await _authService.getCurrentUser();
     if (user != null) {
       _user = user;
@@ -94,7 +95,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
           ),
         ),
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.black))
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.black),
+              )
             : ListView.builder(
                 padding: const EdgeInsets.only(
                   top: kToolbarHeight + 80, // Üst boşluk artırıldı
@@ -106,7 +109,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                 itemBuilder: (context, index) {
                   final brand = _modelsByBrand.keys.elementAt(index);
                   final models = _modelsByBrand[brand]!;
-                  
+
                   return _buildBrandSection(brand, models);
                 },
               ),
@@ -116,15 +119,23 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   Widget _buildBrandSection(String brand, List<String> models) {
     // Bu markaya ait kaç modele sahip olunduğunu hesapla
-    int ownedInBrand = models.where((m) => _ownedModelKeys.contains('${brand}_$m')).length;
+    int ownedInBrand = models
+        .where((m) => _ownedModelKeys.contains('${brand}_$m'))
+        .length;
     bool allOwned = ownedInBrand == models.length;
-    bool alreadyCollected = _user?.collectedBrandRewards.contains(brand) ?? false;
+    bool alreadyCollected =
+        _user?.collectedBrandRewards.contains(brand) ?? false;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 8, 4, 8), // Üst ve alt boşluk azaltıldı
+          padding: const EdgeInsets.fromLTRB(
+            4,
+            8,
+            4,
+            8,
+          ), // Üst ve alt boşluk azaltıldı
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -133,11 +144,10 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   Container(
                     width: 60,
                     height: 60,
-                    decoration: const BoxDecoration(
-                      color: Colors.transparent,
-                    ),
+                    decoration: const BoxDecoration(color: Colors.transparent),
                     child: GameImage(
-                      assetPath: 'assets/images/brands/${brand.toLowerCase()}.png',
+                      assetPath:
+                          'assets/images/brands/${brand.toLowerCase()}.png',
                       fit: BoxFit.contain,
                       // errorBuilder removed as GameImage handles it internally or we can add it if needed
                     ),
@@ -171,7 +181,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
           ),
         ),
         GridView.builder(
-          padding: EdgeInsets.zero, // GridView'ın varsayılan padding'i sıfırlandı
+          padding:
+              EdgeInsets.zero, // GridView'ın varsayılan padding'i sıfırlandı
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -216,14 +227,24 @@ class _CollectionScreenState extends State<CollectionScreen> {
               child: imageUrl != null
                   ? ColorFiltered(
                       colorFilter: isOwned
-                          ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
-                          : ColorFilter.mode(Colors.grey.shade300, BlendMode.srcIn),
+                          ? const ColorFilter.mode(
+                              Colors.transparent,
+                              BlendMode.multiply,
+                            )
+                          : ColorFilter.mode(
+                              Colors.grey.shade300,
+                              BlendMode.srcIn,
+                            ),
                       child: GameImage(
                         assetPath: imageUrl,
                         fit: BoxFit.contain,
                       ),
                     )
-                  : const Icon(Icons.directions_car, size: 48, color: Colors.grey),
+                  : const Icon(
+                      Icons.directions_car,
+                      size: 48,
+                      color: Colors.grey,
+                    ),
             ),
           ),
           Padding(
@@ -243,7 +264,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
     );
   }
 
-  Widget _buildCollectButton(String brand, bool allOwned, bool alreadyCollected) {
+  Widget _buildCollectButton(
+    String brand,
+    bool allOwned,
+    bool alreadyCollected,
+  ) {
     Color buttonColor;
     String buttonText;
     VoidCallback? onTap;
@@ -293,7 +318,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
     final int xpReward = reward['xp'];
 
     // Kullanıcıyı güncelle
-    final updatedCollectedRewards = List<String>.from(_user!.collectedBrandRewards)..add(brand);
+    final updatedCollectedRewards = List<String>.from(
+      _user!.collectedBrandRewards,
+    )..add(brand);
     final updatedUser = _user!.copyWith(
       balance: _user!.balance + moneyReward,
       xp: _user!.xp + xpReward,
@@ -305,7 +332,19 @@ class _CollectionScreenState extends State<CollectionScreen> {
     await _loadData();
 
     if (mounted) {
+      // Önce ödül mesajını göster
       _showRewardSnackBar(brand, moneyReward, xpReward);
+
+      // Kullanıcı ödülünü görsün, sonra reklam göster
+      await Future.delayed(const Duration(milliseconds: 1500));
+
+      // 📺 Koleksiyon ödülü toplandıktan sonra zorunlu reklam göster
+      if (mounted) {
+        await AdService().showInterstitialAd(
+          force: true,
+          hasNoAds: _user?.hasNoAds ?? false,
+        );
+      }
     }
   }
 
@@ -323,7 +362,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.emoji_events, color: Colors.white, size: 28),
+                child: const Icon(
+                  Icons.emoji_events,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -367,9 +410,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
   }
 
   String _formatCurrency(double amount) {
-    return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return amount
+        .toStringAsFixed(0)
+        .replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        );
   }
 }

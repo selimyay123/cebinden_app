@@ -6,6 +6,8 @@ import '../services/daily_quest_service.dart';
 import '../services/mission_service.dart';
 import '../services/database_helper.dart';
 import '../services/localization_service.dart';
+import '../services/ad_service.dart';
+import '../services/auth_service.dart';
 import '../widgets/level_up_dialog.dart';
 
 class DailyQuestsScreen extends StatefulWidget {
@@ -171,12 +173,35 @@ class _DailyQuestsScreenState extends State<DailyQuestsScreen>
             backgroundColor: Colors.green.withValues(alpha: 0.8),
           ),
         );
+        // ⚠️ GEÇİCİ TEST: Level atlama dialogunu test etmek için (KALDIRILACAK)
+        final bool testLevelUp =
+            _currentUser?['email'] == 'selimyay123@gmail.com'
+            ? true
+            : (result.leveledUp && result.rewards != null);
 
-        if (result.leveledUp && result.rewards != null) {
-          await showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => LevelUpDialog(reward: result.rewards!),
+        if (testLevelUp) {
+          // Level atlama varsa: dialog kapanmasını bekle, sonra reklam göster
+          if (result.rewards != null) {
+            await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => LevelUpDialog(reward: result.rewards!),
+            );
+          } else {
+            // Test modu: rewards null ama level-up simüle ediliyor, kısa bekle
+            await Future.delayed(const Duration(milliseconds: 1500));
+          }
+        } else {
+          // Level atlama yoksa: kullanıcı ödül snackbar'ını görsün
+          await Future.delayed(const Duration(milliseconds: 1500));
+        }
+
+        // 📺 Tek seferlik görev ödülü toplandıktan sonra zorunlu reklam göster
+        if (mounted) {
+          final adUser = await AuthService().getCurrentUser();
+          await AdService().showInterstitialAd(
+            force: true,
+            hasNoAds: adUser?.hasNoAds ?? false,
           );
         }
 

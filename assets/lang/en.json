@@ -912,7 +912,12 @@
     "gold_amount_hint": "Gold Amount",
     "assign_gold": "Assign Gold",
     "gold_assigned_success": "{amount} gold assigned to {username}!",
-    "user_not_found": "User not found with this username or email."
+    "user_not_found": "User not found with this username or email.",
+    "clean_leaderboard": "Clean Leaderboard",
+    "cleanLeaderboardTitle": "Clean Leaderboard",
+    "cleanLeaderboardMessage": "Are you sure you want to remove banned users from the leaderboard? This might take a moment.",
+    "cleaning_started": "Cleaning started...",
+    "cleaned_count": "Removed {count} banned users."
   },
   "report": {
     "title": "Report User",

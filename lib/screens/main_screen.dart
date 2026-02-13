@@ -54,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _checkPendingOffers();
-    
+
     // Teklif güncellemelerini dinle
     _offerUpdateSubscription = _db.onOfferUpdate.listen((_) {
       _checkPendingOffers();
@@ -62,9 +62,11 @@ class _MainScreenState extends State<MainScreen> {
 
     // Gün değişimini dinle (tekliflerin süresi dolmuş olabilir)
     GameTimeService().currentGameDay.addListener(_checkPendingOffers);
-    
+
     // Tab değişim isteklerini dinle
-    _tabChangeSubscription = ScreenRefreshService().onTabChangeRequested.listen((index) {
+    _tabChangeSubscription = ScreenRefreshService().onTabChangeRequested.listen((
+      index,
+    ) {
       if (mounted) {
         // Eğer Dashboard (Home) seçildiyse ve zaten oradaysak veya başka tabdan geliyorsak
         // Her durumda Dashboard'un stack'ini sıfırla
@@ -115,11 +117,11 @@ class _MainScreenState extends State<MainScreen> {
       TabNavigator(
         navigatorKey: _navigatorKeys[1],
         child: const SellVehicleScreen(),
-      ),     // 1: Sell
+      ), // 1: Sell
       TabNavigator(
         navigatorKey: _navigatorKeys[2],
         child: const MyVehiclesScreen(),
-      ),      // 2: Garage
+      ), // 2: Garage
       TabNavigator(
         navigatorKey: _navigatorKeys[3],
         child: HomeScreen(
@@ -131,11 +133,11 @@ class _MainScreenState extends State<MainScreen> {
           storeTabKey: _storeTabKey,
           mainScaffoldKey: _mainScaffoldKey,
         ),
-      ),            // 3: Home (Center)
+      ), // 3: Home (Center)
       TabNavigator(
         navigatorKey: _navigatorKeys[4],
         child: const MyListingsScreen(),
-      ),      // 4: Listings
+      ), // 4: Listings
       TabNavigator(
         navigatorKey: _navigatorKeys[5],
         child: const MyOffersScreen(),
@@ -143,7 +145,7 @@ class _MainScreenState extends State<MainScreen> {
       TabNavigator(
         navigatorKey: _navigatorKeys[6],
         child: const StoreScreen(),
-      ),           // 6: Store
+      ), // 6: Store
     ];
 
     return PopScope(
@@ -174,30 +176,27 @@ class _MainScreenState extends State<MainScreen> {
           // SystemNavigator.pop(); // Bu import gerektirir: import 'package:flutter/services.dart';
           // Veya basitçe:
           // exit(0); // import 'dart:io';
-          
+
           // Ancak Flutter'da best practice, PopScope'un canPop'unu true yapıp tekrar pop çağırmaktır
-          // ama burada logic karmaşıklaşabilir. 
+          // ama burada logic karmaşıklaşabilir.
           // En temiz yöntem:
           // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-          
+
           // Şimdilik kullanıcı "swipe back" yaptığında app kapansın istiyorsa (root'ta)
           // bu davranışı simüle edelim.
           // Ama "swipe back" ile kapanması "bug" olarak nitelendirildiğine göre,
           // muhtemelen *yanlışlıkla* kapanmasını istemiyorlar.
           // Yine de root'ta ise kapanması normaldir.
           // Bizim amacımız *nested* iken kapanmaması.
-          
+
           // Eğer buraya düştüysek: Tab'ın rootundayız VE Home tabındayız.
           // Bu durumda app kapanmalı.
-           SystemNavigator.pop();
+          SystemNavigator.pop();
         }
       },
       child: Scaffold(
         key: _mainScaffoldKey,
-        body: IndexedStack(
-          index: _currentIndex,
-          children: screens,
-        ),
+        body: IndexedStack(index: _currentIndex, children: screens),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             boxShadow: [
@@ -213,9 +212,13 @@ class _MainScreenState extends State<MainScreen> {
             onDestinationSelected: (index) {
               // Eğer Dashboard (Home) veya Market seçildiyse stack'i sıfırla
               if (index == 3) {
-                _navigatorKeys[3]?.currentState?.popUntil((route) => route.isFirst);
+                _navigatorKeys[3]?.currentState?.popUntil(
+                  (route) => route.isFirst,
+                );
               } else if (index == 0) {
-                _navigatorKeys[0]?.currentState?.popUntil((route) => route.isFirst);
+                _navigatorKeys[0]?.currentState?.popUntil(
+                  (route) => route.isFirst,
+                );
               }
 
               setState(() {
@@ -232,7 +235,10 @@ class _MainScreenState extends State<MainScreen> {
               // Market
               NavigationDestination(
                 icon: Icon(Icons.search, key: _marketTabKey),
-                selectedIcon: const Icon(Icons.search, color: Colors.deepPurple),
+                selectedIcon: const Icon(
+                  Icons.search,
+                  color: Colors.deepPurple,
+                ),
                 label: 'market.title'.tr(),
               ),
               // Sell
@@ -244,19 +250,28 @@ class _MainScreenState extends State<MainScreen> {
               // Garage
               NavigationDestination(
                 icon: Icon(Icons.directions_car_outlined, key: _garageTabKey),
-                selectedIcon: const Icon(Icons.directions_car, color: Colors.deepPurple),
+                selectedIcon: const Icon(
+                  Icons.directions_car,
+                  color: Colors.deepPurple,
+                ),
                 label: 'garage.title'.tr(),
               ),
               // Home
               NavigationDestination(
                 icon: const Icon(Icons.dashboard_outlined),
-                selectedIcon: const Icon(Icons.dashboard, color: Colors.deepPurple),
+                selectedIcon: const Icon(
+                  Icons.dashboard,
+                  color: Colors.deepPurple,
+                ),
                 label: 'home.title'.tr(),
               ),
               // Listings
               NavigationDestination(
                 icon: Icon(Icons.list_alt_outlined, key: _listingsTabKey),
-                selectedIcon: const Icon(Icons.list_alt, color: Colors.deepPurple),
+                selectedIcon: const Icon(
+                  Icons.list_alt,
+                  color: Colors.deepPurple,
+                ),
                 label: 'home.myListings'.tr(),
               ),
               // Offers
@@ -265,14 +280,20 @@ class _MainScreenState extends State<MainScreen> {
                     ? Badge(
                         label: Text('$_pendingOffersCount'),
                         backgroundColor: Colors.red,
-                        child: Icon(Icons.handshake_outlined, key: _offersTabKey),
+                        child: Icon(
+                          Icons.handshake_outlined,
+                          key: _offersTabKey,
+                        ),
                       )
                     : Icon(Icons.handshake_outlined, key: _offersTabKey),
                 selectedIcon: _pendingOffersCount > 0
                     ? Badge(
                         label: Text('$_pendingOffersCount'),
                         backgroundColor: Colors.red,
-                        child: const Icon(Icons.handshake, color: Colors.deepPurple),
+                        child: const Icon(
+                          Icons.handshake,
+                          color: Colors.deepPurple,
+                        ),
                       )
                     : const Icon(Icons.handshake, color: Colors.deepPurple),
                 label: 'offers.title'.tr(),
@@ -280,7 +301,10 @@ class _MainScreenState extends State<MainScreen> {
               // Store
               NavigationDestination(
                 icon: Icon(Icons.shopping_bag_outlined, key: _storeTabKey),
-                selectedIcon: const Icon(Icons.shopping_bag, color: Colors.deepPurple),
+                selectedIcon: const Icon(
+                  Icons.shopping_bag,
+                  color: Colors.deepPurple,
+                ),
                 label: 'store.title'.tr(),
               ),
             ],

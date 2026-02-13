@@ -1575,8 +1575,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         _offerService.acceptOffer(offer),
       );
 
-      // 📺 Reklam Göster (Zorunlu)
-      await AdService().showInterstitialAd();
+      // 📺 Her 2 satışta bir interstitial reklam göster
+      final adUser = await _authService.getCurrentUser();
+      await AdService().showInterstitialAfterSell(
+        hasNoAds: adUser?.hasNoAds ?? false,
+      );
 
       if (mounted) {
         if (xpResult != null) {
@@ -1601,8 +1604,7 @@ class _MyOffersScreenState extends State<MyOffersScreen>
               builder: (context) => LevelUpDialog(reward: xpResult.rewards!),
             );
 
-            // Dialog kapandıktan sonra reklam göster
-            await AdService().showInterstitialAd();
+            // Level up sonrası ek reklam gösterme (zaten satış reklamı gösterildi)
           }
 
           // Listeyi yenile
@@ -1722,8 +1724,11 @@ class _MyOffersScreenState extends State<MyOffersScreen>
         _offerService.acceptCounterOffer(offer),
       );
 
-      // 📺 Reklam Göster (Zorunlu)
-      await AdService().showInterstitialAd();
+      // 📺 Her 2 alımda bir interstitial reklam göster
+      final adUser = await _authService.getCurrentUser();
+      await AdService().showInterstitialAfterPurchase(
+        hasNoAds: adUser?.hasNoAds ?? false,
+      );
 
       if (mounted && result != null) {
         if (result['success'] == true) {

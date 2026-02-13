@@ -753,6 +753,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
       if (!mounted) return;
 
+      // 📺 Her 2 alımda bir interstitial reklam göster
+      await AdService().showInterstitialAfterPurchase(
+        hasNoAds: _currentUser?.hasNoAds ?? false,
+      );
+
       // Başarılı dialogu göster
       _showPurchaseSuccessDialog(_currentUser!.balance);
     } catch (e) {
@@ -2007,6 +2012,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
         // Başarı dialogunu göster
         if (mounted && _currentUser != null) {
+          // 📺 Her 2 alımda bir interstitial reklam göster
+          await AdService().showInterstitialAfterPurchase(
+            hasNoAds: _currentUser?.hasNoAds ?? false,
+          );
+
           _showPurchaseSuccessDialog(_currentUser!.balance);
         }
       } else {
@@ -2248,6 +2258,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
           // Başarı dialogunu göster
           if (mounted && _currentUser != null) {
+            // 📺 Her 2 alımda bir interstitial reklam göster
+            await AdService().showInterstitialAfterPurchase(
+              hasNoAds: _currentUser?.hasNoAds ?? false,
+            );
+
             _showPurchaseSuccessDialog(_currentUser!.balance);
           }
         }

@@ -6,12 +6,20 @@ class LeaderboardService {
   factory LeaderboardService() => _instance;
   LeaderboardService._internal();
 
+  // Service instance for leaderboard operations
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String collectionName = 'leaderboard';
 
   /// Kullanıcı skorunu Firestore'a günceller
   Future<void> updateUserScore(User user) async {
     try {
+      // Eğer kullanıcı yasaklıysa, leaderboard'dan sil ve güncelleme yapma
+      if (user.isBanned) {
+        await deleteUserScore(user.id);
+        return;
+      }
+
       // Sadece gerekli alanları gönderiyoruz
       final userData = {
         'userId': user.id,
@@ -91,6 +99,42 @@ class LeaderboardService {
       return (countQuery.count ?? 0) + 1;
     } catch (e) {
       return null;
+    }
+  }
+
+  /// Leaderboard temizliği (Yasaklı kullanıcıları kaldırır)
+  Future<int> cleanLeaderboard() async {
+    try {
+      int removedCount = 0;
+      // 1. Tüm leaderboard kayıtlarını çek
+      final snapshot = await _firestore.collection(collectionName).get();
+
+      for (var doc in snapshot.docs) {
+        final userId = doc.id;
+
+        // 2. Kullanıcının güncel durumunu kontrol et
+        final userDoc = await _firestore.collection('users').doc(userId).get();
+
+        if (!userDoc.exists) {
+          // Kullanıcı silinmişse leaderboard'dan da sil
+          await doc.reference.delete();
+          removedCount++;
+          continue;
+        }
+
+        final userData = userDoc.data();
+        final isBanned = userData?['isBanned'] as bool? ?? false;
+
+        if (isBanned) {
+          // Kullanıcı yasaklıysa leaderboard'dan sil
+          await doc.reference.delete();
+          removedCount++;
+        }
+      }
+
+      return removedCount;
+    } catch (e) {
+      return 0;
     }
   }
 }

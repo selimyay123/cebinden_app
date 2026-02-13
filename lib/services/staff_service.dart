@@ -151,6 +151,14 @@ class StaffService with WidgetsBindingObserver {
 
   // Günlük Maaşları Öde
   Future<void> processDailySalaries() async {
+    // 1. App Active Check (Extra Safe)
+    if (_simulatorTimer == null || !_simulatorTimer!.isActive) {
+      debugPrint(
+        'StaffService: Game is paused/inactive. Skipping salary payment.',
+      );
+      return;
+    }
+
     if (_myStaff.isEmpty) return;
 
     final totalWages = calculateDailyWages();
@@ -163,7 +171,17 @@ class StaffService with WidgetsBindingObserver {
     final String userId = userMap['id'];
     final double currentBalance = (userMap['balance'] as num).toDouble();
 
-    // Bakiye kontrolü yapmaksızın düş, eksiye düşebilir (Borç)
+    // 2. Balance Safeguard (Bankruptcy Protection)
+    // Eğer bakiye yetersizse ödeme yapma
+    if (currentBalance < totalWages) {
+      debugPrint(
+        'StaffService: Insufficient balance ($currentBalance < $totalWages). Skipping salary payment to prevent debt.',
+      );
+      // Opsiyonel: Kullanıcıya bildirilmesi gerekebilir ama şimdilik sessizce geçiyoruz.
+      return;
+    }
+
+    // Bakiye kontrolü yapmaksızın düş, eksiye düşebilir (Borç) -> ARTIK YAPMIYORUZ
     final newBalance = currentBalance - totalWages;
     await db.updateUser(userId, {'balance': newBalance});
 

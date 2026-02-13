@@ -910,7 +910,12 @@
     "gold_amount_hint": "Cantidad de Oro",
     "assign_gold": "Asignar Oro",
     "gold_assigned_success": "¡{amount} oro asignado a {username}!",
-    "user_not_found": "No se encontró usuario con este nombre o email."
+    "user_not_found": "No se encontró usuario con este nombre o email.",
+    "clean_leaderboard": "Limpiar Clasificación",
+    "cleanLeaderboardTitle": "Limpiar Clasificación",
+    "cleanLeaderboardMessage": "¿Estás seguro de que quieres eliminar a los usuarios baneados de la clasificación? Esto podría tomar un momento.",
+    "cleaning_started": "Limpieza iniciada...",
+    "cleaned_count": "Eliminados {count} usuarios baneados."
   },
   "report": {
     "title": "Reportar Usuario",

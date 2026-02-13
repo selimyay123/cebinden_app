@@ -916,7 +916,12 @@
     "gold_amount_hint": "Altın Miktarı",
     "assign_gold": "Altın Ata",
     "gold_assigned_success": "{username} kullanıcısına {amount} altın atandı!",
-    "user_not_found": "Bu kullanıcı adı veya e-posta ile kullanıcı bulunamadı."
+    "user_not_found": "Bu kullanıcı adı veya e-posta ile kullanıcı bulunamadı.",
+    "clean_leaderboard": "Leaderboard'u Temizle",
+    "cleanLeaderboardTitle": "Leaderboard Temizliği",
+    "cleanLeaderboardMessage": "Leaderboard'daki yasaklı kullanıcıları temizlemek istediğinize emin misiniz? Bu işlem biraz zaman alabilir.",
+    "cleaning_started": "Temizlik işlemi başladı...",
+    "cleaned_count": "{count} yasaklı kullanıcı temizlendi."
   },
   "report": {
     "title": "Kullanıcıyı Raporla",

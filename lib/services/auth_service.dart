@@ -535,6 +535,9 @@ class AuthService {
       // 2. Cloud güncelleme
       await CloudService().updateUserFields(userId, {'isBanned': true});
 
+      // 3. Leaderboard'dan sil
+      await LeaderboardService().deleteUserScore(userId);
+
       return true;
     } catch (e) {
       return false;

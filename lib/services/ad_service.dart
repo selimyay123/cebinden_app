@@ -52,7 +52,8 @@ class AdService {
 
   /// Reklam yüklenmiş mi?
   bool get isAdReady => _isAdLoaded && _rewardedAd != null;
-  bool get isInterstitialAdReady => _isInterstitialAdLoaded && _interstitialAd != null;
+  bool get isInterstitialAdReady =>
+      _isInterstitialAdLoaded && _interstitialAd != null;
 
   /// Ödüllü reklam yükle
   Future<void> loadRewardedAd() async {
@@ -75,7 +76,7 @@ class AdService {
         onAdFailedToLoad: (LoadAdError error) {
           _rewardedAd = null;
           _isAdLoaded = false;
-          
+
           // Yeniden yüklemeyi dene (exponential backoff ile)
           Future.delayed(
             Duration(seconds: _adLoadAttempts * 2),
@@ -107,7 +108,7 @@ class AdService {
         onAdFailedToLoad: (LoadAdError error) {
           _interstitialAd = null;
           _isInterstitialAdLoaded = false;
-          
+
           // Yeniden yüklemeyi dene
           Future.delayed(
             Duration(seconds: _interstitialAdLoadAttempts * 2),
@@ -121,9 +122,7 @@ class AdService {
   /// Reklam callback'lerini ayarla
   void _setupAdCallbacks() {
     _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (RewardedAd ad) {
-        
-      },
+      onAdShowedFullScreenContent: (RewardedAd ad) {},
       onAdDismissedFullScreenContent: (RewardedAd ad) {
         ad.dispose();
         _rewardedAd = null;
@@ -177,7 +176,7 @@ class AdService {
         _rewardedAd = null;
         _isAdLoaded = false;
         loadRewardedAd();
-        
+
         if (!completer.isCompleted) {
           completer.complete(rewardEarned);
         }
@@ -187,7 +186,7 @@ class AdService {
         _rewardedAd = null;
         _isAdLoaded = false;
         loadRewardedAd();
-        
+
         if (!completer.isCompleted) {
           completer.complete(false);
         }
@@ -206,28 +205,52 @@ class AdService {
   }
 
   int _saleCount = 0;
+  int _purchaseCount = 0;
+  int _sellCount = 0;
 
-  /// Geçiş reklamı göster
-  Future<void> showInterstitialAd({bool force = false, bool hasNoAds = false}) async {
+  /// Araç satın alma sonrası interstitial reklam göster (her 2 alımda 1)
+  Future<void> showInterstitialAfterPurchase({bool hasNoAds = false}) async {
+    if (hasNoAds) return;
+    _purchaseCount++;
+    if (_purchaseCount % 2 != 0) return;
+    await _showInterstitial();
+  }
+
+  /// Araç satış sonrası interstitial reklam göster (her 2 satışta 1)
+  Future<void> showInterstitialAfterSell({bool hasNoAds = false}) async {
+    if (hasNoAds) return;
+    _sellCount++;
+    if (_sellCount % 2 != 0) return;
+    await _showInterstitial();
+  }
+
+  /// Dahili: Interstitial reklamı göster
+  Future<void> _showInterstitial() async {
+    if (!isInterstitialAdReady) {
+      loadInterstitialAd();
+      return;
+    }
+    _interstitialAd?.show();
+  }
+
+  /// Geçiş reklamı göster (genel amaçlı, mevcut kullanımlar için)
+  Future<void> showInterstitialAd({
+    bool force = false,
+    bool hasNoAds = false,
+  }) async {
     // Eğer kullanıcının reklamları kaldırma özelliği varsa reklam gösterme
     if (hasNoAds) return;
 
     if (!force) {
       _saleCount++;
-      
+
       // Sadece her 3. satışta reklam göster
       if (_saleCount % 3 != 0) {
         return;
       }
     }
 
-    if (!isInterstitialAdReady) {
-      // Reklam hazır değilse yüklemeyi dene
-      loadInterstitialAd();
-      return;
-    }
-
-    _interstitialAd?.show();
+    await _showInterstitial();
   }
 
   /// Servisi temizle
@@ -235,10 +258,9 @@ class AdService {
     _rewardedAd?.dispose();
     _rewardedAd = null;
     _isAdLoaded = false;
-    
+
     _interstitialAd?.dispose();
     _interstitialAd = null;
     _isInterstitialAdLoaded = false;
   }
 }
-

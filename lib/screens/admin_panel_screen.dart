@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/database_helper.dart';
 import 'package:intl/intl.dart';
 import '../services/localization_service.dart';
+import '../services/leaderboard_service.dart';
 
 class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({super.key});
@@ -374,12 +375,87 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                     ),
             ),
           ),
+          const SizedBox(height: 32),
+
+          // Clean Leaderboard Button
+          Center(
+            child: TextButton.icon(
+              onPressed: _cleanLeaderboard,
+              icon: const Icon(
+                Icons.cleaning_services_rounded,
+                color: Colors.white54,
+              ),
+              label: Text(
+                'admin.clean_leaderboard'.tr(),
+                style: GoogleFonts.poppins(color: Colors.white54),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   // ─── Actions ───────────────────────────────────────────────────────
+
+  Future<void> _cleanLeaderboard() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: Text(
+          'admin.cleanLeaderboardTitle'.tr(),
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          'admin.cleanLeaderboardMessage'.tr(),
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'common.cancel'.tr(),
+              style: const TextStyle(color: Colors.white54),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(
+              'common.approve'.tr(),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 2),
+          content: Text('admin.cleaning_started'.tr()),
+          backgroundColor: Colors.orange,
+        ),
+      );
+
+      final removedCount = await LeaderboardService().cleanLeaderboard();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 3),
+          content: Text(
+            'admin.cleaned_count'.trParams({'count': '$removedCount'}),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
 
   Future<void> _assignGold() async {
     final username = _emailController.text.trim();

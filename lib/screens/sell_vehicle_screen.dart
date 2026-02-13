@@ -6,6 +6,7 @@ import '../models/user_vehicle_model.dart';
 import '../services/database_helper.dart';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
+import '../services/ad_service.dart';
 import 'create_listing_screen.dart';
 import '../utils/vehicle_utils.dart';
 import '../services/skill_service.dart';
@@ -612,6 +613,11 @@ class _SellVehicleScreenState extends State<SellVehicleScreen> {
       if (updatedUser != null) {
         setState(() => _currentUser = updatedUser);
       }
+
+      // 📺 Her 2 satışta bir interstitial reklam göster
+      await AdService().showInterstitialAfterSell(
+        hasNoAds: _currentUser?.hasNoAds ?? false,
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

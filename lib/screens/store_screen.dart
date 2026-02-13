@@ -158,90 +158,113 @@ class _StoreScreenState extends State<StoreScreen> {
               elevation: 0,
             ),
             body: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/general_bg.png'),
-                  fit: BoxFit.cover,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.deepPurple.shade700,
+                    Colors.deepPurple.shade900,
+                  ],
                 ),
               ),
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _currentUser == null
-                  ? Center(child: Text('common.userNotFound'.tr()))
-                  : RefreshIndicator(
-                      onRefresh: _loadCurrentUser,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(16),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 600),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Bakiye Kartı
-                                _buildBalanceCard(),
-                                const SizedBox(height: 24),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment.topCenter,
+                    radius: 1.2,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.15),
+                      Colors.white.withValues(alpha: 0.05),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.3, 1.0],
+                  ),
+                ),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _currentUser == null
+                    ? Center(child: Text('common.userNotFound'.tr()))
+                    : RefreshIndicator(
+                        onRefresh: _loadCurrentUser,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 600),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Bakiye Kartı
+                                  _buildBalanceCard(),
+                                  const SizedBox(height: 24),
 
-                                // Altın Satın Alma Paketleri
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _buildSectionTitle('store.buyGold'.tr()),
-                                    const SizedBox(height: 4),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 16),
-                                      child: Text(
-                                        '1 ${'store.gold'.tr()} = 1.000.000 ${'store.gameCurrency'.tr()}',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500,
+                                  // Altın Satın Alma Paketleri
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildSectionTitle('store.buyGold'.tr()),
+                                      const SizedBox(height: 4),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 16,
+                                        ),
+                                        child: Text(
+                                          '1 ${'store.gold'.tr()} = 1.000.000 ${'store.gameCurrency'.tr()}',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.7,
+                                            ),
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                _buildGoldPackages(),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildGoldPackages(),
 
-                                const SizedBox(height: 32),
+                                  const SizedBox(height: 32),
 
-                                // Garaj Genişletme (Yükseltmeler)
-                                _buildSectionTitle(
-                                  'store.garageExpansion'.tr(),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildGalleryPurchaseCard(),
-                                const SizedBox(height: 12),
-                                _buildGarageExpansionCard(),
-                                const SizedBox(height: 12),
-                                _buildUnlimitedExpertiseCard(),
-                                const SizedBox(height: 12),
-                                _buildXpBoostCard(),
-                                const SizedBox(height: 12),
-                                _buildRemoveAdsCard(),
-                                const SizedBox(height: 12),
+                                  // Garaj Genişletme (Yükseltmeler)
+                                  _buildSectionTitle(
+                                    'store.garageExpansion'.tr(),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildGalleryPurchaseCard(),
+                                  const SizedBox(height: 12),
+                                  _buildGarageExpansionCard(),
+                                  const SizedBox(height: 12),
+                                  _buildUnlimitedExpertiseCard(),
+                                  const SizedBox(height: 12),
+                                  _buildXpBoostCard(),
+                                  const SizedBox(height: 12),
+                                  _buildRemoveAdsCard(),
+                                  const SizedBox(height: 12),
 
-                                const SizedBox(height: 32),
+                                  const SizedBox(height: 32),
 
-                                // Animasyonlu Profil Resimleri
-                                _buildSectionTitle(
-                                  'store.animatedPP.title'.tr(),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildAnimatedPPSection(),
-                                const SizedBox(height: 12),
+                                  // Animasyonlu Profil Resimleri
+                                  _buildSectionTitle(
+                                    'store.animatedPP.title'.tr(),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildAnimatedPPSection(),
+                                  const SizedBox(height: 12),
 
-                                const SizedBox(height: 20),
-                                _buildVipPassCard(),
-                                const SizedBox(height: 32),
-                              ],
+                                  const SizedBox(height: 20),
+                                  _buildVipPassCard(),
+                                  const SizedBox(height: 32),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+              ),
             ),
           ),
         );
@@ -467,19 +490,12 @@ class _StoreScreenState extends State<StoreScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.amber.shade700, Colors.amber.shade500],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.amber.withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
@@ -838,7 +854,7 @@ class _StoreScreenState extends State<StoreScreen> {
           width: 4,
           height: 24,
           decoration: BoxDecoration(
-            color: Colors.deepPurple,
+            color: Colors.amber.shade500,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -848,7 +864,7 @@ class _StoreScreenState extends State<StoreScreen> {
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Colors.white,
           ),
         ),
       ],
@@ -949,15 +965,22 @@ class _StoreScreenState extends State<StoreScreen> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: Material(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
-                    elevation: 2,
                     child: InkWell(
                       onTap: () =>
                           _showPurchaseDialog(product, goldAmount, bonus),
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
                         child: Row(
                           children: [
                             // İkon
@@ -986,6 +1009,7 @@ class _StoreScreenState extends State<StoreScreen> {
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -993,7 +1017,9 @@ class _StoreScreenState extends State<StoreScreen> {
                                     _formatCurrency(goldAmount * 1000000.0),
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.grey[600],
+                                      color: Colors.white.withValues(
+                                        alpha: 0.6,
+                                      ),
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -1001,13 +1027,35 @@ class _StoreScreenState extends State<StoreScreen> {
                               ),
                             ),
 
-                            // Fiyat
-                            Text(
-                              _formatProductPrice(product),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.deepPurple,
+                            // Fiyat badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.amber.shade600,
+                                    Colors.amber.shade400,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.amber.withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                _formatProductPrice(product),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
@@ -1578,12 +1626,12 @@ class _StoreScreenState extends State<StoreScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.2),
+                    color: Colors.deepPurple.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
                     Icons.currency_exchange,
-                    color: Colors.amber,
+                    color: Colors.deepPurple,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1701,10 +1749,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber.withValues(
-                                  alpha: 0.2,
+                                backgroundColor: Colors.deepPurple.withValues(
+                                  alpha: 0.15,
                                 ),
-                                foregroundColor: Colors.amber[900],
+                                foregroundColor: Colors.deepPurple,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -1730,10 +1778,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber.withValues(
-                                  alpha: 0.2,
+                                backgroundColor: Colors.deepPurple.withValues(
+                                  alpha: 0.15,
                                 ),
-                                foregroundColor: Colors.amber[900],
+                                foregroundColor: Colors.deepPurple,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -1763,10 +1811,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber.withValues(
-                                  alpha: 0.2,
+                                backgroundColor: Colors.deepPurple.withValues(
+                                  alpha: 0.15,
                                 ),
-                                foregroundColor: Colors.amber[900],
+                                foregroundColor: Colors.deepPurple,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -1792,10 +1840,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.amber.withValues(
-                                  alpha: 0.2,
+                                backgroundColor: Colors.deepPurple.withValues(
+                                  alpha: 0.15,
                                 ),
-                                foregroundColor: Colors.amber[900],
+                                foregroundColor: Colors.deepPurple,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -1820,9 +1868,11 @@ class _StoreScreenState extends State<StoreScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      color: Colors.deepPurple.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(
+                        color: Colors.deepPurple.withValues(alpha: 0.15),
+                      ),
                     ),
                     child: Column(
                       children: [
@@ -1856,7 +1906,7 @@ class _StoreScreenState extends State<StoreScreen> {
                             Text(
                               '${_formatCurrency(selectedGold * 1000000)} TL',
                               style: const TextStyle(
-                                color: Colors.green,
+                                color: Colors.deepPurple,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
                               ),
@@ -1995,7 +2045,7 @@ class _StoreScreenState extends State<StoreScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
