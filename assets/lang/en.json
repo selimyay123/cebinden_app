@@ -1862,10 +1862,11 @@
     "removeAdsDesc": "Permanently removes mandatory ads.",
     "removeAdsDialogDesc": "Do you want to permanently remove all mandatory ads (after sales and level up)?",
     "removeAdsSuccess": "Ads Removed!",
+    "galleryTitle": "Gallery",
     "removeAdsSuccessDesc": "You will no longer see mandatory ads. Enjoy the game!",
     "vipPass": {
       "title": "VIP PASS",
-      "desc": "Get everything at once! Gallery + Unlimited Expertise + No Ads + 24h XP Boost + MEMEWE",
+      "desc": "Get everything at once!",
       "dialogDesc": "Do you want to buy VIP PASS for 5 Gold? \n\nIncludes:\n• Gallery\n• Unlimited Expertise\n• No Ads\n• 24h XP Boost\n• MEMEWE Special Profile Picture",
       "success": "VIP PASS Activated!",
       "successDesc": "You have all the privileges now! Enjoy the game."
@@ -1913,6 +1914,10 @@
     "maxAmount": "Maximum amount",
     "garageExpansion": "Upgrades",
     "garageCapacity": "Garage Capacity",
+    "garageCapacityDesc": "Add +1 vehicle slot to your garage.",
+    "buyGalleryDesc": "Open your own gallery, rent vehicles & more.",
+    "unlimitedExpertiseDesc": "Inspect all vehicles for free.",
+    "xpBoostDesc": "Earn 2x XP for 24 hours.",
     "currentLimit": "Current Limit: {limit} Vehicles",
     "plusOneSlot": "+1 Slot",
     "expandGarageTitle": "Expand Garage",
@@ -1939,7 +1944,7 @@
         "CoolEmoji": "Cool Guy",
         "PepeMusic": "DJ Pepe",
         "NyanCat": "Nyan Cat",
-        "VK": "Rocket Launch"
+        "RotatingWheel": "Spinning Wheel"
       }
     }
   },

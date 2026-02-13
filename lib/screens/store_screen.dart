@@ -228,6 +228,8 @@ class _StoreScreenState extends State<StoreScreen> {
                                   _buildGoldPackages(),
 
                                   const SizedBox(height: 32),
+                                  _buildVipPassCard(),
+                                  const SizedBox(height: 32),
 
                                   // Garaj Genişletme (Yükseltmeler)
                                   _buildSectionTitle(
@@ -256,8 +258,6 @@ class _StoreScreenState extends State<StoreScreen> {
                                   const SizedBox(height: 12),
 
                                   const SizedBox(height: 20),
-                                  _buildVipPassCard(),
-                                  const SizedBox(height: 32),
                                 ],
                               ),
                             ),
@@ -272,30 +272,39 @@ class _StoreScreenState extends State<StoreScreen> {
     );
   }
 
-  Widget _buildGalleryPurchaseCard() {
-    final isOwned = _currentUser!.ownsGallery;
+  Widget _buildUpgradeCard({
+    required String title,
+    required String description,
+    required bool isOwned,
+    required VoidCallback onTap,
+    required int price,
+    String? activeText,
+  }) {
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
+      constraints: const BoxConstraints(minHeight: 90),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.withValues(alpha: 0.9),
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Lottie.asset(
-              'assets/animations/level_up.json',
-              width: 70,
-              height: 70,
-              fit: BoxFit.contain,
+            width: 44,
+            height: 44,
+            margin: const EdgeInsets.only(left: 16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.rocket_launch_outlined,
+              color: Colors.white,
+              size: 24,
             ),
           ),
           const SizedBox(width: 16),
@@ -304,13 +313,33 @@ class _StoreScreenState extends State<StoreScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'home.buyGallery'.tr(),
+                  title,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
+                const SizedBox(height: 3),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                if (activeText != null) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    activeText,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.greenAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -318,14 +347,22 @@ class _StoreScreenState extends State<StoreScreen> {
               ? Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.2),
+                    gradient: LinearGradient(
+                      colors: [Colors.amber.shade600, Colors.amber.shade400],
+                    ),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.green, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: const Icon(Icons.check, color: Colors.green, size: 24),
+                  child: const Icon(Icons.check, color: Colors.white, size: 20),
                 )
               : ElevatedButton(
-                  onPressed: () => _showBuyGalleryDialog(),
+                  onPressed: onTap,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
                     foregroundColor: Colors.white,
@@ -340,9 +377,9 @@ class _StoreScreenState extends State<StoreScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        '5',
-                        style: TextStyle(
+                      Text(
+                        '$price',
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -358,6 +395,17 @@ class _StoreScreenState extends State<StoreScreen> {
                 ),
         ],
       ),
+    );
+  }
+
+  Widget _buildGalleryPurchaseCard() {
+    final isOwned = _currentUser!.ownsGallery;
+    return _buildUpgradeCard(
+      title: 'home.buyGallery'.tr(),
+      description: 'store.buyGalleryDesc'.tr(),
+      isOwned: isOwned,
+      onTap: () => _showBuyGalleryDialog(),
+      price: 5,
     );
   }
 
@@ -600,172 +648,23 @@ class _StoreScreenState extends State<StoreScreen> {
   }
 
   Widget _buildGarageExpansionCard() {
-    return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
-      decoration: BoxDecoration(
-        color: Colors.deepPurple.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-            ), // Reduced padding for animation
-            child: Lottie.asset(
-              'assets/animations/level_up.json',
-              width: 70,
-              height: 70,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'store.garageCapacity'.tr(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => _showExpandGarageDialog(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white.withValues(alpha: 0.2),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  '1',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Lottie.asset(
-                  'assets/animations/gold.json',
-                  width: 30,
-                  height: 30,
-                  fit: BoxFit.contain,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return _buildUpgradeCard(
+      title: 'store.garageCapacity'.tr(),
+      description: 'store.garageCapacityDesc'.tr(),
+      isOwned: false,
+      onTap: () => _showExpandGarageDialog(),
+      price: 1,
     );
   }
 
   Widget _buildRemoveAdsCard() {
     final isOwned = _currentUser!.hasNoAds;
-    return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
-      decoration: BoxDecoration(
-        color: Colors.deepPurple.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Lottie.asset(
-              'assets/animations/level_up.json', // Using level_up as generic upgrade animation
-              width: 70,
-              height: 70,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'store.removeAds'.tr(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                // Text(
-                //   'store.removeAdsDesc'.tr(),
-                //   style: TextStyle(
-                //     fontSize: 12,
-                //     color: Colors.white.withValues(alpha: 0.8),
-                //   ),
-                // ),
-              ],
-            ),
-          ),
-          isOwned
-              ? Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.green, width: 2),
-                  ),
-                  child: const Icon(Icons.check, color: Colors.green, size: 24),
-                )
-              : ElevatedButton(
-                  onPressed: () => _showRemoveAdsDialog(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '5',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Lottie.asset(
-                        'assets/animations/gold.json',
-                        width: 30,
-                        height: 30,
-                        fit: BoxFit.contain,
-                      ),
-                    ],
-                  ),
-                ),
-        ],
-      ),
+    return _buildUpgradeCard(
+      title: 'store.removeAds'.tr(),
+      description: 'store.removeAdsDesc'.tr(),
+      isOwned: isOwned,
+      onTap: () => _showRemoveAdsDialog(),
+      price: 5,
     );
   }
 
@@ -1254,90 +1153,12 @@ class _StoreScreenState extends State<StoreScreen> {
 
   Widget _buildUnlimitedExpertiseCard() {
     final isOwned = _currentUser!.hasUnlimitedExpertise;
-    return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
-      decoration: BoxDecoration(
-        color: Colors.deepPurple.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Lottie.asset(
-              'assets/animations/level_up.json',
-              width: 70,
-              height: 70,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'skills.unlimitedExpertiseTitle'.tr(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          isOwned
-              ? Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.green, width: 2),
-                  ),
-                  child: const Icon(Icons.check, color: Colors.green, size: 24),
-                )
-              : ElevatedButton(
-                  onPressed: () => _showBuyUnlimitedExpertiseDialog(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '1',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Lottie.asset(
-                        'assets/animations/gold.json',
-                        width: 30,
-                        height: 30,
-                        fit: BoxFit.contain,
-                      ),
-                    ],
-                  ),
-                ),
-        ],
-      ),
+    return _buildUpgradeCard(
+      title: 'skills.unlimitedExpertiseTitle'.tr(),
+      description: 'store.unlimitedExpertiseDesc'.tr(),
+      isOwned: isOwned,
+      onTap: () => _showBuyUnlimitedExpertiseDialog(),
+      price: 1,
     );
   }
 
@@ -1425,99 +1246,15 @@ class _StoreScreenState extends State<StoreScreen> {
         _currentUser!.xpBoostEndTime != null &&
         _currentUser!.xpBoostEndTime!.isAfter(now);
 
-    return Container(
-      padding: const EdgeInsets.only(top: 8, bottom: 8, left: 0, right: 24),
-      decoration: BoxDecoration(
-        color: Colors.deepPurple.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Lottie.asset(
-              'assets/animations/level_up.json',
-              width: 70,
-              height: 70,
-              fit: BoxFit.contain,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'skills.xpBoostTitle'.tr(),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                if (isActive)
-                  Text(
-                    '${'common.active'.tr()} (${_currentUser!.xpBoostEndTime!.difference(now).inHours}s)',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.greenAccent,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          isActive
-              ? Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.green, width: 2),
-                  ),
-                  child: const Icon(Icons.check, color: Colors.green, size: 24),
-                )
-              : ElevatedButton(
-                  onPressed: () => _showBuyXpBoostDialog(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '1',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Lottie.asset(
-                        'assets/animations/gold.json',
-                        width: 30,
-                        height: 30,
-                        fit: BoxFit.contain,
-                      ),
-                    ],
-                  ),
-                ),
-        ],
-      ),
+    return _buildUpgradeCard(
+      title: 'skills.xpBoostTitle'.tr(),
+      description: 'store.xpBoostDesc'.tr(),
+      isOwned: isActive,
+      onTap: () => _showBuyXpBoostDialog(),
+      price: 1,
+      activeText: isActive
+          ? '${'common.active'.tr()} (${_currentUser!.xpBoostEndTime!.difference(now).inHours}s)'
+          : null,
     );
   }
 
@@ -2115,9 +1852,10 @@ class _StoreScreenState extends State<StoreScreen> {
               const SizedBox(height: 8),
               const SizedBox(height: 8),
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 8,
+                  vertical: 12,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.deepPurpleAccent.withValues(alpha: 0.5),
@@ -2126,25 +1864,22 @@ class _StoreScreenState extends State<StoreScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'store.vipPass.title'.tr(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
                       'store.vipPass.desc'.tr(),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    // Upgrade List
+                    _buildVipPassItem('store.galleryTitle'.tr()),
+                    _buildVipPassItem('skills.unlimitedExpertiseTitle'.tr()),
+                    _buildVipPassItem('store.removeAds'.tr()),
+                    _buildVipPassItem('skills.xpBoostTitle'.tr()),
+                    _buildVipPassItem('store.animatedPP.names.MEMEWE'.tr()),
                   ],
                 ),
               ),
@@ -2216,6 +1951,27 @@ class _StoreScreenState extends State<StoreScreen> {
                 ],
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVipPassItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.check_circle, color: Colors.amber, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -2358,9 +2114,9 @@ class _StoreScreenState extends State<StoreScreen> {
   Widget _buildAnimatedPPSection() {
     final animations = [
       {
-        'name': 'VK',
-        'key': 'store.animatedPP.names.VK',
-        'path': 'assets/animations/vk.json',
+        'name': 'Rotating Wheel',
+        'key': 'store.animatedPP.names.RotatingWheel',
+        'path': 'assets/animations/wheel.json',
       },
       {
         'name': 'Money',
@@ -2409,15 +2165,12 @@ class _StoreScreenState extends State<StoreScreen> {
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.deepPurple.withValues(alpha: 0.9),
+            color: Colors.white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.2),
+              width: 1,
+            ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

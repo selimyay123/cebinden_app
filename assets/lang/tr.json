@@ -1862,10 +1862,11 @@
     "removeAdsDesc": "Zorunlu reklamları kalıcı olarak kaldırır.",
     "removeAdsDialogDesc": "Oyundaki tüm zorunlu reklamları (satış sonrası ve seviye atlama) kalıcı olarak kaldırmak istiyor musunuz?",
     "removeAdsSuccess": "Reklamlar Kaldırıldı!",
+    "galleryTitle": "Galeri",
     "removeAdsSuccessDesc": "Artık zorunlu reklamlarla karşılaşmayacaksınız. İyi oyunlar!",
     "vipPass": {
       "title": "VIP PASS",
-      "desc": "Her şeye tek seferde sahip ol! Galeri + Sınırsız Ekspertiz + Reklamsız + 24s XP Boost + MEMEWE",
+      "desc": "Her şeye tek seferde sahip ol!",
       "dialogDesc": "5 Altın karşılığında VIP PASS satın almak istiyor musunuz? \n\nİçerik:\n• Galeri\n• Sınırsız Ekspertiz\n• Reklamsız Deneyim\n• 24 Saat XP Boost\n• MEMEWE Özel Profil Resmi",
       "success": "VIP PASS Aktif!",
       "successDesc": "Tüm ayrıcalıklara sahipsiniz! İyi oyunlar."
@@ -1913,6 +1914,10 @@
     "maxAmount": "Maksimum miktar",
     "garageExpansion": "Yükseltmeler",
     "garageCapacity": "Garaj Kapasitesi",
+    "garageCapacityDesc": "Garajına +1 araç kapasitesi ekle.",
+    "buyGalleryDesc": "Kendi galerini aç, araç kirala ve daha fazlası.",
+    "unlimitedExpertiseDesc": "Tüm araçları ücretsiz ekspertiz et.",
+    "xpBoostDesc": "24 saat boyunca 2x XP kazan.",
     "currentLimit": "Mevcut Limit: {limit} Araç",
     "plusOneSlot": "+1 Slot",
     "expandGarageTitle": "Garajı Genişlet",
@@ -1933,13 +1938,13 @@
       "purchaseSuccess": "Animasyon başarıyla satın alındı!",
       "activationSuccess": "Profil resminiz güncellendi!",
       "names": {
-        "MEMEWE": "MEMEWE",
+        "MEMEWE": "MEMEWE Profil Resmi",
         "Money": "Zengin Yüz",
         "PEPE": "Havalı Pepe",
         "CoolEmoji": "Havalı Tip",
         "PepeMusic": "DJ Pepe",
         "NyanCat": "Nyan Kedisi",
-        "VK": "Roket Kalkışı"
+        "RotatingWheel": "Dönen Jant"
       }
     }
   },

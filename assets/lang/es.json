@@ -1781,10 +1781,11 @@
     "removeAdsDesc": "Elimina permanentemente los anuncios obligatorios.",
     "removeAdsDialogDesc": "¿Quieres eliminar permanentemente todos los anuncios obligatorios (después de ventas y subida de nivel)?",
     "removeAdsSuccess": "¡Anuncios Eliminados!",
+    "galleryTitle": "Galería",
     "removeAdsSuccessDesc": "Ya no verás anuncios obligatorios. ¡Disfruta el juego!",
     "vipPass": {
       "title": "PASE VIP",
-      "desc": "¡Obtén todo de una vez! Galería + Peritaje Ilimitado + Sin Anuncios + Impulso de XP 24h + MEMEWE",
+      "desc": "¡Obtén todo de una vez!",
       "dialogDesc": "¿Quieres comprar el PASE VIP por 5 Oro? \n\nIncluye:\n• Galería\n• Peritaje Ilimitado\n• Sin Anuncios\n• Impulso de XP 24h\n• Foto de Perfil Especial MEMEWE",
       "success": "¡PASE VIP Activado!",
       "successDesc": "¡Tienes todos los privilegios ahora! Disfruta el juego."
@@ -1832,6 +1833,10 @@
     "maxAmount": "Cantidad máxima",
     "garageExpansion": "Mejoras",
     "garageCapacity": "Capacidad del Garaje",
+    "garageCapacityDesc": "Añade +1 espacio de vehículo a tu garaje.",
+    "buyGalleryDesc": "Abre tu propia galería, alquila vehículos y más.",
+    "unlimitedExpertiseDesc": "Inspecciona todos los vehículos gratis.",
+    "xpBoostDesc": "Gana 2x XP durante 24 horas.",
     "currentLimit": "Límite Actual: {limit} Vehículos",
     "plusOneSlot": "+1 Espacio",
     "expandGarageTitle": "Expandir Garaje",
@@ -1858,7 +1863,7 @@
         "CoolEmoji": "Chico Genial",
         "PepeMusic": "DJ Pepe",
         "NyanCat": "Gato Nyan",
-        "VK": "Lanzamiento de Cohete"
+        "RotatingWheel": "Rueda Giratoria"
       }
     }
   },
